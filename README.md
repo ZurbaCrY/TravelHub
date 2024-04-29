@@ -1,11 +1,11 @@
 # Pb2-Challenge-3
 
-##  React Native
-Initialize:
+## Init React Native
+``npm install -g expo-cli`` <br>
 ``npm init``
 
-Start App:
-``npm start``
-
-Open on Android:
+## Start
+Start App: 
+``npm start`` <br>
+Open on Android: 
 ``a``
