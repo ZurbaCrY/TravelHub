@@ -37,7 +37,7 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#BFD7EA',
   },
   buttonContainer: {
     flexDirection: 'row',
@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
     width: '100%',
     position: 'absolute',
     bottom: 0,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: '#0B3954',
     paddingVertical: 10,
   },
   pageContainer: {
