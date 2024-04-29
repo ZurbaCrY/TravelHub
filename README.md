@@ -1,10 +1,11 @@
 # Pb2-Challenge-3
 
 ##  React Native
-npm init
+Initialize:
+``npm init``
 
 Start App:
-npm start
+``npm start``
 
 Open on Android:
-a
+``a``
