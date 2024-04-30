@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, Button } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { FontAwesome5 } from '@expo/vector-icons';
 
 export default function App() {
-  const [currentPage, setCurrentPage] = useState('Home');
+  const [currentPage, setCurrentPage] = useState('Map');
 
   const renderPage = () => {
     switch (currentPage) {
@@ -20,14 +21,28 @@ export default function App() {
     }
   };
 
+  const renderTab = (tabName, iconName) => {
+    const isActive = currentPage === tabName;
+    return (
+      <TouchableOpacity
+        key={tabName}
+        style={[styles.tab, isActive && styles.activeTab]}
+        onPress={() => setCurrentPage(tabName)}
+      >
+        <FontAwesome5 name={iconName} size={24} color={isActive ? '#FFFFFF' : '#9BA3A6'} />
+        <Text style={[styles.tabText, isActive && styles.activeTabText]}>{tabName}</Text>
+      </TouchableOpacity>
+    );
+  };
+
   return (
     <View style={styles.container}>
       {renderPage()}
-      <View style={styles.buttonContainer}>
-        <Button title="Map" onPress={() => setCurrentPage('Map')} />
-        <Button title="Community" onPress={() => setCurrentPage('Community')} />
-        <Button title="Profile" onPress={() => setCurrentPage('Profile')} />
-        <Button title="Settings" onPress={() => setCurrentPage('Settings')} />
+      <View style={styles.tabBar}>
+        {renderTab('Map', 'map-marker-alt')}
+        {renderTab('Community', 'users')}
+        {renderTab('Profile', 'user')}
+        {renderTab('Settings', 'cog')}
       </View>
       <StatusBar style="auto" />
     </View>
@@ -39,7 +54,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#BFD7EA',
   },
-  buttonContainer: {
+  pageContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  tabBar: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     width: '100%',
@@ -48,9 +68,18 @@ const styles = StyleSheet.create({
     backgroundColor: '#0B3954',
     paddingVertical: 10,
   },
-  pageContainer: {
-    flex: 1,
+  tab: {
     alignItems: 'center',
-    justifyContent: 'center',
+  },
+  activeTab: {
+    borderBottomWidth: 2,
+    borderColor: '#FFFFFF',
+  },
+  tabText: {
+    color: '#9BA3A6',
+    marginTop: 2,
+  },
+  activeTabText: {
+    color: '#FFFFFF',
   },
 });
