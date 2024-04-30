@@ -1,88 +1,67 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
+import { Animated, Easing } from 'react-native'; // Importiere Animated und Easing
+
+import MapScreen from './pages/Maps';
+import CommunityScreen from './pages/Community';
+import ProfileScreen from './pages/Profile';
+import SettingsScreen from './pages/Settings';
+import HomeScreen from './pages/Home';
+
+const Tab = createBottomTabNavigator();
 
 export default function App() {
-  const [currentPage, setCurrentPage] = useState('Map');
-
-  const renderPage = () => {
-    switch (currentPage) {
-      case 'Map':
-        return <View style={styles.pageContainer}><Text>Map Page</Text></View>;
-      case 'Community':
-        return <View style={styles.pageContainer}><Text>Community Page</Text></View>;
-      case 'Profile':
-        return <View style={styles.pageContainer}><Text>Profile Page</Text></View>;
-      case 'Settings':
-        return <View style={styles.pageContainer}><Text>Settings Page</Text></View>;
-      case 'Home':
-        return <View style={styles.pageContainer}><Text>Home Page</Text></View>;
-      default:
-        return null;
-    }
-  };
-
-  const renderTab = (tabName, iconName) => {
-    const isActive = currentPage === tabName;
-    return (
-      <TouchableOpacity
-        key={tabName}
-        style={[styles.tab, isActive && styles.activeTab]}
-        onPress={() => setCurrentPage(tabName)}
-      >
-        <FontAwesome5 name={iconName} size={24} color={isActive ? '#FFFFFF' : '#9BA3A6'} />
-        <Text style={[styles.tabText, isActive && styles.activeTabText]}>{tabName}</Text>
-      </TouchableOpacity>
-    );
-  };
-
   return (
-    <View style={styles.container}>
-      {renderPage()}
-      <View style={styles.tabBar}>
-        {renderTab('Home', 'home')}
-        {renderTab('Community', 'users')}
-        {renderTab('Map', 'map-marker-alt')}
-        {renderTab('Profile', 'user')}
-        {renderTab('Settings', 'cog')}
-      </View>
+    <NavigationContainer>
+      <Tab.Navigator
+        screenOptions={({ route }) => ({
+          activeTintColor: 'blue', // Farbe für aktiven Tab
+          inactiveTintColor: 'gray', // Farbe für inaktiven Tab
+          tabBarIcon: ({ focused, color, size }) => {
+            let iconName;
+
+            if (route.name === 'Home') {
+              iconName = 'home';
+            } else if (route.name === 'Community') {
+              iconName = 'users';
+            } else if (route.name === 'Map') {
+              iconName = 'map-marker-alt';
+            } else if (route.name === 'Profile') {
+              iconName = 'user';
+            } else if (route.name === 'Settings') {
+              iconName = 'cog';
+            }
+
+            // Erstelle eine animierte Komponente
+            return (
+              <Animated.View
+                style={{
+                  transform: [
+                    // Füge eine Animation hinzu, wenn der Tab ausgewählt ist
+                    {
+                      scale: focused
+                        ? new Animated.Value(1.2)
+                        : new Animated.Value(1),
+                    },
+                  ],
+                }}
+              >
+                <FontAwesome5 name={iconName} size={24} color={color} />
+              </Animated.View>
+            );
+          },
+        })}
+      >
+        <Tab.Screen name="Home" component={HomeScreen} />
+        <Tab.Screen name="Community" component={CommunityScreen} />
+        <Tab.Screen name="Map" component={MapScreen} />
+        <Tab.Screen name="Profile" component={ProfileScreen} />
+        <Tab.Screen name="Settings" component={SettingsScreen} />
+      </Tab.Navigator>
       <StatusBar style="auto" />
-    </View>
+    </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#BFD7EA',
-  },
-  pageContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  tabBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    width: '100%',
-    position: 'absolute',
-    bottom: 0,
-    backgroundColor: '#0B3954',
-    paddingVertical: 10,
-  },
-  tab: {
-    alignItems: 'center',
-  },
-  activeTab: {
-    borderBottomWidth: 2,
-    borderColor: '#FFFFFF',
-  },
-  tabText: {
-    color: '#9BA3A6',
-    marginTop: 2,
-  },
-  activeTabText: {
-    color: '#FFFFFF',
-  },
-});
