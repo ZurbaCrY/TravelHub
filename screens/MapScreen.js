@@ -81,7 +81,7 @@ export default function MapScreen() {
           {continentsData.map(continent =>
             continent.countries.map(country =>
               country.cities.map(city =>
-                city.coordinates && (
+                city.coordinates && city.locked && (
                   <Polygon
                     key={`${continent.name}-${country.name}-${city.name}`}
                     coordinates={city.coordinates}
