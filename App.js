@@ -18,7 +18,7 @@ export default function App() {
     <NavigationContainer>
       <Tab.Navigator
         screenOptions={({ route }) => ({
-          activeTintColor: 'blue', // Farbe für aktiven Tab
+          activeTintColor: '#3EAAE9', // Farbe für aktiven Tab
           inactiveTintColor: 'gray', // Farbe für inaktiven Tab
           tabBarIcon: ({ focused, color, size }) => {
             let iconName;
