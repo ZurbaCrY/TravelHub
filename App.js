@@ -16,8 +16,10 @@ export default function App() {
         return <View style={styles.pageContainer}><Text>Profile Page</Text></View>;
       case 'Settings':
         return <View style={styles.pageContainer}><Text>Settings Page</Text></View>;
-      default:
+      case 'Home':
         return <View style={styles.pageContainer}><Text>Home Page</Text></View>;
+      default:
+        return null;
     }
   };
 
@@ -39,8 +41,9 @@ export default function App() {
     <View style={styles.container}>
       {renderPage()}
       <View style={styles.tabBar}>
-        {renderTab('Map', 'map-marker-alt')}
+        {renderTab('Home', 'home')}
         {renderTab('Community', 'users')}
+        {renderTab('Map', 'map-marker-alt')}
         {renderTab('Profile', 'user')}
         {renderTab('Settings', 'cog')}
       </View>
