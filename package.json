@@ -25,5 +25,16 @@
   "devDependencies": {
     "@babel/core": "^7.20.0"
   },
-  "private": true
+  "private": true,
+  "description": "Das ist ein cooles Projekt! Glaubt mir bitte :) ## Init React Native ``npm install -g expo-cli`` <br> ``npm init``",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Tom-N-M/Pb2-Challenge-3.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Tom-N-M/Pb2-Challenge-3/issues"
+  },
+  "homepage": "https://github.com/Tom-N-M/Pb2-Challenge-3#readme"
 }
