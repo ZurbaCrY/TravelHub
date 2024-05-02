@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
-import MapView, { PROVIDER_GOOGLE, Polygon } from 'react-native-maps';
+import MapView, { PROVIDER_GOOGLE, Polygon, Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 
 // Definition der Klassen
@@ -21,11 +21,55 @@ class Country {
 }
 
 class City {
-  constructor(name, coordinates) {
+  constructor(name, coordinates, places) {
     this.name = name;
     this.coordinates = coordinates;
     this.priceLevel = 1; // z.B. preisliche Einordnung der Stadt
+    this.places = places; // Array von Orten in der Stadt
     this.locked = true; // Annahme: alle Städte sind zu Beginn entsperrt
+  }
+}
+
+class Place {
+  constructor(name, coordinates, type) {
+    this.name = name;
+    this.coordinates = coordinates;
+    this.type = type; // Der Ortstyp (z.B. 'Sehenswürdigkeit', 'Restaurant', 'Einkaufsladen', 'Aussichtspunkt')
+  }
+}
+
+class SightseeingSpot extends Place {
+  constructor(name, coordinates, entranceFee) {
+    super(name, coordinates);
+    this.type = 'Sehenswürdigkeit';
+    this.entranceFee = entranceFee; // Eintrittsgebühr für Sehenswürdigkeiten
+  }
+}
+
+class Restaurant extends Place {
+  constructor(name, coordinates, priceLevel, cuisineType) {
+    super(name, coordinates);
+    this.type = 'Restaurant';
+    this.priceLevel = priceLevel; // Preisniveau des Restaurants
+    this.cuisineType = cuisineType; // Art der Küche im Restaurant
+  }
+}
+
+class ShoppingStore extends Place {
+  constructor(name, coordinates, category, isOpen) {
+    super(name, coordinates);
+    this.type = 'Einkaufsladen';
+    this.category = category; // Kategorie des Geschäfts (z.B. Bekleidung, Souvenirs, Lebensmittel)
+    this.isOpen = isOpen; // Gibt an, ob der Laden geöffnet ist oder nicht
+  }
+}
+
+class Viewpoint extends Place {
+  constructor(name, coordinates, viewpointType, height) {
+    super(name, coordinates);
+    this.type = 'Aussichtspunkt';
+    this.viewpointType = viewpointType; // Art des Aussichtspunkts (z.B. Berggipfel, Wolkenkratzer, Aussichtsturm)
+    this.height = height; // Höhe des Aussichtspunkts über dem Meeresspiegel oder der umgebenden Landschaft
   }
 }
 
@@ -63,7 +107,11 @@ const continentsData = [
                            { latitude: 54.800685, longitude: 10.019531 },
                            { latitude: 54.952386, longitude: 8.173828 },
                            { latitude: 55.028022, longitude: 8.085938 }, // Zurück zum Anfang, um das Polygon zu schließen
-                         ]),
+                         ], [
+                                    new SightseeingSpot('Brandenburger Tor', { latitude: 52.516275, longitude: 13.377704 }, 0), // Brandenburger Tor hat keine Eintrittsgebühr
+                                    new Restaurant('Mustermanns Restaurant', { latitude: 52.5233, longitude: 13.4127 }, 3, 'Deutsch'), // Mustermanns Restaurant ist mittelpreisig und serviert deutsche Küche
+                                    // Weitere Orte hinzufügen
+                                  ]),
       // weitere Städte hinzufügen...
     ]),
     // weitere Länder hinzufügen...
@@ -146,6 +194,23 @@ export default function MapScreen() {
             />
           )
         )}
+
+                {/* Markierungen für verschiedene Arten von Orten anzeigen */}
+                {continentsData.flatMap(continent =>
+                  continent.countries.flatMap(country =>
+                    country.cities.flatMap(city =>
+                      city.places.map(place => (
+                        <Marker
+                          key={`${continent.name}-${country.name}-${city.name}-${place.name}`}
+                          coordinate={place.coordinates} // Die Koordinaten des Ortes werden von der Stadt übernommen
+                          title={place.name}
+                          description={place.type === 'Sehenswürdigkeit' ? `Eintritt: ${(place instanceof SightseeingSpot) ? place.entranceFee : 'N/A'}` : `Preisniveau: ${(place instanceof Restaurant) ? place.priceLevel : 'N/A'}, Küche: ${(place instanceof Restaurant) ? place.cuisineType : 'N/A'}`}
+                          pinColor={place.type === 'Sehenswürdigkeit' ? 'red' : (place.type === 'Restaurant' ? 'green' : (place.type === 'Einkaufsladen' ? 'orange' : (place.type === 'Aussichtspunkt' ? 'blue' : 'purple')))}
+                        />
+                      ))
+                    )
+                  )
+                )}
 
         </MapView>
       ) : (
