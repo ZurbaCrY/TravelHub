@@ -9,6 +9,10 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@expo/vector-icons": "^14.0.0",
+    "@react-native-community/masked-view": "^0.1.11",
+    "@react-navigation/bottom-tabs": "^6.5.20",
+    "@react-navigation/native": "^6.1.17",
     "@react-native-async-storage/async-storage": "1.18.2",
     "@supabase/supabase-js": "^2.43.0",
     "expo": "^49.0.23",
@@ -17,10 +21,26 @@
     "react": "18.2.0",
     "react-native": "0.72.10",
     "react-native-elements": "^3.4.3",
-    "react-native-url-polyfill": "^2.0.0"
+    "react-native-url-polyfill": "^2.0.0",
+    "react-native-flags": "^1.0.0",
+    "react-native-gesture-handler": "~2.14.0",
+    "react-native-reanimated": "~3.6.2",
+    "react-native-safe-area-context": "4.8.2",
+    "react-native-screens": "~3.29.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"
   },
-  "private": true
+  "private": true,
+  "description": "Das ist ein cooles Projekt! Glaubt mir bitte :) ## Init React Native ``npm install -g expo-cli`` <br> ``npm init``",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Tom-N-M/Pb2-Challenge-3.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Tom-N-M/Pb2-Challenge-3/issues"
+  },
+  "homepage": "https://github.com/Tom-N-M/Pb2-Challenge-3#readme"
 }
