@@ -3,7 +3,8 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StatusBar } from 'expo-status-bar';
 import { FontAwesome5 } from '@expo/vector-icons';
-import { Animated } from 'react-native'; // Importiere Animated
+import { Animated } from 'react-native';
+import { DarkModeProvider } from './pages/DarkModeContext';
 
 import MapScreen from './pages/Maps';
 import CommunityScreen from './pages/Community';
@@ -15,6 +16,7 @@ const Tab = createBottomTabNavigator();
 
 export default function App() {
   return (
+    <DarkModeProvider>
     <NavigationContainer>
       <Tab.Navigator
         screenOptions={({ route }) => ({
@@ -60,5 +62,6 @@ export default function App() {
       </Tab.Navigator>
       <StatusBar style="auto" />
     </NavigationContainer>
+    </DarkModeProvider>
   );
 }
