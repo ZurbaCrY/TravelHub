@@ -340,7 +340,6 @@ const deg2rad = (deg) => {
                           description={place.type === 'Sehenswürdigkeit' ? `Eintritt: ${(place instanceof SightseeingSpot) ? place.entranceFee : 'N/A'}` : `Preisniveau: ${(place instanceof Restaurant) ? place.priceLevel : 'N/A'}, Küche: ${(place instanceof Restaurant) ? place.cuisineType : 'N/A'}`}
                           image={getImageForPlace(place.type)} // Hier das Bild für den benutzerdefinierten Marker angeben
                           style={{ width: 20, height: 20 }} // Anpassung der Größe des Markers
-                          opacity={0.65}
                         />
                       ))
                     )
