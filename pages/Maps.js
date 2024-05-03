@@ -1,11 +1,13 @@
 // screens/MapScreen.js
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { useDarkMode } from './DarkModeContext';
 
 export default function MapScreen() {
+const { isDarkMode, toggleDarkMode } = useDarkMode();
   return (
-    <View style={styles.container}>
-      <Text>Map Page</Text>
+    <View style={[styles.container, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF',  }]}>
+      <Text style={{color: isDarkMode ? '#FFFDF3' : '#000000'  }}>Map Page</Text>
     </View>
   );
 }
