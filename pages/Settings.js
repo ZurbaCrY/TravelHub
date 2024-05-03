@@ -6,7 +6,6 @@ import { useDarkMode } from './DarkModeContext'; // Importiere den Hook und Cont
 const SettingsScreen = () => {
   const { isDarkMode, toggleDarkMode } = useDarkMode(); // Verwende den globalen Dark Mode State
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
-  const [password, setPassword] = useState('');
 
   return (
     <View style={[styles.container, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
