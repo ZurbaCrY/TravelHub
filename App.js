@@ -3,7 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StatusBar } from 'expo-status-bar';
 import { FontAwesome5 } from '@expo/vector-icons';
-import { Animated, Easing } from 'react-native'; // Importiere Animated und Easing
+import { Animated } from 'react-native'; // Importiere Animated
 
 import MapScreen from './pages/Maps';
 import CommunityScreen from './pages/Community';
@@ -20,10 +20,9 @@ export default function App() {
         screenOptions={({ route }) => ({
           tabBarActiveTintColor: '#ffffff', // Farbe für aktiven Tab
           tabBarInactiveTintColor: 'gray', // Farbe für inaktiven Tab
-          tabBarStyle: {backgroundColor: "#3EAAE9"},
+          tabBarStyle: { backgroundColor: "#3EAAE9" },
           tabBarIcon: ({ focused, color, size }) => {
             let iconName;
-
             if (route.name === 'Home') {
               iconName = 'home';
             } else if (route.name === 'Community') {
@@ -35,17 +34,12 @@ export default function App() {
             } else if (route.name === 'Settings') {
               iconName = 'cog';
             }
-
-            // Erstelle eine animierte Komponente
             return (
               <Animated.View
                 style={{
                   transform: [
-                    // Füge eine Animation hinzu, wenn der Tab ausgewählt ist
                     {
-                      scale: focused
-                        ? new Animated.Value(1.2)
-                        : new Animated.Value(1),
+                      scale: focused ? 1.2 : 1,
                     },
                   ],
                 }}
@@ -54,6 +48,8 @@ export default function App() {
               </Animated.View>
             );
           },
+          tabBarShowLabel: true,
+          headerShown: false // Versteckt den Header komplett
         })}
       >
         <Tab.Screen name="Home" component={HomeScreen} />
