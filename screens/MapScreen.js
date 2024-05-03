@@ -136,6 +136,21 @@ export default function MapScreen() {
     })();
   }, []);
 
+  const getImageForPlace = (placeType) => {
+    switch (placeType) {
+      case 'Sehenswürdigkeit':
+        return require('./resources/travel-marker-s.png');
+      case 'Restaurant':
+        return require('./resources/travel-marker-r.png');
+      case 'Einkaufsladen':
+        return require('./resources/travel-marker-m.png');
+      case 'Aussichtspunkt':
+        return require('./resources/travel-marker-v.png');
+      default:
+        return require('./resources/travel-marker-x.png');
+    }
+  };
+
   return (
     <View style={styles.container}>
       {location ? (
@@ -162,7 +177,7 @@ export default function MapScreen() {
                     key={`${continent.name}-${country.name}-${city.name}`}
                     coordinates={city.coordinates}
                     strokeColor="black"
-                    fillColor="lightblue" // Hintergrundfarbe der Karte
+                    fillColor="rgba(255, 0, 0, 0.2)" // Hintergrundfarbe der Karte
                   />
                 )
               )
@@ -177,7 +192,7 @@ export default function MapScreen() {
                   key={`${continent.name}-${country.name}`}
                   coordinates={country.cities.flatMap(city => city.coordinates)}
                   strokeColor="black"
-                  fillColor="black" // Hintergrundfarbe der Karte
+                  fillColor="rgba(255, 0, 0, 0.2)" // Hintergrundfarbe der Karte
                 />
               )
             )
@@ -190,7 +205,7 @@ export default function MapScreen() {
               key={`${continent.name}`}
               coordinates={continent.countries.flatMap(country => country.cities.flatMap(city => city.coordinates))}
               strokeColor="black"
-              fillColor="red" // Hintergrundfarbe der Karte
+              fillColor="rgba(255, 0, 0, 0.2)" // Hintergrundfarbe der Karte
             />
           )
         )}
@@ -200,12 +215,15 @@ export default function MapScreen() {
                   continent.countries.flatMap(country =>
                     country.cities.flatMap(city =>
                       city.places.map(place => (
+
                         <Marker
                           key={`${continent.name}-${country.name}-${city.name}-${place.name}`}
                           coordinate={place.coordinates} // Die Koordinaten des Ortes werden von der Stadt übernommen
                           title={place.name}
                           description={place.type === 'Sehenswürdigkeit' ? `Eintritt: ${(place instanceof SightseeingSpot) ? place.entranceFee : 'N/A'}` : `Preisniveau: ${(place instanceof Restaurant) ? place.priceLevel : 'N/A'}, Küche: ${(place instanceof Restaurant) ? place.cuisineType : 'N/A'}`}
-                          pinColor={place.type === 'Sehenswürdigkeit' ? 'red' : (place.type === 'Restaurant' ? 'green' : (place.type === 'Einkaufsladen' ? 'orange' : (place.type === 'Aussichtspunkt' ? 'blue' : 'purple')))}
+                          image={getImageForPlace(place.type)} // Hier das Bild für den benutzerdefinierten Marker angeben
+                          style={{ width: 20, height: 20 }} // Anpassung der Größe des Markers
+                          opacity={0.65}
                         />
                       ))
                     )
