@@ -158,7 +158,7 @@ export default function MapScreen() {
     setZoomLevel(region.latitudeDelta);
 
     // Check the zoom level and decide whether to show markers or not
-    if (region.latitudeDelta < 5) {
+    if (region.latitudeDelta < 10) {
       setShowMarkers(true);
     } else {
       setShowMarkers(false);
@@ -229,7 +229,21 @@ export default function MapScreen() {
                      "visibility": "off" // Alle vordefinierten POIs ausblenden (z. B. Parkplatzsymbole, etc.)
                    }
                  ]
-               }
+               },
+                  {
+                    "featureType": "landscape.natural",
+                    "elementType": "geometry.fill",
+                    "stylers": [
+                      { "color": "#f2f2f2" } // Farbe für offizielle Grünflächen (wie Städte)
+                    ]
+                  },
+                     {
+                       "featureType": "poi.park",
+                       "elementType": "geometry.fill",
+                       "stylers": [
+                         { "color": "#6dbd63" } // Farbe für Parks (Grün)
+                       ]
+                     }
           ]}
         >
 
