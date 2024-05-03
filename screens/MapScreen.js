@@ -125,6 +125,13 @@ export default function MapScreen() {
   const [errorMsg, setErrorMsg] = useState(null);
   const [zoomLevel, setZoomLevel] = useState(null);
   const [showMarkers, setShowMarkers] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResult, setSearchResult] = useState(null);
+  const [searchLocation, setSearchLocation] = useState(null);
+    const [region, setRegion] = useState(null); // Zustand für die aktuelle Kartenregion
+      const [mapRef, setMapRef] = useState(null);
+
+
 
   useEffect(() => {
     (async () => {
@@ -136,6 +143,12 @@ export default function MapScreen() {
 
       let location = await Location.getCurrentPositionAsync({});
       setLocation(location);
+      setRegion({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+        latitudeDelta: 0.0922,
+        longitudeDelta: 0.0421,
+      }); // Setze die anfängliche Kartenregion
     })();
   }, []);
 
@@ -154,9 +167,33 @@ export default function MapScreen() {
     }
   };
 
+  const findMiddleCoordinate = (coordinates) => {
+    if (coordinates.length === 0) {
+      return null;
+    }
+
+    let sumLat = 0;
+    let sumLng = 0;
+
+    // Summiere die Breiten- und Längengrade aller Koordinaten
+    for (const coord of coordinates) {
+      sumLat += coord.latitude;
+      sumLng += coord.longitude;
+    }
+
+    // Berechne den Durchschnitt der Breiten- und Längengrade
+    const avgLat = sumLat / coordinates.length;
+    const avgLng = sumLng / coordinates.length;
+
+    // Gib die mittlere Koordinate zurück
+    return { latitude: avgLat, longitude: avgLng };
+  };
+
+
   const onRegionChangeComplete = (region) => {
     // Update the zoom level whenever the region changes
     setZoomLevel(region.latitudeDelta);
+    setRegion(region);
 
     // Check the zoom level and decide whether to show markers or not
     if (region.latitudeDelta < 12) {
@@ -166,21 +203,69 @@ export default function MapScreen() {
     }
   };
 
+    const handleSearch = async () => {
+      const result = continentsData.find(continent =>
+        continent.countries.some(country =>
+          country.cities.some(city =>
+            city.name.toLowerCase() === searchQuery.toLowerCase()
+          )
+        )
+      );
+
+      if (result) {
+        // Durch die Länder des Ergebnisses iterieren
+        const city = result.countries.flatMap(country =>
+          country.cities.find(city =>
+            city.name.toLowerCase() === searchQuery.toLowerCase()
+          )
+        )[0]; // Zugriff auf das erste Element des Arrays
+
+        console.log(city.name);
+
+        if (city) {
+          setSearchResult(city);
+          const middleCoordinate = findMiddleCoordinate(city.coordinates);
+
+          // Animiere die Karte zur Mitte der gesuchten Stadt über einen Zeitraum von 1000 Millisekunden (1 Sekunde)
+          if (mapRef) {
+            mapRef.animateToRegion({
+              latitude: middleCoordinate.latitude,
+              longitude: middleCoordinate.longitude,
+              latitudeDelta: 3, // Hier kannst du die Zoomstufe einstellen
+              longitudeDelta: 3, // Hier kannst du die Zoomstufe einstellen
+            }, 1000);
+          }
+        } else {
+          setSearchResult(null);
+          setSearchLocation(null);
+        }
+      }
+    };
+
 
  return (
     <View style={styles.container}>
+
+      <View style={styles.searchContainer}>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Stadt suchen..."
+          onChangeText={text => setSearchQuery(text)}
+          value={searchQuery}
+        />
+        <Button
+          title="Suchen"
+          onPress={handleSearch}
+        />
+      </View>
+
       {location ? (
         <MapView
           provider={PROVIDER_GOOGLE}
           style={styles.map}
           mapType={"mutedStandard"}
           showsUserLocation={true} // Zeige den Standort des Benutzers als blauen Punkt an
-          initialRegion={{
-            latitude: location.coords.latitude,
-            longitude: location.coords.longitude,
-            latitudeDelta: 0.0922,
-            longitudeDelta: 0.0421,
-          }}
+          region={region}
           backgroundColor="lightblue" // Hintergrundfarbe der gesamten Karte
           onRegionChangeComplete={onRegionChangeComplete}
           showsPointsOfInterest={false} // Entferne vordefinierte Orte wie Geschäfte, Restaurants, etc.
@@ -188,6 +273,7 @@ export default function MapScreen() {
           customMapStyle={customMapStyle}
           rotateEnabled={false} // Rotation der Karte deaktivieren
           showsCompass={false} // Kompass ausblenden
+          ref={(ref) => setMapRef(ref)}
         >
 
 
@@ -271,12 +357,18 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
   },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 10,
+  },
   searchInput: {
-    width: '80%',
+    width: '70%',
     height: 40,
     borderWidth: 1,
     borderColor: 'gray',
-    marginBottom: 10,
+    marginRight: 10,
     paddingHorizontal: 10,
   },
 });
