@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { View, StyleSheet, ActivityIndicator  } from 'react-native'
+import { View, StyleSheet, ActivityIndicator } from 'react-native'
 import { Button, Input } from 'react-native-elements'
 import { signInWithEmail } from '../User-Auth/auth'
 
@@ -12,9 +12,6 @@ export default function SigninPage() {
       setLoading(true)
       const success = await signInWithEmail(email, password)
       setLoading(false)
-      if (success) {
-        // Navigate to the next screen or do something upon successful sign in
-      }
     }
 
   return (
