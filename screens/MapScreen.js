@@ -186,6 +186,8 @@ export default function MapScreen() {
           showsPointsOfInterest={false} // Entferne vordefinierte Orte wie Geschäfte, Restaurants, etc.
           showsTraffic={false}
           customMapStyle={customMapStyle}
+          rotateEnabled={false} // Rotation der Karte deaktivieren
+          showsCompass={false} // Kompass ausblenden
         >
 
 
