@@ -184,12 +184,19 @@ export default function MapScreen() {
           showsPointsOfInterest={false} // Entferne vordefinierte Orte wie Geschäfte, Restaurants, etc.
           showsTraffic={false}
           customMapStyle={[
+          {
+              "featureType": "water",
+              "elementType": "geometry.fill",
+              "stylers": [
+                { "color": "#3d52d5" } // Farbe für Wasser (3d52d5)
+              ]
+            },
             {
               "featureType": "road",
               "elementType": "geometry",
               "stylers": [
                 {
-                  "color": "#cccccc" // Farbe der Straßen
+                  "color": "#d4d2c8" // Farbe der Straßen
                 }
               ]
             },
@@ -234,7 +241,7 @@ export default function MapScreen() {
                     "featureType": "landscape.natural",
                     "elementType": "geometry.fill",
                     "stylers": [
-                      { "color": "#f2f2f2" } // Farbe für offizielle Grünflächen (wie Städte)
+                      { "color": "#fffdf3" } // Farbe für offizielle Grünflächen (wie Städte)
                     ]
                   },
                      {
@@ -257,7 +264,7 @@ export default function MapScreen() {
                     key={`${continent.name}-${country.name}-${city.name}`}
                     coordinates={city.coordinates}
                     strokeColor="black"
-                    fillColor="rgba(255, 0, 0, 0.2)" // Hintergrundfarbe der Karte
+                    fillColor="rgba(212, 210, 200, 0.5)" // Hintergrundfarbe der Karte
                   />
                 )
               )
@@ -272,7 +279,7 @@ export default function MapScreen() {
                   key={`${continent.name}-${country.name}`}
                   coordinates={country.cities.flatMap(city => city.coordinates)}
                   strokeColor="black"
-                  fillColor="rgba(255, 0, 0, 0.2)" // Hintergrundfarbe der Karte
+                  fillColor="rgba(212, 210, 200, 0.5)" // Hintergrundfarbe der Karte
                 />
               )
             )
@@ -285,7 +292,7 @@ export default function MapScreen() {
               key={`${continent.name}`}
               coordinates={continent.countries.flatMap(country => country.cities.flatMap(city => city.coordinates))}
               strokeColor="black"
-              fillColor="rgba(255, 0, 0, 0.2)" // Hintergrundfarbe der Karte
+              fillColor="rgba(212, 210, 200, 0.5)" // Hintergrundfarbe der Karte
             />
           )
         )}
