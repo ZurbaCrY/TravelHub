@@ -13,7 +13,7 @@ const SettingsScreen = () => {
       <Text style={[styles.header, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>Einstellungen</Text>
 
       <View style={styles.setting}>
-        <Text style={[styles.settingLabel, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>Dunkelmodus</Text>
+        <Text style={[styles.settingLabel, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>Darkmode</Text>
         <Switch
           trackColor={{ false: "#767577", true: "#81b0ff" }}
           thumbColor={isDarkMode ? "#f5dd4b" : "#f4f3f4"}
