@@ -298,12 +298,12 @@ const deg2rad = (deg) => {
       <View style={styles.searchContainer}>
         <TextInput
           style={styles.searchInput}
-          placeholder="Stadt suchen..."
+          placeholder="Search for city..."
           onChangeText={text => setSearchQuery(text)}
           value={searchQuery}
         />
         <Button
-          title="Suchen"
+          title="Go!"
           onPress={handleSearch}
         />
       </View>
@@ -411,6 +411,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 10,
+    marginTop: 10,
   },
   searchInput: {
     width: '70%',
