@@ -13,8 +13,10 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Flag from 'react-native-flags';
+import { useDarkMode } from './DarkModeContext';
 
 const ProfileScreen = () => {
+  const { isDarkMode, toggleDarkMode } = useDarkMode();
   const [visitedCountries, setVisitedCountries] = useState(['Italien', 'Spanien', 'Frankreich']);
   const [wishListCountries, setWishListCountries] = useState(['Japan', 'Neuseeland', 'Brasilien']);
   const [newVisited, setNewVisited] = useState('');
@@ -56,21 +58,21 @@ const ProfileScreen = () => {
       setShowVisitedInput(false);
       setShowWishListInput(false);
     }}>
-      <ScrollView style={styles.container}>
-        <View style={styles.profileSection}>
+      <ScrollView style={[styles.container, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
+        <View style={[styles.profileSection, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF',}]}>
           <Image
             source={{uri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/PICA.jpg/1200px-PICA.jpg'}}
             style={styles.profileImage}
           />
-          <Text style={styles.name}>Max Mustermann</Text>
-          <Text style={styles.details}>max@example.com</Text>
+          <Text style={[styles.name, {color: isDarkMode ? '#FFFDF3' : '#000000'  }]}>Max Mustermann</Text>
+          <Text style={[styles.details, {color: isDarkMode ? '#FFFDF3' : '#000000'  }]}>max@example.com</Text>
           <View style={styles.row}>
-            <Icon name="birthday-cake" size={14} color="#FFFDF3" style={styles.iconRightMargin} />
-            <Text style={styles.details}>01.01.1980</Text>
+            <Icon name="birthday-cake" size={14} style={[styles.iconRightMargin, , {color: isDarkMode ? '#FFFDF3' : '#000000'  }]} />
+            <Text style={[styles.details, , {color: isDarkMode ? '#FFFDF3' : '#000000'  }]}>01.01.1980</Text>
           </View>
           <View style={styles.row}>
             <Flag code="DE" size={16} style={styles.iconRightMargin} />
-            <Text style={styles.details}>Deutschland</Text>
+            <Text style={[styles.details, , {color: isDarkMode ? '#FFFDF3' : '#000000'  }]}>Deutschland</Text>
           </View>
         </View>
         <View style={styles.infoSection}>
@@ -139,7 +141,6 @@ const ProfileScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#070A0F',
   },
   profileSection: {
     alignItems: 'center',
@@ -153,7 +154,6 @@ const styles = StyleSheet.create({
     borderWidth: 3,
   },
   name: {
-    color: '#FFFDF3',
     fontSize: 22,
     fontWeight: 'bold',
     marginTop: 10,
