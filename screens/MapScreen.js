@@ -201,7 +201,56 @@ export default function MapScreen() {
     } else {
       setShowMarkers(false);
     }
-  };
+  // Find the nearest city based on the current region
+  const nearestCity = findNearestCity(region);
+
+  // Set the searchLocation state to the nearest city
+  setSearchLocation(nearestCity);
+  //console.log(nearestCity.name);
+};
+
+// Function to find the nearest city based on the current region
+const findNearestCity = (region) => {
+  let nearestCity = null;
+  let minDistance = Infinity;
+
+  // Iterate through all cities to find the nearest one
+  continentsData.forEach(continent => {
+    continent.countries.forEach(country => {
+      country.cities.forEach(city => {
+        // Calculate the distance between the current city and the center of the region
+        const distance = haversineDistance(region.latitude, region.longitude, city.coordinates[0].latitude, city.coordinates[0].longitude);
+
+        // Update the nearest city if this city is closer
+        if (distance < minDistance) {
+          minDistance = distance;
+          nearestCity = city;
+        }
+      });
+    });
+  });
+
+  return nearestCity;
+};
+
+// Function to calculate the distance between two coordinates using the Haversine formula
+const haversineDistance = (lat1, lon1, lat2, lon2) => {
+  const R = 6371; // Radius of the earth in km
+  const dLat = deg2rad(lat2 - lat1);
+  const dLon = deg2rad(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const d = R * c; // Distance in km
+  return d;
+};
+
+// Function to convert degrees to radians
+const deg2rad = (deg) => {
+  return deg * (Math.PI / 180);
+};
 
     const handleSearch = async () => {
       const result = continentsData.find(continent =>
