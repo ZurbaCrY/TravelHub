@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, TextInput, Button, ScrollView } from 'react-native';
+import { StyleSheet, View, Text, TextInput, Button, ScrollView, TouchableOpacity } from 'react-native';
 import MapView, { PROVIDER_GOOGLE, Polygon, Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { customMapStyle } from './resources/customMapStyle';
+import { MaterialIcons } from '@expo/vector-icons'; // Beispiel für ein Icon-Paket, hier MaterialIcons von Expo
 
 // Definition der Klassen
 class Continent {
@@ -288,6 +289,10 @@ const deg2rad = (deg) => {
           }
         };
 
+          const handleResetPlaces = () => {
+            setSearchResult(null); // Setze den Suchergebnis-Status auf null, um den Inhalt der Leiste zurückzusetzen
+          };
+
  return (
     <View style={styles.container}>
 
@@ -348,20 +353,26 @@ const deg2rad = (deg) => {
         <Text>Loading...</Text>
       )}
 
-                {/* Hochwischbare Leiste unten */}
-                <ScrollView
-                  style={styles.bottomBar}
-                  contentContainerStyle={styles.bottomBarContent}
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                >
-                  {/* Hier kannst du die Liste der Orte für die gesuchte Stadt anzeigen */}
-                  {searchResult && searchResult.places.map(place => (
-                    <View key={place.name} style={styles.placeItem}>
-                      <Text>{place.name}</Text>
-                    </View>
-                  ))}
-                </ScrollView>
+        <View style={styles.bottomBar}>
+          <ScrollView
+            contentContainerStyle={styles.bottomBarContent}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+          >
+            {/* Hier kannst du die Liste der Orte für die gesuchte Stadt anzeigen */}
+            {searchResult && searchResult.places.map(place => (
+              <View key={place.name} style={styles.placeItem}>
+                <Text>{place.name}</Text>
+              </View>
+            ))}
+          </ScrollView>
+          {/* Kreuz-Symbol für das Zurücksetzen der Liste */}
+          {searchResult && (
+            <TouchableOpacity onPress={handleResetPlaces} style={styles.crossButton}>
+              <MaterialIcons name="close" size={24} color="black" />
+            </TouchableOpacity>
+          )}
+        </View>
 
     </View>
   );
@@ -409,4 +420,9 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     backgroundColor: '#eee',
   },
+    crossButton: {
+      position: 'absolute',
+      bottom: 16,
+      right: 16,
+    },
 });
