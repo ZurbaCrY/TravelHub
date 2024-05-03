@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, View, Text, TextInput, Button } from 'react-native';
 import MapView, { PROVIDER_GOOGLE, Polygon, Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
+import { customMapStyle } from './resources/customMapStyle';
 
 // Definition der Klassen
 class Continent {
@@ -158,14 +159,15 @@ export default function MapScreen() {
     setZoomLevel(region.latitudeDelta);
 
     // Check the zoom level and decide whether to show markers or not
-    if (region.latitudeDelta < 10) {
+    if (region.latitudeDelta < 12) {
       setShowMarkers(true);
     } else {
       setShowMarkers(false);
     }
   };
 
-  return (
+
+ return (
     <View style={styles.container}>
       {location ? (
         <MapView
@@ -183,75 +185,7 @@ export default function MapScreen() {
           onRegionChangeComplete={onRegionChangeComplete}
           showsPointsOfInterest={false} // Entferne vordefinierte Orte wie Geschäfte, Restaurants, etc.
           showsTraffic={false}
-          customMapStyle={[
-          {
-              "featureType": "water",
-              "elementType": "geometry.fill",
-              "stylers": [
-                { "color": "#3d52d5" } // Farbe für Wasser (3d52d5)
-              ]
-            },
-            {
-              "featureType": "road",
-              "elementType": "geometry",
-              "stylers": [
-                {
-                  "color": "#d4d2c8" // Farbe der Straßen
-                }
-              ]
-            },
-            {
-              "featureType": "road",
-              "elementType": "labels",
-              "stylers": [
-                {
-                  "visibility": "off" // Straßenbezeichnungen ausblenden
-                }
-              ]
-            },
-            {
-              "featureType": "transit.line",
-              "stylers": [
-                {
-                  "visibility": "off" // Symbole für den öffentlichen Nahverkehr ausblenden
-                }
-              ]
-            },
-                         {
-                           "featureType": "transit.station.bus",
-                           "stylers": [
-                             { "visibility": "off" } // Busstationen ausblenden
-                           ]
-                         },
-                         {
-                           "featureType": "transit.station.rail",
-                           "stylers": [
-                             { "visibility": "off" } // Zugstationen ausblenden
-                           ]
-                         },
-               {
-                 "featureType": "poi",
-                 "stylers": [
-                   {
-                     "visibility": "off" // Alle vordefinierten POIs ausblenden (z. B. Parkplatzsymbole, etc.)
-                   }
-                 ]
-               },
-                  {
-                    "featureType": "landscape.natural",
-                    "elementType": "geometry.fill",
-                    "stylers": [
-                      { "color": "#fffdf3" } // Farbe für offizielle Grünflächen (wie Städte)
-                    ]
-                  },
-                     {
-                       "featureType": "poi.park",
-                       "elementType": "geometry.fill",
-                       "stylers": [
-                         { "color": "#6dbd63" } // Farbe für Parks (Grün)
-                       ]
-                     }
-          ]}
+          customMapStyle={customMapStyle}
         >
 
 
@@ -328,8 +262,19 @@ export default function MapScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   map: {
     flex: 1,
+    width: '100%',
+  },
+  searchInput: {
+    width: '80%',
+    height: 40,
+    borderWidth: 1,
+    borderColor: 'gray',
+    marginBottom: 10,
+    paddingHorizontal: 10,
   },
 });
