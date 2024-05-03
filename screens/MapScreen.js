@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, TextInput, Button } from 'react-native';
+import { StyleSheet, View, Text, TextInput, Button, ScrollView } from 'react-native';
 import MapView, { PROVIDER_GOOGLE, Polygon, Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { customMapStyle } from './resources/customMapStyle';
@@ -115,7 +115,20 @@ const continentsData = [
                                   ]),
       // weitere Städte hinzufügen...
     ]),
-    // weitere Länder hinzufügen...
+    new Country('France', [
+      new City('Paris', [
+    { latitude: 48.945447, longitude: 2.135468 }, // Obere linke Ecke
+    { latitude: 48.716946, longitude: 2.146454 }, // Untere linke Ecke
+    { latitude: 48.748628, longitude: 2.703323 }, // Untere rechte Ecke
+    { latitude: 49.013582, longitude: 2.526855 }, // Obere rechte Ecke
+        // Weitere Koordinaten für Paris hinzufügen...
+      ], [
+        new SightseeingSpot('Eiffel Tower', { latitude: 48.8584, longitude: 2.2945 }, 10), // Eiffelturm mit Eintrittsgebühr
+        new SightseeingSpot('Louvre Museum', { latitude: 48.8606, longitude: 2.3376 }, 12), // Louvre Museum mit Eintrittsgebühr
+        // Weitere Sehenswürdigkeiten hinzufügen...
+      ]),
+      // Weitere Städte in Frankreich hinzufügen...
+    ]),
   ]),
   // weitere Kontinente hinzufügen...
 ];
@@ -205,7 +218,7 @@ export default function MapScreen() {
   const nearestCity = findNearestCity(region);
 
   // Set the searchLocation state to the nearest city
-  setSearchLocation(nearestCity);
+  setSearchResult(nearestCity);
   //console.log(nearestCity.name);
 };
 
@@ -253,44 +266,43 @@ const deg2rad = (deg) => {
 };
 
     const handleSearch = async () => {
-      const result = continentsData.find(continent =>
-        continent.countries.some(country =>
-          country.cities.some(city =>
-            city.name.toLowerCase() === searchQuery.toLowerCase()
-          )
-        )
-      );
+          const result = continentsData.find(continent =>
+            continent.countries.some(country =>
+              country.cities.some(city =>
+                city.name.toLowerCase() === searchQuery.toLowerCase()
+              )
+            )
+          );
 
-      if (result) {
-        // Durch die Länder des Ergebnisses iterieren
-        const city = result.countries.flatMap(country =>
-          country.cities.find(city =>
-            city.name.toLowerCase() === searchQuery.toLowerCase()
-          )
-        )[0]; // Zugriff auf das erste Element des Arrays
+          if (result) {
+            // Durch die Länder des Ergebnisses iterieren
+            const city = result.countries.flatMap(country =>
+              country.cities.find(city =>
+                city.name.toLowerCase() === searchQuery.toLowerCase()
+              )
+            )[0]; // Zugriff auf das erste Element des Arrays
 
-        console.log(city.name);
+            console.log(city.name);
 
-        if (city) {
-          setSearchResult(city);
-          const middleCoordinate = findMiddleCoordinate(city.coordinates);
+            if (city) {
+              setSearchResult(city);
+              const middleCoordinate = findMiddleCoordinate(city.coordinates);
 
-          // Animiere die Karte zur Mitte der gesuchten Stadt über einen Zeitraum von 1000 Millisekunden (1 Sekunde)
-          if (mapRef) {
-            mapRef.animateToRegion({
-              latitude: middleCoordinate.latitude,
-              longitude: middleCoordinate.longitude,
-              latitudeDelta: 3, // Hier kannst du die Zoomstufe einstellen
-              longitudeDelta: 3, // Hier kannst du die Zoomstufe einstellen
-            }, 1000);
+              // Animiere die Karte zur Mitte der gesuchten Stadt über einen Zeitraum von 1000 Millisekunden (1 Sekunde)
+              if (mapRef) {
+                mapRef.animateToRegion({
+                  latitude: middleCoordinate.latitude,
+                  longitude: middleCoordinate.longitude,
+                  latitudeDelta: 3, // Hier kannst du die Zoomstufe einstellen
+                  longitudeDelta: 3, // Hier kannst du die Zoomstufe einstellen
+                }, 1000);
+              }
+            } else {
+              setSearchResult(null);
+              setSearchLocation(null);
+            }
           }
-        } else {
-          setSearchResult(null);
-          setSearchLocation(null);
-        }
-      }
-    };
-
+        };
 
  return (
     <View style={styles.container}>
@@ -342,31 +354,7 @@ const deg2rad = (deg) => {
             )
           )}
 
-          {/* Polygone über gesperrten Ländern */}
-          {continentsData.flatMap(continent =>
-            continent.countries.map(country =>
-              country.locked && (
-                <Polygon
-                  key={`${continent.name}-${country.name}`}
-                  coordinates={country.cities.flatMap(city => city.coordinates)}
-                  strokeColor="black"
-                  fillColor="rgba(212, 210, 200, 0.5)" // Hintergrundfarbe der Karte
-                />
-              )
-            )
-          )}
 
-        {/* Polygone über gesperrten Kontinenten */}
-        {continentsData.map(continent =>
-          continent.locked && (
-            <Polygon
-              key={`${continent.name}`}
-              coordinates={continent.countries.flatMap(country => country.cities.flatMap(city => city.coordinates))}
-              strokeColor="black"
-              fillColor="rgba(212, 210, 200, 0.5)" // Hintergrundfarbe der Karte
-            />
-          )
-        )}
 
                 {/* Markierungen für verschiedene Arten von Orten anzeigen */}
                 {showMarkers && continentsData.flatMap(continent =>
@@ -389,9 +377,26 @@ const deg2rad = (deg) => {
                 )}
 
         </MapView>
+
       ) : (
         <Text>Loading...</Text>
       )}
+
+                {/* Hochwischbare Leiste unten */}
+                <ScrollView
+                  style={styles.bottomBar}
+                  contentContainerStyle={styles.bottomBarContent}
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                >
+                  {/* Hier kannst du die Liste der Orte für die gesuchte Stadt anzeigen */}
+                  {searchResult && searchResult.places.map(place => (
+                    <View key={place.name} style={styles.placeItem}>
+                      <Text>{place.name}</Text>
+                    </View>
+                  ))}
+                </ScrollView>
+
     </View>
   );
 }
@@ -420,5 +425,22 @@ const styles = StyleSheet.create({
     borderColor: 'gray',
     marginRight: 10,
     paddingHorizontal: 10,
+  },
+  bottomBar: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'white',
+    paddingVertical: 10,
+  },
+  bottomBarContent: {
+    paddingHorizontal: 20,
+  },
+  placeItem: {
+    marginRight: 10,
+    padding: 5,
+    borderRadius: 5,
+    backgroundColor: '#eee',
   },
 });
