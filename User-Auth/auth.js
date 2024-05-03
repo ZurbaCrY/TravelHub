@@ -14,34 +14,41 @@ AppState.addEventListener('change', (state) => {
     }
 })
 
-export default function Auth() {
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
-    const [loading, setLoading] = useState(false)
-
-    async function signInWithEmail() {
-        setLoading(true)
+export async function signInWithEmail(email, password) {
+    try {
         const { error } = await supabase.auth.signInWithPassword({
             email: email,
             password: password,
         })
 
-        if (error) Alert.alert(error.message)
-        setLoading(false)
-    }
+        if (error) {
+            Alert.alert(error.message)
+            return false
+        }
 
-    async function signUpWithEmail() {
-        setLoading(true)
-        const {
-            data: { session },
-            error,
-        } = await supabase.auth.signUp({
+        return true
+    } catch (error) {
+        Alert.alert('Error signing in')
+        console.log(error)
+        return false
+    }
+}
+
+export async function signUpWithEmail(email, password) {
+    try {
+        const { error } = await supabase.auth.signUp({
             email: email,
             password: password,
         })
 
-        if (error) Alert.alert(error.message)
-        if (!session) Alert.alert('Please check your inbox for email verification!')
-        setLoading(false)
+        if (error) {
+            Alert.alert(error.message)
+            return false
+        }
+
+        return true
+    } catch (error) {
+        Alert.alert('Error signing up')
+        return false
     }
 }
