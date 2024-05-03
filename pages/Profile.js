@@ -59,7 +59,7 @@ const ProfileScreen = () => {
       <ScrollView style={styles.container}>
         <View style={styles.profileSection}>
           <Image
-            source={{uri: ''}}
+            source={{uri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/PICA.jpg/1200px-PICA.jpg'}}
             style={styles.profileImage}
           />
           <Text style={styles.name}>Max Mustermann</Text>
