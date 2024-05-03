@@ -122,6 +122,8 @@ const continentsData = [
 export default function MapScreen() {
   const [location, setLocation] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
+  const [zoomLevel, setZoomLevel] = useState(null);
+  const [showMarkers, setShowMarkers] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -151,6 +153,18 @@ export default function MapScreen() {
     }
   };
 
+  const onRegionChangeComplete = (region) => {
+    // Update the zoom level whenever the region changes
+    setZoomLevel(region.latitudeDelta);
+
+    // Check the zoom level and decide whether to show markers or not
+    if (region.latitudeDelta < 5) {
+      setShowMarkers(true);
+    } else {
+      setShowMarkers(false);
+    }
+  };
+
   return (
     <View style={styles.container}>
       {location ? (
@@ -166,6 +180,7 @@ export default function MapScreen() {
             longitudeDelta: 0.0421,
           }}
           backgroundColor="lightblue" // Hintergrundfarbe der gesamten Karte
+          onRegionChangeComplete={onRegionChangeComplete}
           showsPointsOfInterest={false} // Entferne vordefinierte Orte wie Geschäfte, Restaurants, etc.
           showsTraffic={false}
           customMapStyle={[
@@ -262,7 +277,7 @@ export default function MapScreen() {
         )}
 
                 {/* Markierungen für verschiedene Arten von Orten anzeigen */}
-                {continentsData.flatMap(continent =>
+                {showMarkers && continentsData.flatMap(continent =>
                   continent.countries.flatMap(country =>
                     country.cities.flatMap(city =>
                       city.places.map(place => (
