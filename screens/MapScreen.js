@@ -78,36 +78,12 @@ class Viewpoint extends Place {
 const continentsData = [
   new Continent('Europe', [
     new Country('Germany', [
-      new City('DeutschStadt', [
-                           { latitude: 55.028022, longitude: 8.085938 },
-                           { latitude: 54.265224, longitude: 8.085938 },
-                           { latitude: 53.904338, longitude: 7.602539 },
-                           { latitude: 53.67068, longitude: 6.28418 },
-                           { latitude: 52.988337, longitude: 7.163086 },
-                           { latitude: 52.562995, longitude: 6.943359 },
-                           { latitude: 51.862924, longitude: 6.899414 },
-                           { latitude: 51.835778, longitude: 6.152344 },
-                           { latitude: 51.069017, longitude: 5.932617 },
-                           { latitude: 50.34546, longitude: 6.108398 },
-                           { latitude: 49.353756, longitude: 6.503906 },
-                           { latitude: 48.835797, longitude: 7.954102 },
-                           { latitude: 47.487513, longitude: 7.602539 },
-                           { latitude: 47.546872, longitude: 9.316406 },
-                           { latitude: 47.15984, longitude: 10.239258 },
-                           { latitude: 47.576526, longitude: 12.392578 },
-                           { latitude: 48.57479, longitude: 14.282227 },
-                           { latitude: 50.092393, longitude: 12.348633 },
-                           { latitude: 50.847573, longitude: 14.985352 },
-                           { latitude: 52.402419, longitude: 14.72168 },
-                           { latitude: 52.829321, longitude: 14.282227 },
-                           { latitude: 54.162434, longitude: 14.458008 },
-                           { latitude: 54.749991, longitude: 13.623047 },
-                           { latitude: 54.54658, longitude: 12.436523 },
-                           { latitude: 54.290882, longitude: 12.172852 },
-                           { latitude: 54.41893, longitude: 11.030273 },
-                           { latitude: 54.800685, longitude: 10.019531 },
-                           { latitude: 54.952386, longitude: 8.173828 },
-                           { latitude: 55.028022, longitude: 8.085938 }, // Zurück zum Anfang, um das Polygon zu schließen
+      new City('Berlin', [
+                             { latitude: 52.698878, longitude: 13.373108 },
+                             { latitude: 52.61313, longitude: 13.055878 },
+                             { latitude: 52.343141, longitude: 13.212433 },
+                             { latitude: 52.304555, longitude: 13.709564 },
+                             { latitude: 52.529719, longitude: 13.907318 }
                          ], [
                                     new SightseeingSpot('Brandenburger Tor', { latitude: 52.516275, longitude: 13.377704 }, 0), // Brandenburger Tor hat keine Eintrittsgebühr
                                     new Restaurant('Mustermanns Restaurant', { latitude: 52.5233, longitude: 13.4127 }, 3, 'Deutsch'), // Mustermanns Restaurant ist mittelpreisig und serviert deutsche Küche
@@ -273,34 +249,42 @@ const deg2rad = (deg) => {
               )
             )
           );
+          //console.log(result);
 
           if (result) {
             // Durch die Länder des Ergebnisses iterieren
-            const city = result.countries.flatMap(country =>
-              country.cities.find(city =>
+            const matchingCountry = result.countries.find(country =>
+              country.cities.some(city =>
                 city.name.toLowerCase() === searchQuery.toLowerCase()
               )
-            )[0]; // Zugriff auf das erste Element des Arrays
+            ); // Zugriff auf das erste Element des Arrays
 
-            console.log(city.name);
+            //console.log(matchingCountry);
 
-            if (city) {
-              setSearchResult(city);
-              const middleCoordinate = findMiddleCoordinate(city.coordinates);
+            if (matchingCountry) {
+                    const city = matchingCountry.cities.find(city =>
+                        city.name.toLowerCase() === searchQuery.toLowerCase()
+                    );
+                    //console.log(city);
+                                if (city) {
+                                  setSearchResult(city);
+                                  const middleCoordinate = findMiddleCoordinate(city.coordinates);
 
-              // Animiere die Karte zur Mitte der gesuchten Stadt über einen Zeitraum von 1000 Millisekunden (1 Sekunde)
-              if (mapRef) {
-                mapRef.animateToRegion({
-                  latitude: middleCoordinate.latitude,
-                  longitude: middleCoordinate.longitude,
-                  latitudeDelta: 3, // Hier kannst du die Zoomstufe einstellen
-                  longitudeDelta: 3, // Hier kannst du die Zoomstufe einstellen
-                }, 1000);
-              }
-            } else {
-              setSearchResult(null);
-              setSearchLocation(null);
-            }
+                                  // Animiere die Karte zur Mitte der gesuchten Stadt über einen Zeitraum von 1000 Millisekunden (1 Sekunde)
+                                  if (mapRef) {
+                                    mapRef.animateToRegion({
+                                      latitude: middleCoordinate.latitude,
+                                      longitude: middleCoordinate.longitude,
+                                      latitudeDelta: 1, // Hier kannst du die Zoomstufe einstellen
+                                      longitudeDelta: 1, // Hier kannst du die Zoomstufe einstellen
+                                    }, 1000);
+                                  }
+                                } else {
+                                  setSearchResult(null);
+                                  setSearchLocation(null);
+                                }
+             }
+
           }
         };
 
@@ -432,7 +416,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     backgroundColor: 'white',
-    paddingVertical: 10,
+    paddingVertical: 15,
   },
   bottomBarContent: {
     paddingHorizontal: 20,
