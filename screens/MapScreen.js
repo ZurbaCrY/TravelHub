@@ -322,24 +322,6 @@ const deg2rad = (deg) => {
         >
 
 
-          {/* Polygone über gesperrte Städte*/}
-          {continentsData.flatMap(continent =>
-            continent.countries.flatMap(country =>
-              country.cities.map(city =>
-                city.locked && (
-                  <Polygon
-                    key={`${continent.name}-${country.name}-${city.name}`}
-                    coordinates={city.coordinates}
-                    strokeColor="black"
-                    fillColor="rgba(212, 210, 200, 0.5)" // Hintergrundfarbe der Karte
-                  />
-                )
-              )
-            )
-          )}
-
-
-
                 {/* Markierungen für verschiedene Arten von Orten anzeigen */}
                 {showMarkers && continentsData.flatMap(continent =>
                   continent.countries.flatMap(country =>
