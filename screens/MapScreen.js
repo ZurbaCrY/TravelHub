@@ -157,6 +157,7 @@ export default function MapScreen() {
         <MapView
           provider={PROVIDER_GOOGLE}
           style={styles.map}
+          mapType={"mutedStandard"}
           showsUserLocation={true} // Zeige den Standort des Benutzers als blauen Punkt an
           initialRegion={{
             latitude: location.coords.latitude,
@@ -165,6 +166,56 @@ export default function MapScreen() {
             longitudeDelta: 0.0421,
           }}
           backgroundColor="lightblue" // Hintergrundfarbe der gesamten Karte
+          showsPointsOfInterest={false} // Entferne vordefinierte Orte wie Geschäfte, Restaurants, etc.
+          showsTraffic={false}
+          customMapStyle={[
+            {
+              "featureType": "road",
+              "elementType": "geometry",
+              "stylers": [
+                {
+                  "color": "#cccccc" // Farbe der Straßen
+                }
+              ]
+            },
+            {
+              "featureType": "road",
+              "elementType": "labels",
+              "stylers": [
+                {
+                  "visibility": "off" // Straßenbezeichnungen ausblenden
+                }
+              ]
+            },
+            {
+              "featureType": "transit.line",
+              "stylers": [
+                {
+                  "visibility": "off" // Symbole für den öffentlichen Nahverkehr ausblenden
+                }
+              ]
+            },
+                         {
+                           "featureType": "transit.station.bus",
+                           "stylers": [
+                             { "visibility": "off" } // Busstationen ausblenden
+                           ]
+                         },
+                         {
+                           "featureType": "transit.station.rail",
+                           "stylers": [
+                             { "visibility": "off" } // Zugstationen ausblenden
+                           ]
+                         },
+               {
+                 "featureType": "poi",
+                 "stylers": [
+                   {
+                     "visibility": "off" // Alle vordefinierten POIs ausblenden (z. B. Parkplatzsymbole, etc.)
+                   }
+                 ]
+               }
+          ]}
         >
 
 
