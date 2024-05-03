@@ -49,7 +49,7 @@ export default function App() {
             );
           },
           tabBarShowLabel: true,
-          headerShown: false // Versteckt den Header komplett
+          headerShown: false
         })}
       >
         <Tab.Screen name="Home" component={HomeScreen} />
