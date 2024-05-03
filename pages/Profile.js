@@ -14,6 +14,7 @@ import {
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Flag from 'react-native-flags';
 import { useDarkMode } from './DarkModeContext';
+import { useNavigation } from '@react-navigation/native'; // Importiere useNavigation
 
 const ProfileScreen = () => {
   const { isDarkMode, toggleDarkMode } = useDarkMode();
@@ -23,6 +24,8 @@ const ProfileScreen = () => {
   const [newWishList, setNewWishList] = useState('');
   const [showVisitedInput, setShowVisitedInput] = useState(false);
   const [showWishListInput, setShowWishListInput] = useState(false);
+
+  const navigation = useNavigation(); // Navigation Hook
 
   const addVisitedCountry = () => {
     if (newVisited) {
@@ -133,6 +136,13 @@ const ProfileScreen = () => {
             </TouchableOpacity>
           )}
         </View>
+        {/* Hinzufügung des Navigation Buttons */}
+        <TouchableOpacity
+          onPress={() => navigation.navigate('Settings')}
+          style={styles.navButton}
+        >
+          <Text style={styles.navButtonText}>Zu den Einstellungen</Text>
+        </TouchableOpacity>
       </ScrollView>
     </TouchableWithoutFeedback>
   );
@@ -159,7 +169,6 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   details: {
-    color: '#FFFDF3',
     fontSize: 16,
     marginVertical: 2,
   },
@@ -190,8 +199,8 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   addButtonText: {
-    color: '#FFFDF3',
     fontSize: 16,
+    color: '#FFFDF3',
   },
   countryItem: {
     flexDirection: 'row',
@@ -212,6 +221,19 @@ const styles = StyleSheet.create({
   },
   iconRightMargin: {
     marginRight: 5,
+  },
+  navButton: {
+    backgroundColor: '#3D52D5',
+    padding: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginVertical: 20,
+    marginLeft: 10,
+    marginRight: 10,
+  },
+  navButtonText: {
+    color: '#FFFDF3',
+    fontSize: 18,
   },
 });
 
