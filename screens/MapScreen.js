@@ -359,14 +359,14 @@ const deg2rad = (deg) => {
             showsHorizontalScrollIndicator={false}
           >
             {/* Hier kannst du die Liste der Orte für die gesuchte Stadt anzeigen */}
-            {searchResult && searchResult.places.map(place => (
+            {(region.latitudeDelta < 12) && searchResult && searchResult.places.map(place => (
               <View key={place.name} style={styles.placeItem}>
                 <Text>{place.name}</Text>
               </View>
             ))}
           </ScrollView>
           {/* Kreuz-Symbol für das Zurücksetzen der Liste */}
-          {searchResult && (
+          {(region.latitudeDelta < 12) && searchResult && (
             <TouchableOpacity onPress={handleResetPlaces} style={styles.crossButton}>
               <MaterialIcons name="close" size={24} color="black" />
             </TouchableOpacity>
