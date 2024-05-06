@@ -120,6 +120,7 @@ export default function MapScreen() {
   const [searchLocation, setSearchLocation] = useState(null);
     const [region, setRegion] = useState(null); // Zustand für die aktuelle Kartenregion
       const [mapRef, setMapRef] = useState(null);
+    const [showBottomLine, setShowBottomLine] = useState(false);
 
 
 
@@ -188,8 +189,10 @@ export default function MapScreen() {
     // Check the zoom level and decide whether to show markers or not
     if (region.latitudeDelta < 12) {
       setShowMarkers(true);
+      setShowBottomLine(true);
     } else {
       setShowMarkers(false);
+      setShowBottomLine(false);
     }
   // Find the nearest city based on the current region
   const nearestCity = findNearestCity(region);
@@ -361,14 +364,14 @@ const deg2rad = (deg) => {
             showsHorizontalScrollIndicator={false}
           >
             {/* Hier kannst du die Liste der Orte für die gesuchte Stadt anzeigen */}
-            {searchResult && searchResult.places.map(place => (
+            {showBottomLine && searchResult && searchResult.places.map(place => (
               <View key={place.name} style={styles.placeItem}>
                 <Text>{place.name}</Text>
               </View>
             ))}
           </ScrollView>
           {/* Kreuz-Symbol für das Zurücksetzen der Liste */}
-          {searchResult && (
+          {showBottomLine && searchResult && (
             <TouchableOpacity onPress={handleResetPlaces} style={styles.crossButton}>
               <MaterialIcons name="close" size={24} color="black" />
             </TouchableOpacity>
