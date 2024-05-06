@@ -11,7 +11,7 @@ Start App:
 Open on Android: 
 ``a``
 
-##Linux VM Commands
+## Linux VM Commands
 Neuen SSH Key generieren und danach in GitHub Account eintragen: <br>
 ``ssh-keygen `` <br>
 Projekt klonen: <br>
@@ -31,10 +31,10 @@ Weitere Commands: <br>
 App nach außen erreichbar starten: <br>
 ``npm start --tunnel`` <br>
 
-##Produktivserver
+## Produktivserver
 IP: 108.142.170.213
 DNS: travel-prod.westeurope.cloudapp.azure.com
 
-##Testserver
+## Testserver
 IP: 20.73.246.214
 DNS: travel-test.westeurope.cloudapp.azure.com
