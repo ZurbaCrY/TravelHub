@@ -7,7 +7,7 @@ import { FontAwesome5 } from '@expo/vector-icons';
 import { Animated } from 'react-native';
 import { DarkModeProvider } from './pages/DarkModeContext';
 
-import MapScreen from './pages/Maps';
+import MapScreen from './pages/MapScreen';
 import CommunityScreen from './pages/Community';
 import ProfileScreen from './pages/Profile';
 import SettingsScreen from './pages/Settings';
