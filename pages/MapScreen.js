@@ -321,6 +321,8 @@ const deg2rad = (deg) => {
           showsPointsOfInterest={false} // Entferne vordefinierte Orte wie Geschäfte, Restaurants, etc.
           showsTraffic={false}
           customMapStyle={customMapStyle}
+          showsIndoors={false}
+          showsIndoorLevelPicker={false}
           rotateEnabled={false} // Rotation der Karte deaktivieren
           showsCompass={false} // Kompass ausblenden
           ref={(ref) => setMapRef(ref)}
