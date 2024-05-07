@@ -343,7 +343,7 @@ const scrollToStart = () => {
         };
 
           const handleResetPlaces = () => {
-            setSearchResult(null); // Setze den Suchergebnis-Status auf null, um den Inhalt der Leiste zurückzusetzen
+            setShowBottomLine(false); // Setze den Suchergebnis-Status auf null, um den Inhalt der Leiste zurückzusetzen
             setSelectedPlace(null);
           };
 
@@ -456,6 +456,13 @@ const scrollToStart = () => {
               <MaterialIcons name="close" size={24} color="black" />
             </TouchableOpacity>
           )}
+
+          {showBottomLine && searchResult && (
+          <TouchableOpacity //onPress={scrollToTop}
+          style={styles.arrowButton}>
+                    <MaterialIcons name="keyboard-arrow-up" size={24} color="black" />
+                  </TouchableOpacity>
+                  )}
         </View>
 
     </View>
@@ -515,4 +522,9 @@ const styles = StyleSheet.create({
       bottom: 16,
       right: 16,
     },
+      arrowButton: {
+        position: 'absolute',
+        bottom: 60, // Adjust position as needed
+        right: 20, // Adjust position as needed
+      },
 });
