@@ -178,6 +178,28 @@ useEffect(() => {
     }
   };
 
+  const getDescriptionForPlace = (place) => {
+  if (place === selectedPlace) {
+        if (place.type === 'Sehenswürdigkeit') {
+          return (place instanceof SightseeingSpot) ? `Eintritt: ${place.entranceFee || 'N/A'}` : 'N/A';
+        } else if (place.type === 'Restaurant') {
+          return `Preisniveau: ${place.priceLevel || 'N/A'}, Küche: ${place.cuisineType || 'N/A'}`;
+        } else {
+          return 'N/A';
+        }
+   } else {
+        return null;
+   }
+  };
+
+  const getNameForPlace = (place) => {
+    if (place === selectedPlace){
+        return place.name;
+    } else{
+        return null;
+    }
+  }
+
   const findMiddleCoordinate = (coordinates) => {
     if (coordinates.length === 0) {
       return null;
@@ -378,13 +400,14 @@ const scrollToStart = () => {
                       city.places.map(place => (
 
                         <Marker
-                          key={`${continent.name}-${country.name}-${city.name}-${place.name}`}
+                          key={`${continent.name}-${country.name}-${city.name}-${place.name}-${selectedPlace && selectedPlace.name === place.name ? 'selected' : 'unselected'}`}
                           coordinate={place.coordinates} // Die Koordinaten des Ortes werden von der Stadt übernommen
-                          title={place.name}
-                          description={place.type === 'Sehenswürdigkeit' ? `Eintritt: ${(place instanceof SightseeingSpot) ? place.entranceFee : 'N/A'}` : `Preisniveau: ${(place instanceof Restaurant) ? place.priceLevel : 'N/A'}, Küche: ${(place instanceof Restaurant) ? place.cuisineType : 'N/A'}`}
+                          onPress={() => handleMarkerPress(place)} // Handler für das Anklicken des Markers
+                          title={getNameForPlace(place)}
+                          description={getDescriptionForPlace(place)}
+                          calloutEnabled={true}
                           image={getImageForPlace(place)} // Hier das Bild für den benutzerdefinierten Marker angeben
                           style={{ width: 20, height: 20 }} // Anpassung der Größe des Markers
-                          onPress={() => handleMarkerPress(place)} // Handler für das Anklicken des Markers
                         />
                       ))
                     )
