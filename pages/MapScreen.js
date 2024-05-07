@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { StyleSheet, View, Text, TextInput, Button, ScrollView, TouchableOpacity } from 'react-native';
 import MapView, { PROVIDER_GOOGLE, Polygon, Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
@@ -86,10 +86,14 @@ const continentsData = [
                              { latitude: 52.304555, longitude: 13.709564 },
                              { latitude: 52.529719, longitude: 13.907318 }
                          ], [
-                                    new SightseeingSpot('Brandenburger Tor', { latitude: 52.516275, longitude: 13.377704 }, 0), // Brandenburger Tor hat keine Eintrittsgebühr
-                                    new Restaurant('Mustermanns Restaurant', { latitude: 52.5233, longitude: 13.4127 }, 3, 'Deutsch'), // Mustermanns Restaurant ist mittelpreisig und serviert deutsche Küche
-                                    // Weitere Orte hinzufügen
-                                  ]),
+                              new SightseeingSpot('Brandenburger Tor', { latitude: 52.516275, longitude: 13.377704 }, 0), // Brandenburger Tor hat keine Eintrittsgebühr
+                              new Restaurant('Mustermanns Restaurant', { latitude: 52.5233, longitude: 13.4127 }, 3, 'Deutsch'), // Mustermanns Restaurant ist mittelpreisig und serviert deutsche Küche
+                              new Restaurant('Pizza Paradies', { latitude: 52.5111, longitude: 13.3985 }, 2, 'Italienisch'), // Pizza Paradies ist preiswert und serviert italienische Küche
+                              new SightseeingSpot('Fernsehturm Berlin', { latitude: 52.5200, longitude: 13.4074 }, 10), // Fernsehturm Berlin hat eine Eintrittsgebühr von 10 Euro
+                              new Restaurant('Sushi Deluxe', { latitude: 52.5144, longitude: 13.3453 }, 4, 'Japanisch'), // Sushi Deluxe ist teuer und serviert japanische Küche
+                              // Weitere Orte hinzufügen
+                            ]
+),
       // weitere Städte hinzufügen...
     ]),
     new Country('France', [
@@ -122,27 +126,39 @@ export default function MapScreen() {
       const [mapRef, setMapRef] = useState(null);
     const [showBottomLine, setShowBottomLine] = useState(false);
       const [selectedPlace, setSelectedPlace] = useState(null);
+        const scrollViewRef = useRef(null);
 
 
 
-  useEffect(() => {
-    (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        setErrorMsg('Permission to access location was denied');
-        return;
-      }
+useEffect(() => {
+  // Scrollen zur ausgewählten Position in der ScrollView
+  if (scrollViewRef.current && selectedPlace) {
+    const index = searchResult.places.findIndex(place => place === selectedPlace);
+    const offsetX = index * 120; // Breite des Platzhalters plus Abstand
 
-      let location = await Location.getCurrentPositionAsync({});
-      setLocation(location);
-      setRegion({
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-        latitudeDelta: 0.0922,
-        longitudeDelta: 0.0421,
-      }); // Setze die anfängliche Kartenregion
-    })();
-  }, []);
+    scrollViewRef.current.scrollTo({ x: offsetX, y: 0, animated: true });
+  }
+}, [selectedPlace]); // Füge selectedPlace als Abhängigkeit hinzu
+
+useEffect(() => {
+  (async () => {
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== 'granted') {
+      setErrorMsg('Permission to access location was denied');
+      return;
+    }
+
+    let location = await Location.getCurrentPositionAsync({});
+    setLocation(location);
+    setRegion({
+      latitude: location.coords.latitude,
+      longitude: location.coords.longitude,
+      latitudeDelta: 0.0922,
+      longitudeDelta: 0.0421,
+    }); // Setze die anfängliche Kartenregion
+  })();
+}, []);
+
 
   const getImageForPlace = (place) => {
     if (place === selectedPlace){
@@ -249,6 +265,12 @@ const deg2rad = (deg) => {
   return deg * (Math.PI / 180);
 };
 
+const scrollToStart = () => {
+  if (scrollViewRef.current) {
+    scrollViewRef.current.scrollTo({ x: 0, y: 0, animated: true });
+  }
+};
+
     const handleSearch = async () => {
           const result = continentsData.find(continent =>
             continent.countries.some(country =>
@@ -276,6 +298,8 @@ const deg2rad = (deg) => {
                     //console.log(city);
                                 if (city) {
                                   setSearchResult(city);
+                                  setSelectedPlace(null);
+                                  scrollToStart();
                                   const middleCoordinate = findMiddleCoordinate(city.coordinates);
 
                                   // Animiere die Karte zur Mitte der gesuchten Stadt über einen Zeitraum von 1000 Millisekunden (1 Sekunde)
@@ -374,26 +398,27 @@ const deg2rad = (deg) => {
       )}
 
         <View style={styles.bottomBar}>
-          <ScrollView
-            contentContainerStyle={styles.bottomBarContent}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-          >
-            {/* Hier kannst du die Liste der Orte für die gesuchte Stadt anzeigen */}
-            {showBottomLine && searchResult && searchResult.places.map(place => (
-              <TouchableOpacity
-                            key={place.name}
-                            style={
-                                    selectedPlace === place ?
-                                    [styles.placeItem, styles.selectedPlaceItem] :
-                                    styles.placeItem
-                                }
-                            onPress={() => handleMarkerPress(place)} // Handler für das Anklicken des Ortes
-                          >
-                         <Text>{place.name}</Text>
-                                     </TouchableOpacity>
-            ))}
-          </ScrollView>
+        <ScrollView
+          ref={scrollViewRef}
+          contentContainerStyle={styles.bottomBarContent}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+        >
+          {/* Hier kannst du die Liste der Orte für die gesuchte Stadt anzeigen */}
+          {showBottomLine && searchResult && searchResult.places.map(place => (
+            <TouchableOpacity
+              key={place.name}
+              style={
+                selectedPlace === place ?
+                [styles.placeItem, styles.selectedPlaceItem] :
+                styles.placeItem
+              }
+              onPress={() => handleMarkerPress(place)}
+            >
+              <Text>{place.name}</Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
           {/* Kreuz-Symbol für das Zurücksetzen der Liste */}
           {showBottomLine && searchResult && (
             <TouchableOpacity onPress={handleResetPlaces} style={styles.crossButton}>
