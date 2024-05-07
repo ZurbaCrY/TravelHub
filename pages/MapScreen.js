@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, View, Text, TextInput, Button, ScrollView, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, Text, TextInput, Button, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
 import MapView, { PROVIDER_GOOGLE, Polygon, Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { customMapStyle } from '../resources/customMapStyle';
 import { MaterialIcons } from '@expo/vector-icons'; // Beispiel für ein Icon-Paket, hier MaterialIcons von Expo
+
+
+const { width } = Dimensions.get('window');
 
 // Definition der Klassen
 class Continent {
@@ -500,7 +503,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     backgroundColor: 'white',
-    paddingVertical: 15,
+    paddingVertical: 20,
   },
   bottomBarContent: {
     paddingHorizontal: 20,
@@ -519,12 +522,12 @@ const styles = StyleSheet.create({
     },
     crossButton: {
       position: 'absolute',
-      bottom: 16,
+      bottom: 22,
       right: 16,
     },
       arrowButton: {
         position: 'absolute',
-        bottom: 60, // Adjust position as needed
-        right: 20, // Adjust position as needed
+        bottom: 50, // Adjust position as needed
+        right: (width - 24) / 2, // Width of the screen minus width of the icon divided by 2
       },
 });
