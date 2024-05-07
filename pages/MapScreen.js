@@ -381,7 +381,11 @@ const deg2rad = (deg) => {
           >
             {/* Hier kannst du die Liste der Orte für die gesuchte Stadt anzeigen */}
             {showBottomLine && searchResult && searchResult.places.map(place => (
-              <View key={place.name} style={styles.placeItem}>
+              <View key={place.name} style={
+                                             selectedPlace === place ?
+                                             [styles.placeItem, styles.selectedPlaceItem] :
+                                             styles.placeItem
+                                         }>
                 <Text>{place.name}</Text>
               </View>
             ))}
@@ -440,6 +444,12 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     backgroundColor: '#eee',
   },
+    selectedPlaceItem: {
+        marginRight: 10,
+        padding: 5,
+        borderRadius: 5,
+      backgroundColor: '#dbe155', // Hintergrundfarbe für den ausgewählten Ort
+    },
     crossButton: {
       position: 'absolute',
       bottom: 16,
