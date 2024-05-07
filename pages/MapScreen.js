@@ -121,6 +121,7 @@ export default function MapScreen() {
     const [region, setRegion] = useState(null); // Zustand für die aktuelle Kartenregion
       const [mapRef, setMapRef] = useState(null);
     const [showBottomLine, setShowBottomLine] = useState(false);
+      const [selectedPlace, setSelectedPlace] = useState(null);
 
 
 
@@ -296,6 +297,11 @@ const deg2rad = (deg) => {
             setSearchResult(null); // Setze den Suchergebnis-Status auf null, um den Inhalt der Leiste zurückzusetzen
           };
 
+   const handleMarkerPress = (place) => {
+     setSelectedPlace(place);
+     console.log(place);
+   };
+
  return (
     <View style={styles.container}>
 
@@ -345,6 +351,7 @@ const deg2rad = (deg) => {
                           description={place.type === 'Sehenswürdigkeit' ? `Eintritt: ${(place instanceof SightseeingSpot) ? place.entranceFee : 'N/A'}` : `Preisniveau: ${(place instanceof Restaurant) ? place.priceLevel : 'N/A'}, Küche: ${(place instanceof Restaurant) ? place.cuisineType : 'N/A'}`}
                           image={getImageForPlace(place.type)} // Hier das Bild für den benutzerdefinierten Marker angeben
                           style={{ width: 20, height: 20 }} // Anpassung der Größe des Markers
+                          onPress={() => handleMarkerPress(place)} // Handler für das Anklicken des Markers
                         />
                       ))
                     )
