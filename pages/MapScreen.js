@@ -349,6 +349,14 @@ const scrollToStart = () => {
 
    const handleMarkerPress = (place) => {
      setSelectedPlace(place);
+     if (mapRef) {
+                                         mapRef.animateToRegion({
+                                           latitude: place.coordinates.latitude,
+                                           longitude: place.coordinates.longitude,
+                                           latitudeDelta: 0.01, // Hier kannst du die Zoomstufe einstellen
+                                           longitudeDelta: 0.01, // Hier kannst du die Zoomstufe einstellen
+                                         }, 1000);
+                                       }
      console.log(place);
    };
 
