@@ -144,8 +144,11 @@ export default function MapScreen() {
     })();
   }, []);
 
-  const getImageForPlace = (placeType) => {
-    switch (placeType) {
+  const getImageForPlace = (place) => {
+    if (place === selectedPlace){
+        return require('../resources/travel-marker-x.png');
+    }
+    switch (place.type) {
       case 'Sehenswürdigkeit':
         return require('../resources/travel-marker-s.png');
       case 'Restaurant':
@@ -295,12 +298,17 @@ const deg2rad = (deg) => {
 
           const handleResetPlaces = () => {
             setSearchResult(null); // Setze den Suchergebnis-Status auf null, um den Inhalt der Leiste zurückzusetzen
+            setSelectedPlace(null);
           };
 
    const handleMarkerPress = (place) => {
      setSelectedPlace(place);
      console.log(place);
    };
+
+     const handleMapPress = () => {
+       setSelectedPlace(null);
+     };
 
  return (
     <View style={styles.container}>
@@ -334,6 +342,7 @@ const deg2rad = (deg) => {
           showsIndoorLevelPicker={false}
           rotateEnabled={false} // Rotation der Karte deaktivieren
           showsCompass={false} // Kompass ausblenden
+          onPress={handleMapPress}
           ref={(ref) => setMapRef(ref)}
         >
 
@@ -349,7 +358,7 @@ const deg2rad = (deg) => {
                           coordinate={place.coordinates} // Die Koordinaten des Ortes werden von der Stadt übernommen
                           title={place.name}
                           description={place.type === 'Sehenswürdigkeit' ? `Eintritt: ${(place instanceof SightseeingSpot) ? place.entranceFee : 'N/A'}` : `Preisniveau: ${(place instanceof Restaurant) ? place.priceLevel : 'N/A'}, Küche: ${(place instanceof Restaurant) ? place.cuisineType : 'N/A'}`}
-                          image={getImageForPlace(place.type)} // Hier das Bild für den benutzerdefinierten Marker angeben
+                          image={getImageForPlace(place)} // Hier das Bild für den benutzerdefinierten Marker angeben
                           style={{ width: 20, height: 20 }} // Anpassung der Größe des Markers
                           onPress={() => handleMarkerPress(place)} // Handler für das Anklicken des Markers
                         />
