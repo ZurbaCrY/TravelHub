@@ -381,13 +381,17 @@ const deg2rad = (deg) => {
           >
             {/* Hier kannst du die Liste der Orte für die gesuchte Stadt anzeigen */}
             {showBottomLine && searchResult && searchResult.places.map(place => (
-              <View key={place.name} style={
-                                             selectedPlace === place ?
-                                             [styles.placeItem, styles.selectedPlaceItem] :
-                                             styles.placeItem
-                                         }>
-                <Text>{place.name}</Text>
-              </View>
+              <TouchableOpacity
+                            key={place.name}
+                            style={
+                                    selectedPlace === place ?
+                                    [styles.placeItem, styles.selectedPlaceItem] :
+                                    styles.placeItem
+                                }
+                            onPress={() => handleMarkerPress(place)} // Handler für das Anklicken des Ortes
+                          >
+                         <Text>{place.name}</Text>
+                                     </TouchableOpacity>
             ))}
           </ScrollView>
           {/* Kreuz-Symbol für das Zurücksetzen der Liste */}
