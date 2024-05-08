@@ -554,6 +554,10 @@ const scrollToStart = () => {
                 </View>
               </TouchableOpacity>
             ))}
+                        <TouchableOpacity onPress={() => setShowList(false)}
+                                  style={styles.arrowDown}>
+                                            <MaterialIcons name="keyboard-arrow-down" size={24} color="black" />
+                                          </TouchableOpacity>
           </View>
         </View>
       </Modal>
