@@ -467,7 +467,7 @@ const scrollToStart = () => {
         </MapView>
 
       ) : (
-        <Text>Loading...</Text>
+        <Text>Arvid fickt gerade deine Mum...</Text>
       )}
 
         <View style={styles.bottomBar}>
