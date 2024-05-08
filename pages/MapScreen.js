@@ -111,6 +111,9 @@ const continentsData = [
         new SightseeingSpot('Louvre Museum', { latitude: 48.8606, longitude: 2.3376 }, 12), // Louvre Museum mit Eintrittsgebühr
         // Weitere Sehenswürdigkeiten hinzufügen...
       ]),
+      new City('Marseille',[
+      { latitude: 43.2964, longitude: 5.3700 },
+      ], []),
       // Weitere Städte in Frankreich hinzufügen...
     ]),
   ]),
