@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, View, Modal, Text, TextInput, Button, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
+import { StyleSheet, View, Modal, Text, TextInput, Button, ScrollView, TouchableOpacity, Dimensions, Image } from 'react-native';
 import MapView, { PROVIDER_GOOGLE, Polygon, Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { customMapStyle } from '../resources/customMapStyle';
@@ -174,21 +174,21 @@ useEffect(() => {
 
 
   const getImageForPlace = (place) => {
-    if (place === selectedPlace){
-        return require('../resources/travel-marker-x.png');
-    }
-    switch (place.type) {
-      case 'Sehenswürdigkeit':
-        return require('../resources/travel-marker-s.png');
-      case 'Restaurant':
-        return require('../resources/travel-marker-r.png');
-      case 'Einkaufsladen':
-        return require('../resources/travel-marker-m.png');
-      case 'Aussichtspunkt':
-        return require('../resources/travel-marker-v.png');
-      default:
-        return require('../resources/travel-marker-x.png');
-    }
+        if (place === selectedPlace){
+            return require('../resources/travel-marker-x.png');
+        }
+        switch (place.type) {
+          case 'Sehenswürdigkeit':
+            return require('../resources/travel-marker-s.png');
+          case 'Restaurant':
+            return require('../resources/travel-marker-r.png');
+          case 'Einkaufsladen':
+            return require('../resources/travel-marker-m.png');
+          case 'Aussichtspunkt':
+            return require('../resources/travel-marker-v.png');
+          default:
+            return require('../resources/travel-marker-x.png');
+        }
   };
 
   const getDescriptionForPlace = (place) => {
@@ -512,18 +512,29 @@ const scrollToStart = () => {
           {/* Hier füge deine Liste oder deine zusätzlichen Inhalte ein */}
           <View style={styles.modalContent}>
             {searchResult && searchResult.places.map(place => (
-                        <TouchableOpacity
-                          key={place.name}
-                          style={
-                            selectedPlace === place ?
-                            [styles.placeItem, styles.selectedPlaceItem] :
-                            styles.placeItem
-                          }
-                          onPress={() => handleMarkerPress(place)}
-                        >
-                          <Text>{place.name}</Text>
-                        </TouchableOpacity>
-                      ))}
+              <TouchableOpacity
+                key={place.name}
+                style={
+                  selectedPlace === place ?
+                  [styles.customPlaceItem, styles.customSelectedPlaceItem] :
+                  styles.customPlaceItem
+                }
+                onPress={() => handleMarkerPress(place)}
+              >
+                <View style={styles.customPlaceItemContainer}>
+                  {/* Bild links */}
+                  <Image
+                    source={{ uri: 'https://www.fineart-panorama.de/361381/eiffelturm-paris-im-morgenlicht.jpg' }}
+                    style={styles.customPlaceItemImage}
+                  />
+                  {/* Name und Beschreibung rechts daneben */}
+                  <View style={styles.customPlaceItemTextContainer}>
+                    <Text style={styles.customPlaceItemName}>{place.name}</Text>
+                    <Text style={styles.customPlaceItemDescription}>{place.description}</Text>
+                  </View>
+                </View>
+              </TouchableOpacity>
+            ))}
             <TouchableOpacity onPress={() => setShowList(false)}
                       style={styles.arrowDown}>
                                 <MaterialIcons name="keyboard-arrow-down" size={24} color="black" />
@@ -613,4 +624,34 @@ const styles = StyleSheet.create({
                 top: 0, // Adjust position as needed
                 right: (width - 24) / 2, // Width of the screen minus width of the icon divided by 2
               },
+
+              customPlaceItem: {
+                  padding: 10,
+                  borderBottomWidth: 1,
+                  borderBottomColor: '#ccc',
+                },
+                customSelectedPlaceItem: {
+                  backgroundColor: '#e0e0e0',
+                },
+                customPlaceItemContainer: {
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                },
+                customPlaceItemImage: {
+                  width: 50,
+                  height: 50,
+                  marginRight: 10,
+                  borderRadius: 25,
+                },
+                customPlaceItemTextContainer: {
+                  flex: 1,
+                },
+                customPlaceItemName: {
+                  fontSize: 16,
+                  fontWeight: 'bold',
+                },
+                customPlaceItemDescription: {
+                  fontSize: 14,
+                  color: '#666',
+                },
 });
