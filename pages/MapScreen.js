@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, View, Text, TextInput, Button, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
+import { StyleSheet, View, Modal, Text, TextInput, Button, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
 import MapView, { PROVIDER_GOOGLE, Polygon, Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { customMapStyle } from '../resources/customMapStyle';
@@ -133,6 +133,7 @@ export default function MapScreen() {
     const [showBottomLine, setShowBottomLine] = useState(false);
       const [selectedPlace, setSelectedPlace] = useState(null);
         const scrollViewRef = useRef(null);
+        const [showList, setShowList] = useState(false);
 
 
 
@@ -393,6 +394,10 @@ const scrollToStart = () => {
        setSelectedPlace(null);
      };
 
+     const scrollToTop = () => {
+        setShowList(true);
+     };
+
  return (
     <View style={styles.container}>
 
@@ -487,12 +492,45 @@ const scrollToStart = () => {
           )}
 
           {showBottomLine && searchResult && (
-          <TouchableOpacity //onPress={scrollToTop}
+          <TouchableOpacity onPress={scrollToTop}
           style={styles.arrowButton}>
                     <MaterialIcons name="keyboard-arrow-up" size={24} color="black" />
                   </TouchableOpacity>
                   )}
         </View>
+
+      {/* Modal für die Liste von unten */}
+      <Modal
+        animationType="slide-up"
+        transparent={true}
+        visible={showList}
+        onRequestClose={() => {
+          setShowList(false);
+        }}
+      >
+        <View style={styles.modalContainer}>
+          {/* Hier füge deine Liste oder deine zusätzlichen Inhalte ein */}
+          <View style={styles.modalContent}>
+            {searchResult && searchResult.places.map(place => (
+                        <TouchableOpacity
+                          key={place.name}
+                          style={
+                            selectedPlace === place ?
+                            [styles.placeItem, styles.selectedPlaceItem] :
+                            styles.placeItem
+                          }
+                          onPress={() => handleMarkerPress(place)}
+                        >
+                          <Text>{place.name}</Text>
+                        </TouchableOpacity>
+                      ))}
+            <TouchableOpacity onPress={() => setShowList(false)}
+                      style={styles.arrowDown}>
+                                <MaterialIcons name="keyboard-arrow-down" size={24} color="black" />
+                              </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
 
     </View>
   );
@@ -529,7 +567,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     backgroundColor: 'white',
-    paddingVertical: 20,
+    paddingVertical: 25,
   },
   bottomBarContent: {
     paddingHorizontal: 20,
@@ -538,6 +576,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
     padding: 5,
     borderRadius: 5,
+    bottom: 0,
     backgroundColor: '#eee',
   },
     selectedPlaceItem: {
@@ -553,7 +592,25 @@ const styles = StyleSheet.create({
     },
       arrowButton: {
         position: 'absolute',
-        bottom: 50, // Adjust position as needed
+        top: 0, // Adjust position as needed
         right: (width - 24) / 2, // Width of the screen minus width of the icon divided by 2
       },
+        modalContainer: {
+    position: 'absolute',
+    bottom: 50,
+    left: 0,
+    right: 0,
+        },
+        modalContent: {
+          backgroundColor: 'white',
+          padding: 20,
+          borderTopLeftRadius: 20,
+          borderTopRightRadius: 20,
+        },
+
+              arrowDown: {
+                position: 'absolute',
+                top: 0, // Adjust position as needed
+                right: (width - 24) / 2, // Width of the screen minus width of the icon divided by 2
+              },
 });
