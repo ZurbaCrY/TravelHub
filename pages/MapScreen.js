@@ -162,6 +162,12 @@ useEffect(() => {
       latitudeDelta: 0.0922,
       longitudeDelta: 0.0421,
     }); // Setze die anfängliche Kartenregion
+    console.log("folgendes Land wurde besucht: " + findCountry(findNearestCity({
+                                                                         latitude: location.coords.latitude,
+                                                                         longitude: location.coords.longitude,
+                                                                         latitudeDelta: 0.0922,
+                                                                         longitudeDelta: 0.0421,
+                                                                       })).name);
   })();
 }, []);
 
@@ -273,6 +279,23 @@ const findNearestCity = (region) => {
 
   return nearestCity;
 };
+
+const findCountry = (city) => {
+  let country = null;
+
+  continentsData.forEach(continent => {
+    continent.countries.forEach(c => {
+      const foundCity = c.cities.find(c => c.name === city.name);
+      if (foundCity) {
+        country = c;
+        return; // Beende die Schleife, wenn die Stadt gefunden wurde
+      }
+    });
+  });
+
+  return country;
+};
+
 
 // Function to calculate the distance between two coordinates using the Haversine formula
 const haversineDistance = (lat1, lon1, lat2, lon2) => {
