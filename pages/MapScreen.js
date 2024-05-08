@@ -205,6 +205,12 @@ useEffect(() => {
    }
   };
 
+  const getListImage = (place) => {
+
+    return 'https://www.fineart-panorama.de/361381/eiffelturm-paris-im-morgenlicht.jpg'
+
+  };
+
   const getNameForPlace = (place) => {
     if (place === selectedPlace){
         return place.name;
@@ -524,7 +530,7 @@ const scrollToStart = () => {
                 <View style={styles.customPlaceItemContainer}>
                   {/* Bild links */}
                   <Image
-                    source={{ uri: 'https://www.fineart-panorama.de/361381/eiffelturm-paris-im-morgenlicht.jpg' }}
+                    source={{ uri: getListImage(place) }}
                     style={styles.customPlaceItemImage}
                   />
                   {/* Name und Beschreibung rechts daneben */}
