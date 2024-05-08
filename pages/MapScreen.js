@@ -407,18 +407,20 @@ const scrollToStart = () => {
  return (
     <View style={styles.container}>
 
-      <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search for city..."
-          onChangeText={text => setSearchQuery(text)}
-          value={searchQuery}
-        />
-        <Button
-          title="Go!"
-          onPress={handleSearch}
-        />
-      </View>
+<View style={[styles.searchContainer, showList && styles.disabledContainer]}>
+  <TextInput
+    style={[styles.searchInput, showList && styles.disabledInput]}
+    placeholder="Search for city..."
+    onChangeText={text => setSearchQuery(text)}
+    value={searchQuery}
+    editable={!showList} // Deaktiviere die Eingabe, wenn showList true ist
+  />
+  <Button
+    title="Go!"
+    onPress={handleSearch}
+    disabled={showList} // Deaktiviere den Button, wenn showList true ist
+  />
+</View>
 
       {location ? (
         <MapView
@@ -578,6 +580,12 @@ const styles = StyleSheet.create({
     marginRight: 10,
     paddingHorizontal: 10,
   },
+  disabledContainer: {
+      opacity: 0.5, // Verringert die Deckkraft des Containers, um ihn auszugrauen
+    },
+    disabledInput: {
+      backgroundColor: '#f2f2f2', // Ändert die Hintergrundfarbe des Eingabefelds, um es auszugrauen
+    },
   bottomBar: {
     position: 'absolute',
     bottom: 0,
