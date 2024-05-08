@@ -404,6 +404,12 @@ const scrollToStart = () => {
         setShowList(true);
      };
 
+     const isStarred = (place) => {
+
+     return false;
+
+     };
+
  return (
     <View style={styles.container}>
 
@@ -540,13 +546,14 @@ const scrollToStart = () => {
                     <Text style={styles.customPlaceItemName}>{place.name}</Text>
                     <Text style={styles.customPlaceItemDescription}>{place.description}</Text>
                   </View>
+                      <TouchableOpacity //onPress={() => handleStarClick(place)}
+                      style={styles.starIconContainer}>
+                        {!isStarred(place) && <MaterialIcons name="star-border" size={24} color="black" />}
+                        {isStarred(place) && <MaterialIcons name="star" size={24} color="gold" style={styles.starFill} />}
+                      </TouchableOpacity>
                 </View>
               </TouchableOpacity>
             ))}
-            <TouchableOpacity onPress={() => setShowList(false)}
-                      style={styles.arrowDown}>
-                                <MaterialIcons name="keyboard-arrow-down" size={24} color="black" />
-                              </TouchableOpacity>
           </View>
         </View>
       </Modal>
@@ -668,4 +675,7 @@ const styles = StyleSheet.create({
                   fontSize: 14,
                   color: '#666',
                 },
+                  starIconContainer: {
+                    marginLeft: 'auto', // Setzt das Sternsymbol ganz rechts
+                  },
 });
