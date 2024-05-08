@@ -3,7 +3,7 @@ import { View, StyleSheet, ActivityIndicator } from 'react-native'
 import { Button, Input } from 'react-native-elements'
 import { signInWithEmail } from '../User-Auth/auth'
 
-export default function SigninPage() {
+export default function SigninScreen() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [loading, setLoading] = useState(false)
