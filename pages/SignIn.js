@@ -23,6 +23,7 @@ export default function SigninScreen() {
   };
 
   return (
+    //  medium creating a stylish logn form in react native
     <SafeAreaView>
       <Text style={styles.title}>Login</Text>
       <View style={styles.inputView}>
