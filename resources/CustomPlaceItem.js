@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons'; // Oder aus einem anderen Icon-Pack
 
-const CustomPlaceItem = ({ place, handleMarkerPress, handleStarClick, image }) => {
+const CustomPlaceItem = ({ place, handleMarkerPress, handleStarClick, handlePlaceDetail, image }) => {
   const isFavourite = place.favourite;
 
   return (
@@ -24,6 +24,10 @@ const CustomPlaceItem = ({ place, handleMarkerPress, handleStarClick, image }) =
         {/* Sternsymbol */}
         <TouchableOpacity onPress={() => handleStarClick(place)} style={styles.starIconContainer}>
           {isFavourite ? <MaterialIcons name="star" size={24} color="gold" /> : <MaterialIcons name="star-border" size={24} color="black" />}
+        </TouchableOpacity>
+        {/* Weiterleitungs-Symbol */}
+        <TouchableOpacity onPress={() => handlePlaceDetail(place)} style={styles.iconContainer}>
+          <MaterialIcons name="info" size={24} color="blue" />
         </TouchableOpacity>
       </View>
     </TouchableOpacity>

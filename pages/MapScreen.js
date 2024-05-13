@@ -5,6 +5,7 @@ import * as Location from 'expo-location';
 import { customMapStyle } from '../resources/customMapStyle';
 import { MaterialIcons } from '@expo/vector-icons'; // Beispiel für ein Icon-Paket, hier MaterialIcons von Expo
 import CustomPlaceItem from '../resources/CustomPlaceItem'; // Annahme: Pfad zur Datei mit der CustomPlaceItem-Komponente
+import PlaceDetailScreen from './PlaceDetailScreen';
 
 
 const { width } = Dimensions.get('window');
@@ -141,6 +142,7 @@ export default function MapScreen() {
         const scrollViewRef = useRef(null);
         const [showList, setShowList] = useState(false);
         const [forceUpdate, setForceUpdate] = useState(false);
+          const [showPlaceDetailModal, setShowPlaceDetailModal] = useState(false);
 
 
 
@@ -426,6 +428,11 @@ const scrollToStart = () => {
 
      }
 
+       const handlePlaceDetail = (place) => {
+         setSelectedPlace(place);
+         setShowPlaceDetailModal(true);
+       };
+
  return (
     <View style={styles.container}>
 
@@ -547,6 +554,7 @@ const scrollToStart = () => {
                       handleMarkerPress={handleMarkerPress}
                       handleStarClick={handleStarClick}
                       image={getListImage(place)}
+                      handlePlaceDetail={handlePlaceDetail} // Diese Prop hinzufügen
                     />
                   ))}
                   <TouchableOpacity onPress={() => setShowList(false)} style={styles.arrowDown}>
@@ -555,6 +563,13 @@ const scrollToStart = () => {
                 </View>
               </View>
             </Modal>
+
+                  {/* Das Modal für die Ortseinzelheiten */}
+                  <PlaceDetailScreen
+                    visible={showPlaceDetailModal}
+                    place={selectedPlace}
+                    onClose={() => setShowPlaceDetailModal(false)}
+                  />
 
     </View>
   );
