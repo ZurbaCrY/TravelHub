@@ -41,7 +41,7 @@ class Place {
     this.name = name;
     this.coordinates = coordinates;
     this.type = type; // Der Ortstyp (z.B. 'Sehenswürdigkeit', 'Restaurant', 'Einkaufsladen', 'Aussichtspunkt')
-    this.favourite = true;
+    this.favourite = false;
   }
     // Methode zum Aktualisieren des Favoritenstatus
     toggleFavourite() {
