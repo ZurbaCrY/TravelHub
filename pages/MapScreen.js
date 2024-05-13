@@ -40,6 +40,7 @@ class Place {
     this.name = name;
     this.coordinates = coordinates;
     this.type = type; // Der Ortstyp (z.B. 'Sehenswürdigkeit', 'Restaurant', 'Einkaufsladen', 'Aussichtspunkt')
+    this.favourite = true;
   }
 }
 
@@ -406,7 +407,7 @@ const scrollToStart = () => {
 
      const isStarred = (place) => {
 
-     return false;
+     return place.favourite;
 
      };
 
