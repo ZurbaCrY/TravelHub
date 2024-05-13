@@ -38,8 +38,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     padding: 20,
     borderRadius: 10,
-    width: '100%',
-    height: '100%',
+    width: '90%',
+    height: '80%',
   },
   placeName: {
     fontSize: 20,
