@@ -1,13 +1,6 @@
 import React, { useState } from "react";
-import { View, StyleSheet, ActivityIndicator } from "react-native";
-import {
-  Button,
-  TextInput,
-  Input,
-  Switch,
-  SafeAreaView,
-  Pressable,
-} from "react-native-elements";
+import { Alert, View, StyleSheet, ActivityIndicator } from "react-native";
+import { Button, Input, Switch, Pressable, Text } from "react-native-elements";
 import { signInWithEmail } from "../User-Auth/auth";
 
 export default function SigninScreen() {
@@ -22,26 +15,32 @@ export default function SigninScreen() {
     setLoading(false);
   };
 
+  const handleForgetPasswordPress = () => {
+    Alert.alert("This Feature is not implemented yet. Please contact Support!");
+  };
+
   return (
-    //  medium creating a stylish logn form in react native
-    <SafeAreaView>
+    //  medium creating a stylish login form in react native
+    <View style={styles.container}>
       <Text style={styles.title}>Login</Text>
       <View style={styles.inputView}>
-        <TextInput
+        <Input
           style={styles.input}
-          placeholder="EMAIL"
+          label="Email"
+          leftIcon={{ type: "font-awesome", name: "envelope" }}
+          onChangeText={(text) => setEmail(text)}
           value={email}
-          onChangeText={setEmail}
-          autoCorrect={false}
-          autoCapitalize="none"
+          placeholder="email@address.com"
+          autoCapitalize={"none"}
         />
-        <TextInput
-          style={styles.input}
-          placeholder="PASSWORD"
+        <Input
+          label="Password"
+          leftIcon={{ type: "font-awesome", name: "lock" }}
+          onChangeText={(text) => setPassword(text)}
           value={password}
-          onChangeText={setPassword}
-          autoCorrect={false}
-          autoCapitalize="none"
+          secureTextEntry={true}
+          placeholder="Password"
+          autoCapitalize={"none"}
         />
       </View>
       <View style={styles.rememberView}>
@@ -54,36 +53,12 @@ export default function SigninScreen() {
           <Text style={styles.rememberText}>Remember Me</Text>
         </View>
         <View>
-          <Pressable onPress={() => Alert.alert("Forget Password!")}>
-            <Text style={styles.forgetText}>Forgot password?</Text>
-          </Pressable>
+          <Text onPress={handleForgetPasswordPress} style={styles.forgetText}>
+            Forgot password?
+          </Text>
         </View>
       </View>
       <View style={styles.container}>
-        <View style={[styles.verticallySpaced, styles.mt20]}>
-          <Input
-            label="Email"
-            leftIcon={{ type: "font-awesome", name: "envelope" }}
-            onChangeText={(text) => setEmail(text)}
-            value={email}
-            placeholder="email@address.com"
-            autoCapitalize={"none"}
-          />
-        </View>
-        <View style={styles.verticallySpaced}>
-          <Input
-            label="Password"
-            leftIcon={{ type: "font-awesome", name: "lock" }}
-            onChangeText={(text) => setPassword(text)}
-            value={password}
-            secureTextEntry={true}
-            placeholder="Password"
-            autoCapitalize={"none"}
-          />
-        </View>
-        <View style={[styles.verticallySpaced]}>
-          <Switch></Switch>
-        </View>
         <View style={[styles.verticallySpaced, styles.mt20]}>
           <Button title="Sign in" disabled={loading} onPress={handleSignIn} />
         </View>
@@ -94,11 +69,8 @@ export default function SigninScreen() {
             style={styles.loadingIndicator}
           />
         )}
-        <View>
-          <Text>Test</Text>
-        </View>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 

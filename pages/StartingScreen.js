@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, StyleSheet, ActivityIndicator, SafeAreaView } from "react-native";
+import { View, StyleSheet, Text, SafeAreaView } from "react-native";
 import { Button, Input } from "react-native-elements";
 
 export default function StartingScreen() {

@@ -23,6 +23,7 @@ import "react-native-url-polyfill/auto";
 import { useState, useEffect } from "react";
 import { supabase } from "./User-Auth/supabase";
 import SignInScreen from "./pages/SignIn";
+import StartingScreen from "./pages/StartingScreen";
 import SignUpScreen from "./pages/SignUp";
 import auth from "./User-Auth/auth"
 import { Session } from "@supabase/supabase-js";
@@ -112,7 +113,7 @@ export default function App() {
     );
   } else {
     return (
-      <SignInScreen/>
+      <StartingScreen/>
     );
   }
 }
