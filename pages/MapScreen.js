@@ -4,6 +4,7 @@ import MapView, { PROVIDER_GOOGLE, Polygon, Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { customMapStyle } from '../resources/customMapStyle';
 import { MaterialIcons } from '@expo/vector-icons'; // Beispiel für ein Icon-Paket, hier MaterialIcons von Expo
+import CustomPlaceItem from '../resources/CustomPlaceItem'; // Annahme: Pfad zur Datei mit der CustomPlaceItem-Komponente
 
 
 const { width } = Dimensions.get('window');
@@ -42,6 +43,10 @@ class Place {
     this.type = type; // Der Ortstyp (z.B. 'Sehenswürdigkeit', 'Restaurant', 'Einkaufsladen', 'Aussichtspunkt')
     this.favourite = true;
   }
+    // Methode zum Aktualisieren des Favoritenstatus
+    toggleFavourite() {
+      this.favourite = !this.favourite;
+    }
 }
 
 class SightseeingSpot extends Place {
@@ -135,6 +140,7 @@ export default function MapScreen() {
       const [selectedPlace, setSelectedPlace] = useState(null);
         const scrollViewRef = useRef(null);
         const [showList, setShowList] = useState(false);
+        const [forceUpdate, setForceUpdate] = useState(false);
 
 
 
@@ -411,6 +417,15 @@ const scrollToStart = () => {
 
      };
 
+     const handleStarClick = (place) => {
+
+        place.toggleFavourite();
+        console.log(place.favourite);
+
+        setForceUpdate(prevState => !prevState);
+
+     }
+
  return (
     <View style={styles.container}>
 
@@ -515,53 +530,31 @@ const scrollToStart = () => {
         </View>
 
       {/* Modal für die Liste von unten */}
-      <Modal
-        animationType="slide-up"
-        transparent={true}
-        visible={showList}
-        onRequestClose={() => {
-          setShowList(false);
-        }}
-      >
-        <View style={styles.modalContainer}>
-          {/* Hier füge deine Liste oder deine zusätzlichen Inhalte ein */}
-          <View style={styles.modalContent}>
-            {searchResult && searchResult.places.map(place => (
-              <TouchableOpacity
-                key={place.name}
-                style={
-                  selectedPlace === place ?
-                  [styles.customPlaceItem, styles.customSelectedPlaceItem] :
-                  styles.customPlaceItem
-                }
-                onPress={() => handleMarkerPress(place)}
-              >
-                <View style={styles.customPlaceItemContainer}>
-                  {/* Bild links */}
-                  <Image
-                    source={{ uri: getListImage(place) }}
-                    style={styles.customPlaceItemImage}
-                  />
-                  {/* Name und Beschreibung rechts daneben */}
-                  <View style={styles.customPlaceItemTextContainer}>
-                    <Text style={styles.customPlaceItemName}>{place.name}</Text>
-                    <Text style={styles.customPlaceItemDescription}>{place.description}</Text>
-                  </View>
-                      <TouchableOpacity //onPress={() => handleStarClick(place)}
-                      style={styles.starIconContainer}>
-                        {!isStarred(place) && <MaterialIcons name="star-border" size={24} color="black" />}
-                        {isStarred(place) && <MaterialIcons name="star" size={24} color="gold" style={styles.starFill} />}
-                      </TouchableOpacity>
+            <Modal
+              animationType="slide-up"
+              transparent={true}
+              visible={showList}
+              onRequestClose={() => {
+                setShowList(false);
+              }}
+            >
+              <View style={styles.modalContainer}>
+                <View style={styles.modalContent}>
+                  {searchResult && searchResult.places.map(place => (
+                    <CustomPlaceItem
+                      key={`${place.name}-${forceUpdate}`}
+                      place={place}
+                      handleMarkerPress={handleMarkerPress}
+                      handleStarClick={handleStarClick}
+                      image={getListImage(place)}
+                    />
+                  ))}
+                  <TouchableOpacity onPress={() => setShowList(false)} style={styles.arrowDown}>
+                    <MaterialIcons name="keyboard-arrow-down" size={24} color="black" />
+                  </TouchableOpacity>
                 </View>
-              </TouchableOpacity>
-            ))}
-                        <TouchableOpacity onPress={() => setShowList(false)}
-                                  style={styles.arrowDown}>
-                                            <MaterialIcons name="keyboard-arrow-down" size={24} color="black" />
-                                          </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
+              </View>
+            </Modal>
 
     </View>
   );
