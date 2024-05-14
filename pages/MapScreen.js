@@ -460,8 +460,7 @@ const scrollToStart = () => {
 </View>
 
       {/* Symbol mit einem Plus oben links */}
-      <TouchableOpacity style={styles.addButton} onPress={handleOpenModal}
-      >
+      <TouchableOpacity style={[styles.addButton, showList && styles.disabledContainer]} onPress={handleOpenModal} >
         <MaterialIcons name="add" size={24} color="black" />
       </TouchableOpacity>
 
