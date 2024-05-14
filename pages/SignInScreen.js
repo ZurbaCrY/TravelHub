@@ -1,9 +1,17 @@
 import React, { useState } from "react";
-import { Alert, View, StyleSheet, ActivityIndicator } from "react-native";
-import { Button, Input, Switch, Pressable, Text } from "react-native-elements";
+import {
+  Alert,
+  View,
+  StyleSheet,
+  ActivityIndicator,
+  TouchableOpacity,
+} from "react-native";
+import { Button, Input, Switch, Text } from "react-native-elements";
 import { signInWithEmail } from "../User-Auth/auth";
+import { useNavigation } from "@react-navigation/native";
 
 export default function SigninScreen() {
+  const navigation = useNavigation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -19,19 +27,27 @@ export default function SigninScreen() {
     Alert.alert("This Feature is not implemented yet. Please contact Support!");
   };
 
+  const authSwitch = () => {
+    navigation.navigate("SignUpScreen");
+  };
+
   return (
-    //  medium creating a stylish login form in react native
     <View style={styles.container}>
       <Text style={styles.title}>Login</Text>
+      <TouchableOpacity style={styles.authSwitchTouchable} onPress={authSwitch}>
+        <Text style={styles.switchText}>
+          Don't have an account? Sign Up instead
+        </Text>
+      </TouchableOpacity>
       <View style={styles.inputView}>
         <Input
-          style={styles.input}
           label="Email"
           leftIcon={{ type: "font-awesome", name: "envelope" }}
           onChangeText={(text) => setEmail(text)}
           value={email}
           placeholder="email@address.com"
           autoCapitalize={"none"}
+          containerStyle={styles.input}
         />
         <Input
           label="Password"
@@ -41,6 +57,7 @@ export default function SigninScreen() {
           secureTextEntry={true}
           placeholder="Password"
           autoCapitalize={"none"}
+          containerStyle={styles.input}
         />
       </View>
       <View style={styles.rememberView}>
@@ -52,16 +69,19 @@ export default function SigninScreen() {
           />
           <Text style={styles.rememberText}>Remember Me</Text>
         </View>
-        <View>
-          <Text onPress={handleForgetPasswordPress} style={styles.forgetText}>
-            Forgot password?
-          </Text>
-        </View>
+        <TouchableOpacity onPress={handleForgetPasswordPress}>
+          <Text style={styles.forgetText}>Forgot password?</Text>
+        </TouchableOpacity>
       </View>
-      <View style={styles.container}>
-        <View style={[styles.verticallySpaced, styles.mt20]}>
-          <Button title="Sign in" disabled={loading} onPress={handleSignIn} />
-        </View>
+      <View style={styles.buttonView}>
+        <Button
+          title="Sign In"
+          style={styles.button}
+          disabled={loading}
+          onPress={handleSignIn}
+          buttonStyle={styles.button}
+          titleStyle={styles.buttonText}
+        />
         {loading && (
           <ActivityIndicator
             size="large"
@@ -74,100 +94,65 @@ export default function SigninScreen() {
   );
 }
 
-
 const styles = StyleSheet.create({
-  container: {
+  authSwitchTouchable: {
     alignItems: "center",
-    paddingTop: 70,
+    marginBottom: 20,
   },
-  image: {
-    height: 160,
-    width: 170,
+  container: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
   title: {
     fontSize: 30,
     fontWeight: "bold",
     textTransform: "uppercase",
-    textAlign: "center",
-    paddingVertical: 40,
+    marginBottom: 20,
     color: "#3EAAE9",
   },
   inputView: {
-    gap: 15,
-    width: "100%",
-    paddingHorizontal: 40,
-    marginBottom: 5,
+    width: "80%",
+    marginBottom: 20,
   },
   input: {
-    height: 50,
-    paddingHorizontal: 20,
-    borderColor: "#3EAAE9",
-    borderWidth: 1,
-    borderRadius: 7,
+    marginBottom: 15,
   },
   rememberView: {
-    width: "100%",
-    paddingHorizontal: 50,
+    width: "80%",
+    flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    flexDirection: "row",
-    marginBottom: 8,
+    marginBottom: 20,
   },
   switch: {
     flexDirection: "row",
-    gap: 1,
-    justifyContent: "center",
     alignItems: "center",
   },
   rememberText: {
     fontSize: 13,
   },
   forgetText: {
-    fontSize: 11,
+    fontSize: 13,
     color: "#3EAAE9",
   },
+  buttonView: {
+    width: "80%",
+  },
   button: {
-    backgroundColor: "red",
+    backgroundColor: "#3EAAE9",
     height: 45,
-    borderColor: "gray",
-    borderWidth: 1,
-    borderRadius: 5,
-    alignItems: "center",
-    justifyContent: "center",
+    borderRadius: 7,
   },
   buttonText: {
-    color: "white",
     fontSize: 18,
     fontWeight: "bold",
   },
-  buttonView: {
-    width: "100%",
-    paddingHorizontal: 50,
+  loadingIndicator: {
+    marginTop: 10,
   },
-  optionsText: {
-    textAlign: "center",
-    paddingVertical: 10,
-    color: "gray",
-    fontSize: 13,
-    marginBottom: 6,
-  },
-  mediaIcons: {
-    flexDirection: "row",
-    gap: 15,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 23,
-  },
-  icons: {
-    width: 40,
-    height: 40,
-  },
-  footerText: {
-    textAlign: "center",
-    color: "gray",
-  },
-  signup: {
-    color: "red",
-    fontSize: 13,
+  switchText: {
+    fontSize: 16,
+    color: "#3EAAE9",
   },
 });

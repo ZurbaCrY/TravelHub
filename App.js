@@ -24,12 +24,12 @@ import "react-native-url-polyfill/auto";
 import { useState, useEffect } from "react";
 import { supabase } from "./User-Auth/supabase";
 import StartingScreen from "./pages/StartingScreen";
-import SignInScreen from "./pages/SignIn";
-import SignUpScreen from "./pages/SignUp";
+import SignInScreen from "./pages/SignInScreen";
+import SignUpScreen from "./pages/SignUpScreen";
 import auth from "./User-Auth/auth";
 import { Session } from "@supabase/supabase-js";
 import LoadingScreen from "./pages/LoadingScreen";
-import SigninScreen from "./pages/SignIn";
+import SigninScreen from "./pages/SignInScreen";
 
 function MainTabs() {
   return (
@@ -126,8 +126,16 @@ export default function App() {
             component={StartingScreen}
             options={{ headerShown: false }}
           />
-          <Stack.Screen name="SignInScreen" component={SignInScreen} />
-          <Stack.Screen name="SignUpScreen" component={SignUpScreen} />
+          <Stack.Screen
+            name="SignInScreen"
+            component={SignInScreen}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="SignUpScreen"
+            component={SignUpScreen}
+            options={{ headerShown: false }}
+          />
         </Stack.Navigator>
       </NavigationContainer>
     );
