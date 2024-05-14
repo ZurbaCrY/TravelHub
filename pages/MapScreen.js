@@ -451,6 +451,12 @@ const scrollToStart = () => {
   />
 </View>
 
+      {/* Symbol mit einem Plus oben links */}
+      <TouchableOpacity style={styles.addButton} //onPress={handleOpenModal}
+      >
+        <MaterialIcons name="add" size={24} color="black" />
+      </TouchableOpacity>
+
       {location ? (
         <MapView
           provider={PROVIDER_GOOGLE}
@@ -692,4 +698,16 @@ const styles = StyleSheet.create({
                   starIconContainer: {
                     marginLeft: 'auto', // Setzt das Sternsymbol ganz rechts
                   },
+                    addButton: {
+                      position: 'absolute',
+                      top: 20,
+                      left: 20,
+                      backgroundColor: 'white',
+                      padding: 10,
+                      borderRadius: 20,
+                      zIndex: 10, // Stelle sicher, dass das Plus-Symbol über anderen Elementen liegt
+                      marginTop: 70,
+                      borderWidth: 1,
+                      borderColor: 'black',
+                    },
 });
