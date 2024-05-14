@@ -25,6 +25,7 @@ import { supabase } from "./User-Auth/supabase";
 import SignInScreen from "./pages/SignIn";
 import SignUpScreen from "./pages/SignUp";
 import { Session } from "@supabase/supabase-js";
+import FriendsScreen from "./pages/Friends";
 
 function MainTabs() {
   return (
@@ -90,6 +91,7 @@ export default function App() {
               options={{ headerShown: false }}
             />
             <RootStack.Screen name="Settings" component={SettingsScreen} />
+            <RootStack.Screen name="Friends" component={FriendsScreen} />
           </RootStack.Navigator>
           <StatusBar style="auto" />
         </NavigationContainer>

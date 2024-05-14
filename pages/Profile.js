@@ -143,6 +143,12 @@ const ProfileScreen = () => {
         >
           <Text style={styles.navButtonText}>Zu den Einstellungen</Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('Friends')}
+          style={styles.navButton}
+        >
+          <Text style={styles.navButtonText}>Zu deiner Freundesliste</Text>
+        </TouchableOpacity>
       </ScrollView>
     </TouchableWithoutFeedback>
   );
@@ -227,7 +233,7 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',
-    marginVertical: 20,
+    marginVertical: 10,
     marginLeft: 10,
     marginRight: 10,
   },
