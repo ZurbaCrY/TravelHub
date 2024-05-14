@@ -26,11 +26,11 @@ const CustomPlaceItem = ({ place, handleMarkerPress, handleStarClick, handlePlac
         </View>
         {/* Sternsymbol */}
         <TouchableOpacity onPress={() => handleStarClick(place)} style={styles.starIconContainer}>
-          {isFavourite ? <MaterialIcons name="star" size={24} color="gold" /> : <MaterialIcons name="star-border" size={24} color="black" />}
+          {isFavourite ? <MaterialIcons name="star" size={24} color="#3EAAE9" /> : <MaterialIcons name="star-border" size={24} color="#3EAAE9" />}
         </TouchableOpacity>
         {/* Weiterleitungs-Symbol */}
         <TouchableOpacity onPress={() => handlePlaceDetail(place)} style={styles.iconContainer}>
-          <MaterialIcons name="info" size={24} color="blue" />
+          <MaterialIcons name="info" size={24} color="#3EAAE9" />
         </TouchableOpacity>
       </View>
     </TouchableOpacity>
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
     marginLeft: 'auto', // Setzt das Sternsymbol ganz rechts
   },
   selectedItem: {
-    backgroundColor: '#dbe155', // Hintergrundfarbe ändern
+    backgroundColor: '#FFFDF3', // Hintergrundfarbe ändern
   },
 });
 
