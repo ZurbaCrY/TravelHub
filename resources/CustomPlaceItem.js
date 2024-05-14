@@ -2,13 +2,16 @@ import React from 'react';
 import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons'; // Oder aus einem anderen Icon-Pack
 
-const CustomPlaceItem = ({ place, handleMarkerPress, handleStarClick, handlePlaceDetail, image }) => {
+const CustomPlaceItem = ({ place, handleMarkerPress, handleStarClick, handlePlaceDetail, image, selected }) => {
   const isFavourite = place.favourite;
+    const handlePress = () => {
+      handleMarkerPress(place);
+    };
 
   return (
     <TouchableOpacity
-      style={styles.customPlaceItem}
-      onPress={() => handleMarkerPress(place)}
+      style={selected ? [styles.customPlaceItem, styles.selectedItem] : styles.customPlaceItem}
+      onPress={handlePress}
     >
       <View style={styles.customPlaceItemContainer}>
         {/* Bild links */}
@@ -63,6 +66,9 @@ const styles = StyleSheet.create({
   },
   starIconContainer: {
     marginLeft: 'auto', // Setzt das Sternsymbol ganz rechts
+  },
+  selectedItem: {
+    backgroundColor: '#dbe155', // Hintergrundfarbe ändern
   },
 });
 

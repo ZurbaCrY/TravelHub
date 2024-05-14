@@ -555,6 +555,7 @@ const scrollToStart = () => {
                       handleStarClick={handleStarClick}
                       image={getListImage(place)}
                       handlePlaceDetail={handlePlaceDetail} // Diese Prop hinzufügen
+                      selected={selectedPlace === place} // Hier wird selected übergeben
                     />
                   ))}
                   <TouchableOpacity onPress={() => setShowList(false)} style={styles.arrowDown}>
