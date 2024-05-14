@@ -15,6 +15,7 @@ import HomeScreen from "./pages/Home";
 
 const Tab = createBottomTabNavigator();
 const RootStack = createStackNavigator();
+const Stack = createStackNavigator();
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 const TopTab = createMaterialTopTabNavigator();
 
@@ -22,12 +23,13 @@ import { View, Text, StyleSheet } from "react-native";
 import "react-native-url-polyfill/auto";
 import { useState, useEffect } from "react";
 import { supabase } from "./User-Auth/supabase";
-import SignInScreen from "./pages/SignIn";
 import StartingScreen from "./pages/StartingScreen";
+import SignInScreen from "./pages/SignIn";
 import SignUpScreen from "./pages/SignUp";
-import auth from "./User-Auth/auth"
+import auth from "./User-Auth/auth";
 import { Session } from "@supabase/supabase-js";
-import LoadingScreen from "./pages/Loading";
+import LoadingScreen from "./pages/LoadingScreen";
+import SigninScreen from "./pages/SignIn";
 
 function MainTabs() {
   return (
@@ -74,19 +76,23 @@ export default function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setLoading(false); // Set loading to false once session is fetched
-    }).catch(error => {
-      console.error('Error fetching session:', error);
-      setLoading(false); // Set loading to false even if there's an error
-    });
+    supabase.auth
+      .getSession()
+      .then(({ data: { session } }) => {
+        setSession(session);
+        setLoading(false); // Set loading to false once session is fetched
+      })
+      .catch((error) => {
+        console.error("Error fetching session:", error);
+        setLoading(false); // Set loading to false even if there's an error
+      });
 
     const authListener = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
     });
 
     return () => {
+      // Funktioniert nicht, bitte überarbeiten
       authListener.unsubscribe(); // Cleanup function for listener
     };
   }, []);
@@ -113,7 +119,17 @@ export default function App() {
     );
   } else {
     return (
-      <StartingScreen/>
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName="Welcome">
+          <Stack.Screen
+            name="Welcome"
+            component={StartingScreen}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen name="SignInScreen" component={SignInScreen} />
+          <Stack.Screen name="SignUpScreen" component={SignUpScreen} />
+        </Stack.Navigator>
+      </NavigationContainer>
     );
   }
 }

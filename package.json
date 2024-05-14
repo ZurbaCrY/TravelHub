@@ -18,6 +18,8 @@
     "@react-navigation/material-top-tabs": "^6.6.13",
     "@react-navigation/native": "^6.1.17",
     "@react-navigation/stack": "^6.3.29",
+    "@supabase/auth-helpers-nextjs": "^0.7.0-next.8",
+    "@supabase/auth-helpers-react": "^0.4.0-next.0",
     "@supabase/supabase-js": "^2.43.0",
     "expo": "^51.0.0",
     "expo-location": "^16.5.5",

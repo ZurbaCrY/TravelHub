@@ -74,17 +74,100 @@ export default function SigninScreen() {
   );
 }
 
+
 const styles = StyleSheet.create({
   container: {
-    marginTop: 40,
-    padding: 12,
+    alignItems: "center",
+    paddingTop: 70,
   },
-  verticallySpaced: {
-    paddingTop: 4,
-    paddingBottom: 4,
-    alignSelf: "stretch",
+  image: {
+    height: 160,
+    width: 170,
   },
-  mt20: {
-    marginTop: 20,
+  title: {
+    fontSize: 30,
+    fontWeight: "bold",
+    textTransform: "uppercase",
+    textAlign: "center",
+    paddingVertical: 40,
+    color: "#3EAAE9",
+  },
+  inputView: {
+    gap: 15,
+    width: "100%",
+    paddingHorizontal: 40,
+    marginBottom: 5,
+  },
+  input: {
+    height: 50,
+    paddingHorizontal: 20,
+    borderColor: "#3EAAE9",
+    borderWidth: 1,
+    borderRadius: 7,
+  },
+  rememberView: {
+    width: "100%",
+    paddingHorizontal: 50,
+    justifyContent: "space-between",
+    alignItems: "center",
+    flexDirection: "row",
+    marginBottom: 8,
+  },
+  switch: {
+    flexDirection: "row",
+    gap: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  rememberText: {
+    fontSize: 13,
+  },
+  forgetText: {
+    fontSize: 11,
+    color: "#3EAAE9",
+  },
+  button: {
+    backgroundColor: "red",
+    height: 45,
+    borderColor: "gray",
+    borderWidth: 1,
+    borderRadius: 5,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  buttonView: {
+    width: "100%",
+    paddingHorizontal: 50,
+  },
+  optionsText: {
+    textAlign: "center",
+    paddingVertical: 10,
+    color: "gray",
+    fontSize: 13,
+    marginBottom: 6,
+  },
+  mediaIcons: {
+    flexDirection: "row",
+    gap: 15,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 23,
+  },
+  icons: {
+    width: 40,
+    height: 40,
+  },
+  footerText: {
+    textAlign: "center",
+    color: "gray",
+  },
+  signup: {
+    color: "red",
+    fontSize: 13,
   },
 });
