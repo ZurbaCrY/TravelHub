@@ -77,6 +77,8 @@ const AddPlaceModal = ({ visible, onClose }) => {
                           customMapStyle={customMapStyle}
                         rotateEnabled={false} // Rotation der Karte deaktivieren
                         showsCompass={false} // Kompass ausblenden
+                                  showsUserLocation={true} // Zeige den Standort des Benutzers als blauen Punkt an
+
                         >
                           {coordinates && <Marker coordinate={coordinates} />}
                         </MapView>
