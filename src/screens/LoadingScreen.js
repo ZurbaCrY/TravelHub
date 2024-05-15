@@ -1,9 +1,10 @@
-import { View, Modal, ActivityIndicator} from 'react-native';
+import { View, Text} from 'react-native';
+import { styles } from '../style/styles';
 
 export default function LoadingScreen  ({ visible }) {
-  <Modal transparent={true} visible={visible}>
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <ActivityIndicator size="large" color="#0000ff" />
-    </View>
-  </Modal>
+  <View style={styles.container}>
+    <Text style={styles.title}>
+      Test
+    </Text>
+  </View>
 }

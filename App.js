@@ -13,21 +13,20 @@ import {
   ProfileScreen,
   SettingsScreen,
   HomeScreen,
+  StartingScreen,
+  SignInScreen,
+  SignUpScreen,
+  LoadingScreen,
 } from './src/screens'
 
 const Tab = createBottomTabNavigator();
 const RootStack = createStackNavigator();
 const Stack = createStackNavigator();
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
-const TopTab = createMaterialTopTabNavigator();
 
 import "react-native-url-polyfill/auto";
 import { useState, useEffect } from "react";
-import { supabase } from "./User-Auth/supabase";
-import StartingScreen from "./screens/StartingScreen";
-import SignInScreen from "./screens/SignInScreen";
-import SignUpScreen from "./screens/SignUpScreen";
-import LoadingScreen from "./screens/LoadingScreen";
+import { supabase } from "./src/User-Auth/supabase";
 
 function MainTabs() {
   return (
@@ -88,11 +87,6 @@ export default function App() {
     const authListener = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
     });
-
-    return () => {
-      // Funktioniert nicht, bitte überarbeiten
-      authListener.unsubscribe(); // Cleanup function for listener
-    };
   }, []);
 
   if (loading) {

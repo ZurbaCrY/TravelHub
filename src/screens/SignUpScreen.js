@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { Input, Text } from 'react-native-elements';
 import { signUp } from '../User-Auth/auth';
 import { styles } from '../style/styles';
@@ -13,31 +13,30 @@ export default function SignUpScreen({ navigation }) {
   const [loading, setLoading] = useState(false);
 
   const handleSignUp = async () => {
-    setLoading(true);
     try {
-      // Additional validation if needed
-      if (password !== confirmPassword) {
-        throw new Error('Passwords do not match');
+      setLoading(true);
+      success = await signUp(username, email, password, confirmPassword)
+      setLoading(false);
+      // if sign up is successfull switch to login
+      // else print message (for cases where no error occured but also no success)
+      if (success.success == true) {
+        authSwitchToSignIn
+      } else {
+        console.log(success.message)
       }
-
-      // Call signUp function for Supabase sign-up logic
-      await signUp(username, email, password);
-      // Handle successful sign-up, e.g., navigate to another screen
     } catch (error) {
-      console.error('Sign-up error:', error.message);
-      // Handle error, e.g., display error message to the user
+      console.error(error)
     }
-    setLoading(false);
   };
 
-  const authSwitch = () => {
+  const authSwitchToSignIn = () => {
     navigation.navigate("SignInScreen");
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Sign Up</Text>
-      <TouchableOpacity style={styles.authSwitchTouchable} onPress={authSwitch}>
+      <TouchableOpacity style={styles.authSwitchTouchable} onPress={authSwitchToSignIn}>
         <Text style={styles.switchText}>
           Already have an account? Sign In instead
         </Text>
@@ -83,7 +82,7 @@ export default function SignUpScreen({ navigation }) {
         />
       </View>
       <View style={styles.buttonView}>
-        <Button mode='contained' onPress={handleSignUp}>
+        <Button onPress={handleSignUp}>
           Sign Up
         </Button>
         {loading && (

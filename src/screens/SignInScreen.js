@@ -28,14 +28,14 @@ export default function SigninScreen() {
     Alert.alert("This Feature is not implemented yet. Please contact Support!");
   };
 
-  const authSwitch = () => {
+  const authSwitchToSignUp = () => {
     navigation.navigate("SignUpScreen");
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Login</Text>
-      <TouchableOpacity style={styles.authSwitchTouchable} onPress={authSwitch}>
+      <TouchableOpacity style={styles.authSwitchTouchable} onPress={authSwitchToSignUp}>
         <Text style={styles.switchText}>
           Don't have an account? Sign Up instead
         </Text>
