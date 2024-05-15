@@ -66,9 +66,10 @@ const AddPlaceModal = ({ visible, onClose }) => {
             onChangeText={setPlaceDescription}
             value={placeDescription}
           />
-          <TouchableOpacity onPress={() => setShowMap(true)} style={styles.locationButton}>
-                      <Text style={styles.locationInput}>Standort wählen</Text>
-                    </TouchableOpacity>
+<TouchableOpacity onPress={() => setShowMap(true)} style={[styles.locationButton, coordinates ? styles.locationButtonSelected : null]}>
+  <Text style={styles.locationInput}>{coordinates ? 'Standort ausgewählt' : 'Standort wählen'}</Text>
+</TouchableOpacity>
+
                     {showMap && (
                       <View style={styles.mapContainer}>
                         <MapView
@@ -186,6 +187,9 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     paddingHorizontal: 10,
     marginBottom: 10,
+  },
+  locationButtonSelected: {
+    backgroundColor: "lightgreen",
   },
   locationInput: {
   color: 'gray',
