@@ -404,7 +404,7 @@ const scrollToStart = () => {
                                            longitudeDelta: 0.01, // Hier kannst du die Zoomstufe einstellen
                                          }, 1000);
                                        }
-     console.log(place);
+     //console.log(place);
    };
 
      const handleMapPress = () => {
