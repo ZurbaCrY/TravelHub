@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -6,31 +6,23 @@ import { StatusBar } from "expo-status-bar";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { Animated } from "react-native";
 import { DarkModeProvider } from "./pages/DarkModeContext";
+import { supabase } from "./User-Auth/supabase";
 
 import MapScreen from "./pages/MapScreen";
 import CommunityScreen from "./pages/CommunityScreen";
 import ProfileScreen from "./pages/ProfileScreen";
 import SettingsScreen from "./pages/SettingsScreen";
 import HomeScreen from "./pages/HomeScreen";
+import StartingScreen from "./pages/StartingScreen";
+import SignInScreen from "./pages/SignInScreen";
+import SignUpScreen from "./pages/SignUpScreen";
+import LoadingScreen from "./pages/LoadingScreen";
+import ChatListScreen from "./pages/ChatList";
+import ChatScreen from "./pages/Chat";
 
 const Tab = createBottomTabNavigator();
 const RootStack = createStackNavigator();
 const Stack = createStackNavigator();
-import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
-const TopTab = createMaterialTopTabNavigator();
-
-import { View, Text, StyleSheet } from "react-native";
-import "react-native-url-polyfill/auto";
-import { useState, useEffect } from "react";
-import { supabase } from "./User-Auth/supabase";
-import StartingScreen from "./pages/StartingScreen";
-import SignInScreen from "./pages/SignInScreen";
-import SignUpScreen from "./pages/SignUpScreen";
-import auth from "./User-Auth/auth";
-import { Session } from "@supabase/supabase-js";
-import LoadingScreen from "./pages/LoadingScreen";
-import SigninScreen from "./pages/SignInScreen";
-import FriendsScreen from "./pages/Friends";
 
 function MainTabs() {
   return (
@@ -49,6 +41,8 @@ function MainTabs() {
             iconName = "map-marker-alt";
           } else if (route.name === "Profile") {
             iconName = "user";
+          } else if (route.name === "ChatList") {
+            iconName = "comments";
           }
           return (
             <Animated.View
@@ -68,6 +62,7 @@ function MainTabs() {
       <Tab.Screen name="Community" component={CommunityScreen} />
       <Tab.Screen name="Map" component={MapScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
+      <Tab.Screen name="ChatList" component={ChatListScreen} />
     </Tab.Navigator>
   );
 }
@@ -81,25 +76,24 @@ export default function App() {
       .getSession()
       .then(({ data: { session } }) => {
         setSession(session);
-        setLoading(false); // Set loading to false once session is fetched
+        setLoading(false);
       })
       .catch((error) => {
         console.error("Error fetching session:", error);
-        setLoading(false); // Set loading to false even if there's an error
+        setLoading(false);
       });
 
-    const authListener = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
     });
 
     return () => {
-      // Funktioniert nicht, bitte überarbeiten
-      authListener.unsubscribe(); // Cleanup function for listener
+      authListener?.unsubscribe();
     };
   }, []);
 
   if (loading) {
-    return <LoadingScreen />; // Placeholder for loading screen
+    return <LoadingScreen />;
   }
 
   if (session && session.user) {
@@ -113,7 +107,8 @@ export default function App() {
               options={{ headerShown: false }}
             />
             <RootStack.Screen name="Settings" component={SettingsScreen} />
-            <RootStack.Screen name="Friends" component={FriendsScreen} />
+            <RootStack.Screen name="ChatList" component={ChatListScreen} />
+            <RootStack.Screen name="Chat" component={ChatScreen} />
           </RootStack.Navigator>
           <StatusBar style="auto" />
         </NavigationContainer>

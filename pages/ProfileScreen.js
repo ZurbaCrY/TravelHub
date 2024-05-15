@@ -144,10 +144,10 @@ const ProfileScreen = () => {
           <Text style={styles.navButtonText}>Zu den Einstellungen</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          onPress={() => navigation.navigate('Friends')}
+          onPress={() => navigation.navigate('ChatList')}
           style={styles.navButton}
         >
-          <Text style={styles.navButtonText}>Zu deiner Freundesliste</Text>
+          <Text style={styles.navButtonText}>Zu deinen Chats </Text>
         </TouchableOpacity>
       </ScrollView>
     </TouchableWithoutFeedback>
