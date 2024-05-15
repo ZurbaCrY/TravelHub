@@ -27,9 +27,16 @@ const AddPlaceModal = ({ visible, onClose }) => {
     // Hier kannst du die Logik zum Hinzufügen des Ortes implementieren
     // Verwende die eingegebenen Werte (placeName, placeDescription usw.)
     // und die Koordinaten (coordinates)
+    if (!placeName || !placeDescription || !placeType || !coordinates) {
+        alert('Bitte füllen Sie alle erforderlichen Felder aus.');
+    } else {
+        console.log(coordinates);
+        onClose();
+    }
     setPlaceType('');
-    console.log(coordinates);
-    onClose();
+    setCoordinates(null);
+    setPlaceDescription('');
+    setPlaceName('');
   };
 
   const handleConfirmLocation = () => {
