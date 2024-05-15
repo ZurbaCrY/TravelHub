@@ -156,11 +156,12 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   dropdown: {
-    height: 50,
+    width: '100%',
+    height: 40,
+    borderWidth: 1,
     borderColor: 'gray',
-    borderWidth: 0.5,
-    borderRadius: 8,
-    paddingHorizontal: 8,
+    borderRadius: 5,
+    paddingHorizontal: 10,
   },
   icon: {
     marginRight: 5,
