@@ -18,6 +18,7 @@ export default function CommunityScreen() {
     fetchPosts();
   }, []);
 
+  //Vorhandene Nachrichten aus Supabase DB abrufen 
   const fetchPosts = async () => {
     try {
       const { data, error } = await supabase.from('posts').select('*').order('timestamp', { ascending: false });
@@ -47,6 +48,7 @@ export default function CommunityScreen() {
     }
   };
 
+  //Elemente der Seite
   return (
     <View style={[styles.container, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
       <FlatList
