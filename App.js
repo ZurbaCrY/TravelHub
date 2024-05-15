@@ -5,13 +5,20 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { StatusBar } from "expo-status-bar";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { Animated } from "react-native";
-import { DarkModeProvider } from "./pages/DarkModeContext";
+import { DarkModeProvider } from "./screens/DarkModeContext";
 
-import MapScreen from "./pages/MapScreen";
-import CommunityScreen from "./pages/CommunityScreen";
-import ProfileScreen from "./pages/ProfileScreen";
-import SettingsScreen from "./pages/SettingsScreen";
-import HomeScreen from "./pages/HomeScreen";
+import MapScreen from "./screens/MapScreen";
+import CommunityScreen from "./screens/CommunityScreen";
+import ProfileScreen from "./screens/ProfileScreen";
+import SettingsScreen from "./screens/SettingsScreen";
+import HomeScreen from "./screens/HomeScreen";
+// import {
+//   MapScreen,
+//   CommunityScreen,
+//   ProfileScreen,
+//   SettingsScreen,
+//   HomeScreen,
+// } from './pages'
 
 const Tab = createBottomTabNavigator();
 const RootStack = createStackNavigator();
@@ -23,13 +30,13 @@ import { View, Text, StyleSheet } from "react-native";
 import "react-native-url-polyfill/auto";
 import { useState, useEffect } from "react";
 import { supabase } from "./User-Auth/supabase";
-import StartingScreen from "./pages/StartingScreen";
-import SignInScreen from "./pages/SignInScreen";
-import SignUpScreen from "./pages/SignUpScreen";
+import StartingScreen from "./screens/StartingScreen";
+import SignInScreen from "./screens/SignInScreen";
+import SignUpScreen from "./screens/SignUpScreen";
 import auth from "./User-Auth/auth";
 import { Session } from "@supabase/supabase-js";
-import LoadingScreen from "./pages/LoadingScreen";
-import SigninScreen from "./pages/SignInScreen";
+import LoadingScreen from "./screens/LoadingScreen";
+import SigninScreen from "./screens/SignInScreen";
 
 function MainTabs() {
   return (

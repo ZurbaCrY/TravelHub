@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { View, TouchableOpacity, ActivityIndicator} from 'react-native';
-import { Button, Input, Text } from 'react-native-elements';
+import { View, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { Input, Text } from 'react-native-elements';
 import { signUp } from '../User-Auth/auth';
-import { styles } from '../styles/styles';
+import { styles } from '../style/styles';
+import Button from '../components/Button';
 
 export default function SignUpScreen({ navigation }) {
   const [username, setUsername] = useState('');
@@ -82,9 +83,15 @@ export default function SignUpScreen({ navigation }) {
         />
       </View>
       <View style={styles.buttonView}>
-        <Button title="Sign Up" disabled={loading} onPress={handleSignUp} style={styles.button} />
+        <Button mode='contained' onPress={handleSignUp}>
+          Sign Up
+        </Button>
         {loading && (
-          <ActivityIndicator size="large" color="#0000ff" style={styles.loadingIndicator} />
+          <ActivityIndicator
+            size="large"
+            color="#0000ff"
+            style={styles.loadingIndicator}
+          />
         )}
       </View>
     </View>

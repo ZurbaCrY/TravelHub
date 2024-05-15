@@ -5,10 +5,11 @@ import {
   ActivityIndicator,
   TouchableOpacity,
 } from "react-native";
-import { Button, Input, Switch, Text } from "react-native-elements";
+import { Input, Switch, Text } from "react-native-elements";
 import { signInWithEmail } from "../User-Auth/auth";
 import { useNavigation } from "@react-navigation/native";
-import { styles } from '../styles/styles';
+import { styles } from '../style/styles';
+import Button from "../components/Button";
 
 export default function SigninScreen() {
   const navigation = useNavigation();
@@ -74,14 +75,9 @@ export default function SigninScreen() {
         </TouchableOpacity>
       </View>
       <View style={styles.buttonView}>
-        <Button
-          title="Sign In"
-          style={styles.button}
-          disabled={loading}
-          onPress={handleSignIn}
-          buttonStyle={styles.button}
-          titleStyle={styles.buttonText}
-        />
+        <Button mode='contained' onPress={handleSignIn}>
+          Sign In
+        </Button>
         {loading && (
           <ActivityIndicator
             size="large"
