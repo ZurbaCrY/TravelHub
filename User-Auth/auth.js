@@ -1,69 +1,106 @@
-import React, { useState } from 'react'
-import { Alert, AppState } from 'react-native'
-import { supabase } from './supabase'
+import React, { useState } from "react";
+import { Alert, AppState } from "react-native";
+import { supabase } from "./supabase";
+import LoadingScreen from "../pages/LoadingScreen";
 
-// Tells Supabase Auth to continuously refresh the session automatically if
-// the app is in the foreground. When this is added, you will continue to receive
-// `onAuthStateChange` events with the `TOKEN_REFRESHED` or `SIGNED_OUT` event
-// if the user's session is terminated. This should only be registered once.
-AppState.addEventListener('change', (state) => {
-    if (state === 'active') {
-        supabase.auth.startAutoRefresh()
-    } else {
-        supabase.auth.stopAutoRefresh()
-    }
-})
+// Registering auto-refresh for Supabase Auth when app state changes
+AppState.addEventListener("change", (state) => {
+  if (state === "active") {
+    supabase.auth.startAutoRefresh();
+  } else {
+    supabase.auth.stopAutoRefresh();
+  }
+});
 
 export async function signInWithEmail(email, password) {
-    try {
-        const { error } = await supabase.auth.signInWithPassword({
-            email: email,
-            password: password,
-        })
+  try {
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
 
-        if (error) {
-            Alert.alert(error.message)
-            return false
-        }
-
-        return true
-    } catch (error) {
-        Alert.alert('Error signing in')
-        console.log(error)
-        return false
+    if (error) {
+      Alert.alert(error.message);
+      return false;
     }
+
+    return true;
+  } catch (error) {
+    Alert.alert("Error signing in");
+    console.log(error);
+    return false;
+  }
 }
 
 export async function signUpWithEmail(email, password) {
-    try {
-        const { error } = await supabase.auth.signUp({
-            email: email,
-            password: password,
-        })
+  try {
+    const { error } = await supabase.auth.signUp({
+      email: email,
+      password: password,
+    });
 
-        if (error) {
-            Alert.alert(error.message)
-            return false
-        }
-
-        return true
-    } catch (error) {
-        Alert.alert('Error signing up')
-        return false
+    if (error) {
+      Alert.alert(error.message);
+      return false;
     }
+
+    return true;
+  } catch (error) {
+    Alert.alert("Error signing up");
+    return false;
+  }
 }
 
 export async function signOut() {
-    try {
-        const { error } = await supabase.auth.signOut()
-        if (error) {
-            Alert.alert(error.message)
-            return false
-        }
-
-        return true
-    } catch (error) {
-        Alert.alert('Error signing out')
-        return false
+  try {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      Alert.alert(error.message);
+      return false;
     }
+
+    return true;
+  } catch (error) {
+    Alert.alert("Error signing out");
+    return false;
+  }
+}
+
+
+export async function signUp(username, email, password) {
+  try {
+    // Check if username is unique
+    const { data: usernameData, error: usernameError } = await supabase
+      .from("users")
+      .select("id")
+      .eq("username", username);
+
+    if (usernameData && usernameData.length > 0) {
+      throw new Error("Username is already taken");
+    }
+
+    // Check if email is unique
+    const { data: emailData, error: emailError } = await supabase
+      .from("users")
+      .select("id")
+      .eq("email", email);
+
+    if (emailData && emailData.length > 0) {
+      throw new Error("Email is already taken");
+    }
+
+    // Sign up the user
+    const { user, error } = await supabase.auth.signUp({
+      email,
+      password,
+    });
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    return { success: true, message: "Sign up successful!" };
+  } catch (error) {
+    return { success: false, message: error.message };
+  }
 }
