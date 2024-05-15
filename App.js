@@ -15,6 +15,7 @@ import HomeScreen from "./pages/Home";
 
 const Tab = createBottomTabNavigator();
 const RootStack = createStackNavigator();
+const Stack = createStackNavigator();
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 const TopTab = createMaterialTopTabNavigator();
 
@@ -22,9 +23,13 @@ import { View, Text, StyleSheet } from "react-native";
 import "react-native-url-polyfill/auto";
 import { useState, useEffect } from "react";
 import { supabase } from "./User-Auth/supabase";
-import SignInScreen from "./pages/SignIn";
-import SignUpScreen from "./pages/SignUp";
+import StartingScreen from "./pages/StartingScreen";
+import SignInScreen from "./pages/SignInScreen";
+import SignUpScreen from "./pages/SignUpScreen";
+import auth from "./User-Auth/auth";
 import { Session } from "@supabase/supabase-js";
+import LoadingScreen from "./pages/LoadingScreen";
+import SigninScreen from "./pages/SignInScreen";
 
 function MainTabs() {
   return (
@@ -68,16 +73,33 @@ function MainTabs() {
 
 export default function App() {
   const [session, setSession] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth
+      .getSession()
+      .then(({ data: { session } }) => {
+        setSession(session);
+        setLoading(false); // Set loading to false once session is fetched
+      })
+      .catch((error) => {
+        console.error("Error fetching session:", error);
+        setLoading(false); // Set loading to false even if there's an error
+      });
+
+    const authListener = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
     });
 
-    supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
+    return () => {
+      // Funktioniert nicht, bitte überarbeiten
+      authListener.unsubscribe(); // Cleanup function for listener
+    };
   }, []);
+
+  if (loading) {
+    return <LoadingScreen />; // Placeholder for loading screen
+  }
 
   if (session && session.user) {
     return (
@@ -97,52 +119,25 @@ export default function App() {
     );
   } else {
     return (
-      // Disign nur von Oben kopirt, sollte bearbeitet werden!
-
-      <DarkModeProvider>
-        <NavigationContainer>
-          <TopTab.Navigator
-            screenOptions={({ route }) => ({
-              tabBarActiveTintColor: "#ffffff", // Farbe für aktiven Tab
-              tabBarInactiveTintColor: "gray", // Farbe für inaktiven Tab
-              tabBarStyle: { backgroundColor: "#3EAAE9" },
-              tabBarIcon: ({ focused, color, size }) => {
-                let iconName;
-                if (route.name === "Home") {
-                  iconName = "home";
-                } else if (route.name === "Community") {
-                  iconName = "users";
-                } else if (route.name === "Map") {
-                  iconName = "map-marker-alt";
-                } else if (route.name === "Profile") {
-                  iconName = "user";
-                } else if (route.name === "Settings") {
-                  iconName = "cog";
-                }
-                return (
-                  <Animated.View
-                    style={{
-                      transform: [
-                        {
-                          scale: focused ? 1.2 : 1,
-                        },
-                      ],
-                    }}
-                  >
-                    <FontAwesome5 name={iconName} size={24} color={color} />
-                  </Animated.View>
-                );
-              },
-              tabBarShowLabel: true,
-              headerShown: false,
-            })}
-          >
-            <Tab.Screen name="SignIn" component={SignInScreen} />
-            <Tab.Screen name="SignUp" component={SignUpScreen} />
-          </TopTab.Navigator>
-          <StatusBar style="auto" />
-        </NavigationContainer>
-      </DarkModeProvider>
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName="Welcome">
+          <Stack.Screen
+            name="Welcome"
+            component={StartingScreen}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="SignInScreen"
+            component={SignInScreen}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="SignUpScreen"
+            component={SignUpScreen}
+            options={{ headerShown: false }}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
     );
   }
 }
