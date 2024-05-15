@@ -58,7 +58,6 @@ export async function signOut() {
       Alert.alert(error.message);
       return false;
     }
-
     return true;
   } catch (error) {
     Alert.alert("Error signing out");
