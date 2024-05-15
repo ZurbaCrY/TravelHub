@@ -8,10 +8,10 @@ import { Animated } from "react-native";
 import { DarkModeProvider } from "./pages/DarkModeContext";
 
 import MapScreen from "./pages/MapScreen";
-import CommunityScreen from "./pages/Community";
-import ProfileScreen from "./pages/Profile";
-import SettingsScreen from "./pages/Settings";
-import HomeScreen from "./pages/Home";
+import CommunityScreen from "./pages/CommunityScreen";
+import ProfileScreen from "./pages/ProfileScreen";
+import SettingsScreen from "./pages/SettingsScreen";
+import HomeScreen from "./pages/HomeScreen";
 
 const Tab = createBottomTabNavigator();
 const RootStack = createStackNavigator();
