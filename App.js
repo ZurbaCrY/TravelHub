@@ -7,18 +7,18 @@ import { FontAwesome5 } from "@expo/vector-icons";
 import { Animated } from "react-native";
 import { DarkModeProvider } from "./screens/DarkModeContext";
 
-import MapScreen from "./screens/MapScreen";
-import CommunityScreen from "./screens/CommunityScreen";
-import ProfileScreen from "./screens/ProfileScreen";
-import SettingsScreen from "./screens/SettingsScreen";
-import HomeScreen from "./screens/HomeScreen";
-// import {
-//   MapScreen,
-//   CommunityScreen,
-//   ProfileScreen,
-//   SettingsScreen,
-//   HomeScreen,
-// } from './pages'
+// import MapScreen from "./screens/MapScreen";
+// import CommunityScreen from "./screens/CommunityScreen";
+// import ProfileScreen from "./screens/ProfileScreen";
+// import SettingsScreen from "./screens/SettingsScreen";
+// import HomeScreen from "./screens/HomeScreen";
+import {
+  MapScreen,
+  CommunityScreen,
+  ProfileScreen,
+  SettingsScreen,
+  HomeScreen,
+} from './src/screens'
 
 const Tab = createBottomTabNavigator();
 const RootStack = createStackNavigator();
