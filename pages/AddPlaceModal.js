@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, Modal, TouchableOpacity, StyleSheet, TextInput } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
+import MapView, { Marker } from 'react-native-maps'; // assuming you have 'react-native-maps' installed
 import AntDesign from '@expo/vector-icons/AntDesign';
 
 const AddPlaceModal = ({ visible, onClose }) => {
@@ -11,6 +12,8 @@ const AddPlaceModal = ({ visible, onClose }) => {
   const [priceLevel, setPriceLevel] = useState('');
   const [isOpen, setIsOpen] = useState('');
   const [viewpointType, setViewpointType] = useState('');
+  const [coordinates, setCoordinates] = useState(null);
+  const [showMap, setShowMap] = useState(false);
 
   const data = [
     { label: 'Sehenswürdigkeit', value: 'Sehenswürdigkeit' },
@@ -22,9 +25,15 @@ const AddPlaceModal = ({ visible, onClose }) => {
   const handleAddPlace = () => {
     // Hier kannst du die Logik zum Hinzufügen des Ortes implementieren
     // Verwende die eingegebenen Werte (placeName, placeDescription usw.)
-    // Schließe das Modal nach dem Hinzufügen des Ortes
+    // und die Koordinaten (coordinates)
     setPlaceType('');
+    console.log(coordinates);
     onClose();
+  };
+
+  const handleConfirmLocation = () => {
+    // Hier kannst du die ausgewählten Koordinaten bestätigen und speichern
+    setShowMap(false); // Verstecke die Karte nach der Bestätigung
   };
 
   return (
@@ -49,6 +58,22 @@ const AddPlaceModal = ({ visible, onClose }) => {
             onChangeText={setPlaceDescription}
             value={placeDescription}
           />
+          <TouchableOpacity onPress={() => setShowMap(true)} style={styles.locationButton}>
+                      <Text style={styles.locationInput}>Standort wählen</Text>
+                    </TouchableOpacity>
+                    {showMap && (
+                      <View style={styles.mapContainer}>
+                        <MapView
+                          style={styles.map}
+                          onPress={(event) => setCoordinates(event.nativeEvent.coordinate)}
+                        >
+                          {coordinates && <Marker coordinate={coordinates} />}
+                        </MapView>
+                        <TouchableOpacity onPress={handleConfirmLocation} style={styles.confirmButton}>
+                          <Text style={styles.buttonText}>OK</Text>
+                        </TouchableOpacity>
+                      </View>
+                    )}
           <View style={styles.dropdownContainer}>
             <Dropdown
               style={styles.dropdown}
@@ -68,30 +93,7 @@ const AddPlaceModal = ({ visible, onClose }) => {
               value={entranceFee}
             />
           )}
-          {placeType === 'Restaurant' && (
-            <TextInput
-              style={styles.input}
-              placeholder="Preisniveau"
-              onChangeText={setPriceLevel}
-              value={priceLevel}
-            />
-          )}
-          {placeType === 'Einkaufsladen' && (
-            <TextInput
-              style={styles.input}
-              placeholder="Geöffnet? (Ja/Nein)"
-              onChangeText={setIsOpen}
-              value={isOpen}
-            />
-          )}
-          {placeType === 'Aussichtspunkt' && (
-            <TextInput
-              style={styles.input}
-              placeholder="Typ des Aussichtspunkts"
-              onChangeText={setViewpointType}
-              value={viewpointType}
-            />
-          )}
+          {/* Weitere Bedingungen für verschiedene Ortstypen... */}
           <TouchableOpacity onPress={handleAddPlace} style={styles.addButton}>
             <Text style={styles.buttonText}>Ort hinzufügen</Text>
           </TouchableOpacity>
@@ -163,17 +165,37 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     paddingHorizontal: 10,
   },
-  icon: {
-    marginRight: 5,
+  locationButton: {
+    width: '100%',
+    height: 40,
+    borderWidth: 1,
+    borderColor: 'gray',
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    marginBottom: 10,
   },
-  label: {
+  locationInput: {
+  color: 'gray',
+    marginTop: 7,
+    fontSize: 15,
+  },
+  mapContainer: {
+    width: '100%',
+    height: 300,
+    marginTop: 10,
+    marginBottom: 10,
+  },
+  map: {
+    flex: 1,
+  },
+  confirmButton: {
     position: 'absolute',
-    backgroundColor: 'white',
-    left: 22,
-    top: 8,
-    zIndex: 999,
-    paddingHorizontal: 8,
-    fontSize: 14,
+    bottom: 10,
+    right: 10,
+    backgroundColor: 'lightblue',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
   },
 });
 
