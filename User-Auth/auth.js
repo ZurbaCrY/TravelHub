@@ -66,36 +66,41 @@ export async function signOut() {
   }
 }
 
+
 export async function signUp(username, email, password) {
-  // Check if username is unique
-  const { data: usernameData, error: usernameError } = await supabase
-    .from("users")
-    .select("id")
-    .eq("username", username);
+  try {
+    // Check if username is unique
+    const { data: usernameData, error: usernameError } = await supabase
+      .from("users")
+      .select("id")
+      .eq("username", username);
 
-  if (usernameData && usernameData.length > 0) {
-    throw new Error("Username is already taken");
+    if (usernameData && usernameData.length > 0) {
+      throw new Error("Username is already taken");
+    }
+
+    // Check if email is unique
+    const { data: emailData, error: emailError } = await supabase
+      .from("users")
+      .select("id")
+      .eq("email", email);
+
+    if (emailData && emailData.length > 0) {
+      throw new Error("Email is already taken");
+    }
+
+    // Sign up the user
+    const { user, error } = await supabase.auth.signUp({
+      email,
+      password,
+    });
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    return { success: true, message: "Sign up successful!" };
+  } catch (error) {
+    return { success: false, message: error.message };
   }
-
-  // Check if email is unique
-  const { data: emailData, error: emailError } = await supabase
-    .from("users")
-    .select("id")
-    .eq("email", email);
-
-  if (emailData && emailData.length > 0) {
-    throw new Error("Email is already taken");
-  }
-
-  // Sign up the user
-  const { user, error } = await supabase.auth.signUp({
-    email,
-    password,
-  });
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return user;
 }

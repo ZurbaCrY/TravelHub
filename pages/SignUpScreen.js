@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { View, StyleSheet ,TouchableOpacity} from 'react-native';
+import { View, TouchableOpacity, ActivityIndicator} from 'react-native';
 import { Button, Input, Text } from 'react-native-elements';
 import { signUp } from '../User-Auth/auth';
+import { styles } from '../styles/styles';
 
 export default function SignUpScreen({ navigation }) {
   const [username, setUsername] = useState('');
@@ -90,43 +91,3 @@ export default function SignUpScreen({ navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 30,
-    fontWeight: 'bold',
-    textTransform: 'uppercase',
-    marginBottom: 20,
-    color: '#3EAAE9',
-  },
-  authSwitchTouchable: {
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  inputView: {
-    width: '80%',
-    marginBottom: 20,
-  },
-  input: {
-    marginBottom: 15,
-  },
-  buttonView: {
-    width: '80%',
-  },
-  button: {
-    backgroundColor: '#3EAAE9',
-    height: 45,
-    borderRadius: 7,
-  },
-  loadingIndicator: {
-    marginTop: 10,
-  },
-  switchText: {
-    fontSize: 16,
-    color: "#3EAAE9",
-  },
-});
