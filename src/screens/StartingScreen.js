@@ -12,10 +12,10 @@ export default function StartingScreen() {
       <Text style={styles.title}>TravelHub</Text>
       <Text style={styles.subtitle}>Welcome to our App!</Text>
       <View style={styles.buttonView}>
-        <Button onPress={() => navigation.navigate('SignInScreen')}>
+        <Button mode='contained' onPress={() => navigation.navigate('SignInScreen')}>
           Sign In
         </Button>
-        <Button onPress={() => navigation.navigate('SignUpScreen')}>
+        <Button mode='contained' onPress={() => navigation.navigate('SignUpScreen')}>
           Sign Up
         </Button>
       </View>

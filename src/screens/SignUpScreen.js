@@ -82,7 +82,7 @@ export default function SignUpScreen({ navigation }) {
         />
       </View>
       <View style={styles.buttonView}>
-        <Button onPress={handleSignUp}>
+        <Button mode='contained' onPress={handleSignUp}>
           Sign Up
         </Button>
         {loading && (
