@@ -3,6 +3,7 @@ import { View, Text, Modal, TouchableOpacity, StyleSheet, TextInput } from 'reac
 import { Dropdown } from 'react-native-element-dropdown';
 import MapView, { Marker } from 'react-native-maps'; // assuming you have 'react-native-maps' installed
 import AntDesign from '@expo/vector-icons/AntDesign';
+import { customMapStyle } from '../resources/customMapStyle';
 
 const AddPlaceModal = ({ visible, onClose }) => {
   const [placeName, setPlaceName] = useState('');
@@ -66,6 +67,9 @@ const AddPlaceModal = ({ visible, onClose }) => {
                         <MapView
                           style={styles.map}
                           onPress={(event) => setCoordinates(event.nativeEvent.coordinate)}
+                          customMapStyle={customMapStyle}
+                        rotateEnabled={false} // Rotation der Karte deaktivieren
+                        showsCompass={false} // Kompass ausblenden
                         >
                           {coordinates && <Marker coordinate={coordinates} />}
                         </MapView>
