@@ -24,7 +24,7 @@ export default function ChatScreen({ route, navigation }) {
             .from('messages')
             .select('id, username, content, created_at, chat_id')
             .eq('chat_id', chatId)
-            .order('created_at', { ascending: false });
+            .order('created_at', { ascending: true });
 
         if (error) {
           console.error('Error fetching messages:', error);
@@ -59,11 +59,10 @@ export default function ChatScreen({ route, navigation }) {
         .from('messages')
         .insert([
           {
-            content: message.text,
-            user_id: message.user._id,
             username: message.user.name,
-            chat_id: chatId,
+            content: message.text,
             created_at: new Date().toISOString(), // Use ISO string format
+            chat_id: chatId,
           },
         ]);
       if (error) {
@@ -83,7 +82,7 @@ export default function ChatScreen({ route, navigation }) {
         onSend={(messages) => onSend(messages)}
         user={{
           _id: 1,
-          name: 'Ole', // Replace with the current user's name
+          name: 'Ole',
         }}
         textInputStyle={{ color: isDarkMode ? '#FFF' : '#000' }}
       />
