@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -8,6 +7,8 @@ import { Animated } from "react-native";
 import { DarkModeProvider } from "./src/screens/DarkModeContext";
 
 import {
+  ChatListScreen,
+  ChatScreen,
   MapScreen,
   CommunityScreen,
   ProfileScreen,
@@ -45,7 +46,7 @@ function MainTabs() {
             iconName = "map-marker-alt";
           } else if (route.name === "ProfileScreen") {
             iconName = "user";
-          } else if (route.name === "ChatList") {
+          } else if (route.name === "ChatListScreen") {
             iconName = "comments";
           }
           return (
@@ -66,6 +67,7 @@ function MainTabs() {
       <Tab.Screen name="CommunityScreen" component={CommunityScreen} />
       <Tab.Screen name="MapScreen" component={MapScreen} />
       <Tab.Screen name="ProfileScreen" component={ProfileScreen} />
+      <Tab.Screen name="ChatListScreen" component={ChatListScreen} />
     </Tab.Navigator>
   );
 }
@@ -106,8 +108,8 @@ export default function App() {
               options={{ headerShown: false }}
             />
             <RootStack.Screen name="Settings" component={SettingsScreen} />
-            <RootStack.Screen name="ChatList" component={ChatListScreen} />
-            <RootStack.Screen name="Chat" component={ChatScreen} />
+            <RootStack.Screen name="ChatListScreen" component={ChatListScreen} />
+            <RootStack.Screen name="ChatScreen" component={ChatScreen} />
           </RootStack.Navigator>
           <StatusBar style="auto" />
         </NavigationContainer>

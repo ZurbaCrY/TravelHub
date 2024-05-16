@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
-import { useDarkMode } from '../pages/DarkModeContext';
+import { useDarkMode } from './DarkModeContext';
 
 //Liste an Chats
 const chats = [
@@ -22,7 +22,7 @@ export default function ChatListScreen({ navigation }) {
           return (
             <TouchableOpacity
               style={styles.chatItem}
-              onPress={() => navigation.navigate('Chat', { chatId: item.id, chatName: item.name })}
+              onPress={() => navigation.navigate('ChatScreen', { chatId: item.id, chatName: item.name })}
             >
               <Text style={[styles.chatName, { color: isDarkMode ? '#FFF' : '#000' }]}>{item.name}</Text>
               <Text style={[styles.lastMessage, { color: isDarkMode ? '#AAA' : '#555' }]}>{lastMessage}</Text>
