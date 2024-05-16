@@ -38,3 +38,11 @@ DNS: travel-prod.westeurope.cloudapp.azure.com
 ## Testserver
 IP: 20.73.246.214
 DNS: travel-test.westeurope.cloudapp.azure.com
+
+# Arbeiten mit Userdaten
+```
+import AuthService from "../User-Auth/auth"
+const userdata = AuthService.user
+```
+User hat daten wie bspw. id (AuthService.user.id)
+Mehr kommt in Zukunft

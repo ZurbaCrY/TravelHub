@@ -97,11 +97,6 @@ class AuthService {
       throw error;
     }
   }
-
-  getUser() {
-    return this.user
-  }
-  // get only specific user stuff ???
 }
 
 export default new AuthService(sb);
