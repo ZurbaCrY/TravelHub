@@ -7,6 +7,7 @@ import { MaterialIcons } from '@expo/vector-icons'; // Beispiel für ein Icon-Pa
 import CustomPlaceItem from '../resources/CustomPlaceItem'; // Annahme: Pfad zur Datei mit der CustomPlaceItem-Komponente
 import PlaceDetailScreen from './PlaceDetailScreen';
 import AddPlaceModal from './AddPlaceModal';
+import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 
 
 const { width } = Dimensions.get('window');
@@ -145,6 +146,7 @@ export default function MapScreen() {
         const [forceUpdate, setForceUpdate] = useState(false);
           const [showPlaceDetailModal, setShowPlaceDetailModal] = useState(false);
                    const [showAddModal, setShowAddModal] = useState(false);
+                     const [selectedCoordinates, setSelectedCoordinates] = useState(null);
 
 
 
@@ -340,6 +342,36 @@ const scrollToStart = () => {
   }
 };
 
+const newHandleSearch = () => {
+
+    if (selectedCoordinates) {
+                                          setSelectedPlace(null);
+                                          scrollToStart();
+                                                                            if (mapRef) {
+                                                                              mapRef.animateToRegion({
+                                                                                latitude: selectedCoordinates.lat,
+                                                                                longitude: selectedCoordinates.lng,
+                                                                                latitudeDelta: 1, // Hier kannst du die Zoomstufe einstellen
+                                                                                longitudeDelta: 1, // Hier kannst du die Zoomstufe einstellen
+                                                                              }, 1000);
+                                                                            }
+                                                                            const nearestCity = findNearestCity({
+                                                                                                        latitude: selectedCoordinates.lat,
+                                                                                                        longitude: selectedCoordinates.lng,
+                                                                                                        latitudeDelta: 1, // Eine sehr kleine Zahl für einen sehr kleinen Bereich
+                                                                                                        longitudeDelta: 1, // Eine sehr kleine Zahl für einen sehr kleinen Bereich
+                                                                                                          });
+                                                                    console.log(nearestCity.name);
+
+                                                                    // Set the searchLocation state to the nearest city
+                                                                    setSearchResult(nearestCity);
+                                                                    console.log(searchResult);
+    } else {
+        console.log("ERROR: City not found")
+    }
+
+}
+
     const handleSearch = async () => {
           const result = continentsData.find(continent =>
             continent.countries.some(country =>
@@ -441,20 +473,51 @@ const scrollToStart = () => {
 
        };
 
+
+const fetchCityCoordinates = async (placeId) => {
+    try {
+      const response = await fetch(`https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=geometry&key=AIzaSyDUMJ0wbXrEYkKY4iN7noJJ7yRp-C86LFU`);
+      const data = await response.json();
+      const { geometry } = data.result;
+      if (geometry) {
+        setSelectedCoordinates(geometry.location);
+        console.log(selectedCoordinates);
+      }
+    } catch (error) {
+      console.error('Error fetching city coordinates:', error);
+    }
+  };
+
  return (
     <View style={styles.container}>
 
 <View style={[styles.searchContainer, showList && styles.disabledContainer]}>
-  <TextInput
-    style={[styles.searchInput, showList && styles.disabledInput]}
-    placeholder="Search for city..."
-    onChangeText={text => setSearchQuery(text)}
-    value={searchQuery}
-    editable={!showList} // Deaktiviere die Eingabe, wenn showList true ist
-  />
+<GooglePlacesAutocomplete
+      placeholder='Search for city...'
+      onPress={(data, details = null) => {
+        // Extrahiere die Koordinaten aus den Details, falls vorhanden
+        console.log(data);
+        const { place_id } = details;
+        console.log(place_id);
+                if (place_id) {
+                  fetchCityCoordinates(place_id);
+                }
+      }}
+      query={{
+        key: 'AIzaSyDUMJ0wbXrEYkKY4iN7noJJ7yRp-C86LFU',
+        language: 'en',
+        types: '(cities)',
+      }}
+              styles={{
+                textInput: styles.textInput,
+                listView: styles.listView,
+              }}
+              listViewStyle={styles.listViewContainer}
+    />
   <Button
     title="Go!"
-    onPress={handleSearch}
+    onPress={newHandleSearch}
+    style={styles.searchLocationButton}
     disabled={showList} // Deaktiviere den Button, wenn showList true ist
   />
 </View>
@@ -607,7 +670,6 @@ const styles = StyleSheet.create({
   },
   searchContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 10,
     marginTop: 30,
@@ -723,4 +785,33 @@ const styles = StyleSheet.create({
                       borderWidth: 1,
                       borderColor: 'black',
                     },
+                textInput: {
+                    width: '80%',
+                    height: 40,
+                    borderColor: 'gray',
+                    borderWidth: 1,
+                    marginBottom: 10,
+                    paddingHorizontal: 10,
+                  },
+                  listViewContainer: {
+                    position: 'absolute',
+                    top: '100%',
+                    width: '80%',
+                    maxHeight: 200,
+                    backgroundColor: 'white',
+                    borderColor: 'gray',
+                    borderWidth: 1,
+                    borderRadius: 5,
+                  },
+searchLocationButton: {
+  position: 'absolute',
+  top: 10, // Beispiel-Positionierung, anpassen nach Bedarf
+  right: 10, // Beispiel-Positionierung, anpassen nach Bedarf
+  width: 40,
+  height: 40,
+  borderRadius: 20, // Halbe Breite für runde Ecken
+  backgroundColor: 'blue', // Beispielhintergrundfarbe, anpassen nach Bedarf
+  justifyContent: 'center',
+  alignItems: 'center',
+},
 });
