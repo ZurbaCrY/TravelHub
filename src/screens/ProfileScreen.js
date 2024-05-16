@@ -16,7 +16,7 @@ import Flag from 'react-native-flags';
 import { useDarkMode } from './DarkModeContext';
 import { useNavigation } from '@react-navigation/native'; // Importiere useNavigation
 
-const ProfileScreen = () => {
+export default function ProfileScreen () {
   const { isDarkMode, toggleDarkMode } = useDarkMode();
   const [visitedCountries, setVisitedCountries] = useState(['Italien', 'Spanien', 'Frankreich']);
   const [wishListCountries, setWishListCountries] = useState(['Japan', 'Neuseeland', 'Brasilien']);
@@ -237,4 +237,3 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ProfileScreen;
