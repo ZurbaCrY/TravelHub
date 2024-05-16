@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Alert, AppState } from "react-native";
-import { supabase } from "./supabase";
+import { supabase } from "../User-Auth/supabase";
 import LoadingScreen from "../screens/LoadingScreen";
 
 // Registering auto-refresh for Supabase Auth when app state changes
