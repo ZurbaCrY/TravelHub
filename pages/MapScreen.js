@@ -509,7 +509,7 @@ const fetchCityCoordinates = async (placeId) => {
         types: '(cities)',
       }}
               styles={{
-                textInput: styles.textInput,
+                textInput: styles.searchInput,
                 listView: styles.listView,
               }}
               listViewStyle={styles.listViewContainer}
@@ -668,26 +668,6 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
   },
-  searchContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginBottom: 10,
-    marginTop: 30,
-  },
-  searchInput: {
-    width: '70%',
-    height: 40,
-    borderWidth: 1,
-    borderColor: 'gray',
-    marginRight: 10,
-    paddingHorizontal: 10,
-  },
-  disabledContainer: {
-      opacity: 0.5, // Verringert die Deckkraft des Containers, um ihn auszugrauen
-    },
-    disabledInput: {
-      backgroundColor: '#f2f2f2', // Ändert die Hintergrundfarbe des Eingabefelds, um es auszugrauen
-    },
   bottomBar: {
     position: 'absolute',
     bottom: 0,
@@ -780,38 +760,54 @@ const styles = StyleSheet.create({
                       backgroundColor: 'white',
                       padding: 10,
                       borderRadius: 20,
-                      zIndex: 10, // Stelle sicher, dass das Plus-Symbol über anderen Elementen liegt
+                      zIndex: 1, // Stelle sicher, dass das Plus-Symbol über anderen Elementen liegt
                       marginTop: 70,
                       borderWidth: 1,
                       borderColor: 'black',
                     },
-                textInput: {
-                    width: '80%',
-                    height: 40,
-                    borderColor: 'gray',
-                    borderWidth: 1,
-                    marginBottom: 10,
-                    paddingHorizontal: 10,
-                  },
-                  listViewContainer: {
-                    position: 'absolute',
-                    top: '100%',
-                    width: '80%',
-                    maxHeight: 200,
-                    backgroundColor: 'white',
-                    borderColor: 'gray',
-                    borderWidth: 1,
-                    borderRadius: 5,
-                  },
-searchLocationButton: {
-  position: 'absolute',
-  top: 10, // Beispiel-Positionierung, anpassen nach Bedarf
-  right: 10, // Beispiel-Positionierung, anpassen nach Bedarf
-  width: 40,
-  height: 40,
-  borderRadius: 20, // Halbe Breite für runde Ecken
-  backgroundColor: 'blue', // Beispielhintergrundfarbe, anpassen nach Bedarf
-  justifyContent: 'center',
-  alignItems: 'center',
-},
+                    searchContainer: {
+                      position: 'relative', // Ändere die Position auf 'relative', um 'absolute'-positionierte Kinder zu berücksichtigen
+                      flexDirection: 'row',
+                      justifyContent: 'center',
+                      marginBottom: 10,
+                      marginTop: 30,
+                      zIndex: 2,
+                    },
+                    searchInput: {
+                      width: '70%',
+                      height: 40,
+                      borderWidth: 1,
+                      borderColor: 'gray',
+                      marginRight: 10,
+                      paddingHorizontal: 10,
+                    },
+                    listViewContainer: {
+                      position: 'absolute',
+                      top: '100%',
+                      width: '80%',
+                      maxHeight: 200,
+                      backgroundColor: 'white',
+                      borderColor: 'gray',
+                      borderWidth: 1,
+                      borderRadius: 5,
+                      zIndex: 2, // Stelle sicher, dass das Dropdown-Menü über anderen Inhalten liegt
+                    },
+                    searchLocationButton: {
+                      position: 'absolute',
+                      top: 10, // Beispiel-Positionierung, anpassen nach Bedarf
+                      right: 10, // Beispiel-Positionierung, anpassen nach Bedarf
+                      width: 40,
+                      height: 40,
+                      borderRadius: 20, // Halbe Breite für runde Ecken
+                      backgroundColor: 'blue', // Beispielhintergrundfarbe, anpassen nach Bedarf
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      zIndex: 2, // Stelle sicher, dass der Button über dem Listcontainer liegt
+                    },
+                    disabledContainer: {
+                      opacity: 0.5, // Verringert die Deckkraft des Containers, um ihn auszugrauen
+                    },
+                    disabledInput: {
+                      backgroundColor: '#f2f2f2', // Ändert die Hintergrundfarbe des Eingabefelds, um es auszugrauen
+                    },
 });
