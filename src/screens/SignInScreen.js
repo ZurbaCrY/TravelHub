@@ -6,10 +6,10 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { Input, Switch, Text } from "react-native-elements";
-import { signInWithEmail } from "../User-Auth/auth";
 import { useNavigation } from "@react-navigation/native";
 import { styles } from '../style/styles';
 import Button from "../components/Button";
+import AuthService from "../User-Auth/auth"
 
 export default function SigninScreen() {
   const navigation = useNavigation();
@@ -20,7 +20,7 @@ export default function SigninScreen() {
 
   const handleSignIn = async () => {
     setLoading(true);
-    const success = await signInWithEmail(email, password);
+    await AuthService.signIn(email, password);
     setLoading(false);
   };
 

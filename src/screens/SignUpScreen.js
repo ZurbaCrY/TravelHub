@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { View, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { Input, Text } from 'react-native-elements';
-import { signUp } from '../User-Auth/auth';
 import { styles } from '../style/styles';
 import Button from '../components/Button';
+import AuthService from '../User-Auth/auth';
 
 export default function SignUpScreen({ navigation }) {
   const [username, setUsername] = useState('');
@@ -15,14 +15,12 @@ export default function SignUpScreen({ navigation }) {
   const handleSignUp = async () => {
     try {
       setLoading(true);
-      success = await signUp(username, email, password, confirmPassword)
+      success = await AuthService.signUp(username, email, password, confirmPassword)
       setLoading(false);
       // if sign up is successfull switch to login
       // else print message (for cases where no error occured but also no success)
-      if (success.success == true) {
-        authSwitchToSignIn
-      } else {
-        console.log(success.message)
+      if (success == true) {
+        authSwitchToSignIn();
       }
     } catch (error) {
       console.error(error)
