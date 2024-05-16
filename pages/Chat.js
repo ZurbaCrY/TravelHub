@@ -2,12 +2,8 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { GiftedChat } from 'react-native-gifted-chat';
 import { useDarkMode } from './DarkModeContext';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '../User-Auth/supabase';
 
-const REACT_APP_SUPABASE_URL = "https://zjnvamrbnqzefncmdpaf.supabase.co";
-const REACT_APP_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpqbnZhbXJibnF6ZWZuY21kcGFmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTQ0NjgzMDIsImV4cCI6MjAzMDA0NDMwMn0.O4S0x7F-5df2hR218qrO4VJbDOLK1Gzsvb3a8SGqwvY";
-
-const supabase = createClient(REACT_APP_SUPABASE_URL, REACT_APP_ANON_KEY);
 
 export default function ChatScreen({ route, navigation }) {
   const { chatId, chatName } = route.params;
