@@ -5,24 +5,28 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { StatusBar } from "expo-status-bar";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { Animated } from "react-native";
-import { DarkModeProvider } from "./pages/DarkModeContext";
-import { supabase } from "./User-Auth/supabase";
+import { DarkModeProvider } from "./src/screens/DarkModeContext";
 
-import MapScreen from "./pages/MapScreen";
-import CommunityScreen from "./pages/CommunityScreen";
-import ProfileScreen from "./pages/ProfileScreen";
-import SettingsScreen from "./pages/SettingsScreen";
-import HomeScreen from "./pages/HomeScreen";
-import StartingScreen from "./pages/StartingScreen";
-import SignInScreen from "./pages/SignInScreen";
-import SignUpScreen from "./pages/SignUpScreen";
-import LoadingScreen from "./pages/LoadingScreen";
-import ChatListScreen from "./pages/ChatList";
-import ChatScreen from "./pages/Chat";
+import {
+  MapScreen,
+  CommunityScreen,
+  ProfileScreen,
+  SettingsScreen,
+  HomeScreen,
+  StartingScreen,
+  SignInScreen,
+  SignUpScreen,
+  LoadingScreen,
+} from './src/screens'
 
 const Tab = createBottomTabNavigator();
 const RootStack = createStackNavigator();
 const Stack = createStackNavigator();
+import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
+
+import "react-native-url-polyfill/auto";
+import { useState, useEffect } from "react";
+import { supabase } from "./src/User-Auth/supabase";
 
 function MainTabs() {
   return (
@@ -33,13 +37,13 @@ function MainTabs() {
         tabBarStyle: { backgroundColor: "#3EAAE9" },
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
-          if (route.name === "Home") {
+          if (route.name === "HomeScreen") {
             iconName = "home";
-          } else if (route.name === "Community") {
+          } else if (route.name === "CommunityScreen") {
             iconName = "users";
-          } else if (route.name === "Map") {
+          } else if (route.name === "MapScreen") {
             iconName = "map-marker-alt";
-          } else if (route.name === "Profile") {
+          } else if (route.name === "ProfileScreen") {
             iconName = "user";
           } else if (route.name === "ChatList") {
             iconName = "comments";
@@ -58,11 +62,10 @@ function MainTabs() {
         headerShown: false,
       })}
     >
-      <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Community" component={CommunityScreen} />
-      <Tab.Screen name="Map" component={MapScreen} />
-      <Tab.Screen name="Profile" component={ProfileScreen} />
-      <Tab.Screen name="ChatList" component={ChatListScreen} />
+      <Tab.Screen name="HomeScreen" component={HomeScreen} />
+      <Tab.Screen name="CommunityScreen" component={CommunityScreen} />
+      <Tab.Screen name="MapScreen" component={MapScreen} />
+      <Tab.Screen name="ProfileScreen" component={ProfileScreen} />
     </Tab.Navigator>
   );
 }
@@ -86,10 +89,6 @@ export default function App() {
     const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
     });
-
-    return () => {
-      authListener?.unsubscribe();
-    };
   }, []);
 
   if (loading) {
