@@ -6,9 +6,7 @@ import { supabase } from '../User-Auth/supabase';
 import AuthService from '../User-Auth/auth';
 
 const CURRENT_USER_ID = AuthService.user.id; 
-const CURRENT_USER_NAME = AuthService.user.username; // assuming this is correct
-console.log(CURRENT_USER_NAME);
-console.log(CURRENT_USER_ID);
+const CURRENT_USER_NAME = AuthService.user.username;
 
 export default function ChatScreen({ route, navigation }) {
   const { chatId, chatName } = route.params;
