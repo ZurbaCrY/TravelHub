@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Alert, AppState } from "react-native";
-import { supabase } from "./supabase";
-import LoadingScreen from "../pages/LoadingScreen";
+import { supabase } from "../User-Auth/supabase";
+import LoadingScreen from "../screens/LoadingScreen";
 
 // Registering auto-refresh for Supabase Auth when app state changes
 AppState.addEventListener("change", (state) => {
@@ -32,25 +32,6 @@ export async function signInWithEmail(email, password) {
   }
 }
 
-export async function signUpWithEmail(email, password) {
-  try {
-    const { error } = await supabase.auth.signUp({
-      email: email,
-      password: password,
-    });
-
-    if (error) {
-      Alert.alert(error.message);
-      return false;
-    }
-
-    return true;
-  } catch (error) {
-    Alert.alert("Error signing up");
-    return false;
-  }
-}
-
 export async function signOut() {
   try {
     const { error } = await supabase.auth.signOut();
@@ -58,7 +39,6 @@ export async function signOut() {
       Alert.alert(error.message);
       return false;
     }
-
     return true;
   } catch (error) {
     Alert.alert("Error signing out");
@@ -66,10 +46,13 @@ export async function signOut() {
   }
 }
 
+export async function signUp(username, email, password, confirmPassword) {
+  if (password !== confirmPassword) {
+    alert.alert('Error', 'Passwords do not match')
+    return false;
+  }
 
-export async function signUp(username, email, password) {
   try {
-    // Check if username is unique
     const { data: usernameData, error: usernameError } = await supabase
       .from("users")
       .select("id")

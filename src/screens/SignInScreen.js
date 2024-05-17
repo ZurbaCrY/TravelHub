@@ -5,10 +5,11 @@ import {
   ActivityIndicator,
   TouchableOpacity,
 } from "react-native";
-import { Button, Input, Switch, Text } from "react-native-elements";
-import { signInWithEmail } from "../User-Auth/auth";
+import { Input, Switch, Text } from "react-native-elements";
 import { useNavigation } from "@react-navigation/native";
-import { styles } from '../styles/styles';
+import { styles } from '../style/styles';
+import Button from "../components/Button";
+import AuthService from "../User-Auth/auth"
 
 export default function SigninScreen() {
   const navigation = useNavigation();
@@ -19,7 +20,7 @@ export default function SigninScreen() {
 
   const handleSignIn = async () => {
     setLoading(true);
-    const success = await signInWithEmail(email, password);
+    await AuthService.signIn(email, password);
     setLoading(false);
   };
 
@@ -27,14 +28,14 @@ export default function SigninScreen() {
     Alert.alert("This Feature is not implemented yet. Please contact Support!");
   };
 
-  const authSwitch = () => {
+  const authSwitchToSignUp = () => {
     navigation.navigate("SignUpScreen");
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Login</Text>
-      <TouchableOpacity style={styles.authSwitchTouchable} onPress={authSwitch}>
+      <TouchableOpacity style={styles.authSwitchTouchable} onPress={authSwitchToSignUp}>
         <Text style={styles.switchText}>
           Don't have an account? Sign Up instead
         </Text>
@@ -74,14 +75,9 @@ export default function SigninScreen() {
         </TouchableOpacity>
       </View>
       <View style={styles.buttonView}>
-        <Button
-          title="Sign In"
-          style={styles.button}
-          disabled={loading}
-          onPress={handleSignIn}
-          buttonStyle={styles.button}
-          titleStyle={styles.buttonText}
-        />
+        <Button mode='contained' onPress={handleSignIn}>
+          Sign In
+        </Button>
         {loading && (
           <ActivityIndicator
             size="large"

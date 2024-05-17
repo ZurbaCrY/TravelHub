@@ -1,17 +1,18 @@
 // SettingsScreen.js
 import React, { useState } from 'react';
-import { View, Text, Switch, TextInput, TouchableOpacity, StyleSheet, Button, Input } from 'react-native';
+import { View, Text, Switch,  StyleSheet, } from 'react-native';
 import { useDarkMode } from './DarkModeContext'; // Importiere den Hook und Context
-import { signOut } from '../User-Auth/auth' 
+import Button from '../components/Button';
+import AuthService from '../User-Auth/auth'
 
 const SettingsScreen = () => {
   const { isDarkMode, toggleDarkMode } = useDarkMode(); // Verwende den globalen Dark Mode State
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [loading, setLoading] = useState(false)
 
-  const handleSignIn = async () => {
+  const handleSignOut = async () => {
     setLoading(true)
-    const success = await signOut()
+    await AuthService.signOut()
     setLoading(false)
   }
 
@@ -42,7 +43,9 @@ const SettingsScreen = () => {
       </View>
 
       <View>
-        <Button title="Sign out" disabled={loading} onPress={handleSignIn} />
+        <Button mode="contained" onPress={handleSignOut}>
+          Sign out
+        </Button>
       </View>
     </View>
   );
