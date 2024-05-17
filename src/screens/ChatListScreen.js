@@ -9,6 +9,20 @@ export default function ChatListScreen({ navigation }) {
 
   useEffect(() => {
     fetchChats();
+
+    // Subscription einrichten
+    const messageSubscription = supabase
+      .channel('public:messages')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, payload => {
+        console.log('Change received!', payload);
+        fetchChats();
+      })
+      .subscribe();
+
+    // Cleanup function
+    return () => {
+      supabase.removeChannel(messageSubscription);
+    };
   }, []);
 
   const fetchChats = async () => {
@@ -22,7 +36,7 @@ export default function ChatListScreen({ navigation }) {
     } else {
       // Filter nach Nachrichten mit vorhandener user_id oder username
       const filteredData = data.filter((message) => message.user_id || message.username);
-      
+
       // Gruppen Nachrichten nach chat_id und extrahieren die letzte Nachricht
       const chatMap = new Map();
       filteredData.forEach((message) => {

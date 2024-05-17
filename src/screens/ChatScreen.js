@@ -6,7 +6,7 @@ import { supabase } from '../User-Auth/supabase';
 import AuthService from '../User-Auth/auth';
 
 const CURRENT_USER_ID = AuthService.user.id; 
-const CURRENT_USER_NAME = AuthService.user;
+const CURRENT_USER_NAME = AuthService.user.username; // assuming this is correct
 console.log(CURRENT_USER_NAME);
 console.log(CURRENT_USER_ID);
 
@@ -37,7 +37,7 @@ export default function ChatScreen({ route, navigation }) {
             createdAt: new Date(message.created_at),
             user: {
               _id: message.user_id,
-              name: message.user_id === CURRENT_USER_ID
+              name: message.user_id === CURRENT_USER_ID ? CURRENT_USER_NAME : message.username,
             },
           }));
           setMessages(formattedMessages);
@@ -49,6 +49,29 @@ export default function ChatScreen({ route, navigation }) {
     };
 
     fetchMessages();
+
+    // Subscription einrichten
+    const messageSubscription = supabase
+      .channel(`public:messages:chat_id=eq.${chatId}`)
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `chat_id=eq.${chatId}` }, payload => {
+        console.log('New message received!', payload);
+        const newMessage = {
+          _id: payload.new.id,
+          text: payload.new.content,
+          createdAt: new Date(payload.new.created_at),
+          user: {
+            _id: payload.new.user_id,
+            name: payload.new.user_id === CURRENT_USER_ID ? CURRENT_USER_NAME : payload.new.username,
+          },
+        };
+        setMessages(previousMessages => GiftedChat.append(previousMessages, newMessage));
+      })
+      .subscribe();
+
+    // Cleanup function
+    return () => {
+      supabase.removeChannel(messageSubscription);
+    };
   }, [chatId, chatName, navigation]);
 
   const onSend = useCallback(async (newMessages = []) => {
