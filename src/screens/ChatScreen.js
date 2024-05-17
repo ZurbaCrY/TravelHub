@@ -73,7 +73,6 @@ export default function ChatScreen({ route, navigation }) {
   }, [chatId, chatName, navigation]);
 
   const onSend = useCallback(async (newMessages = []) => {
-    setMessages((previousMessages) => GiftedChat.append(previousMessages, newMessages));
     const message = newMessages[0];
     try {
       console.log('Sending message:', message);
