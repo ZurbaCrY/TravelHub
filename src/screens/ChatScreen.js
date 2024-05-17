@@ -3,9 +3,12 @@ import { View, StyleSheet } from 'react-native';
 import { GiftedChat } from 'react-native-gifted-chat';
 import { useDarkMode } from './DarkModeContext';
 import { supabase } from '../User-Auth/supabase';
+import AuthService from '../User-Auth/auth';
 
-const CURRENT_USER_ID = 1; 
-const CURRENT_USER_NAME = 'Ole';
+const CURRENT_USER_ID = AuthService.user.id; 
+const CURRENT_USER_NAME = AuthService.user;
+console.log(CURRENT_USER_NAME);
+console.log(CURRENT_USER_ID);
 
 export default function ChatScreen({ route, navigation }) {
   const { chatId, chatName } = route.params;
