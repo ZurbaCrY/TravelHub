@@ -496,6 +496,7 @@ const fetchCityCoordinates = async (placeId) => {
 <GooglePlacesAutocomplete
       placeholder='Search for city...'
       onPress={(data, details = null) => {
+      console.log('hurensohn');
         // Extrahiere die Koordinaten aus den Details, falls vorhanden
         console.log(data);
         const { place_id } = details;
