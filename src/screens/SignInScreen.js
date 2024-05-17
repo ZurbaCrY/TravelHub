@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import {
   Alert,
   View,
-  ActivityIndicator,
   TouchableOpacity,
 } from "react-native";
 import { Input, Switch, Text } from "react-native-elements";
@@ -15,13 +14,10 @@ export default function SigninScreen() {
   const navigation = useNavigation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
   const [click, setClick] = useState(false);
 
   const handleSignIn = async () => {
-    setLoading(true);
     await AuthService.signIn(email, password);
-    setLoading(false);
   };
 
   const handleForgetPasswordPress = () => {
@@ -78,13 +74,6 @@ export default function SigninScreen() {
         <Button mode='contained' onPress={handleSignIn}>
           Sign In
         </Button>
-        {loading && (
-          <ActivityIndicator
-            size="large"
-            color="#0000ff"
-            style={styles.loadingIndicator}
-          />
-        )}
       </View>
     </View>
   );

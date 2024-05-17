@@ -8,12 +8,9 @@ import AuthService from '../User-Auth/auth'
 const SettingsScreen = () => {
   const { isDarkMode, toggleDarkMode } = useDarkMode(); // Verwende den globalen Dark Mode State
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
-  const [loading, setLoading] = useState(false)
 
   const handleSignOut = async () => {
-    setLoading(true)
     await AuthService.signOut()
-    setLoading(false)
   }
 
   return (
