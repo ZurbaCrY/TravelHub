@@ -26,4 +26,5 @@ jobs:
       run: |
         npm install
         npm install -g expo-cli
-        npm start
+        expo start --no-dev --non-interactive --max-workers 1 &
+        wait $!
