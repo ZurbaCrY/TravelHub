@@ -511,9 +511,8 @@ const fetchCityCoordinates = async (placeId) => {
       }}
               styles={{
                 textInput: styles.searchInput,
-                listView: styles.listView,
+                listView: styles.listViewContainer,
               }}
-              listViewStyle={styles.listViewContainer}
     />
   <Button
     mode='contained'
@@ -788,13 +787,7 @@ const styles = StyleSheet.create({
                     listViewContainer: {
                       position: 'absolute',
                       top: '100%',
-                      width: '80%',
-                      maxHeight: 200,
-                      backgroundColor: 'white',
-                      borderColor: 'gray',
-                      borderWidth: 1,
-                      borderRadius: 5,
-                      zIndex: 2, // Stelle sicher, dass das Dropdown-Menü über anderen Inhalten liegt
+                      maxHeight: 150,
                     },
                     searchLocationButton: {
                       height: 40,
