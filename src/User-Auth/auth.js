@@ -12,9 +12,32 @@ class AuthService {
   handleAppStateChange = (state) => {
     if (state === "active") {
       this.supabase.auth.startAutoRefresh();
+      this.update();
     } else {
       this.supabase.auth.stopAutoRefresh();
     }
+  }
+
+  async update() {
+    try {
+      console.log("awaiting")
+      const { data, error } = await this.supabase.auth.getSession()
+      this.session = data.session
+      this.user = data.session.user
+      // debug:
+      if(this.session.user == this.user){
+        console.log("hussa")
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getUser() {
+    console.log("1....")
+    this.update;
+    console.log("2....")
+    return this.user;
   }
 
   async signUp(username, email, password, confirmPassword) {
@@ -31,10 +54,10 @@ class AuthService {
           throw new Error(`${field.capitalize()} is already taken`);
         }
       };
-      
+
       await checkUnique("username", username);
       await checkUnique("email", email);
-      
+
 
       // Debug this func when emails can be sent again
       // Sign up the user
@@ -42,18 +65,20 @@ class AuthService {
         email,
         password,
       });
-      console.log(data)
       user = data.user
-      if(data != null) {
+      console.log(data)
+      console.log(user)
+      if (data != null) {
         console.log("New User:", user)
-  
+
         // Update User information in db
         await this.supabase
           .from('users')
-          .insert([{if: user.id, email, username}]);
-  
+          .insert([{ if: user.id, email, username }]);
+
         // Set the user in AuthService
-        this.setUser(user);
+        this.user = user;
+        this.session = data.session;
         return true
       } else {
         throw new Error("Something went wrong: auth.js:59");
@@ -75,6 +100,11 @@ class AuthService {
       }
       this.user = data.user
       this.session = data.session
+      console.info("User signed in:", data.user)
+      console.info("User.id:", data.user.id)
+      if(data.user == data.session.user){
+        console.log("hussa die 2.")
+      }
       return true;
     } catch (error) {
       throw error;
