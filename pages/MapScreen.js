@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, View, Modal, Text, TextInput, Button, ScrollView, TouchableOpacity, Dimensions, Image } from 'react-native';
+import { StyleSheet, View, Modal, Text, TextInput, ScrollView, TouchableOpacity, Dimensions, Image } from 'react-native';
 import MapView, { PROVIDER_GOOGLE, Polygon, Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { customMapStyle } from '../resources/customMapStyle';
@@ -8,6 +8,7 @@ import CustomPlaceItem from '../resources/CustomPlaceItem'; // Annahme: Pfad zur
 import PlaceDetailScreen from './PlaceDetailScreen';
 import AddPlaceModal from './AddPlaceModal';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
+import { Button } from 'react-native-paper'
 
 
 const { width } = Dimensions.get('window');
@@ -367,7 +368,7 @@ const newHandleSearch = () => {
                                                                     setSearchResult(nearestCity);
                                                                     console.log(searchResult);
     } else {
-        console.log("ERROR: City not found")
+        console.log("ERROR: City not found");
     }
 
 }
@@ -515,11 +516,12 @@ const fetchCityCoordinates = async (placeId) => {
               listViewStyle={styles.listViewContainer}
     />
   <Button
-    title="Go!"
+    mode='contained'
     onPress={newHandleSearch}
-    style={styles.searchLocationButton}
     disabled={showList} // Deaktiviere den Button, wenn showList true ist
-  />
+    style={styles.button}
+    labelStyle={styles.buttonText}
+  >Go!</Button>
 </View>
 
       {/* Symbol mit einem Plus oben links */}
@@ -761,7 +763,7 @@ const styles = StyleSheet.create({
                       padding: 10,
                       borderRadius: 20,
                       zIndex: 1, // Stelle sicher, dass das Plus-Symbol über anderen Elementen liegt
-                      marginTop: 70,
+                      marginTop: 90,
                       borderWidth: 1,
                       borderColor: 'black',
                     },
@@ -778,7 +780,9 @@ const styles = StyleSheet.create({
                       height: 40,
                       borderWidth: 1,
                       borderColor: 'gray',
+                      marginLeft: 10,
                       marginRight: 10,
+                      marginTop: 10,
                       paddingHorizontal: 10,
                     },
                     listViewContainer: {
@@ -793,17 +797,20 @@ const styles = StyleSheet.create({
                       zIndex: 2, // Stelle sicher, dass das Dropdown-Menü über anderen Inhalten liegt
                     },
                     searchLocationButton: {
-                      position: 'absolute',
-                      top: 10, // Beispiel-Positionierung, anpassen nach Bedarf
-                      right: 10, // Beispiel-Positionierung, anpassen nach Bedarf
-                      width: 40,
                       height: 40,
-                      borderRadius: 20, // Halbe Breite für runde Ecken
-                      backgroundColor: 'blue', // Beispielhintergrundfarbe, anpassen nach Bedarf
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      zIndex: 2, // Stelle sicher, dass der Button über dem Listcontainer liegt
+                      color: 'black',
                     },
+                    button: {
+                        backgroundColor: "#3EAAE9",
+                        height: 40,
+                        borderRadius: 7,
+                        marginTop: 10,
+                        marginRight: 5,
+                      },
+                      buttonText: {
+                        fontSize: 18,
+                        fontWeight: "bold",
+                      },
                     disabledContainer: {
                       opacity: 0.5, // Verringert die Deckkraft des Containers, um ihn auszugrauen
                     },
