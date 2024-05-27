@@ -4,8 +4,8 @@ import { useDarkMode } from './DarkModeContext';
 import { supabase } from '../User-Auth/supabase';
 import AuthService from '../User-Auth/auth';
 
-const CURRENT_USER_ID = AuthService.user.id; 
-const CURRENT_USER_NAME = AuthService.user.username; 
+const CURRENT_USER = AuthService.getUser(); 
+const CURRENT_USER_ID = CURRENT_USER.id; 
 
 export default function ChatListScreen({ navigation }) {
   const { isDarkMode } = useDarkMode();
@@ -37,7 +37,7 @@ export default function ChatListScreen({ navigation }) {
   const fetchChats = async () => {
     const { data, error } = await supabase
       .from('messages')
-      .select('chat_id, user_id, username, content, created_at')
+      .select('chat_id, user_id, content, created_at')
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -62,7 +62,7 @@ export default function ChatListScreen({ navigation }) {
   const fetchUsernames = async (userIds) => {
     const { data, error } = await supabase
       .from('users')
-      .select('user_id, username')
+      .select('user_id')
       .in('user_id', userIds);
 
     if (error) {
@@ -79,7 +79,7 @@ export default function ChatListScreen({ navigation }) {
   const fetchUsers = async () => {
     const { data, error } = await supabase
       .from('users')
-      .select('user_id, username');
+      .select('user_id');
 
     if (error) {
       console.error('Error fetching users:', error);

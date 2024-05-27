@@ -5,8 +5,9 @@ import { useDarkMode } from './DarkModeContext';
 import { supabase } from '../User-Auth/supabase';
 import AuthService from '../User-Auth/auth';
 
-const CURRENT_USER_ID = AuthService.user.id; 
-const CURRENT_USER_NAME = AuthService.user.username;
+const CURRENT_USER = AuthService.getUser(); 
+const CURRENT_USER_ID = CURRENT_USER.id;
+console.log("hallo" + CURRENT_USER_ID);
 
 export default function ChatScreen({ route, navigation }) {
   const { chatId, chatName } = route.params;
@@ -21,7 +22,7 @@ export default function ChatScreen({ route, navigation }) {
         console.log(`Fetching messages for chatId: ${chatId}`);
         const { data, error } = await supabase
           .from('messages')
-          .select('id, username, content, created_at, chat_id, user_id')
+          .select('id, content, created_at, chat_id, user_id')
           .eq('chat_id', chatId)
           .order('created_at', { ascending: false });
 
@@ -35,7 +36,6 @@ export default function ChatScreen({ route, navigation }) {
             createdAt: new Date(message.created_at),
             user: {
               _id: message.user_id,
-              name: message.user_id === CURRENT_USER_ID ? CURRENT_USER_NAME : message.username,
             },
           }));
           setMessages(formattedMessages);
@@ -59,7 +59,6 @@ export default function ChatScreen({ route, navigation }) {
           createdAt: new Date(payload.new.created_at),
           user: {
             _id: payload.new.user_id,
-            name: payload.new.user_id === CURRENT_USER_ID ? CURRENT_USER_NAME : payload.new.username,
           },
         };
         setMessages(previousMessages => GiftedChat.append(previousMessages, newMessage));
@@ -81,7 +80,6 @@ export default function ChatScreen({ route, navigation }) {
         .insert([
           {
             user_id: CURRENT_USER_ID,
-            username: CURRENT_USER_NAME,
             content: message.text,
             chat_id: chatId,
             created_at: new Date().toISOString(), // Use ISO string format
@@ -104,7 +102,6 @@ export default function ChatScreen({ route, navigation }) {
         onSend={(messages) => onSend(messages)}
         user={{
           _id: CURRENT_USER_ID,
-          name: CURRENT_USER_NAME,
         }}
         textInputStyle={{ color: isDarkMode ? '#FFF' : '#000' }}
       />
