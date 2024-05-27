@@ -9,9 +9,15 @@ import PlaceDetailScreen from './PlaceDetailScreen';
 import AddPlaceModal from './AddPlaceModal';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { Button } from 'react-native-paper'
+import { createClient } from '@supabase/supabase-js';
 
 
 const { width } = Dimensions.get('window');
+
+const REACT_APP_SUPABASE_URL = "https://zjnvamrbnqzefncmdpaf.supabase.co";
+const REACT_APP_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpqbnZhbXJibnF6ZWZuY21kcGFmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTQ0NjgzMDIsImV4cCI6MjAzMDA0NDMwMn0.O4S0x7F-5df2hR218qrO4VJbDOLK1Gzsvb3a8SGqwvY";
+
+const supabase = createClient(REACT_APP_SUPABASE_URL, REACT_APP_ANON_KEY);
 
 // Definition der Klassen
 class Continent {
@@ -89,6 +95,7 @@ class Viewpoint extends Place {
 }
 
 // Daten für die Weltkarte
+/*
 const continentsData = [
   new Continent('Europe', [
     new Country('Germany', [
@@ -128,7 +135,7 @@ const continentsData = [
     ]),
   ]),
   // weitere Kontinente hinzufügen...
-];
+]; */
 
 export default function MapScreen() {
   const [location, setLocation] = useState(null);
@@ -148,11 +155,13 @@ export default function MapScreen() {
           const [showPlaceDetailModal, setShowPlaceDetailModal] = useState(false);
                    const [showAddModal, setShowAddModal] = useState(false);
                      const [selectedCoordinates, setSelectedCoordinates] = useState(null);
+                 const [continentsData, setContinentsData] = useState([]);
 
 
 
 useEffect(() => {
   // Scrollen zur ausgewählten Position in der ScrollView
+  fetchData();
   if (scrollViewRef.current && selectedPlace) {
     const index = searchResult.places.findIndex(place => place === selectedPlace);
     const offsetX = index * 120; // Breite des Platzhalters plus Abstand
@@ -186,6 +195,66 @@ useEffect(() => {
   })();
 }, []);
 
+const fetchCountries = async () => {
+  const { data, error } = await supabase.from('Country').select('*');
+  if (error) {
+    throw new Error(error.message);
+  }
+  return data;
+};
+
+const fetchCities = async () => {
+  const { data, error } = await supabase.from('City').select('*');
+  if (error) {
+    throw new Error(error.message);
+  }
+  return data;
+};
+
+const fetchPlaces = async () => {
+  const { data, error } = await supabase.from('Attraction').select('*');
+  if (error) {
+    throw new Error(error.message);
+  }
+  return data;
+};
+
+
+  const fetchData = async () => {
+    try {
+      const countries = await fetchCountries();
+      const cities = await fetchCities();
+      const attractions = await fetchPlaces();
+
+      const continentsData = [
+        new Continent('World', countries.map(country => {
+          const countryCities = cities
+            .filter(city => city.Country_ID === country.Country_ID)
+            .map(city => {
+              const cityAttractions = attractions
+                .filter(attraction => attraction.City_ID === city.City_ID)
+                .map(attraction => new Place(
+                  attraction.Attraction_Name,
+                  { latitude: parseFloat(attraction.Latitude), longitude: parseFloat(attraction.Longitude) },
+                  attraction.Type_of_Attraction
+                ));
+
+              const cityCoordinates = [
+                { latitude: parseFloat(city.latitude), longitude: parseFloat(city.longitude) } // Hier sollten die Stadtgrenzen hinzugefügt werden, falls vorhanden
+              ];
+
+              return new City(city.Cityname, cityCoordinates, cityAttractions);
+            });
+
+          return new Country(country.Countryname, countryCities);
+        }))
+      ];
+
+      setContinentsData(continentsData);
+    } catch (error) {
+      console.error('Error fetching data:', error.message);
+    }
+  };
 
   const getImageForPlace = (place) => {
         if (place === selectedPlace){
@@ -362,11 +431,11 @@ const newHandleSearch = () => {
                                                                                                         latitudeDelta: 1, // Eine sehr kleine Zahl für einen sehr kleinen Bereich
                                                                                                         longitudeDelta: 1, // Eine sehr kleine Zahl für einen sehr kleinen Bereich
                                                                                                           });
-                                                                    console.log(nearestCity.name);
+                                                                    //console.log(nearestCity.name);
 
                                                                     // Set the searchLocation state to the nearest city
                                                                     setSearchResult(nearestCity);
-                                                                    console.log(searchResult);
+                                                                    //console.log(searchResult);
     } else {
         console.log("ERROR: City not found");
     }
@@ -437,7 +506,7 @@ const newHandleSearch = () => {
                                            longitudeDelta: 0.01, // Hier kannst du die Zoomstufe einstellen
                                          }, 1000);
                                        }
-     console.log(place);
+     //console.log(place);
    };
 
      const handleMapPress = () => {
@@ -457,7 +526,7 @@ const newHandleSearch = () => {
      const handleStarClick = (place) => {
 
         place.toggleFavourite();
-        console.log(place.favourite);
+        //console.log(place.favourite);
 
         setForceUpdate(prevState => !prevState);
 
@@ -482,7 +551,7 @@ const fetchCityCoordinates = async (placeId) => {
       const { geometry } = data.result;
       if (geometry) {
         setSelectedCoordinates(geometry.location);
-        console.log(selectedCoordinates);
+        //console.log(selectedCoordinates);
       }
     } catch (error) {
       console.error('Error fetching city coordinates:', error);
@@ -496,11 +565,11 @@ const fetchCityCoordinates = async (placeId) => {
 <GooglePlacesAutocomplete
       placeholder='Search for city...'
       onPress={(data, details = null) => {
-      console.log('hurensohn');
+      //console.log('hurensohn');
         // Extrahiere die Koordinaten aus den Details, falls vorhanden
-        console.log(data);
+        //console.log(data);
         const { place_id } = details;
-        console.log(place_id);
+        //console.log(place_id);
                 if (place_id) {
                   fetchCityCoordinates(place_id);
                 }
