@@ -1,3 +1,4 @@
+import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -9,8 +10,6 @@ import "react-native-url-polyfill/auto";
 import { useState, useEffect } from "react";
 import { supabase } from "./src/User-Auth/supabase";
 import {
-  ChatListScreen,
-  ChatScreen,
   MapScreen,
   CommunityScreen,
   ProfileScreen,
@@ -78,24 +77,11 @@ export default function App() {
   useEffect(() => {
     const initUser = async () => {
       const currentUser = await AuthService.getUser();
+      console.log(currentUser);
       setUser(currentUser);
       setLoading(false)
     };
     initUser();
-    supabase.auth
-      .getSession()
-      .then(({ data: { session } }) => {
-        setSession(session);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching session:", error);
-        setLoading(false);
-      });
-
-    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
   }, []);
 
   // Just some User state prints for debugging purposes
@@ -104,10 +90,6 @@ export default function App() {
   }, [user]);
 
   if (loading) {
-    return <LoadingScreen />;
-  }
-
-  if (session && session.user) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <ActivityIndicator size="large" color="#39FF55" />
@@ -127,6 +109,8 @@ export default function App() {
                 options={{ headerShown: false }}
               />
               <RootStack.Screen name="Settings" component={SettingsScreen} />
+              <RootStack.Screen name="ChatListScreen" component={ChatListScreen} />
+              <RootStack.Screen name="ChatScreen" component={ChatScreen} />
             </RootStack.Navigator>
             <StatusBar style="auto" />
         </DarkModeProvider>
@@ -154,43 +138,3 @@ export default function App() {
     </NavigationContainer>
   );
 };
-      <DarkModeProvider>
-        <NavigationContainer>
-          <RootStack.Navigator>
-            <RootStack.Screen
-              name="Main"
-              component={MainTabs}
-              options={{ headerShown: false }}
-            />
-            <RootStack.Screen name="Settings" component={SettingsScreen} />
-            <RootStack.Screen name="ChatListScreen" component={ChatListScreen} />
-            <RootStack.Screen name="ChatScreen" component={ChatScreen} />
-          </RootStack.Navigator>
-          <StatusBar style="auto" />
-        </NavigationContainer>
-      </DarkModeProvider>
-    );
-  } else {
-    return (
-      <NavigationContainer>
-        <Stack.Navigator initialRouteName="Welcome">
-          <Stack.Screen
-            name="Welcome"
-            component={StartingScreen}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="SignInScreen"
-            component={SignInScreen}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="SignUpScreen"
-            component={SignUpScreen}
-            options={{ headerShown: false }}
-          />
-        </Stack.Navigator>
-      </NavigationContainer>
-    );
-  }
-}
