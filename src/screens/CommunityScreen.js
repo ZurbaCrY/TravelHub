@@ -1,7 +1,8 @@
 import 'react-native-url-polyfill/auto'
-import React, { useState, useEffect } from 'react';import { View, Text, StyleSheet, FlatList, TextInput, Button, Image, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react'; import { View, Text, StyleSheet, FlatList, TextInput, Button, Image, TouchableOpacity } from 'react-native';
 import { useDarkMode } from './DarkModeContext';
 import { createClient } from '@supabase/supabase-js';
+import * as ImagePicker from 'expo-image-picker';
 
 const REACT_APP_SUPABASE_URL = "https://zjnvamrbnqzefncmdpaf.supabase.co";
 const REACT_APP_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpqbnZhbXJibnF6ZWZuY21kcGFmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTQ0NjgzMDIsImV4cCI6MjAzMDA0NDMwMn0.O4S0x7F-5df2hR218qrO4VJbDOLK1Gzsvb3a8SGqwvY";
@@ -12,6 +13,7 @@ export default function CommunityScreen() {
   const { isDarkMode, toggleDarkMode } = useDarkMode();
   const [posts, setPosts] = useState([]);
   const [newPostContent, setNewPostContent] = useState('');
+  const [image, setImage] = useState(null);
 
   useEffect(() => {
     fetchPosts();
@@ -46,7 +48,7 @@ export default function CommunityScreen() {
       console.error('Error creating post:', error.message);
     }
   };
-  
+
   // Upvote geben für eine Nachricht
   const handleUpvote = async (postId) => {
     try {
@@ -93,6 +95,52 @@ export default function CommunityScreen() {
     }
   };
 
+  const handleImageUpload = async () => {
+    try {
+      // Öffne den Dateiauswähler für den Benutzer
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
+  
+      // Überprüfe, ob das Bild ausgewählt wurde und nicht abgebrochen wurde
+        console.log(result)
+        const firstAsset = result.assets[0];
+        const fileUri = firstAsset.uri;
+        console.log(fileUri)
+        const fileName = fileUri.substring(fileUri.lastIndexOf('/') + 1);
+        console.log(fileName)
+  
+        // Lade das Bild hoch zu Supabase Storage
+        const response = await fetch(fileUri);
+        const blob = await response.blob();
+        // const avatarFile = event.target.files[0]
+        console.log(blob)
+        const { data, error } = await supabase
+          .storage
+          .from('Storage')
+          .upload('./images/picture.png', blob, {
+          cacheControl: '3600',
+          upsert: false
+        });
+  
+        if (error) {
+          throw error;
+        }
+  
+        // Konstruiere den URI des hochgeladenen Bildes
+        const imageUrl = `${REACT_APP_SUPABASE_URL}/storage/v1/object/Storage/${fileName}`;
+        console.log('Image URL:', imageUrl);
+    } catch (error) {
+      console.error('Fehler beim Hochladen des Bildes:', error.message);
+    }
+  };
+  
+  
+
+
 
   //Elemente der Communityseite  
   return (
@@ -100,19 +148,21 @@ export default function CommunityScreen() {
       <FlatList
         data={posts}
         renderItem={({ item }) => (
-          <View style={{ backgroundColor: isDarkMode ? '#374151' : '#E5E7EB', padding: 10, marginVertical: 5, width: 350, }}>
-            <Text style={{ color: isDarkMode ? '#FFF' : '#000' }}>{item.content}</Text>
-            <Text style={{ color: isDarkMode ? '#9CA3AF' : '#6B7280', fontSize: 12 }}>{item.author}</Text>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5 }}>
-              <TouchableOpacity onPress={() => handleUpvote(item.id)}>
-                <Image source={require('./images/thumbs-up.png')} style={{ width: 20, height: 20 }} />
-                <Text style={{ color: isDarkMode ? '#FFF' : '#000', fontSize: 12, marginLeft: 3 }}>{item.upvotes}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => handleDownvote(item.id)}>
-                <Image source={require('./images/thumbs-down.png')} style={{ width: 20, height: 20 }} />
-                <Text style={{ color: isDarkMode ? '#FFF' : '#000', fontSize: 12, marginLeft: 3 }}>{item.downvotes}</Text>
-              </TouchableOpacity>
+          <View style={{ backgroundColor: isDarkMode ? '#374151' : '#E5E7EB', padding: 10, marginVertical: 5, width: 350 }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5, alignItems: 'center' }}>
+              <Text style={{ color: isDarkMode ? '#FFF' : '#000' }}>{item.content}</Text>
+              <View style={{ flexDirection: 'row' }}>
+                <TouchableOpacity onPress={() => handleUpvote(item.id)} style={{ flexDirection: 'row', alignItems: 'center', marginRight: 10 }}>
+                  <Image source={require('./images/thumbs-up.png')} style={{ width: 20, height: 20 }} />
+                  <Text style={{ color: isDarkMode ? '#FFF' : '#000', fontSize: 12, marginLeft: 3 }}>{item.upvotes}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => handleDownvote(item.id)} style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <Image source={require('./images/thumbs-down.png')} style={{ width: 20, height: 20 }} />
+                  <Text style={{ color: isDarkMode ? '#FFF' : '#000', fontSize: 12, marginLeft: 3 }}>{item.downvotes}</Text>
+                </TouchableOpacity>
+              </View>
             </View>
+            <Text style={{ color: isDarkMode ? '#9CA3AF' : '#6B7280', fontSize: 12 }}>{item.author}</Text>
           </View>
         )}
         keyExtractor={item => item.id.toString()}
@@ -120,14 +170,16 @@ export default function CommunityScreen() {
       <View style={{ flexDirection: 'row', alignItems: 'center', }}>
         <TextInput
           style={[styles.input, { backgroundColor: isDarkMode ? '#374151' : '#E5E7EB', color: isDarkMode ? '#FFF' : '#000' }]}
-          placeholder="Was möchtest du teilen?"
+          placeholder="Type here.."
           value={newPostContent}
           onChangeText={text => setNewPostContent(text)}
         />
-        <Button
-          title="Post"
-          onPress={createNewPost}
-        />
+        <TouchableOpacity onPress={handleImageUpload}>
+          <Image source={require('./images/picture.png')} style={{ width: 50, height: 50 }} />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={createNewPost}>
+          <Image source={require('./images/message_send.png')} style={{ width: 55, height: 55 }} />
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -143,12 +195,13 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   input: {
-    width: '80%',
+    width: '70%',
     height: 40,
-    borderWidth: 1,
+    borderWidth: 3,
     borderRadius: 50,
     paddingHorizontal: 10,
     marginVertical: 10,
     marginTop: 'auto',
+    borderColor: '#8a8a8a'
   },
 });
