@@ -45,7 +45,7 @@ export default function SignUpScreen({ navigation }) {
           leftIcon={{ type: 'font-awesome', name: 'user' }}
           onChangeText={setUsername}
           value={username}
-          placeholder="Username"
+          placeholder="The Username will not be saved"
           autoCapitalize="none"
           containerStyle={styles.input}
         />

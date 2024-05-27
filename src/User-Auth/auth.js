@@ -4,6 +4,7 @@ class AuthService {
   constructor(supabase) {
     this.supabase = supabase
     this.user = null
+    this.session = null
 
     AppState.addEventListener("change", (this.handleAppStateChange))
   }
@@ -11,13 +12,32 @@ class AuthService {
   handleAppStateChange = (state) => {
     if (state === "active") {
       this.supabase.auth.startAutoRefresh();
+      this.update();
     } else {
       this.supabase.auth.stopAutoRefresh();
     }
   }
 
-  setUser(user) {
-    this.user = user
+  async update() {
+    try {
+      console.log("awaiting")
+      const { data, error } = await this.supabase.auth.getSession()
+      this.session = data.session
+      this.user = data.session.user
+      // debug:
+      if(this.session.user == this.user){
+        console.log("hussa")
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getUser() {
+    console.log("1....")
+    this.update;
+    console.log("2....")
+    return this.user;
   }
 
   async signUp(username, email, password, confirmPassword) {
@@ -25,43 +45,43 @@ class AuthService {
       throw Error('Passwords do not match')
     }
     try {
-      // Check if Username is unique
-      let { data: usernameData, error: usernameError } = await this.supabase
-        .from("users")
-        .select("user_id")
-        .eq("username", username);
-      if (usernameData && usernameData.length > 0) {
-        throw new Error("Username is already taken");
-      }
+      const checkUnique = async (field, value) => {
+        let { data, error } = await this.supabase
+          .from("users")
+          .select("user_id")
+          .eq(field, value);
+        if (data && data.length > 0) {
+          throw new Error(`${field.capitalize()} is already taken`);
+        }
+      };
 
-      // Check if email is unique
-      let { data: emailData, error: emailError } = await this.supabase
-        .from("users")
-        .select("user_id")
-        .eq("email", email);
-      if (emailData && emailData.length > 0) {
-        throw new Error("Email is already taken");
-      }
+      await checkUnique("username", username);
+      await checkUnique("email", email);
 
+
+      // Debug this func when emails can be sent again
       // Sign up the user
-      const { user, error } = await this.supabase.auth.signUp({
+      const { data, error } = await this.supabase.auth.signUp({
         email,
         password,
       });
-      user = null;
-      if(user != null) {
-        console.log(user)
-  
+      user = data.user
+      console.log(data)
+      console.log(user)
+      if (data != null) {
+        console.log("New User:", user)
+
         // Update User information in db
         await this.supabase
           .from('users')
-          .insert([{if: user.id, email, username}]);
-  
+          .insert([{ if: user.id, email, username }]);
+
         // Set the user in AuthService
-        this.setUser(user);
+        this.user = user;
+        this.session = data.session;
         return true
       } else {
-        throw new Error("Something went wrong: auth.js:65");
+        throw new Error("Something went wrong: auth.js:59");
       }
     } catch (error) {
       throw error;
@@ -78,8 +98,13 @@ class AuthService {
       if (error) {
         throw error;
       }
-      // data has session and user (and weak password) information, only user is needed here
-      this.setUser(data.user)
+      this.user = data.user
+      this.session = data.session
+      console.info("User signed in:", data.user)
+      console.info("User.id:", data.user.id)
+      if(data.user == data.session.user){
+        console.log("hussa die 2.")
+      }
       return true;
     } catch (error) {
       throw error;
@@ -92,16 +117,12 @@ class AuthService {
       if (error) {
         throw error;
       }
-      this.setUser(null)
+      this.user = null
+      this.session = null
     } catch (error) {
       throw error;
     }
   }
-
-  getUser() {
-    return this.user
-  }
-  // get only specific user stuff ???
 }
 
 export default new AuthService(sb);

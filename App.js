@@ -5,7 +5,9 @@ import { StatusBar } from "expo-status-bar";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { Animated } from "react-native";
 import { DarkModeProvider } from "./src/screens/DarkModeContext";
-
+import "react-native-url-polyfill/auto";
+import { useState, useEffect } from "react";
+import { supabase } from "./src/User-Auth/supabase";
 import {
   ChatListScreen,
   ChatScreen,
@@ -23,11 +25,6 @@ import {
 const Tab = createBottomTabNavigator();
 const RootStack = createStackNavigator();
 const Stack = createStackNavigator();
-import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
-
-import "react-native-url-polyfill/auto";
-import { useState, useEffect } from "react";
-import { supabase } from "./src/User-Auth/supabase";
 
 function MainTabs() {
   return (
