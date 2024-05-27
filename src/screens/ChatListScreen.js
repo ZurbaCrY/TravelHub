@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Button, Modal, TouchableWithoutFeedback, Alert } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Modal, TouchableWithoutFeedback, Alert } from 'react-native';
 import { useDarkMode } from './DarkModeContext';
 import { supabase } from '../User-Auth/supabase';
 import AuthService from '../User-Auth/auth';
+import Button from '../components/Button';
 
-const CURRENT_USER = AuthService.getUser(); 
-const CURRENT_USER_ID = CURRENT_USER.id; 
+
 
 export default function ChatListScreen({ navigation }) {
+  const CURRENT_USER = AuthService.getUser(); 
+  const CURRENT_USER_ID = CURRENT_USER.id;  
   const { isDarkMode } = useDarkMode();
   const [chats, setChats] = useState([]);
   const [users, setUsers] = useState([]);
@@ -137,9 +139,12 @@ export default function ChatListScreen({ navigation }) {
 
   return (
     <View style={[styles.container, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
-      <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.newChatButton}>
+      <Button mode="contained" onPress={() => setModalVisible(true)}>
+          Neuen Chat erstellen
+        </Button> 
+      {/* <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.newChatButton}>
         <Text style={styles.newChatButtonText}>Neuen Chat erstellen</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
       <FlatList
         data={chats}
         keyExtractor={(item) => item.chat_id}
@@ -180,7 +185,7 @@ export default function ChatListScreen({ navigation }) {
               <Text style={styles.userName}>{user.username}</Text>
             </TouchableOpacity>
           ))}
-          <Button title="Chat starten" onPress={createNewChat} disabled={!selectedUser} />
+          <Button onPress={createNewChat} disabled={!selectedUser}>Chat starten</Button>
         </View>
       </Modal>
     </View>
@@ -191,17 +196,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     marginTop: 20,
-  },
-  newChatButton: {
-    padding: 10,
-    backgroundColor: '#007BFF',
-    borderRadius: 5,
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  newChatButtonText: {
-    color: '#FFF',
-    fontSize: 16,
   },
   chatItem: {
     padding: 20,

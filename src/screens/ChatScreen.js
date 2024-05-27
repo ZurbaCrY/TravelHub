@@ -5,11 +5,10 @@ import { useDarkMode } from './DarkModeContext';
 import { supabase } from '../User-Auth/supabase';
 import AuthService from '../User-Auth/auth';
 
-const CURRENT_USER = AuthService.getUser(); 
-const CURRENT_USER_ID = CURRENT_USER.id;
-console.log("hallo" + CURRENT_USER_ID);
 
 export default function ChatScreen({ route, navigation }) {
+  const CURRENT_USER = AuthService.getUser(); 
+  const CURRENT_USER_ID = CURRENT_USER.id;
   const { chatId, chatName } = route.params;
   const [messages, setMessages] = useState([]);
   const { isDarkMode } = useDarkMode();

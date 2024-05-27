@@ -19,6 +19,8 @@ import {
   SignInScreen,
   SignUpScreen,
   LoadingScreen,
+  ChatScreen,
+  ChatListScreen,
 } from './src/screens'
 import AuthService from "./src/User-Auth/auth"
 
