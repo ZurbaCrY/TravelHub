@@ -89,8 +89,7 @@ class AuthService {
       throw Error('Passwords do not match')
     }
     try {
-      // async func to check if a specific Value is in users table 
-      // will not check for Auth Users
+      // check if username and email are unique 
       const checkUnique = async (field, value) => {
         let { data, error } = await this.supabase
           .from("users")
@@ -103,12 +102,19 @@ class AuthService {
       };
       await checkUnique("username", username);
       await checkUnique("email", email);
+
       // The main signUp:
       const { data, error } = await this.supabase.auth.signUp({
-        email,
-        password,
+        email: email,
+        password: password,
+        options: {
+          data: {
+            username: username,
+          }
+        }
       });
       if (error) throw error;
+
       // Check if Data is there before proceeding
       if (data != null && data.user != null) {
         // Update User info table:
@@ -123,7 +129,6 @@ class AuthService {
         this.user = data.user;
         return data.user;
       } else {
-        // this line should theoretically never be executed as there should be a suapabase error if there is no user data
         throw new Error("Something went wrong, data retrieved: ", data);
       }
     } catch (error) {
