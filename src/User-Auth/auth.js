@@ -20,21 +20,6 @@ class AuthService {
   //   }
   // }
 
-  // async update() {
-  //   try {
-  //     console.log("awaiting")
-  //     const { data, error } = await this.supabase.auth.getSession()
-  //     this.session = data.session
-  //     this.user = data.session.user
-  //     // debug:
-  //     if(this.session.user == this.user){
-  //       console.log("hussa")
-  //     }
-  //   } catch (error) {
-  //     throw error;
-  //   }
-  // }
-
   async loadUser() {
     try {
       const userJson = await AsyncStorage.getItem('user');
@@ -93,56 +78,104 @@ class AuthService {
     };
   }
 
-
-
-  // This function needs some serious debugging
   async signUp(username, email, password, confirmPassword) {
     if (password !== confirmPassword) {
       throw Error('Passwords do not match')
     }
     try {
+      // async func to check if a specific Value is in users table 
+      // will not check for Auth Users
       const checkUnique = async (field, value) => {
         let { data, error } = await this.supabase
           .from("users")
           .select("user_id")
           .eq(field, value);
+        if (error) throw error;
         if (data && data.length > 0) {
-          throw new Error(`${field.capitalize()} is already taken`);
+          throw new Error(`${field.capitalize()} is already taken`)
         }
       };
-
       await checkUnique("username", username);
       await checkUnique("email", email);
-
-
-      // Debug this func when emails can be sent again
-      // Sign up the user
+      // The main signUp:
       const { data, error } = await this.supabase.auth.signUp({
         email,
         password,
       });
-      user = data.user
-      console.log(data)
-      console.log(user)
-      if (data != null) {
-        console.log("New User:", user)
-
-        // Update User information in db
+      if (error) throw error;
+      // Check if Data is there before proceeding
+      if (data != null && data.user != null) {
+        // Not sure if this works:
+        // Update User info table:
         await this.supabase
           .from('users')
-          .insert([{ if: user.id, email, username }]);
-
-        // Set the user in AuthService
-        this.user = user;
-        this.session = data.session;
-        return true
+          .insert([{
+            user_id: data.user.id,
+            email: email,
+            username: username
+          }]);
+        await this.saveUser(data.user);
+        return data.user;
       } else {
-        throw new Error("Something went wrong: auth.js:59");
+        // this line should theoretically never be executed as there should be a suapabase error if there is no user data
+        throw new Error("Something went wrong, data retrieved: ", data);
       }
     } catch (error) {
       throw error;
     }
   }
+
+  // This function needs some serious debugging
+  // async signUp(username, email, password, confirmPassword) {
+  //   if (password !== confirmPassword) {
+  //     throw Error('Passwords do not match')
+  //   }
+  //   try {
+  //     const checkUnique = async (field, value) => {
+  //       let { data, error } = await this.supabase
+  //         .from("users")
+  //         .select("user_id")
+  //         .eq(field, value);
+  //       if (data && data.length > 0) {
+  //         throw new Error(`${field.capitalize()} is already taken`);
+  //       }
+  //     };
+
+  //     await checkUnique("username", username);
+  //     await checkUnique("email", email);
+
+
+  //     // Debug this func when emails can be sent again
+  //     // Sign up the user
+  //     const { data, error } = await this.supabase.auth.signUp({
+  //       email,
+  //       password,
+  //     });
+
+
+
+  //     user = data.user
+  //     console.log(data)
+  //     console.log(user)
+  //     if (data != null) {
+  //       console.log("New User:", user)
+
+  //       // Update User information in db
+  //       await this.supabase
+  //         .from('users')
+  //         .insert([{ if: user.id, email, username }]);
+
+  //       // Set the user in AuthService
+  //       this.user = user;
+  //       this.session = data.session;
+  //       return true
+  //     } else {
+  //       throw new Error("Something went wrong: auth.js:59");
+  //     }
+  //   } catch (error) {
+  //     throw error;
+  //   }
+  // }
 }
 
 export default new AuthService(sb);

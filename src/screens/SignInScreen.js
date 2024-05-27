@@ -5,34 +5,25 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { Input, Switch, Text } from "react-native-elements";
-import { useNavigation } from "@react-navigation/native";
+// import { useNavigation } from "@react-navigation/native";
 import { styles } from '../style/styles';
 import Button from "../components/Button";
 import AuthService from "../User-Auth/auth"
 
-// const SignInScreen = ({ navigation, setUser }) => {
-const SignInScreen = ({ route }) => {
-  const{ setUser } = route.params;
-  const navigation = useNavigation();
+const SignInScreen = ({ navigation, route }) => {
+  const { setUser } = route.params;
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [click, setClick] = useState(false);
 
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
-
-
   const handleSignIn = async () => {
-    setLoading(true);
-    setError(null);
     try {
       const user = await AuthService.signIn(email, password);
-      console.log("User Signed In: ", user);
       setUser(user);
     } catch (error) {
       setError(error);
     } finally {
-    setLoading(false);
+      // setLoading(false);
     }
   };
 

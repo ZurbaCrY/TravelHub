@@ -5,25 +5,23 @@ import { styles } from '../style/styles';
 import Button from '../components/Button';
 import AuthService from '../User-Auth/auth';
 
-export default function SignUpScreen({ navigation }) {
+export default function SignUpScreen({ navigation, route }) {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [loading, setLoading] = useState(false);
+
+  const { setUser } = route.params;
+
 
   const handleSignUp = async () => {
     try {
-      setLoading(true);
-      success = await AuthService.signUp(username, email, password, confirmPassword)
-      setLoading(false);
-      // if sign up is successfull switch to login
-      // else print message (for cases where no error occured but also no success)
-      if (success == true) {
-        authSwitchToSignIn();
-      }
+      const user = await AuthService.signUp(username, email, password, confirmPassword)
+      setUser(user);
     } catch (error) {
       console.error(error)
+    } finally {
+      // setLoading(false);
     }
   };
 
@@ -83,13 +81,6 @@ export default function SignUpScreen({ navigation }) {
         <Button mode='contained' onPress={handleSignUp}>
           Sign Up
         </Button>
-        {loading && (
-          <ActivityIndicator
-            size="large"
-            color="#0000ff"
-            style={styles.loadingIndicator}
-          />
-        )}
       </View>
     </View>
   );
