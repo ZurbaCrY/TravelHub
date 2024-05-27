@@ -116,11 +116,12 @@ export default function MapScreen() {
                      const [selectedCoordinates, setSelectedCoordinates] = useState(null);
                  const [continentsData, setContinentsData] = useState([]);
 
-
+  useEffect(() => {
+    fetchData();
+  }, []);
 
 useEffect(() => {
   // Scrollen zur ausgewählten Position in der ScrollView
-  fetchData();
   if (scrollViewRef.current && selectedPlace) {
     const index = searchResult.places.findIndex(place => place === selectedPlace);
     const offsetX = index * 120; // Breite des Platzhalters plus Abstand
@@ -628,14 +629,8 @@ const fetchCityCoordinates = async (placeId) => {
             </TouchableOpacity>
           ))}
         </ScrollView>
-          {/* Kreuz-Symbol für das Zurücksetzen der Liste */}
-          {showBottomLine && searchResult && (
-            <TouchableOpacity onPress={handleResetPlaces} style={styles.crossButton}>
-              <MaterialIcons name="close" size={24} color="black" />
-            </TouchableOpacity>
-          )}
 
-          {showBottomLine && searchResult && (
+          {showBottomLine && searchResult.places.length > 0 && (
           <TouchableOpacity onPress={scrollToTop}
           style={styles.arrowButton}>
                     <MaterialIcons name="keyboard-arrow-up" size={24} color="black" />
