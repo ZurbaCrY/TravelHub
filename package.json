@@ -25,6 +25,7 @@
     "expo": "~51.0.7",
     "expo-image-picker": "~15.0.5",
     "expo-location": "~17.0.1",
+    "expo-secure-store": "~13.0.1",
     "expo-status-bar": "~1.12.1",
     "hermes": "^0.0.8",
     "js-polyfills": "^0.1.43",

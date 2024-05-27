@@ -14,14 +14,15 @@ const SignInScreen = ({ navigation, route }) => {
   const { setUser } = route.params;
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [click, setClick] = useState(false);
+  const [remember, setRemember] = useState(false);
 
   const handleSignIn = async () => {
     try {
-      const user = await AuthService.signIn(email, password);
+      console.log(remember)
+      const user = await AuthService.signIn(email, password, remember);
       setUser(user);
     } catch (error) {
-      setError(error);
+      throw Error;
     } finally {
       // setLoading(false);
     }
@@ -67,8 +68,8 @@ const SignInScreen = ({ navigation, route }) => {
       <View style={styles.rememberView}>
         <View style={styles.switch}>
           <Switch
-            value={click}
-            onValueChange={setClick}
+            value={remember}
+            onValueChange={setRemember}
             trackColor={{ true: "green", false: "gray" }}
           />
           <Text style={styles.rememberText}>Remember Me</Text>
