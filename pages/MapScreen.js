@@ -858,6 +858,7 @@ const styles = StyleSheet.create({
                       position: 'absolute',
                       top: '100%',
                       maxHeight: 150,
+                      zIndex: 10,
                     },
                     searchLocationButton: {
                       height: 40,
