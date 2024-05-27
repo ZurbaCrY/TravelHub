@@ -104,7 +104,7 @@ export default function App() {
                 component={MainTabs}
                 options={{ headerShown: false }}
               />
-              <RootStack.Screen name="Settings" component={SettingsScreen} />
+              <RootStack.Screen name="Settings" component={SettingsScreen} initialParams={{setUser: setUser}}/>
             </RootStack.Navigator>
             <StatusBar style="auto" />
         </DarkModeProvider>

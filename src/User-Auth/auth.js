@@ -85,8 +85,9 @@ class AuthService {
     try {
       const { error } = await this.supabase.auth.signOut();
       if (error) throw error;
+      console.info("User signed out")
       await this.removeUser();
-      console.log(this.user)
+      return this.user;
     } catch (error) {
       throw error;
     };
