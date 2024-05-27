@@ -10,14 +10,30 @@ import { styles } from '../style/styles';
 import Button from "../components/Button";
 import AuthService from "../User-Auth/auth"
 
-export default function SigninScreen() {
+// const SignInScreen = ({ navigation, setUser }) => {
+const SignInScreen = ({ route }) => {
+  const{ setUser } = route.params;
   const navigation = useNavigation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [click, setClick] = useState(false);
 
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+
   const handleSignIn = async () => {
-    await AuthService.signIn(email, password);
+    setLoading(true);
+    setError(null);
+    try {
+      const user = await AuthService.signIn(email, password);
+      console.log("User Signed In: ", user);
+      setUser(user);
+    } catch (error) {
+      setError(error);
+    } finally {
+    setLoading(false);
+    }
   };
 
   const handleForgetPasswordPress = () => {
@@ -79,3 +95,4 @@ export default function SigninScreen() {
   );
 }
 
+export default SignInScreen;
