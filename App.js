@@ -108,8 +108,6 @@ export default function App() {
               options={{ headerShown: false }}
             />
             <RootStack.Screen name="Settings" component={SettingsScreen} />
-            <RootStack.Screen name="ChatListScreen" component={ChatListScreen} />
-            <RootStack.Screen name="ChatScreen" component={ChatScreen} />
           </RootStack.Navigator>
           <StatusBar style="auto" />
         </NavigationContainer>
