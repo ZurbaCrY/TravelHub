@@ -1,45 +1,100 @@
-import { AppState } from "react-native";
 import { supabase as sb } from "./supabase";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+
 class AuthService {
   constructor(supabase) {
     this.supabase = supabase
-    this.user = null
-    this.session = null
+    this.user = null;
+    this.loadUser();
 
-    AppState.addEventListener("change", (this.handleAppStateChange))
+    // AppState.addEventListener("change", (this.handleAppStateChange))
   }
 
-  handleAppStateChange = (state) => {
-    if (state === "active") {
-      this.supabase.auth.startAutoRefresh();
-      this.update();
-    } else {
-      this.supabase.auth.stopAutoRefresh();
+  // handleAppStateChange = (state) => {
+  //   if (state === "active") {
+  //     this.supabase.auth.startAutoRefresh();
+  //     this.update();
+  //   } else {
+  //     this.supabase.auth.stopAutoRefresh();
+  //   }
+  // }
+
+  // async update() {
+  //   try {
+  //     console.log("awaiting")
+  //     const { data, error } = await this.supabase.auth.getSession()
+  //     this.session = data.session
+  //     this.user = data.session.user
+  //     // debug:
+  //     if(this.session.user == this.user){
+  //       console.log("hussa")
+  //     }
+  //   } catch (error) {
+  //     throw error;
+  //   }
+  // }
+
+  async loadUser() {
+    try {
+      const userJson = await AsyncStorage.getItem('user');
+      if (userJson) {
+        this.user = JSON.parse(userJson);
+      }
+    } catch (error) {
+      console.error('Failed to load user from AsyncStorage:', error);
     }
   }
 
-  async update() {
+  async saveUser(user) {
     try {
-      console.log("awaiting")
-      const { data, error } = await this.supabase.auth.getSession()
-      this.session = data.session
-      this.user = data.session.user
-      // debug:
-      if(this.session.user == this.user){
-        console.log("hussa")
-      }
+      await AsyncStorage.setItem('user', JSON.stringify(user));
+      this.user = user;
+    } catch (error) {
+      console.error('Failed to save user to AsyncStorage:', error);
+    }
+  }
+
+  async removeUser() {
+    try {
+      await AsyncStorage.removeItem('user');
+      this.user = null;
+    } catch (error) {
+      console.error('Failed to remove user from AsyncStorage:', error);
+    }
+  }
+
+  getUser() {
+    return this.user;
+  }
+
+  async signIn(email, password) {
+    try {
+      const { data, error } = await this.supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      console.info("User signed in:", data.user)
+      console.info("User.id:", data.user.id)
+      await this.saveUser(data.user);
+      return data.user;
     } catch (error) {
       throw error;
     }
   }
 
-  async getUser() {
-    console.log("1....")
-    this.update;
-    console.log("2....")
-    return this.user;
+  async signOut() {
+    try {
+      const { error } = await this.supabase.auth.signOut();
+      if (error) throw error;
+      await this.removeUser();
+      console.log(this.user)
+    } catch (error) {
+      throw error;
+    };
   }
 
+
+
+  // This function needs some serious debugging
   async signUp(username, email, password, confirmPassword) {
     if (password !== confirmPassword) {
       throw Error('Passwords do not match')
@@ -83,42 +138,6 @@ class AuthService {
       } else {
         throw new Error("Something went wrong: auth.js:59");
       }
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  // async signIn(username, email, password) {
-  async signIn(email, password) {
-    try {
-      const { data, error } = await this.supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      if (error) {
-        throw error;
-      }
-      this.user = data.user
-      this.session = data.session
-      console.info("User signed in:", data.user)
-      console.info("User.id:", data.user.id)
-      if(data.user == data.session.user){
-        console.log("hussa die 2.")
-      }
-      return true;
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  async signOut() {
-    try {
-      const { error } = await this.supabase.auth.signOut();
-      if (error) {
-        throw error;
-      }
-      this.user = null
-      this.session = null
     } catch (error) {
       throw error;
     }
