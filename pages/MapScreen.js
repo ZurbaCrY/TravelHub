@@ -47,11 +47,12 @@ class City {
 }
 
 class Place {
-  constructor(name, coordinates, type) {
+  constructor(name, coordinates, type, description) {
     this.name = name;
     this.coordinates = coordinates;
     this.type = type; // Der Ortstyp (z.B. 'Sehenswürdigkeit', 'Restaurant', 'Einkaufsladen', 'Aussichtspunkt')
     this.favourite = false;
+    this.description = description;
   }
     // Methode zum Aktualisieren des Favoritenstatus
     toggleFavourite() {
@@ -60,16 +61,16 @@ class Place {
 }
 
 class SightseeingSpot extends Place {
-  constructor(name, coordinates, entranceFee) {
-    super(name, coordinates);
+  constructor(name, coordinates, description, entranceFee) {
+    super(name, coordinates, description);
     this.type = 'Sehenswürdigkeit';
     this.entranceFee = entranceFee; // Eintrittsgebühr für Sehenswürdigkeiten
   }
 }
 
 class Restaurant extends Place {
-  constructor(name, coordinates, priceLevel, cuisineType) {
-    super(name, coordinates);
+  constructor(name, coordinates, description, priceLevel, cuisineType) {
+    super(name, coordinates, description);
     this.type = 'Restaurant';
     this.priceLevel = priceLevel; // Preisniveau des Restaurants
     this.cuisineType = cuisineType; // Art der Küche im Restaurant
@@ -77,8 +78,8 @@ class Restaurant extends Place {
 }
 
 class ShoppingStore extends Place {
-  constructor(name, coordinates, category, isOpen) {
-    super(name, coordinates);
+  constructor(name, coordinates, description, category, isOpen) {
+    super(name, coordinates, description);
     this.type = 'Einkaufsladen';
     this.category = category; // Kategorie des Geschäfts (z.B. Bekleidung, Souvenirs, Lebensmittel)
     this.isOpen = isOpen; // Gibt an, ob der Laden geöffnet ist oder nicht
@@ -86,56 +87,14 @@ class ShoppingStore extends Place {
 }
 
 class Viewpoint extends Place {
-  constructor(name, coordinates, viewpointType, height) {
-    super(name, coordinates);
+  constructor(name, coordinates, description, viewpointType, height) {
+    super(name, coordinates, description);
     this.type = 'Aussichtspunkt';
     this.viewpointType = viewpointType; // Art des Aussichtspunkts (z.B. Berggipfel, Wolkenkratzer, Aussichtsturm)
     this.height = height; // Höhe des Aussichtspunkts über dem Meeresspiegel oder der umgebenden Landschaft
   }
 }
 
-// Daten für die Weltkarte
-/*
-const continentsData = [
-  new Continent('Europe', [
-    new Country('Germany', [
-      new City('Berlin', [
-                             { latitude: 52.698878, longitude: 13.373108 },
-                             { latitude: 52.61313, longitude: 13.055878 },
-                             { latitude: 52.343141, longitude: 13.212433 },
-                             { latitude: 52.304555, longitude: 13.709564 },
-                             { latitude: 52.529719, longitude: 13.907318 }
-                         ], [
-                              new SightseeingSpot('Brandenburger Tor', { latitude: 52.516275, longitude: 13.377704 }, 0), // Brandenburger Tor hat keine Eintrittsgebühr
-                              new Restaurant('Mustermanns Restaurant', { latitude: 52.5233, longitude: 13.4127 }, 3, 'Deutsch'), // Mustermanns Restaurant ist mittelpreisig und serviert deutsche Küche
-                              new Restaurant('Pizza Paradies', { latitude: 52.5111, longitude: 13.3985 }, 2, 'Italienisch'), // Pizza Paradies ist preiswert und serviert italienische Küche
-                              new SightseeingSpot('Fernsehturm Berlin', { latitude: 52.5200, longitude: 13.4074 }, 10), // Fernsehturm Berlin hat eine Eintrittsgebühr von 10 Euro
-                              new Restaurant('Sushi Deluxe', { latitude: 52.5144, longitude: 13.3453 }, 4, 'Japanisch'), // Sushi Deluxe ist teuer und serviert japanische Küche
-                              // Weitere Orte hinzufügen
-                            ]
-),
-      // weitere Städte hinzufügen...
-    ]),
-    new Country('France', [
-      new City('Paris', [
-    { latitude: 48.945447, longitude: 2.135468 }, // Obere linke Ecke
-    { latitude: 48.716946, longitude: 2.146454 }, // Untere linke Ecke
-    { latitude: 48.748628, longitude: 2.703323 }, // Untere rechte Ecke
-    { latitude: 49.013582, longitude: 2.526855 }, // Obere rechte Ecke
-        // Weitere Koordinaten für Paris hinzufügen...
-      ], [
-        new SightseeingSpot('Eiffel Tower', { latitude: 48.8584, longitude: 2.2945 }, 10), // Eiffelturm mit Eintrittsgebühr
-        new SightseeingSpot('Louvre Museum', { latitude: 48.8606, longitude: 2.3376 }, 12), // Louvre Museum mit Eintrittsgebühr
-        // Weitere Sehenswürdigkeiten hinzufügen...
-      ]),
-      new City('Marseille',[
-      { latitude: 43.2964, longitude: 5.3700 },
-      ], []),
-      // Weitere Städte in Frankreich hinzufügen...
-    ]),
-  ]),
-  // weitere Kontinente hinzufügen...
-]; */
 
 export default function MapScreen() {
   const [location, setLocation] = useState(null);
@@ -236,7 +195,8 @@ const fetchPlaces = async () => {
                 .map(attraction => new Place(
                   attraction.Attraction_Name,
                   { latitude: parseFloat(attraction.Latitude), longitude: parseFloat(attraction.Longitude) },
-                  attraction.Type_of_Attraction
+                  attraction.Type_of_Attraction,
+                  attraction.Description
                 ));
 
               const cityCoordinates = [
