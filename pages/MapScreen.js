@@ -678,6 +678,9 @@ const fetchCityCoordinates = async (placeId) => {
                 <AddPlaceModal
                   visible={showAddModal}
                   onClose={() => setShowAddModal(false)}
+                  onFetchData={fetchData} // Übergibt die fetchData Funktion als Prop
+                  continentsData={continentsData} // Übergibt die aktuelle continentData als Prop
+                  haversineDistance={haversineDistance}
                 />
 
     </View>

@@ -4,6 +4,12 @@ import { Dropdown } from 'react-native-element-dropdown';
 import MapView, { Marker } from 'react-native-maps'; // assuming you have 'react-native-maps' installed
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { customMapStyle } from '../resources/customMapStyle';
+import { createClient } from '@supabase/supabase-js';
+
+const REACT_APP_SUPABASE_URL = "https://zjnvamrbnqzefncmdpaf.supabase.co";
+const REACT_APP_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpqbnZhbXJibnF6ZWZuY21kcGFmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTQ0NjgzMDIsImV4cCI6MjAzMDA0NDMwMn0.O4S0x7F-5df2hR218qrO4VJbDOLK1Gzsvb3a8SGqwvY";
+
+const supabase = createClient(REACT_APP_SUPABASE_URL, REACT_APP_ANON_KEY);
 
 const AddPlaceModal = ({ visible, onClose }) => {
   const [placeName, setPlaceName] = useState('');
@@ -31,6 +37,7 @@ const AddPlaceModal = ({ visible, onClose }) => {
         alert('Bitte füllen Sie alle erforderlichen Felder aus.');
     } else {
         console.log(coordinates);
+        addPlace(placeName, 1, placeType, placeDescription, coordinates.latitude, coordinates.longitude)
         onClose();
     }
     setPlaceType('');
@@ -39,9 +46,61 @@ const AddPlaceModal = ({ visible, onClose }) => {
     setPlaceName('');
   };
 
+  const addPlace = async (attractionName, typeOfAttraction, description, latitude, longitude) => {
+    cityId = findNearestCityId({
+               latitude: latitude,
+               longitude: longitude,
+               latitudeDelta: 1, // Eine sehr kleine Zahl für einen sehr kleinen Bereich
+               longitudeDelta: 1, // Eine sehr kleine Zahl für einen sehr kleinen Bereich
+             }, haversineDistance);
+    try {
+      const { data, error } = await supabase
+        .from('Attraction')
+        .insert([
+          { Attraction_Name: attractionName, City_ID: cityId, Type_of_Attraction: typeOfAttraction, Description: description, Latitude: latitude, Longitude: longitude }
+        ]);
+      if (error) {
+        throw new Error(error.message);
+      }
+      return data;
+    } catch (error) {
+      console.error('Error adding place:', error.message);
+    }
+    await onFetchData(); // Aktualisiert die continentData nach dem Hinzufügen des Ortes
+  };
+
   const handleConfirmLocation = () => {
     // Hier kannst du die ausgewählten Koordinaten bestätigen und speichern
     setShowMap(false); // Verstecke die Karte nach der Bestätigung
+  };
+
+  const findNearestCityId = async (region, haversineDistance) => {
+    try {
+      const { data: cities, error } = await supabase.from('City').select('*');
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      let nearestCityId = null;
+      let minDistance = Infinity;
+
+      // Iterate through all cities to find the nearest one
+      cities.forEach(city => {
+        // Calculate the distance between the current city and the region
+        const distance = haversineDistance(region.latitude, region.longitude, city.latitude, city.longitude);
+
+        // Update the nearest city if this city is closer
+        if (distance < minDistance) {
+          minDistance = distance;
+          nearestCityId = city.City_ID;
+        }
+      });
+
+      return nearestCityId;
+    } catch (error) {
+      console.error('Error finding nearest city:', error.message);
+      return null;
+    }
   };
 
   return (
