@@ -46,7 +46,7 @@ export default function NameScreen() {
   user = AuthService.getUser();
   user_id = user.id
   user_email = user.email
-  user_username = user.metadata.username
+  user_username = user.user_metadata.username
 }
 ```
 Wenn ihr noch andere Infos braucht, Tom fragen.
