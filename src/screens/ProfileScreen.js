@@ -72,7 +72,7 @@ export default function ProfileScreen() {
           throw error;
         }
 
-        setWishListCountries(data.country || []);
+        setWishListCountries(data ? data.country : []);
       } catch (error) {
         console.error('Error fetching wishlist countries:', error);
       }
