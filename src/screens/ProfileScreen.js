@@ -20,12 +20,8 @@ import { styles } from '../style/styles';
 import { supabase } from '../User-Auth/supabase';
 
 export default function ProfileScreen() {
-<<<<<<< HEAD
-  user = AuthService.getUser();
-=======
   const CURRENT_USER = AuthService.getUser();
   const CURRENT_USER_ID = CURRENT_USER.id;
->>>>>>> ec26d2c5e9b5247ea177365d15c577e37b241711
   const { isDarkMode, toggleDarkMode } = useDarkMode();
   const [visitedCountries, setVisitedCountries] = useState([]);
   const [wishListCountries, setWishListCountries] = useState([]);
@@ -247,43 +243,23 @@ export default function ProfileScreen() {
       setShowVisitedInput(false);
       setShowWishListInput(false);
     }}>
-<<<<<<< HEAD
-      <ScrollView style={[styles.container, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
-        <View style={[styles.profileSection, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF', }]}>
-=======
       <ScrollView style={[styles.containerProfileScreen, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
         <View style={[styles.profileSection, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF',}]}>
->>>>>>> ec26d2c5e9b5247ea177365d15c577e37b241711
           <Image
             source={{ uri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/PICA.jpg/1200px-PICA.jpg' }}
             style={styles.profileImage}
           />
-<<<<<<< HEAD
-          <Text style={[styles.name, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>
-            {user.user_metadata.username ? user.user_metadata.username : 'Usernamen Festlegen'}
-          </Text>
-          <Text style={[styles.details, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>{user.email}</Text>
-          <View style={styles.row}>
-            <Icon name="birthday-cake" size={14} style={[styles.iconRightMargin, , { color: isDarkMode ? '#FFFDF3' : '#000000' }]} />
-            <Text style={[styles.details, , { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>
-              {user.user_metadata.birthday ? user.user_metadata.birthday : 'No birthdate configured'}
-=======
           <Text style={[styles.name, {color: isDarkMode ? '#FFFDF3' : '#000000'  }]}>{ CURRENT_USER.user_metadata.username }</Text>
           <Text style={[styles.details, {color: isDarkMode ? '#FFFDF3' : '#000000'  }]}>{ CURRENT_USER.email }</Text>
           <View style={styles.row}>
             <Icon name="birthday-cake" size={14} style={[styles.iconRightMargin, {color: isDarkMode ? '#FFFDF3' : '#000000'  }]} />
             <Text style={[styles.details, {color: isDarkMode ? '#FFFDF3' : '#000000'  }]}>
               { CURRENT_USER.user_metadata.birthday ?  CURRENT_USER.user_metadata.birthday  : 'No birthdate configured'}
->>>>>>> ec26d2c5e9b5247ea177365d15c577e37b241711
             </Text>
           </View>
           <View style={styles.row}>
             <Flag code="DE" size={16} style={styles.iconRightMargin} />
-<<<<<<< HEAD
-            <Text style={[styles.details, , { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>Deutschland</Text>
-=======
             <Text style={[styles.details, {color: isDarkMode ? '#FFFDF3' : '#000000'  }]}>Deutschland</Text>
->>>>>>> ec26d2c5e9b5247ea177365d15c577e37b241711
           </View>
         </View>
         <View style={styles.infoSection}>
