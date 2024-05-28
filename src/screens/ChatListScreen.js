@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Modal, TouchableWithoutFeedback, Alert } from 'react-native';
+import { ActivityIndicator, View, Text, FlatList, TouchableOpacity, StyleSheet, Modal, TouchableWithoutFeedback, Alert } from 'react-native';
 import { useDarkMode } from './DarkModeContext';
 import { supabase } from '../User-Auth/supabase';
 import AuthService from '../User-Auth/auth';
@@ -16,9 +16,20 @@ export default function ChatListScreen({ navigation }) {
   const [selectedUser, setSelectedUser] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
 
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    fetchChats();
-    fetchUsers();
+    const fetchChatsAndUsers = async () => {
+      try {
+        await fetchChats();
+        await fetchUsers();
+      } catch (error) {
+        console.error('Error fetching chats and users:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchChatsAndUsers();
 
     const messageSubscription = supabase
       .channel('public:messages')
