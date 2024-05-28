@@ -248,6 +248,11 @@ const CURRENT_USER_ID = CURRENT_USER.id;
     }
   };
 
+
+  /**
+   * Funktionen zum Verifizieren der besuchten Länder.
+   *
+   */
     const updateVisitedCountry = () => {
         let country = findCountry(findNearestCity({
                               latitude: location.coords.latitude,
