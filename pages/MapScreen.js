@@ -48,12 +48,13 @@ class City {
 }
 
 class Place {
-  constructor(name, coordinates, type, description) {
+  constructor(name, coordinates, type, description, link) {
     this.name = name;
     this.coordinates = coordinates;
     this.type = type; // Der Ortstyp (z.B. 'Sehenswürdigkeit', 'Restaurant', 'Einkaufsladen', 'Aussichtspunkt')
     this.favourite = false;
     this.description = description;
+    this.link = link;
   }
     // Methode zum Aktualisieren des Favoritenstatus
     toggleFavourite() {
@@ -62,16 +63,16 @@ class Place {
 }
 
 class SightseeingSpot extends Place {
-  constructor(name, coordinates, description, entranceFee) {
-    super(name, coordinates, description);
+  constructor(name, coordinates, description, entranceFee, link) {
+    super(name, coordinates, description, link);
     this.type = 'Sehenswürdigkeit';
     this.entranceFee = entranceFee; // Eintrittsgebühr für Sehenswürdigkeiten
   }
 }
 
 class Restaurant extends Place {
-  constructor(name, coordinates, description, priceLevel, cuisineType) {
-    super(name, coordinates, description);
+  constructor(name, coordinates, description, priceLevel, cuisineType, link) {
+    super(name, coordinates, description, link);
     this.type = 'Restaurant';
     this.priceLevel = priceLevel; // Preisniveau des Restaurants
     this.cuisineType = cuisineType; // Art der Küche im Restaurant
@@ -79,8 +80,8 @@ class Restaurant extends Place {
 }
 
 class ShoppingStore extends Place {
-  constructor(name, coordinates, description, category, isOpen) {
-    super(name, coordinates, description);
+  constructor(name, coordinates, description, category, isOpen, link) {
+    super(name, coordinates, description, link);
     this.type = 'Einkaufsladen';
     this.category = category; // Kategorie des Geschäfts (z.B. Bekleidung, Souvenirs, Lebensmittel)
     this.isOpen = isOpen; // Gibt an, ob der Laden geöffnet ist oder nicht
@@ -88,8 +89,8 @@ class ShoppingStore extends Place {
 }
 
 class Viewpoint extends Place {
-  constructor(name, coordinates, description, viewpointType, height) {
-    super(name, coordinates, description);
+  constructor(name, coordinates, description, viewpointType, height, link) {
+    super(name, coordinates, description, link);
     this.type = 'Aussichtspunkt';
     this.viewpointType = viewpointType; // Art des Aussichtspunkts (z.B. Berggipfel, Wolkenkratzer, Aussichtsturm)
     this.height = height; // Höhe des Aussichtspunkts über dem Meeresspiegel oder der umgebenden Landschaft
@@ -198,7 +199,8 @@ const fetchPlaces = async () => {
                   attraction.Attraction_Name,
                   { latitude: parseFloat(attraction.Latitude), longitude: parseFloat(attraction.Longitude) },
                   attraction.Type_of_Attraction,
-                  attraction.Description
+                  attraction.Description,
+                  attraction.Link
                 ));
 
               const cityCoordinates = [
@@ -252,7 +254,7 @@ const fetchPlaces = async () => {
 
   const getListImage = (place) => {
 
-    return 'https://www.fineart-panorama.de/361381/eiffelturm-paris-im-morgenlicht.jpg'
+    return place.link;
 
   };
 
