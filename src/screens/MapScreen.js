@@ -28,7 +28,8 @@ class Continent {
 }
 
 class Country {
-  constructor(name, cities) {
+  constructor(countryId, name, cities) {
+    this.countryId = countryId;
     this.name = name;
     this.cities = cities;
     this.locked = true; // Annahme: alle Länder sind zu Beginn gesperrt
@@ -231,7 +232,7 @@ export default function MapScreen() {
               return new City(city.City_ID, city.Cityname, cityCoordinates, cityAttractions);
             });
 
-          return new Country(country.Countryname, countryCities);
+          return new Country(country.Country_ID, country.Countryname, countryCities);
         }))
       ];
 
@@ -252,7 +253,7 @@ export default function MapScreen() {
                               latitudeDelta: 0.0922,
                               longitudeDelta: 0.0421,
                             }));
-      console.log("folgendes Land wurde besucht: " + country.name);
+      console.log("folgendes Land wurde besucht: " + country.countryId);
     }
 
   /**
