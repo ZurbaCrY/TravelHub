@@ -72,12 +72,23 @@ export default function ProfileScreen () {
     updatedCountries.splice(index, 1);
     setWishListCountries(updatedCountries);
 
-    const { error } = await supabase
-      .from('DesiredDestinationProfile')
-      .upsert({ user_id: CURRENT_USER_ID, country: updatedCountries }, { onConflict: ['user_id'] });
+    if (updatedCountries.length === 0) {
+      const { error } = await supabase
+        .from('DesiredDestinationProfile')
+        .delete()
+        .eq('user_id', CURRENT_USER_ID);
 
-    if (error) {
-      console.error('Error updating wishlist countries:', error);
+      if (error) {
+        console.error('Error deleting wishlist countries:', error);
+      }
+    } else {
+      const { error } = await supabase
+        .from('DesiredDestinationProfile')
+        .upsert({ user_id: CURRENT_USER_ID, country: updatedCountries }, { onConflict: ['user_id'] });
+
+      if (error) {
+        console.error('Error updating wishlist countries:', error);
+      }
     }
   };
 
