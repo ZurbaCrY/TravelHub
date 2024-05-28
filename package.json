@@ -6,7 +6,8 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "lint": "eslint ."
   },
   "dependencies": {
     "@expo/metro-runtime": "~3.2.1",
@@ -50,7 +51,12 @@
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
-    "grunt": "^1.6.1"
+    "@eslint/js": "^9.3.0",
+    "eslint": "^8.57.0",
+    "eslint-plugin-react": "^7.34.2",
+    "globals": "^15.3.0",
+    "grunt": "^1.6.1",
+    "typescript-eslint": "^7.11.0"
   },
   "private": true,
   "description": "Das ist ein cooles Projekt! Glaubt mir bitte :) ## Init React Native ``npm install -g expo-cli`` <br> ``npm init``",
