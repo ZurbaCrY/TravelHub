@@ -19,11 +19,11 @@ import Button from '../components/Button';
 import { styles } from '../style/styles';
 import { supabase } from '../User-Auth/supabase';
 
-export default function ProfileScreen () {
+export default function ProfileScreen() {
   const CURRENT_USER = AuthService.getUser();
   const CURRENT_USER_ID = CURRENT_USER.id;
   const { isDarkMode, toggleDarkMode } = useDarkMode();
-  const [visitedCountries, setVisitedCountries] = useState(['Italien', 'Spanien', 'Frankreich']);
+  const [visitedCountries, setVisitedCountries] = useState([]);
   const [wishListCountries, setWishListCountries] = useState([]);
   const [newVisited, setNewVisited] = useState('');
   const [newWishList, setNewWishList] = useState('');
@@ -32,68 +32,207 @@ export default function ProfileScreen () {
 
   const navigation = useNavigation();
 
+  // Lädt die besuchten Länder und Wunschländer, wenn die Komponente geladen wird
   useEffect(() => {
-    const fetchWishListCountries = async () => {
-      const { data, error } = await supabase
-        .from('DesiredDestinationProfile')
-        .select('country')
-        .eq('user_id', CURRENT_USER_ID)
-        .single();
+    const fetchVisitedCountries = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('Visited Countries')
+          .select(`
+            Country_ID,
+            verified,
+            Country (Countryname)
+          `)
+          .eq('user_id', CURRENT_USER_ID);
 
-      if (error && error.code !== 'PGRST116') { // PGRST116 indicates no rows found
-        console.error('Error fetching wishlist countries:', error);
-      } else if (data) {
-        setWishListCountries(data.country || []);
+        if (error) {
+          throw error;
+        }
+
+        // Formatiert die Daten in ein passendes Format für die Anzeige
+        const countries = data.map(item => ({
+          name: item.Country.Countryname,
+          verified: item.verified
+        }));
+        setVisitedCountries(countries);
+      } catch (error) {
+        console.error('Error fetching visited countries:', error);
       }
     };
 
+    const fetchWishListCountries = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('DesiredDestinationProfile')
+          .select('country')
+          .eq('user_id', CURRENT_USER_ID)
+          .single();
+
+        if (error && error.code !== 'PGRST116') { // PGRST116 bedeutet, dass keine Zeilen gefunden wurden
+          throw error;
+        }
+
+        setWishListCountries(data.country || []);
+      } catch (error) {
+        console.error('Error fetching wishlist countries:', error);
+      }
+    };
+
+    fetchVisitedCountries();
     fetchWishListCountries();
   }, [CURRENT_USER_ID]);
 
+  // Überprüft, ob das Land in der Tabelle "Country" existiert
+  const validateCountry = async (countryName) => {
+    try {
+      const { data, error } = await supabase
+        .from('Country')
+        .select('Country_ID')
+        .ilike('Countryname', countryName);
+
+      if (error || !data || data.length === 0) {
+        throw error || new Error('Country not found');
+      }
+
+      return data[0].Country_ID;
+    } catch (error) {
+      console.error('Error validating country:', error);
+      return null;
+    }
+  };
+
+  // Fügt ein neues Land zu den besuchten Ländern hinzu
+  const addVisitedCountry = async () => {
+    if (newVisited) {
+      // Überprüft, ob das Land bereits in der Liste der besuchten Länder enthalten ist
+      if (visitedCountries.some(country => country.name.toLowerCase() === newVisited.toLowerCase())) {
+        alert('Das Land ist bereits in der Liste der besuchten Länder.');
+        return;
+      }
+
+      const countryId = await validateCountry(newVisited);
+
+      if (!countryId) {
+        alert('Das eingegebene Land ist nicht in der Tabelle "Country" vorhanden.');
+        return;
+      }
+
+      const updatedVisited = [...visitedCountries, { name: newVisited, verified: false }];
+      setVisitedCountries(updatedVisited);
+      setNewVisited('');
+
+      try {
+        const { error } = await supabase
+          .from('Visited Countries')
+          .insert({
+            user_id: CURRENT_USER_ID,
+            Country_ID: countryId,
+            verified: false
+          });
+
+        if (error) {
+          throw error;
+        }
+      } catch (error) {
+        console.error('Error adding visited country:', error);
+      }
+    }
+    setShowVisitedInput(false);
+  };
+
+  // Fügt ein neues Land zur Wunschliste hinzu
   const addWishListCountry = async () => {
     if (newWishList) {
+      const countryId = await validateCountry(newWishList);
+
+      if (!countryId) {
+        alert('Das eingegebene Land ist nicht in der Tabelle "Country" vorhanden.');
+        return;
+      }
+
       const updatedWishList = [...wishListCountries, newWishList];
       setWishListCountries(updatedWishList);
       setNewWishList('');
 
-      const { error } = await supabase
-        .from('DesiredDestinationProfile')
-        .upsert({ user_id: CURRENT_USER_ID, country: updatedWishList }, { onConflict: ['user_id'] });
+      try {
+        const { error } = await supabase
+          .from('DesiredDestinationProfile')
+          .upsert({ user_id: CURRENT_USER_ID, country: updatedWishList }, { onConflict: ['user_id'] });
 
-      if (error) {
+        if (error) {
+          throw error;
+        }
+      } catch (error) {
         console.error('Error updating wishlist countries:', error);
       }
     }
     setShowWishListInput(false);
   };
 
+  // Entfernt ein Land aus den besuchten Ländern
+  const removeVisitedCountry = async (index) => {
+    const countryToRemove = visitedCountries[index];
+    const updatedCountries = [...visitedCountries];
+    updatedCountries.splice(index, 1);
+    setVisitedCountries(updatedCountries);
+
+    try {
+      const { data, error } = await supabase
+        .from('Country')
+        .select('Country_ID')
+        .ilike('Countryname', countryToRemove.name);
+
+      if (error || !data || data.length === 0) {
+        throw error || new Error('Country not found');
+      }
+
+      const { error: deleteError } = await supabase
+        .from('Visited Countries')
+        .delete()
+        .eq('user_id', CURRENT_USER_ID)
+        .eq('Country_ID', data[0].Country_ID);
+
+      if (deleteError) {
+        throw deleteError;
+      }
+    } catch (error) {
+      console.error('Error deleting visited country:', error);
+    }
+  };
+
+  // Entfernt ein Land aus der Wunschliste
   const removeWishListCountry = async (index) => {
     const updatedCountries = [...wishListCountries];
     updatedCountries.splice(index, 1);
     setWishListCountries(updatedCountries);
 
-    if (updatedCountries.length === 0) {
-      const { error } = await supabase
-        .from('DesiredDestinationProfile')
-        .delete()
-        .eq('user_id', CURRENT_USER_ID);
+    try {
+      if (updatedCountries.length === 0) {
+        const { error } = await supabase
+          .from('DesiredDestinationProfile')
+          .delete()
+          .eq('user_id', CURRENT_USER_ID);
 
-      if (error) {
-        console.error('Error deleting wishlist countries:', error);
-      }
-    } else {
-      const { error } = await supabase
-        .from('DesiredDestinationProfile')
-        .upsert({ user_id: CURRENT_USER_ID, country: updatedCountries }, { onConflict: ['user_id'] });
+        if (error) {
+          throw error;
+        }
+      } else {
+        const { error } = await supabase
+          .from('DesiredDestinationProfile')
+          .upsert({ user_id: CURRENT_USER_ID, country: updatedCountries }, { onConflict: ['user_id'] });
 
-      if (error) {
-        console.error('Error updating wishlist countries:', error);
+        if (error) {
+          throw error;
+        }
       }
+    } catch (error) {
+      console.error('Error updating wishlist countries:', error);
     }
   };
 
   return (
     <TouchableWithoutFeedback onPress={() => {
+      // Schließt die Tastatur, wenn der Benutzer außerhalb der Eingabefelder tippt
       Keyboard.dismiss();
       setShowVisitedInput(false);
       setShowWishListInput(false);
@@ -107,26 +246,33 @@ export default function ProfileScreen () {
           <Text style={[styles.name, {color: isDarkMode ? '#FFFDF3' : '#000000'  }]}>{ CURRENT_USER.user_metadata.username }</Text>
           <Text style={[styles.details, {color: isDarkMode ? '#FFFDF3' : '#000000'  }]}>{ CURRENT_USER.email }</Text>
           <View style={styles.row}>
-            <Icon name="birthday-cake" size={14} style={[styles.iconRightMargin, , {color: isDarkMode ? '#FFFDF3' : '#000000'  }]} />
-            <Text style={[styles.details, , {color: isDarkMode ? '#FFFDF3' : '#000000'  }]}>
+            <Icon name="birthday-cake" size={14} style={[styles.iconRightMargin, {color: isDarkMode ? '#FFFDF3' : '#000000'  }]} />
+            <Text style={[styles.details, {color: isDarkMode ? '#FFFDF3' : '#000000'  }]}>
               { CURRENT_USER.user_metadata.birthday ?  CURRENT_USER.user_metadata.birthday  : 'No birthdate configured'}
             </Text>
           </View>
           <View style={styles.row}>
             <Flag code="DE" size={16} style={styles.iconRightMargin} />
-            <Text style={[styles.details, , {color: isDarkMode ? '#FFFDF3' : '#000000'  }]}>Deutschland</Text>
+            <Text style={[styles.details, {color: isDarkMode ? '#FFFDF3' : '#000000'  }]}>Deutschland</Text>
           </View>
         </View>
         <View style={styles.infoSection}>
           <Text style={styles.header}>Bereits besuchte Länder:</Text>
-          {visitedCountries.map((country, index) => (
-            <View key={index} style={styles.countryItem}>
-              <Text style={styles.details}>{country}</Text>
-              <TouchableOpacity onPress={() => removeVisitedCountry(index)} style={styles.removeButton}>
-                <Icon name="trash" size={20} color="#FFFDF3" />
-              </TouchableOpacity>
-            </View>
-          ))}
+          {visitedCountries.length === 0 ? (
+            <Text style={styles.details}>Keine besuchten Länder hinzugefügt</Text>
+          ) : (
+            visitedCountries.map((country, index) => (
+              <View key={index} style={styles.countryItem}>
+                <View style={localStyles.countryTextContainer}>
+                  <Text style={styles.details}>{country.name}</Text>
+                  {country.verified && <Icon name="check-circle" size={16} color="green" style={localStyles.verifiedIcon} />}
+                </View>
+                <TouchableOpacity onPress={() => removeVisitedCountry(index)} style={styles.removeButton}>
+                  <Icon name="trash" size={20} color="#FFFDF3" />
+                </TouchableOpacity>
+              </View>
+            ))
+          )}
           {showVisitedInput && (
             <>
               <TextInput
@@ -188,3 +334,13 @@ export default function ProfileScreen () {
     </TouchableWithoutFeedback>
   );
 };
+
+const localStyles = StyleSheet.create({
+  countryTextContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  verifiedIcon: {
+    marginLeft: 5,
+  },
+});
