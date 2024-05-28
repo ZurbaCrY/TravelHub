@@ -143,6 +143,12 @@ export default function ProfileScreen() {
   // Fügt ein neues Land zur Wunschliste hinzu
   const addWishListCountry = async () => {
     if (newWishList) {
+      // Überprüft, ob das Land bereits in der Wunschliste enthalten ist
+      if (wishListCountries.some(country => country.toLowerCase() === newWishList.toLowerCase())) {
+        alert('Das Land ist bereits in der Wunschliste.');
+        return;
+      }
+
       const countryId = await validateCountry(newWishList);
 
       if (!countryId) {
@@ -325,9 +331,11 @@ export default function ProfileScreen() {
             </TouchableOpacity>
           )}
         </View>
-        <View style={[styles.container, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
+        <View style={[styles.infoSection, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
           <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
-            <Button mode="contained"> Zu den Einstellungen</Button>
+            <Button mode="contained"> 
+            Zu den Einstellungen
+            </Button>
           </TouchableOpacity>
         </View>
       </ScrollView>
