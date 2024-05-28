@@ -246,7 +246,7 @@ export default function ProfileScreen() {
       <ScrollView style={[styles.containerProfileScreen, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
         <View style={[styles.profileSection, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF',}]}>
           <Image
-            source={{uri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/PICA.jpg/1200px-PICA.jpg'}}
+            source={{ uri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/PICA.jpg/1200px-PICA.jpg' }}
             style={styles.profileImage}
           />
           <Text style={[styles.name, {color: isDarkMode ? '#FFFDF3' : '#000000'  }]}>{ CURRENT_USER.user_metadata.username }</Text>

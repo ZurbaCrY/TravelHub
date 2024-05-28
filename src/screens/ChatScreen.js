@@ -1,17 +1,20 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { Text, View, ActivityIndicator, StyleSheet } from 'react-native';
 import { GiftedChat } from 'react-native-gifted-chat';
 import { useDarkMode } from './DarkModeContext';
 import { supabase } from '../User-Auth/supabase';
 import AuthService from '../User-Auth/auth';
-
+import { LoadingScreen } from './LoadingScreen';
+import { styles as st } from '../style/styles';
 
 export default function ChatScreen({ route, navigation }) {
-  const CURRENT_USER = AuthService.getUser(); 
+  const CURRENT_USER = AuthService.getUser();
   const CURRENT_USER_ID = CURRENT_USER.id;
   const { chatId, chatName } = route.params;
   const [messages, setMessages] = useState([]);
   const { isDarkMode } = useDarkMode();
+
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     navigation.setOptions({ title: chatName });
@@ -42,6 +45,8 @@ export default function ChatScreen({ route, navigation }) {
         }
       } catch (error) {
         console.error('Error fetching messages:', error);
+      } finally {
+        setLoading(false)
       }
     };
 
@@ -94,18 +99,27 @@ export default function ChatScreen({ route, navigation }) {
     }
   }, [chatId]);
 
-  return (
-    <View style={[styles.container, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
-      <GiftedChat
-        messages={messages}
-        onSend={(messages) => onSend(messages)}
-        user={{
-          _id: CURRENT_USER_ID,
-        }}
-        textInputStyle={{ color: isDarkMode ? '#FFF' : '#000' }}
-      />
-    </View>
-  );
+  if (loading) {
+    return (
+      <View style={st.container}>
+        <ActivityIndicator size="large" color="#3EAAE9" />
+        <Text>Loading Chat...</Text>
+      </View>
+    );
+  } else {
+    return (
+      <View style={[styles.container, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
+        <GiftedChat
+          messages={messages}
+          onSend={(messages) => onSend(messages)}
+          user={{
+            _id: CURRENT_USER_ID,
+          }}
+          textInputStyle={{ color: isDarkMode ? '#FFF' : '#000' }}
+        />
+      </View>
+    );
+  }
 }
 
 const styles = StyleSheet.create({
