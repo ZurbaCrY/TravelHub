@@ -134,12 +134,7 @@ export default function MapScreen() {
   useEffect(() => {
     fetchData();
     if (location) {
-      console.log("folgendes Land wurde besucht: " + findCountry(findNearestCity({
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-        latitudeDelta: 0.0922,
-        longitudeDelta: 0.0421,
-      })).name);
+        updateVisitedCountry();
     }
   }, []);
 
@@ -246,15 +241,19 @@ export default function MapScreen() {
     }
 
     if (location) {
-      console.log("folgendes Land wurde besucht: " + findCountry(findNearestCity({
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-        latitudeDelta: 0.0922,
-        longitudeDelta: 0.0421,
-      })).name);
+        updateVisitedCountry();
     }
   };
 
+    const updateVisitedCountry = () => {
+        let country = findCountry(findNearestCity({
+                              latitude: location.coords.latitude,
+                              longitude: location.coords.longitude,
+                              latitudeDelta: 0.0922,
+                              longitudeDelta: 0.0421,
+                            }));
+      console.log("folgendes Land wurde besucht: " + country.name);
+    }
 
   /**
    * Funktionen zum rendern der Details auf der Map.
