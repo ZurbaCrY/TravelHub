@@ -48,7 +48,8 @@
     "react-native-web": "~0.19.10"
   },
   "devDependencies": {
-    "@babel/core": "^7.20.0"
+    "@babel/core": "^7.20.0",
+    "grunt": "^1.6.1"
   },
   "private": true,
   "description": "Das ist ein cooles Projekt! Glaubt mir bitte :) ## Init React Native ``npm install -g expo-cli`` <br> ``npm init``",
