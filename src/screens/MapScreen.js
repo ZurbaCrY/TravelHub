@@ -49,11 +49,12 @@ class City {
 }
 
 class Place {
-  constructor(name, coordinates, type, description, link) {
+  constructor(placeId, name, coordinates, type, description, link, fave) {
+    this.placeId = placeId;
     this.name = name;
     this.coordinates = coordinates;
     this.type = type; // Der Ortstyp (z.B. 'Sehenswürdigkeit', 'Restaurant', 'Einkaufsladen', 'Aussichtspunkt')
-    this.favourite = false;
+    this.favourite = fave;
     this.description = description;
     this.link = link;
   }
@@ -64,16 +65,16 @@ class Place {
 }
 
 class SightseeingSpot extends Place {
-  constructor(name, coordinates, description, entranceFee, link) {
-    super(name, coordinates, description, link);
+  constructor(placeId, name, coordinates, description, entranceFee, link, fave) {
+    super(placeId, name, coordinates, description, link, fave);
     this.type = 'Sehenswürdigkeit';
     this.entranceFee = entranceFee; // Eintrittsgebühr für Sehenswürdigkeiten
   }
 }
 
 class Restaurant extends Place {
-  constructor(name, coordinates, description, priceLevel, cuisineType, link) {
-    super(name, coordinates, description, link);
+  constructor(placeId, name, coordinates, description, priceLevel, cuisineType, link, fave) {
+    super(placeId, name, coordinates, description, link, fave);
     this.type = 'Restaurant';
     this.priceLevel = priceLevel; // Preisniveau des Restaurants
     this.cuisineType = cuisineType; // Art der Küche im Restaurant
@@ -81,8 +82,8 @@ class Restaurant extends Place {
 }
 
 class ShoppingStore extends Place {
-  constructor(name, coordinates, description, category, isOpen, link) {
-    super(name, coordinates, description, link);
+  constructor(placeId, name, coordinates, description, category, isOpen, link, fave) {
+    super(placeId, name, coordinates, description, link, fave);
     this.type = 'Einkaufsladen';
     this.category = category; // Kategorie des Geschäfts (z.B. Bekleidung, Souvenirs, Lebensmittel)
     this.isOpen = isOpen; // Gibt an, ob der Laden geöffnet ist oder nicht
@@ -90,8 +91,8 @@ class ShoppingStore extends Place {
 }
 
 class Viewpoint extends Place {
-  constructor(name, coordinates, description, viewpointType, height, link) {
-    super(name, coordinates, description, link);
+  constructor(placeId, name, coordinates, description, viewpointType, height, link, fave) {
+    super(placeId, name, coordinates, description, link, fave);
     this.type = 'Aussichtspunkt';
     this.viewpointType = viewpointType; // Art des Aussichtspunkts (z.B. Berggipfel, Wolkenkratzer, Aussichtsturm)
     this.height = height; // Höhe des Aussichtspunkts über dem Meeresspiegel oder der umgebenden Landschaft
@@ -220,11 +221,13 @@ const CURRENT_USER_ID = CURRENT_USER.id;
               const cityAttractions = attractions
                 .filter(attraction => attraction.City_ID === city.City_ID)
                 .map(attraction => new Place(
+                  attraction.Attraction_ID,
                   attraction.Attraction_Name,
                   { latitude: parseFloat(attraction.Latitude), longitude: parseFloat(attraction.Longitude) },
                   attraction.Type_of_Attraction,
                   attraction.Description,
-                  attraction.Link
+                  attraction.Link,
+                  isFavourite(attraction.Attraction_ID, CURRENT_USER_ID)
                 ));
 
               const cityCoordinates = [
@@ -247,6 +250,30 @@ const CURRENT_USER_ID = CURRENT_USER.id;
         updateVisitedCountry();
     }
   };
+
+const isFavourite = async (placeId, userId) => {
+  try {
+    // Überprüfe, ob ein Eintrag für die gegebene Attractions_ID und user_id existiert
+    const { data, error } = await supabase
+      .from('DesiredDestination')
+      .select('Attractions_ID')
+      .eq('Attractions_ID', placeId)
+      .eq('User_ID', userId)
+      .single();
+
+    if (error && error.code !== 'PGRST116') { // PGRST116: Single row expected, multiple rows found
+      throw error;
+    }
+
+    // Wenn ein Eintrag existiert, gib true zurück, ansonsten false
+    console.log(!!data);
+    return !!data;
+  } catch (error) {
+    console.error('Fehler beim Überprüfen des Favoritenstatus:', error.message);
+    return false;
+  }
+};
+
 
 
   /**
