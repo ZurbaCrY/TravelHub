@@ -1,14 +1,16 @@
 import 'react-native-url-polyfill/auto'
-import React, { useState, useEffect } from 'react'; import { View, Text, StyleSheet, FlatList, TextInput, Button, Image, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react'; import { View, Text, StyleSheet, FlatList, TextInput, Image, TouchableOpacity } from 'react-native';
 import { useDarkMode } from './DarkModeContext';
 import { createClient } from '@supabase/supabase-js';
 import * as ImagePicker from 'expo-image-picker';
 import AuthService from '../User-Auth/auth';
-import { supabase } from '../User-Auth/supabase';
+
+const REACT_APP_SUPABASE_URL = "https://zjnvamrbnqzefncmdpaf.supabase.co";
+const REACT_APP_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpqbnZhbXJibnF6ZWZuY21kcGFmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTQ0NjgzMDIsImV4cCI6MjAzMDA0NDMwMn0.O4S0x7F-5df2hR218qrO4VJbDOLK1Gzsvb3a8SGqwvY";
+
+const supabase = createClient(REACT_APP_SUPABASE_URL, REACT_APP_ANON_KEY);
 
 export default function CommunityScreen() {
-  user = AuthService.getUser();
-  const user_username = user.user_metadata.username;
   const { isDarkMode, toggleDarkMode } = useDarkMode();
   const [posts, setPosts] = useState([]);
   const [newPostContent, setNewPostContent] = useState('');
@@ -34,7 +36,7 @@ export default function CommunityScreen() {
   // Abschicken einer Nachricht
   const createNewPost = async () => {
     try {
-      const { data, error } = await supabase.from('posts').insert([{ content: newPostContent, author: user_username, upvotes: 0, downvotes: 0 }]);
+      const { data, error } = await supabase.from('posts').insert([{ content: newPostContent, author: 'Anonymous', upvotes: 0, downvotes: 0 }]);
       if (error) {
         console.error('Error creating post:', error.message);
       } else {
@@ -114,12 +116,11 @@ export default function CommunityScreen() {
         // Lade das Bild hoch zu Supabase Storage
         const response = await fetch(fileUri);
         const blob = await response.blob();
-        // const avatarFile = event.target.files[0]
         console.log(blob)
         const { data, error } = await supabase
           .storage
           .from('Storage')
-          .upload('./images/picture.png', blob, {
+          .upload(fileUri, blob, {
           cacheControl: '3600',
           upsert: false
         });
