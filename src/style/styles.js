@@ -50,7 +50,9 @@ export const styles = StyleSheet.create({
     backgroundColor: "#3EAAE9",
     height: 45,
     borderRadius: 7,
-    marginTop: 10
+    marginTop: 10,
+    minWidth: 300,
+    maxWidth: '95%',
   },
   buttonText: {
     fontSize: 18,

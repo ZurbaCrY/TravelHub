@@ -17,7 +17,7 @@ import { useDarkMode } from './DarkModeContext';
 import { useNavigation } from '@react-navigation/native'; // Importiere useNavigation
 import AuthService from '../User-Auth/auth'
 
-export default function ProfileScreen () {
+export default function ProfileScreen() {
   user = AuthService.getUser();
   const { isDarkMode, toggleDarkMode } = useDarkMode();
   const [visitedCountries, setVisitedCountries] = useState(['Italien', 'Spanien', 'Frankreich']);
@@ -64,22 +64,24 @@ export default function ProfileScreen () {
       setShowWishListInput(false);
     }}>
       <ScrollView style={[styles.container, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
-        <View style={[styles.profileSection, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF',}]}>
+        <View style={[styles.profileSection, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF', }]}>
           <Image
-            source={{uri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/PICA.jpg/1200px-PICA.jpg'}}
+            source={{ uri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/PICA.jpg/1200px-PICA.jpg' }}
             style={styles.profileImage}
           />
-          <Text style={[styles.name, {color: isDarkMode ? '#FFFDF3' : '#000000'  }]}>{ user.user_metadata.username }</Text>
-          <Text style={[styles.details, {color: isDarkMode ? '#FFFDF3' : '#000000'  }]}>{ user.email }</Text>
+          <Text style={[styles.name, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>
+            {user.user_metadata.username ? user.user_metadata.username : 'Usernamen Festlegen'}
+          </Text>
+          <Text style={[styles.details, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>{user.email}</Text>
           <View style={styles.row}>
-            <Icon name="birthday-cake" size={14} style={[styles.iconRightMargin, , {color: isDarkMode ? '#FFFDF3' : '#000000'  }]} />
-            <Text style={[styles.details, , {color: isDarkMode ? '#FFFDF3' : '#000000'  }]}>
-              { user.user_metadata.birthday ?  user.user_metadata.birthday  : 'No birthdate configured'}
+            <Icon name="birthday-cake" size={14} style={[styles.iconRightMargin, , { color: isDarkMode ? '#FFFDF3' : '#000000' }]} />
+            <Text style={[styles.details, , { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>
+              {user.user_metadata.birthday ? user.user_metadata.birthday : 'No birthdate configured'}
             </Text>
           </View>
           <View style={styles.row}>
             <Flag code="DE" size={16} style={styles.iconRightMargin} />
-            <Text style={[styles.details, , {color: isDarkMode ? '#FFFDF3' : '#000000'  }]}>Deutschland</Text>
+            <Text style={[styles.details, , { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>Deutschland</Text>
           </View>
         </View>
         <View style={styles.infoSection}>
