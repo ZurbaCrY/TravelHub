@@ -39,10 +39,15 @@ DNS: travel-prod.westeurope.cloudapp.azure.com
 IP: 20.73.246.214
 DNS: travel-test.westeurope.cloudapp.azure.com
 
-# Arbeiten mit Userdaten
+# Nutzen von Userdaten:
 ```
-import AuthService from "../User-Auth/auth"
-const userdata = AuthService.user
+import AuthService from '../User-Auth/auth';
+export default function NameScreen() {
+  user = AuthService.getUser();
+  user_id = user.id
+  user_email = user.email
+  user_username = user.metadata.username
+}
 ```
-User hat daten wie bspw. id (AuthService.user.id)
-Mehr kommt in Zukunft
+Wenn ihr noch andere Infos braucht, Tom fragen.
+
