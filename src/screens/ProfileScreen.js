@@ -168,7 +168,7 @@ export default function ProfileScreen () {
             </TouchableOpacity>
           )}
         </View>
-        <View style={[styles.container]}>
+        <View style={[styles.container, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
           <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
             <Button mode="contained"> Zu den Einstellungen</Button>
           </TouchableOpacity>

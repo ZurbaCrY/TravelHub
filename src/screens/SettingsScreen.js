@@ -1,4 +1,3 @@
-// SettingsScreen.js
 import React, { useState } from 'react';
 import { View, Text, Switch, StyleSheet, } from 'react-native';
 import { useDarkMode } from './DarkModeContext';
@@ -7,7 +6,7 @@ import AuthService from '../User-Auth/auth'
 
 const SettingsScreen = ({ route }) => {
   const{ setUser } = route.params;
-  const { isDarkMode, toggleDarkMode } = useDarkMode(); // Verwende den globalen Dark Mode State
+  const { isDarkMode, toggleDarkMode } = useDarkMode();
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
 
   const handleSignOut = async () => {
