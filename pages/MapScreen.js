@@ -140,6 +140,14 @@ export default function MapScreen() {
      */
     useEffect(() => {
         fetchData();
+        if(location){
+            console.log("folgendes Land wurde besucht: " + findCountry(findNearestCity({
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude,
+                latitudeDelta: 0.0922,
+                longitudeDelta: 0.0421,
+            })).name);
+        }
     }, []);
 
     useEffect(() => {
@@ -164,18 +172,22 @@ export default function MapScreen() {
             console.log("data fetched");
             let location = await Location.getCurrentPositionAsync({});
             setLocation(location);
-            setRegion({
-                latitude: location.coords.latitude,
-                longitude: location.coords.longitude,
-                latitudeDelta: 0.0922,
-                longitudeDelta: 0.0421,
-            }); // Setze die anfängliche Kartenregion
-            console.log("folgendes Land wurde besucht: " + findCountry(findNearestCity({
-                latitude: location.coords.latitude,
-                longitude: location.coords.longitude,
-                latitudeDelta: 0.0922,
-                longitudeDelta: 0.0421,
-            })).name);
+            if(location){
+                setRegion({
+                    latitude: location.coords.latitude,
+                    longitude: location.coords.longitude,
+                    latitudeDelta: 0.0922,
+                    longitudeDelta: 0.0421,
+                }); // Setze die anfängliche Kartenregion
+                /*if(continentsData){
+                    console.log("folgendes Land wurde besucht: " + findCountry(findNearestCity({
+                        latitude: location.coords.latitude,
+                        longitude: location.coords.longitude,
+                        latitudeDelta: 0.0922,
+                        longitudeDelta: 0.0421,
+                    })).name);
+                }*/
+            }
         })();
     }, []);
 
@@ -238,6 +250,15 @@ export default function MapScreen() {
             setContinentsData(continentsData);
         } catch (error) {
             console.error('Error fetching data:', error.message);
+        }
+
+        if(location){
+            console.log("folgendes Land wurde besucht: " + findCountry(findNearestCity({
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude,
+                latitudeDelta: 0.0922,
+                longitudeDelta: 0.0421,
+            })).name);
         }
     };
 
@@ -377,7 +398,6 @@ const findCountry = (city) => {
       }
     });
   });
-
   return country;
 };
 
@@ -523,6 +543,7 @@ const newHandleSearch = () => {
 
      const scrollToTop = () => {
         setShowList(true);
+        fetchData();
      };
 
      const isStarred = (place) => {
