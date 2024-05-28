@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Modal, TouchableWithoutFeedback, Alert } from 'react-native';
+import { ActivityIndicator, View, Text, FlatList, TouchableOpacity, StyleSheet, Modal, TouchableWithoutFeedback, Alert } from 'react-native';
 import { useDarkMode } from './DarkModeContext';
 import { supabase } from '../User-Auth/supabase';
 import AuthService from '../User-Auth/auth';
 import Button from '../components/Button';
+import { styles as st } from '../style/styles';
 
 export default function ChatListScreen({ navigation }) {
   const CURRENT_USER = AuthService.getUser();
@@ -15,9 +16,20 @@ export default function ChatListScreen({ navigation }) {
   const [selectedUser, setSelectedUser] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
 
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    fetchChats();
-    fetchUsers();
+    const fetchChatsAndUsers = async () => {
+      try {
+        await fetchChats();
+        await fetchUsers();
+      } catch (error) {
+        console.error('Error fetching chats and users:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchChatsAndUsers();
 
     const messageSubscription = supabase
       .channel('public:messages')
@@ -307,46 +319,55 @@ export default function ChatListScreen({ navigation }) {
     </TouchableOpacity>
   );
 
-  return (
-    <View style={[styles.container, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
-      <Button mode="contained" onPress={() => setModalVisible(true)}>
-        Neuen Chat erstellen
-      </Button>
-      <FlatList
-        data={chats}
-        keyExtractor={(item) => item.chat_id}
-        renderItem={renderChatItem}
-      />
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => {
-          setModalVisible(!modalVisible);
-        }}
-      >
-        <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
-          <View style={styles.modalOverlay} />
-        </TouchableWithoutFeedback>
-        <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>Wähle einen Benutzer für den Chat</Text>
-          {users.map((user) => (
-            <TouchableOpacity
-              key={user.user_id}
-              style={[
-                styles.userItem,
-                selectedUser && selectedUser.user_id === user.user_id && styles.selectedUserItem
-              ]}
-              onPress={() => setSelectedUser(user)}
-            >
-              <Text style={styles.userName}>{user.username}</Text>
-            </TouchableOpacity>
-          ))}
-          <Button onPress={createNewChat} disabled={!selectedUser}>Chat starten</Button>
-        </View>
-      </Modal>
-    </View>
-  );
+  if (loading) {
+    return (
+      <View style={st.container}>
+        <ActivityIndicator size="large" color="#3EAAE9" />
+        <Text>Loading Chats...</Text>
+      </View>
+    );
+  } else {
+    return (
+      <View style={[styles.container, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
+        <Button mode="contained" onPress={() => setModalVisible(true)}>
+          Neuen Chat erstellen
+        </Button>
+        <FlatList
+          data={chats}
+          keyExtractor={(item) => item.chat_id}
+          renderItem={renderChatItem}
+        />
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => {
+            setModalVisible(!modalVisible);
+          }}
+        >
+          <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
+            <View style={styles.modalOverlay} />
+          </TouchableWithoutFeedback>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Wähle einen Benutzer für den Chat</Text>
+            {users.map((user) => (
+              <TouchableOpacity
+                key={user.user_id}
+                style={[
+                  styles.userItem,
+                  selectedUser && selectedUser.user_id === user.user_id && styles.selectedUserItem
+                ]}
+                onPress={() => setSelectedUser(user)}
+              >
+                <Text style={styles.userName}>{user.username}</Text>
+              </TouchableOpacity>
+            ))}
+            <Button onPress={createNewChat} disabled={!selectedUser}>Chat starten</Button>
+          </View>
+        </Modal>
+      </View>
+    );
+  }
 }
 
 const styles = StyleSheet.create({
