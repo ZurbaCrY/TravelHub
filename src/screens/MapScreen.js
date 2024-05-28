@@ -213,33 +213,38 @@ const CURRENT_USER_ID = CURRENT_USER.id;
       const cities = await fetchCities();
       const attractions = await fetchPlaces();
 
-      const continentsData = [
-        new Continent('World', countries.map(country => {
-          const countryCities = cities
-            .filter(city => city.Country_ID === country.Country_ID)
-            .map(city => {
-              const cityAttractions = attractions
-                .filter(attraction => attraction.City_ID === city.City_ID)
-                .map(attraction => new Place(
-                  attraction.Attraction_ID,
-                  attraction.Attraction_Name,
-                  { latitude: parseFloat(attraction.Latitude), longitude: parseFloat(attraction.Longitude) },
-                  attraction.Type_of_Attraction,
-                  attraction.Description,
-                  attraction.Link,
-                  isFavourite(attraction.Attraction_ID, CURRENT_USER_ID)
-                ));
+       const continentsData = await Promise.all([
+         new Continent('World', await Promise.all(countries.map(async (country) => {
+           const countryCities = await Promise.all(cities
+             .filter(city => city.Country_ID === country.Country_ID)
+             .map(async (city) => {
+               const cityAttractions = await Promise.all(attractions
+                 .filter(attraction => attraction.City_ID === city.City_ID)
+                 .map(async (attraction) => {
+                   const favourite = await isFavourite(attraction.Attraction_ID, CURRENT_USER_ID);
+                   return new Place(
+                     attraction.Attraction_ID,
+                     attraction.Attraction_Name,
+                     { latitude: parseFloat(attraction.Latitude), longitude: parseFloat(attraction.Longitude) },
+                     attraction.Type_of_Attraction,
+                     attraction.Description,
+                     attraction.Link,
+                     favourite
+                   );
+                 })
+               );
 
-              const cityCoordinates = [
-                { latitude: parseFloat(city.latitude), longitude: parseFloat(city.longitude) } // Hier sollten die Stadtgrenzen hinzugefügt werden, falls vorhanden
-              ];
+               const cityCoordinates = [
+                 { latitude: parseFloat(city.latitude), longitude: parseFloat(city.longitude) }
+               ];
 
-              return new City(city.City_ID, city.Cityname, cityCoordinates, cityAttractions);
-            });
+               return new City(city.City_ID, city.Cityname, cityCoordinates, cityAttractions);
+             })
+           );
 
-          return new Country(country.Country_ID, country.Countryname, countryCities);
-        }))
-      ];
+           return new Country(country.Country_ID, country.Countryname, countryCities);
+         })))
+       ]);
 
       setContinentsData(continentsData);
     } catch (error) {
@@ -250,6 +255,63 @@ const CURRENT_USER_ID = CURRENT_USER.id;
         updateVisitedCountry();
     }
   };
+
+const updateFavourite = async (attractionId, userId) => {
+  try {
+    // Überprüfen, ob ein Eintrag für die gegebene Attractions_ID und user_id existiert
+    const { data, error } = await supabase
+      .from('DesiredDestination')
+      .select('Desired_Destination_ID')
+      .eq('Attractions_ID', attractionId)
+      .eq('User_ID', userId)
+      .single();
+
+    if (error && error.code !== 'PGRST116') { // PGRST116: Single row expected, multiple rows found
+      throw error;
+    }
+
+    // Wenn ein Eintrag existiert, gib den bestehenden Eintrag zurück
+    if (data) {
+      return data;
+    } else {
+      // Eintrag existiert nicht, erstelle einen neuen Eintrag
+      const { data: newEntry, error: insertError } = await supabase
+        .from('DesiredDestination')
+        .insert([{ Attractions_ID: attractionId, User_ID: userId }])
+        .select()
+        .single();
+
+      if (insertError) {
+        throw insertError;
+      }
+
+      return newEntry;
+    }
+  } catch (error) {
+    console.error('Fehler beim Erstellen des Eintrags in DesiredDestination:', error.message);
+    return null;
+  }
+};
+
+const deleteFavourite = async (attractionId, userId) => {
+  try {
+    // Lösche den Eintrag für die gegebene Attractions_ID und user_id
+    const { data, error } = await supabase
+      .from('DesiredDestination')
+      .delete()
+      .eq('Attractions_ID', attractionId)
+      .eq('User_ID', userId);
+
+    if (error) {
+      throw error;
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Fehler beim Löschen des Eintrags aus DesiredDestination:', error.message);
+    return null;
+  }
+};
 
 const isFavourite = async (placeId, userId) => {
   try {
@@ -631,7 +693,12 @@ const isFavourite = async (placeId, userId) => {
     return place.favourite;
   };
 
-  const handleStarClick = (place) => {
+  const handleStarClick = async (place) => {
+    if(!place.favourite){
+        await updateFavourite(place.placeId, CURRENT_USER_ID);
+    } else {
+        await deleteFavourite(place.placeId, CURRENT_USER_ID);
+    }
     place.toggleFavourite();
     //console.log(place.favourite);
     setForceUpdate(prevState => !prevState);
