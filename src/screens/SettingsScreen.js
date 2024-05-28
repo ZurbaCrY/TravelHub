@@ -3,20 +3,21 @@ import { View, Text, Switch, StyleSheet, } from 'react-native';
 import { useDarkMode } from './DarkModeContext';
 import Button from '../components/Button';
 import AuthService from '../User-Auth/auth'
+import AnimatedSwitch from '../components/AnimatedSwitch';
 
-const SettingsScreen = ({ route }) => {
-  const{ setUser } = route.params;
-  const { isDarkMode, toggleDarkMode } = useDarkMode();
+const SettingsScreen = ({ setUser, setLoading }) => {
+  const { isDarkMode, toggleDarkMode } = useDarkMode(); // Verwende den globalen Dark Mode State
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
 
   const handleSignOut = async () => {
     try {
+      setLoading(true, "Signing Out");
       const user = await AuthService.signOut();
       setUser(user);
     } catch (error) {
       throw error;
     } finally {
-      // setLoading(false);
+      setLoading(false);
     }
   }
 
@@ -26,10 +27,7 @@ const SettingsScreen = ({ route }) => {
 
       <View style={styles.setting}>
         <Text style={[styles.settingLabel, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>Darkmode</Text>
-        <Switch
-          trackColor={{ false: "#767577", true: "#81b0ff" }}
-          thumbColor={isDarkMode ? "#f5dd4b" : "#f4f3f4"}
-          ios_backgroundColor="#3e3e3e"
+        <AnimatedSwitch
           onValueChange={toggleDarkMode}
           value={isDarkMode}
         />
@@ -37,10 +35,7 @@ const SettingsScreen = ({ route }) => {
 
       <View style={styles.setting}>
         <Text style={[styles.settingLabel, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>Benachrichtigungen</Text>
-        <Switch
-          trackColor={{ false: "#767577", true: "#81b0ff" }}
-          thumbColor={notificationsEnabled ? "#f5dd4b" : "#f4f3f4"}
-          ios_backgroundColor="#3e3e3e"
+        <AnimatedSwitch
           onValueChange={() => setNotificationsEnabled(previousState => !previousState)}
           value={notificationsEnabled}
         />
