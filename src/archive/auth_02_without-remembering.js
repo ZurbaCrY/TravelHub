@@ -1,6 +1,6 @@
 import { supabase as sb } from "./supabase";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as SecureStore from 'expo-secure-store';
+
 
 class AuthService {
   constructor(supabase) {
@@ -22,32 +22,30 @@ class AuthService {
 
   async loadUser() {
     try {
-      const userJson = await SecureStore.getItemAsync('user');
+      const userJson = await AsyncStorage.getItem('user');
       if (userJson) {
-        console.log("Found User: ", userJson)
         this.user = JSON.parse(userJson);
-      } else {
-        console.log("No User Signed in")
       }
     } catch (error) {
-      console.error('Failed to load user from SecureStore:', error);
+      console.error('Failed to load user from AsyncStorage:', error);
     }
   }
 
   async saveUser(user) {
     try {
-      await SecureStore.setItemAsync('user', JSON.stringify(user));
+      await AsyncStorage.setItem('user', JSON.stringify(user));
+      this.user = user;
     } catch (error) {
-      console.error('Failed to save user to SecureStore:', error);
+      console.error('Failed to save user to AsyncStorage:', error);
     }
   }
 
   async removeUser() {
     try {
-      await SecureStore.deleteItemAsync('user');
+      await AsyncStorage.removeItem('user');
       this.user = null;
     } catch (error) {
-      console.error('Failed to remove user from AsyncStorage/SecureStore: ', error);
+      console.error('Failed to remove user from AsyncStorage:', error);
     }
   }
 
@@ -55,17 +53,13 @@ class AuthService {
     return this.user;
   }
 
-  async signIn(email, password, rememberMe) {
+  async signIn(email, password) {
     try {
       const { data, error } = await this.supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
       console.info("User signed in:", data.user)
       console.info("User.id:", data.user.id)
-      // SaveUser Saves to SecureStore if User wants so
-      if (rememberMe) {
-        await this.saveUser(data.user)
-      }
-      this.user = data.user;
+      await this.saveUser(data.user);
       return data.user;
     } catch (error) {
       throw error;
@@ -89,7 +83,8 @@ class AuthService {
       throw Error('Passwords do not match')
     }
     try {
-      // check if username and email are unique 
+      // async func to check if a specific Value is in users table 
+      // will not check for Auth Users
       const checkUnique = async (field, value) => {
         let { data, error } = await this.supabase
           .from("users")
@@ -102,19 +97,12 @@ class AuthService {
       };
       await checkUnique("username", username);
       await checkUnique("email", email);
-
       // The main signUp:
       const { data, error } = await this.supabase.auth.signUp({
-        email: email,
-        password: password,
-        options: {
-          data: {
-            username: username,
-          }
-        }
+        email,
+        password,
       });
       if (error) throw error;
-
       // Check if Data is there before proceeding
       if (data != null && data.user != null) {
         // Update User info table:
@@ -125,10 +113,10 @@ class AuthService {
             email: email, 
             username: username
           }]);
-        // Only local Save, user needs to login again on next app open
-        this.user = data.user;
+        await this.saveUser(data.user);
         return data.user;
       } else {
+        // this line should theoretically never be executed as there should be a suapabase error if there is no user data
         throw new Error("Something went wrong, data retrieved: ", data);
       }
     } catch (error) {

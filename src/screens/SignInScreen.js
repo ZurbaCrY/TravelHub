@@ -2,26 +2,30 @@ import React, { useState } from "react";
 import {
   Alert,
   View,
-  ActivityIndicator,
   TouchableOpacity,
 } from "react-native";
 import { Input, Switch, Text } from "react-native-elements";
-import { useNavigation } from "@react-navigation/native";
+// import { useNavigation } from "@react-navigation/native";
 import { styles } from '../style/styles';
 import Button from "../components/Button";
 import AuthService from "../User-Auth/auth"
 
-export default function SigninScreen() {
-  const navigation = useNavigation();
+const SignInScreen = ({ navigation, route }) => {
+  const { setUser } = route.params;
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [click, setClick] = useState(false);
+  const [remember, setRemember] = useState(false);
 
   const handleSignIn = async () => {
-    setLoading(true);
-    await AuthService.signIn(email, password);
-    setLoading(false);
+    try {
+      console.log(remember)
+      const user = await AuthService.signIn(email, password, remember);
+      setUser(user);
+    } catch (error) {
+      throw Error;
+    } finally {
+      // setLoading(false);
+    }
   };
 
   const handleForgetPasswordPress = () => {
@@ -64,8 +68,8 @@ export default function SigninScreen() {
       <View style={styles.rememberView}>
         <View style={styles.switch}>
           <Switch
-            value={click}
-            onValueChange={setClick}
+            value={remember}
+            onValueChange={setRemember}
             trackColor={{ true: "green", false: "gray" }}
           />
           <Text style={styles.rememberText}>Remember Me</Text>
@@ -78,15 +82,9 @@ export default function SigninScreen() {
         <Button mode='contained' onPress={handleSignIn}>
           Sign In
         </Button>
-        {loading && (
-          <ActivityIndicator
-            size="large"
-            color="#0000ff"
-            style={styles.loadingIndicator}
-          />
-        )}
       </View>
     </View>
   );
 }
 
+export default SignInScreen;
