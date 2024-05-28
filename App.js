@@ -68,7 +68,11 @@ function MainTabs() {
 
 export default function App() {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState({ status: true, message: "Loading..." });
+
+  const setLoadingStatus = (status, message = "Loading...") => {
+    setLoading({ status, message })
+  }
 
   // On App open, initialize User, will not get info ever because AuthService cant have any (yet)
   useEffect(() => {
@@ -76,7 +80,7 @@ export default function App() {
       await AuthService.loadUser();
       const currentUser = await AuthService.getUser();
       setUser(currentUser);
-      setLoading(false)
+      setLoadingStatus(false)
     };
     initUser();
   }, []);
@@ -86,11 +90,9 @@ export default function App() {
     console.log('User state:', user);
   }, [user]);
 
-  if (loading) {
+  if (loading.status) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" color="#39FF55" />
-      </View>
+      <LoadingScreen loadingMessage={loading.message} />
     );
   }
   return (
@@ -99,36 +101,39 @@ export default function App() {
     <NavigationContainer ignoreSerializableWarnings={true}>
       {user ? (
         <DarkModeProvider>
-            <RootStack.Navigator>
-              <RootStack.Screen
-                name="Main"
-                component={MainTabs}
-                options={{ headerShown: false }}
-              />
-              <RootStack.Screen name="Settings" component={SettingsScreen} initialParams={{setUser: setUser}}/>
-            </RootStack.Navigator>
-            <StatusBar style="auto" />
+          <RootStack.Navigator ignoreSerializableWarnings={true}>
+            <RootStack.Screen
+              name="Main"
+              component={MainTabs}
+              options={{ headerShown: false }}
+            />
+            <RootStack.Screen name="Settings">
+              {props => <SettingsScreen {...props} setUser={setUser} setLoading={setLoadingStatus} />}
+
+            </RootStack.Screen>
+          </RootStack.Navigator>
+          <StatusBar style="auto" />
         </DarkModeProvider>
       ) : (
-          <Stack.Navigator initialRouteName="Welcome">
-            <Stack.Screen
-              name="Welcome"
-              component={StartingScreen}
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="SignInScreen"
-              component={SignInScreen}
-              options={{ headerShown: false }}
-              initialParams={{setUser: setUser}}
-              />
-            <Stack.Screen
-              name="SignUpScreen"
-              component={SignUpScreen}
-              options={{ headerShown: false }}
-              initialParams={{setUser: setUser}}
-            />
-          </Stack.Navigator>
+        <Stack.Navigator gnoreSerializableWarnings={true} initialRouteName="Welcome">
+          <Stack.Screen
+            name="Welcome"
+            component={StartingScreen}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="SignInScreen"
+            options={{ headerShown: false }}
+          >
+            {props => <SignInScreen {...props} setUser={setUser} setLoading={setLoadingStatus} />}
+          </Stack.Screen>
+          <Stack.Screen
+            name="SignUpScreen"
+            options={{ headerShown: false }}
+          >
+            {props => <SignUpScreen {...props} setUser={setUser} setLoading={setLoadingStatus} />}
+          </Stack.Screen>
+        </Stack.Navigator>
       )}
     </NavigationContainer>
   );

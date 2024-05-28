@@ -30,6 +30,7 @@
     "hermes": "^0.0.8",
     "js-polyfills": "^0.1.43",
     "metro": "~0.80.8",
+    "prop-types": "^15.8.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-native": "0.74.1",
