@@ -6,7 +6,6 @@ import AuthService from '../User-Auth/auth';
 import Button from '../components/Button';
 import { styles as st } from '../style/styles';
 
-
 export default function ChatListScreen({ navigation }) {
   const CURRENT_USER = AuthService.getUser();
   const CURRENT_USER_ID = CURRENT_USER.id;
@@ -308,11 +307,9 @@ export default function ChatListScreen({ navigation }) {
   } else {
     return (
       <View style={[styles.container, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
-        <View style={styles.buttonContainer}>
-          <Button mode="contained" onPress={() => setModalVisible(true)}>
-            Neuen Chat erstellen
-          </Button>
-        </View>
+        <Button mode="contained" onPress={() => setModalVisible(true)}>
+          Neuen Chat erstellen
+        </Button>
         <FlatList
           data={chats}
           keyExtractor={(item) => item.chat_id}
@@ -343,7 +340,7 @@ export default function ChatListScreen({ navigation }) {
                 <Text style={styles.userName}>{user.username}</Text>
               </TouchableOpacity>
             ))}
-            <Button mode='contained' onPress={createNewChat} disabled={!selectedUser}>Chat starten</Button>
+            <Button onPress={createNewChat} disabled={!selectedUser}>Chat starten</Button>
           </View>
         </Modal>
       </View>
@@ -355,12 +352,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     marginTop: 20,
-  },
-  buttonContainer: {
-    marginTop: 20,
-    marginBottom: 0,
-    alignItems: "center",
-    justifyContent: "center",
   },
   chatItem: {
     padding: 20,
@@ -380,7 +371,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
-    alignItems: "center",
     backgroundColor: '#FFF',
     padding: 20,
     borderTopLeftRadius: 10,
