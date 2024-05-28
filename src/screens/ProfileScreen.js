@@ -15,8 +15,10 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import Flag from 'react-native-flags';
 import { useDarkMode } from './DarkModeContext';
 import { useNavigation } from '@react-navigation/native'; // Importiere useNavigation
+import AuthService from '../User-Auth/auth'
 
-const ProfileScreen = () => {
+export default function ProfileScreen () {
+  user = AuthService.getUser();
   const { isDarkMode, toggleDarkMode } = useDarkMode();
   const [visitedCountries, setVisitedCountries] = useState(['Italien', 'Spanien', 'Frankreich']);
   const [wishListCountries, setWishListCountries] = useState(['Japan', 'Neuseeland', 'Brasilien']);
@@ -67,11 +69,13 @@ const ProfileScreen = () => {
             source={{uri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/PICA.jpg/1200px-PICA.jpg'}}
             style={styles.profileImage}
           />
-          <Text style={[styles.name, {color: isDarkMode ? '#FFFDF3' : '#000000'  }]}>Max Mustermann</Text>
-          <Text style={[styles.details, {color: isDarkMode ? '#FFFDF3' : '#000000'  }]}>max@example.com</Text>
+          <Text style={[styles.name, {color: isDarkMode ? '#FFFDF3' : '#000000'  }]}>{ user.user_metadata.username }</Text>
+          <Text style={[styles.details, {color: isDarkMode ? '#FFFDF3' : '#000000'  }]}>{ user.email }</Text>
           <View style={styles.row}>
             <Icon name="birthday-cake" size={14} style={[styles.iconRightMargin, , {color: isDarkMode ? '#FFFDF3' : '#000000'  }]} />
-            <Text style={[styles.details, , {color: isDarkMode ? '#FFFDF3' : '#000000'  }]}>01.01.1980</Text>
+            <Text style={[styles.details, , {color: isDarkMode ? '#FFFDF3' : '#000000'  }]}>
+              { user.user_metadata.birthday ?  user.user_metadata.birthday  : 'No birthdate configured'}
+            </Text>
           </View>
           <View style={styles.row}>
             <Flag code="DE" size={16} style={styles.iconRightMargin} />
@@ -227,7 +231,7 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',
-    marginVertical: 20,
+    marginVertical: 10,
     marginLeft: 10,
     marginRight: 10,
   },
@@ -237,4 +241,3 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ProfileScreen;

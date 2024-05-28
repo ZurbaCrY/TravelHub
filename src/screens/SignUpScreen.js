@@ -1,42 +1,38 @@
 import React, { useState } from 'react';
-import { View, TouchableOpacity, ActivityIndicator} from 'react-native';
-import { Button, Input, Text } from 'react-native-elements';
-import { signUp } from '../User-Auth/auth';
-import { styles } from '../styles/styles';
+import { View, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
+import { Input, Text } from 'react-native-elements';
+import { styles } from '../style/styles';
+import Button from '../components/Button';
+import AuthService from '../User-Auth/auth';
 
-export default function SignUpScreen({ navigation }) {
+export default function SignUpScreen({ navigation, route }) {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [loading, setLoading] = useState(false);
+
+  const { setUser } = route.params;
+
 
   const handleSignUp = async () => {
-    setLoading(true);
     try {
-      // Additional validation if needed
-      if (password !== confirmPassword) {
-        throw new Error('Passwords do not match');
-      }
-
-      // Call signUp function for Supabase sign-up logic
-      await signUp(username, email, password);
-      // Handle successful sign-up, e.g., navigate to another screen
+      const user = await AuthService.signUp(username, email, password, confirmPassword)
+      setUser(user);
     } catch (error) {
-      console.error('Sign-up error:', error.message);
-      // Handle error, e.g., display error message to the user
+      console.error(error)
+    } finally {
+      // setLoading(false);
     }
-    setLoading(false);
   };
 
-  const authSwitch = () => {
+  const authSwitchToSignIn = () => {
     navigation.navigate("SignInScreen");
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Sign Up</Text>
-      <TouchableOpacity style={styles.authSwitchTouchable} onPress={authSwitch}>
+      <TouchableOpacity style={styles.authSwitchTouchable} onPress={authSwitchToSignIn}>
         <Text style={styles.switchText}>
           Already have an account? Sign In instead
         </Text>
@@ -47,7 +43,7 @@ export default function SignUpScreen({ navigation }) {
           leftIcon={{ type: 'font-awesome', name: 'user' }}
           onChangeText={setUsername}
           value={username}
-          placeholder="Username"
+          placeholder="The Username will not be saved"
           autoCapitalize="none"
           containerStyle={styles.input}
         />
@@ -82,10 +78,9 @@ export default function SignUpScreen({ navigation }) {
         />
       </View>
       <View style={styles.buttonView}>
-        <Button title="Sign Up" disabled={loading} onPress={handleSignUp} style={styles.button} />
-        {loading && (
-          <ActivityIndicator size="large" color="#0000ff" style={styles.loadingIndicator} />
-        )}
+        <Button mode='contained' onPress={handleSignUp}>
+          Sign Up
+        </Button>
       </View>
     </View>
   );
