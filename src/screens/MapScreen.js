@@ -8,8 +8,9 @@ import CustomPlaceItem from '../resources/CustomPlaceItem'; // Annahme: Pfad zur
 import PlaceDetailScreen from './PlaceDetailScreen';
 import AddPlaceModal from './AddPlaceModal';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
-import { Button } from 'react-native-paper'
+import { Button } from 'react-native-paper';
 import { createClient } from '@supabase/supabase-js';
+import AuthService from '../User-Auth/auth';
 
 const { width } = Dimensions.get('window');
 
@@ -131,7 +132,8 @@ export default function MapScreen() {
     const [showAddModal, setShowAddModal] = useState(false);
     const [selectedCoordinates, setSelectedCoordinates] = useState(null);
     const [continentsData, setContinentsData] = useState([]);
-
+    const CURRENT_USER = AuthService.getUser();
+    const CURRENT_USER_ID = CURRENT_USER.id;
 
     /**
      * Use Effect Methoden für erstmaliges Aufrufen - Laden der Karte und Daten aus DB.
