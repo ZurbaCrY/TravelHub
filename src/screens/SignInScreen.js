@@ -4,27 +4,27 @@ import {
   View,
   TouchableOpacity,
 } from "react-native";
-import { Input, Switch, Text } from "react-native-elements";
+import { Input, Text } from "react-native-elements";
 // import { useNavigation } from "@react-navigation/native";
 import { styles } from '../style/styles';
 import Button from "../components/Button";
 import AuthService from "../User-Auth/auth"
+import AnimatedSwitch from "../components/AnimatedSwitch";
 
-const SignInScreen = ({ navigation, route }) => {
-  const { setUser } = route.params;
+const SignInScreen = ({ navigation, setUser, setLoading }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
 
   const handleSignIn = async () => {
     try {
-      console.log(remember)
+      setLoading(true, "Signing in")
       const user = await AuthService.signIn(email, password, remember);
       setUser(user);
     } catch (error) {
       throw Error;
     } finally {
-      // setLoading(false);
+      setLoading(false);
     }
   };
 
@@ -67,10 +67,10 @@ const SignInScreen = ({ navigation, route }) => {
       </View>
       <View style={styles.rememberView}>
         <View style={styles.switch}>
-          <Switch
+          <AnimatedSwitch
             value={remember}
             onValueChange={setRemember}
-            trackColor={{ true: "green", false: "gray" }}
+            // trackColor={{ true: "green", false: "gray" }}
           />
           <Text style={styles.rememberText}>Remember Me</Text>
         </View>

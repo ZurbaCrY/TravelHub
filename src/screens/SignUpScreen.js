@@ -5,23 +5,21 @@ import { styles } from '../style/styles';
 import Button from '../components/Button';
 import AuthService from '../User-Auth/auth';
 
-export default function SignUpScreen({ navigation, route }) {
+const SignUpScreen = ({ navigation, setUser, setLoading }) => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  const { setUser } = route.params;
-
-
   const handleSignUp = async () => {
     try {
+      setLoading(true, "Signing Up");
       const user = await AuthService.signUp(username, email, password, confirmPassword)
       setUser(user);
     } catch (error) {
       console.error(error)
     } finally {
-      // setLoading(false);
+      setLoading(false);
     }
   };
 
@@ -43,7 +41,7 @@ export default function SignUpScreen({ navigation, route }) {
           leftIcon={{ type: 'font-awesome', name: 'user' }}
           onChangeText={setUsername}
           value={username}
-          placeholder="The Username will not be saved"
+          placeholder="Give yourself a Username"
           autoCapitalize="none"
           containerStyle={styles.input}
         />
@@ -86,3 +84,4 @@ export default function SignUpScreen({ navigation, route }) {
   );
 }
 
+export default SignUpScreen;
