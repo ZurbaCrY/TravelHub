@@ -19,6 +19,8 @@ import {
   SignInScreen,
   SignUpScreen,
   LoadingScreen,
+  ChatScreen,
+  ChatListScreen,
 } from './src/screens'
 import AuthService from "./src/User-Auth/auth"
 
@@ -43,6 +45,8 @@ function MainTabs() {
             iconName = "map-marker-alt";
           } else if (route.name === "ProfileScreen") {
             iconName = "user";
+          } else if (route.name === "ChatListScreen") {
+            iconName = "comments";
           }
           return (
             <Animated.View
@@ -62,6 +66,7 @@ function MainTabs() {
       <Tab.Screen name="CommunityScreen" component={CommunityScreen} />
       <Tab.Screen name="MapScreen" component={MapScreen} />
       <Tab.Screen name="ProfileScreen" component={ProfileScreen} />
+      <Tab.Screen name="ChatListScreen" component={ChatListScreen} />
     </Tab.Navigator>
   );
 }
@@ -75,6 +80,7 @@ export default function App() {
     const initUser = async () => {
       await AuthService.loadUser();
       const currentUser = await AuthService.getUser();
+      console.log(currentUser);
       setUser(currentUser);
       setLoading(false)
     };
@@ -106,6 +112,8 @@ export default function App() {
                 options={{ headerShown: false }}
               />
               <RootStack.Screen name="Settings" component={SettingsScreen} initialParams={{setUser: setUser}}/>
+              <RootStack.Screen name="ChatListScreen" component={ChatListScreen} />
+              <RootStack.Screen name="ChatScreen" component={ChatScreen} />
             </RootStack.Navigator>
             <StatusBar style="auto" />
         </DarkModeProvider>
