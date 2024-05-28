@@ -11,7 +11,7 @@ const REACT_APP_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXB
 
 const supabase = createClient(REACT_APP_SUPABASE_URL, REACT_APP_ANON_KEY);
 
-const AddPlaceModal = ({ visible, onClose }) => {
+const AddPlaceModal = ({ visible, onClose, onFetchData, continentsData }) => {
   const [placeName, setPlaceName] = useState('');
   const [placeDescription, setPlaceDescription] = useState('');
   const [placeType, setPlaceType] = useState('');
@@ -37,8 +37,8 @@ const AddPlaceModal = ({ visible, onClose }) => {
         alert('Bitte füllen Sie alle erforderlichen Felder aus.');
     } else {
         console.log(coordinates);
-        addPlace(placeName, 1, placeType, placeDescription, coordinates.latitude, coordinates.longitude)
-        onClose();
+        addPlace(placeName, placeType, placeDescription, coordinates.latitude, coordinates.longitude);
+                    onClose();
     }
     setPlaceType('');
     setCoordinates(null);
@@ -46,14 +46,36 @@ const AddPlaceModal = ({ visible, onClose }) => {
     setPlaceName('');
   };
 
+  // Function to calculate the distance between two coordinates using the Haversine formula
+  const haversineDistance = (lat1, lon1, lat2, lon2) => {
+    const R = 6371; // Radius of the earth in km
+    const dLat = deg2rad(lat2 - lat1);
+    const dLon = deg2rad(lon2 - lon1);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const d = R * c; // Distance in km
+    return d;
+  };
+
+  // Function to convert degrees to radians
+  const deg2rad = (deg) => {
+    return deg * (Math.PI / 180);
+  };
+
   const addPlace = async (attractionName, typeOfAttraction, description, latitude, longitude) => {
-    cityId = findNearestCityId({
-               latitude: latitude,
-               longitude: longitude,
-               latitudeDelta: 1, // Eine sehr kleine Zahl für einen sehr kleinen Bereich
-               longitudeDelta: 1, // Eine sehr kleine Zahl für einen sehr kleinen Bereich
-             }, haversineDistance);
     try {
+        cityId = findNearestCityId({
+                   latitude: latitude,
+                   longitude: longitude,
+                   latitudeDelta: 1, // Eine sehr kleine Zahl für einen sehr kleinen Bereich
+                   longitudeDelta: 1, // Eine sehr kleine Zahl für einen sehr kleinen Bereich
+                 }, continentsData);
+                 console.log(cityId);
+                 console.log(typeof cityId); // Überprüfen, welcher Typ zurückgegeben wird
+                 // Konvertiere cityId in Number, falls möglich, oder in String
       const { data, error } = await supabase
         .from('Attraction')
         .insert([
@@ -66,7 +88,7 @@ const AddPlaceModal = ({ visible, onClose }) => {
     } catch (error) {
       console.error('Error adding place:', error.message);
     }
-    await onFetchData(); // Aktualisiert die continentData nach dem Hinzufügen des Ortes
+            onClose();
   };
 
   const handleConfirmLocation = () => {
@@ -74,34 +96,31 @@ const AddPlaceModal = ({ visible, onClose }) => {
     setShowMap(false); // Verstecke die Karte nach der Bestätigung
   };
 
-  const findNearestCityId = async (region, haversineDistance) => {
-    try {
-      const { data: cities, error } = await supabase.from('City').select('*');
-      if (error) {
-        throw new Error(error.message);
-      }
+ const findNearestCityId = (region, continentsData) => {
 
-      let nearestCityId = null;
-      let minDistance = Infinity;
+   let nearestCityId = null;
+   let minDistance = Infinity;
 
-      // Iterate through all cities to find the nearest one
-      cities.forEach(city => {
-        // Calculate the distance between the current city and the region
-        const distance = haversineDistance(region.latitude, region.longitude, city.latitude, city.longitude);
+   // Iterate through continents
+   continentsData.forEach(continent => {
+     // Iterate through countries in the continent
+     continent.countries.forEach(country => {
+       // Iterate through cities in the country
+       country.cities.forEach(city => {
+         // Calculate the distance between the current city and the region
+         const distance = haversineDistance(region.latitude, region.longitude, city.coordinates[0].latitude, city.coordinates[0].longitude);
 
-        // Update the nearest city if this city is closer
-        if (distance < minDistance) {
-          minDistance = distance;
-          nearestCityId = city.City_ID;
-        }
-      });
+         // Update the nearest city if this city is closer
+         if (distance < minDistance) {
+           minDistance = distance;
+           nearestCityId = city.cityId;
+         }
+       });
+     });
+   });
 
-      return nearestCityId;
-    } catch (error) {
-      console.error('Error finding nearest city:', error.message);
-      return null;
-    }
-  };
+   return nearestCityId;
+ };
 
   return (
     <Modal

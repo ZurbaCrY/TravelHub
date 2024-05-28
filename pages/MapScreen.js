@@ -37,7 +37,8 @@ class Country {
 }
 
 class City {
-  constructor(name, coordinates, places) {
+  constructor(cityId, name, coordinates, places) {
+    this.cityId = cityId;
     this.name = name;
     this.coordinates = coordinates;
     this.priceLevel = 1; // z.B. preisliche Einordnung der Stadt
@@ -204,7 +205,7 @@ const fetchPlaces = async () => {
                 { latitude: parseFloat(city.latitude), longitude: parseFloat(city.longitude) } // Hier sollten die Stadtgrenzen hinzugefügt werden, falls vorhanden
               ];
 
-              return new City(city.Cityname, cityCoordinates, cityAttractions);
+              return new City(city.City_ID, city.Cityname, cityCoordinates, cityAttractions);
             });
 
           return new Country(country.Countryname, countryCities);
@@ -604,7 +605,7 @@ const fetchCityCoordinates = async (placeId) => {
         </MapView>
 
       ) : (
-        <Text>Arvid fickt gerade deine Mum...</Text>
+        <Text>Map Loading...</Text>
       )}
 
         <View style={styles.bottomBar}>
@@ -680,7 +681,6 @@ const fetchCityCoordinates = async (placeId) => {
                   onClose={() => setShowAddModal(false)}
                   onFetchData={fetchData} // Übergibt die fetchData Funktion als Prop
                   continentsData={continentsData} // Übergibt die aktuelle continentData als Prop
-                  haversineDistance={haversineDistance}
                 />
 
     </View>
