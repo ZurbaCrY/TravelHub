@@ -396,21 +396,21 @@ const haversineDistance = (lat1, lon1, lat2, lon2) => {
   return d;
 };
 
-// Function to convert degrees to radians
-const deg2rad = (deg) => {
-  return deg * (Math.PI / 180);
-};
+    // Function to convert degrees to radians
+    const deg2rad = (deg) => {
+      return deg * (Math.PI / 180);
+    };
 
 
     /**
      * Funktion für BottomBar.
      *
      */
-const scrollToStart = () => {
-  if (scrollViewRef.current) {
-    scrollViewRef.current.scrollTo({ x: 0, y: 0, animated: true });
-  }
-};
+    const scrollToStart = () => {
+      if (scrollViewRef.current) {
+        scrollViewRef.current.scrollTo({ x: 0, y: 0, animated: true });
+      }
+    };
 
     /**
      * Funktionen für Suchleiste mit Autocomplete.
