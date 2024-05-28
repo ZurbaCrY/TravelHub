@@ -5,34 +5,26 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { Input, Switch, Text } from "react-native-elements";
-import { useNavigation } from "@react-navigation/native";
+// import { useNavigation } from "@react-navigation/native";
 import { styles } from '../style/styles';
 import Button from "../components/Button";
 import AuthService from "../User-Auth/auth"
 
-// const SignInScreen = ({ navigation, setUser }) => {
-const SignInScreen = ({ route }) => {
-  const{ setUser } = route.params;
-  const navigation = useNavigation();
+const SignInScreen = ({ navigation, route }) => {
+  const { setUser } = route.params;
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [click, setClick] = useState(false);
-
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
-
+  const [remember, setRemember] = useState(false);
 
   const handleSignIn = async () => {
-    setLoading(true);
-    setError(null);
     try {
-      const user = await AuthService.signIn(email, password);
-      console.log("User Signed In: ", user);
+      console.log(remember)
+      const user = await AuthService.signIn(email, password, remember);
       setUser(user);
     } catch (error) {
-      setError(error);
+      throw Error;
     } finally {
-    setLoading(false);
+      // setLoading(false);
     }
   };
 
@@ -76,8 +68,8 @@ const SignInScreen = ({ route }) => {
       <View style={styles.rememberView}>
         <View style={styles.switch}>
           <Switch
-            value={click}
-            onValueChange={setClick}
+            value={remember}
+            onValueChange={setRemember}
             trackColor={{ true: "green", false: "gray" }}
           />
           <Text style={styles.rememberText}>Remember Me</Text>

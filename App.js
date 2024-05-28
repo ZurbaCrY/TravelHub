@@ -78,6 +78,7 @@ export default function App() {
   // On App open, initialize User, will not get info ever because AuthService cant have any (yet)
   useEffect(() => {
     const initUser = async () => {
+      await AuthService.loadUser();
       const currentUser = await AuthService.getUser();
       console.log(currentUser);
       setUser(currentUser);
