@@ -11,15 +11,21 @@ import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplet
 import { Button } from 'react-native-paper'
 import { createClient } from '@supabase/supabase-js';
 
-
 const { width } = Dimensions.get('window');
 
+/**
+ * Konfiguration Supabase Connection.
+ *
+ */
 const REACT_APP_SUPABASE_URL = "https://zjnvamrbnqzefncmdpaf.supabase.co";
 const REACT_APP_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpqbnZhbXJibnF6ZWZuY21kcGFmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTQ0NjgzMDIsImV4cCI6MjAzMDA0NDMwMn0.O4S0x7F-5df2hR218qrO4VJbDOLK1Gzsvb3a8SGqwvY";
 
 const supabase = createClient(REACT_APP_SUPABASE_URL, REACT_APP_ANON_KEY);
 
-// Definition der Klassen
+/**
+ * Definitionen der Klassen für die Map nach OOP
+ *
+ */
 class Continent {
   constructor(name, countries) {
     this.name = name;
@@ -97,166 +103,184 @@ class Viewpoint extends Place {
   }
 }
 
-
+/**
+ * Implementation MapScreen Komponente.
+ *
+ */
 export default function MapScreen() {
-  const [location, setLocation] = useState(null);
-  const [errorMsg, setErrorMsg] = useState(null);
-  const [zoomLevel, setZoomLevel] = useState(null);
-  const [showMarkers, setShowMarkers] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [searchResult, setSearchResult] = useState(null);
-  const [searchLocation, setSearchLocation] = useState(null);
+
+    /**
+     * State Variablen der Map.
+     *
+     */
+    const [location, setLocation] = useState(null);
+    const [errorMsg, setErrorMsg] = useState(null);
+    const [zoomLevel, setZoomLevel] = useState(null);
+    const [showMarkers, setShowMarkers] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searchResult, setSearchResult] = useState(null);
+    const [searchLocation, setSearchLocation] = useState(null);
     const [region, setRegion] = useState(null); // Zustand für die aktuelle Kartenregion
-      const [mapRef, setMapRef] = useState(null);
+    const [mapRef, setMapRef] = useState(null);
     const [showBottomLine, setShowBottomLine] = useState(false);
-      const [selectedPlace, setSelectedPlace] = useState(null);
-        const scrollViewRef = useRef(null);
-        const [showList, setShowList] = useState(false);
-        const [forceUpdate, setForceUpdate] = useState(false);
-          const [showPlaceDetailModal, setShowPlaceDetailModal] = useState(false);
-                   const [showAddModal, setShowAddModal] = useState(false);
-                     const [selectedCoordinates, setSelectedCoordinates] = useState(null);
-                 const [continentsData, setContinentsData] = useState([]);
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-useEffect(() => {
-  // Scrollen zur ausgewählten Position in der ScrollView
-  if (scrollViewRef.current && selectedPlace) {
-    const index = searchResult.places.findIndex(place => place === selectedPlace);
-    const offsetX = index * 120; // Breite des Platzhalters plus Abstand
-
-    scrollViewRef.current.scrollTo({ x: offsetX, y: 0, animated: true });
-  }
-}, [selectedPlace]); // Füge selectedPlace als Abhängigkeit hinzu
-
-useEffect(() => {
-  (async () => {
-    let { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== 'granted') {
-      setErrorMsg('Permission to access location was denied');
-      return;
-    }
-
-    let location = await Location.getCurrentPositionAsync({});
-    setLocation(location);
-    setRegion({
-      latitude: location.coords.latitude,
-      longitude: location.coords.longitude,
-      latitudeDelta: 0.0922,
-      longitudeDelta: 0.0421,
-    }); // Setze die anfängliche Kartenregion
-    console.log("folgendes Land wurde besucht: " + findCountry(findNearestCity({
-                                                                         latitude: location.coords.latitude,
-                                                                         longitude: location.coords.longitude,
-                                                                         latitudeDelta: 0.0922,
-                                                                         longitudeDelta: 0.0421,
-                                                                       })).name);
-  })();
-}, []);
-
-const fetchCountries = async () => {
-  const { data, error } = await supabase.from('Country').select('*');
-  if (error) {
-    throw new Error(error.message);
-  }
-  return data;
-};
-
-const fetchCities = async () => {
-  const { data, error } = await supabase.from('City').select('*');
-  if (error) {
-    throw new Error(error.message);
-  }
-  return data;
-};
-
-const fetchPlaces = async () => {
-  const { data, error } = await supabase.from('Attraction').select('*');
-  if (error) {
-    throw new Error(error.message);
-  }
-  return data;
-};
+    const [selectedPlace, setSelectedPlace] = useState(null);
+    const scrollViewRef = useRef(null);
+    const [showList, setShowList] = useState(false);
+    const [forceUpdate, setForceUpdate] = useState(false);
+    const [showPlaceDetailModal, setShowPlaceDetailModal] = useState(false);
+    const [showAddModal, setShowAddModal] = useState(false);
+    const [selectedCoordinates, setSelectedCoordinates] = useState(null);
+    const [continentsData, setContinentsData] = useState([]);
 
 
-  const fetchData = async () => {
-    try {
-      const countries = await fetchCountries();
-      const cities = await fetchCities();
-      const attractions = await fetchPlaces();
+    /**
+     * Use Effect Methoden für erstmaliges Aufrufen - Laden der Karte und Daten aus DB.
+     * Aktualisieren der Position und der nächstliegenden Stadt
+     *
+     */
+    useEffect(() => {
+        fetchData();
+    }, []);
 
-      const continentsData = [
-        new Continent('World', countries.map(country => {
-          const countryCities = cities
-            .filter(city => city.Country_ID === country.Country_ID)
-            .map(city => {
-              const cityAttractions = attractions
+    useEffect(() => {
+      // Scrollen zur ausgewählten Position in der ScrollView
+      if (scrollViewRef.current && selectedPlace) {
+        const index = searchResult.places.findIndex(place => place === selectedPlace);
+        const offsetX = index * 120; // Breite des Platzhalters plus Abstand
+
+        scrollViewRef.current.scrollTo({ x: offsetX, y: 0, animated: true });
+      }
+    }, [selectedPlace]); // Füge selectedPlace als Abhängigkeit hinzu
+
+    useEffect(() => {
+        (async () => {
+            let { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== 'granted') {
+                setErrorMsg('Permission to access location was denied');
+                return;
+            }
+
+            fetchData();
+            console.log("data fetched");
+            let location = await Location.getCurrentPositionAsync({});
+            setLocation(location);
+            setRegion({
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude,
+                latitudeDelta: 0.0922,
+                longitudeDelta: 0.0421,
+            }); // Setze die anfängliche Kartenregion
+            console.log("folgendes Land wurde besucht: " + findCountry(findNearestCity({
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude,
+                latitudeDelta: 0.0922,
+                longitudeDelta: 0.0421,
+            })).name);
+        })();
+    }, []);
+
+    const fetchCountries = async () => {
+      const { data, error } = await supabase.from('Country').select('*');
+      if (error) {
+        throw new Error(error.message);
+      }
+      return data;
+    };
+
+    const fetchCities = async () => {
+      const { data, error } = await supabase.from('City').select('*');
+      if (error) {
+        throw new Error(error.message);
+      }
+      return data;
+    };
+
+    const fetchPlaces = async () => {
+        const { data, error } = await supabase.from('Attraction').select('*');
+        if (error) {
+            throw new Error(error.message);
+        }
+        return data;
+    };
+
+    const fetchData = async () => {
+        try {
+            const countries = await fetchCountries();
+            const cities = await fetchCities();
+            const attractions = await fetchPlaces();
+
+            const continentsData = [
+                new Continent('World', countries.map(country => {
+                const countryCities = cities
+                .filter(city => city.Country_ID === country.Country_ID)
+                .map(city => {
+                const cityAttractions = attractions
                 .filter(attraction => attraction.City_ID === city.City_ID)
                 .map(attraction => new Place(
-                  attraction.Attraction_Name,
-                  { latitude: parseFloat(attraction.Latitude), longitude: parseFloat(attraction.Longitude) },
-                  attraction.Type_of_Attraction,
-                  attraction.Description,
-                  attraction.Link
+                    attraction.Attraction_Name,
+                    { latitude: parseFloat(attraction.Latitude), longitude: parseFloat(attraction.Longitude) },
+                    attraction.Type_of_Attraction,
+                    attraction.Description,
+                    attraction.Link
                 ));
 
-              const cityCoordinates = [
+                const cityCoordinates = [
                 { latitude: parseFloat(city.latitude), longitude: parseFloat(city.longitude) } // Hier sollten die Stadtgrenzen hinzugefügt werden, falls vorhanden
-              ];
+                ];
 
-              return new City(city.City_ID, city.Cityname, cityCoordinates, cityAttractions);
-            });
+                return new City(city.City_ID, city.Cityname, cityCoordinates, cityAttractions);
+                });
 
-          return new Country(country.Countryname, countryCities);
-        }))
-      ];
+                return new Country(country.Countryname, countryCities);
+                }))
+            ];
 
-      setContinentsData(continentsData);
-    } catch (error) {
-      console.error('Error fetching data:', error.message);
-    }
-  };
+            setContinentsData(continentsData);
+        } catch (error) {
+            console.error('Error fetching data:', error.message);
+        }
+    };
 
-  const getImageForPlace = (place) => {
+
+    /**
+     * Funktionen zum rendern der Details auf der Map.
+     *
+     */
+    const getImageForPlace = (place) => {
         if (place === selectedPlace){
             return require('../resources/travel-marker-x.png');
         }
         switch (place.type) {
-          case 'Sehenswürdigkeit':
+            case 'Sehenswürdigkeit':
             return require('../resources/travel-marker-s.png');
-          case 'Restaurant':
+            case 'Restaurant':
             return require('../resources/travel-marker-r.png');
-          case 'Einkaufsladen':
+            case 'Einkaufsladen':
             return require('../resources/travel-marker-m.png');
-          case 'Aussichtspunkt':
+            case 'Aussichtspunkt':
             return require('../resources/travel-marker-v.png');
-          default:
+            default:
             return require('../resources/travel-marker-x.png');
         }
-  };
+    };
 
-  const getDescriptionForPlace = (place) => {
-  if (place === selectedPlace) {
-        if (place.type === 'Sehenswürdigkeit') {
-          return (place instanceof SightseeingSpot) ? `Eintritt: ${place.entranceFee || 'N/A'}` : 'N/A';
-        } else if (place.type === 'Restaurant') {
-          return `Preisniveau: ${place.priceLevel || 'N/A'}, Küche: ${place.cuisineType || 'N/A'}`;
+    const getDescriptionForPlace = (place) => {
+        if (place === selectedPlace) {
+            if (place.type === 'Sehenswürdigkeit') {
+                return (place instanceof SightseeingSpot) ? `Eintritt: ${place.entranceFee || 'N/A'}` : 'N/A';
+            } else if (place.type === 'Restaurant') {
+                return `Preisniveau: ${place.priceLevel || 'N/A'}, Küche: ${place.cuisineType || 'N/A'}`;
+            } else {
+                return 'N/A';
+            }
         } else {
-          return 'N/A';
+            return null;
         }
-   } else {
-        return null;
-   }
-  };
+    };
 
-  const getListImage = (place) => {
-
-    return place.link;
-
-  };
+    const getListImage = (place) => {
+        return place.link;
+    };
 
   const getNameForPlace = (place) => {
     if (place === selectedPlace){
@@ -289,6 +313,10 @@ const fetchPlaces = async () => {
   };
 
 
+    /**
+     * Funktionen zum Verändern der Position der Map.
+     *
+     */
   const onRegionChangeComplete = (region) => {
     // Update the zoom level whenever the region changes
     setZoomLevel(region.latitudeDelta);
@@ -310,7 +338,10 @@ const fetchPlaces = async () => {
   //console.log(nearestCity.name);
 };
 
-// Function to find the nearest city based on the current region
+    /**
+     * Funktion um nächste Stadt zu finden (Banger Funktion).
+     *
+     */
 const findNearestCity = (region) => {
   let nearestCity = null;
   let minDistance = Infinity;
@@ -370,36 +401,45 @@ const deg2rad = (deg) => {
   return deg * (Math.PI / 180);
 };
 
+
+    /**
+     * Funktion für BottomBar.
+     *
+     */
 const scrollToStart = () => {
   if (scrollViewRef.current) {
     scrollViewRef.current.scrollTo({ x: 0, y: 0, animated: true });
   }
 };
 
+    /**
+     * Funktionen für Suchleiste mit Autocomplete.
+     *
+     */
 const newHandleSearch = () => {
 
     if (selectedCoordinates) {
-                                          setSelectedPlace(null);
-                                          scrollToStart();
-                                                                            if (mapRef) {
-                                                                              mapRef.animateToRegion({
-                                                                                latitude: selectedCoordinates.lat,
-                                                                                longitude: selectedCoordinates.lng,
-                                                                                latitudeDelta: 1, // Hier kannst du die Zoomstufe einstellen
-                                                                                longitudeDelta: 1, // Hier kannst du die Zoomstufe einstellen
-                                                                              }, 1000);
-                                                                            }
-                                                                            const nearestCity = findNearestCity({
-                                                                                                        latitude: selectedCoordinates.lat,
-                                                                                                        longitude: selectedCoordinates.lng,
-                                                                                                        latitudeDelta: 1, // Eine sehr kleine Zahl für einen sehr kleinen Bereich
-                                                                                                        longitudeDelta: 1, // Eine sehr kleine Zahl für einen sehr kleinen Bereich
-                                                                                                          });
-                                                                    //console.log(nearestCity.name);
+        setSelectedPlace(null);
+        scrollToStart();
+        if (mapRef) {
+        mapRef.animateToRegion({
+        latitude: selectedCoordinates.lat,
+        longitude: selectedCoordinates.lng,
+        latitudeDelta: 1, // Hier kannst du die Zoomstufe einstellen
+        longitudeDelta: 1, // Hier kannst du die Zoomstufe einstellen
+        }, 1000);
+        }
+        const nearestCity = findNearestCity({
+        latitude: selectedCoordinates.lat,
+        longitude: selectedCoordinates.lng,
+        latitudeDelta: 1, // Eine sehr kleine Zahl für einen sehr kleinen Bereich
+        longitudeDelta: 1, // Eine sehr kleine Zahl für einen sehr kleinen Bereich
+          });
+        //console.log(nearestCity.name);
 
-                                                                    // Set the searchLocation state to the nearest city
-                                                                    setSearchResult(nearestCity);
-                                                                    //console.log(searchResult);
+        // Set the searchLocation state to the nearest city
+        setSearchResult(nearestCity);
+        //console.log(searchResult);
     } else {
         console.log("ERROR: City not found");
     }
@@ -426,40 +466,44 @@ const newHandleSearch = () => {
 
             //console.log(matchingCountry);
 
-            if (matchingCountry) {
-                    const city = matchingCountry.cities.find(city =>
-                        city.name.toLowerCase() === searchQuery.toLowerCase()
-                    );
-                    //console.log(city);
-                                if (city) {
-                                  setSearchResult(city);
-                                  setSelectedPlace(null);
-                                  scrollToStart();
-                                  const middleCoordinate = findMiddleCoordinate(city.coordinates);
+        if (matchingCountry) {
+        const city = matchingCountry.cities.find(city =>
+        city.name.toLowerCase() === searchQuery.toLowerCase()
+        );
+        //console.log(city);
+        if (city) {
+        setSearchResult(city);
+        setSelectedPlace(null);
+        scrollToStart();
+        const middleCoordinate = findMiddleCoordinate(city.coordinates);
 
-                                  // Animiere die Karte zur Mitte der gesuchten Stadt über einen Zeitraum von 1000 Millisekunden (1 Sekunde)
-                                  if (mapRef) {
-                                    mapRef.animateToRegion({
-                                      latitude: middleCoordinate.latitude,
-                                      longitude: middleCoordinate.longitude,
-                                      latitudeDelta: 1, // Hier kannst du die Zoomstufe einstellen
-                                      longitudeDelta: 1, // Hier kannst du die Zoomstufe einstellen
-                                    }, 1000);
-                                  }
-                                } else {
-                                  setSearchResult(null);
-                                  setSearchLocation(null);
-                                }
-             }
+        // Animiere die Karte zur Mitte der gesuchten Stadt über einen Zeitraum von 1000 Millisekunden (1 Sekunde)
+        if (mapRef) {
+        mapRef.animateToRegion({
+          latitude: middleCoordinate.latitude,
+          longitude: middleCoordinate.longitude,
+          latitudeDelta: 1, // Hier kannst du die Zoomstufe einstellen
+          longitudeDelta: 1, // Hier kannst du die Zoomstufe einstellen
+        }, 1000);
+        }
+        } else {
+        setSearchResult(null);
+        setSearchLocation(null);
+        }
+        }
 
           }
         };
 
-          const handleResetPlaces = () => {
-            setShowBottomLine(false); // Setze den Suchergebnis-Status auf null, um den Inhalt der Leiste zurückzusetzen
-            setSelectedPlace(null);
-          };
+    const handleResetPlaces = () => {
+    setShowBottomLine(false); // Setze den Suchergebnis-Status auf null, um den Inhalt der Leiste zurückzusetzen
+    setSelectedPlace(null);
+    };
 
+    /**
+     * Funktionen zum Favorisieren von Attractions und Zoomen zu Attractions.
+     *
+     */
    const handleMarkerPress = (place) => {
      setSelectedPlace(place);
      if (mapRef) {
@@ -482,20 +526,19 @@ const newHandleSearch = () => {
      };
 
      const isStarred = (place) => {
-
-     return place.favourite;
-
+        return place.favourite;
      };
 
      const handleStarClick = (place) => {
-
         place.toggleFavourite();
         //console.log(place.favourite);
-
         setForceUpdate(prevState => !prevState);
-
      }
 
+    /**
+     * Funktionen zum Öffnen von extra seiten für Attraction Details.
+     *
+     */
        const handlePlaceDetail = (place) => {
          setSelectedPlace(place);
          setShowPlaceDetailModal(true);
@@ -507,7 +550,10 @@ const newHandleSearch = () => {
 
        };
 
-
+    /**
+     * Funktion für API Autocomplete Aufruf.
+     *
+     */
 const fetchCityCoordinates = async (placeId) => {
     try {
       const response = await fetch(`https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=geometry&key=AIzaSyDUMJ0wbXrEYkKY4iN7noJJ7yRp-C86LFU`);
@@ -522,6 +568,11 @@ const fetchCityCoordinates = async (placeId) => {
     }
   };
 
+
+    /**
+     * tatsächliche Komponenten fürs Rendering.
+     *
+     */
  return (
     <View style={styles.container}>
 
@@ -617,7 +668,7 @@ const fetchCityCoordinates = async (placeId) => {
           horizontal
           showsHorizontalScrollIndicator={false}
         >
-          {/* Hier kannst du die Liste der Orte für die gesuchte Stadt anzeigen */}
+          {/*  Liste der Orte für die gesuchte Stadt anzeigen */}
           {showBottomLine && searchResult && searchResult.places.map(place => (
             <TouchableOpacity
               key={place.name}
@@ -689,6 +740,10 @@ const fetchCityCoordinates = async (placeId) => {
   );
 }
 
+    /**
+     * Stylesheet was genutzt wird.
+     *
+     */
 const styles = StyleSheet.create({
   container: {
     flex: 1,
