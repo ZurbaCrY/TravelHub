@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -13,49 +13,72 @@ import {
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Flag from 'react-native-flags';
 import { useDarkMode } from './DarkModeContext';
-import { useNavigation } from '@react-navigation/native'; // Importiere useNavigation
-import AuthService from '../User-Auth/auth'
+import { useNavigation } from '@react-navigation/native';
+import AuthService from '../User-Auth/auth';
 import Button from '../components/Button';
 import { styles } from '../style/styles';
+import { supabase } from '../User-Auth/supabase';
 
 export default function ProfileScreen () {
-  user = AuthService.getUser();
+  const CURRENT_USER = AuthService.getUser();
+  const CURRENT_USER_ID = CURRENT_USER.id;
   const { isDarkMode, toggleDarkMode } = useDarkMode();
   const [visitedCountries, setVisitedCountries] = useState(['Italien', 'Spanien', 'Frankreich']);
-  const [wishListCountries, setWishListCountries] = useState(['Japan', 'Neuseeland', 'Brasilien']);
+  const [wishListCountries, setWishListCountries] = useState([]);
   const [newVisited, setNewVisited] = useState('');
   const [newWishList, setNewWishList] = useState('');
   const [showVisitedInput, setShowVisitedInput] = useState(false);
   const [showWishListInput, setShowWishListInput] = useState(false);
 
-  const navigation = useNavigation(); // Navigation Hook
+  const navigation = useNavigation();
 
-  const addVisitedCountry = () => {
-    if (newVisited) {
-      setVisitedCountries([...visitedCountries, newVisited]);
-      setNewVisited('');
-    }
-    setShowVisitedInput(false);
-  };
+  useEffect(() => {
+    const fetchWishListCountries = async () => {
+      const { data, error } = await supabase
+        .from('DesiredDestinationProfile')
+        .select('country')
+        .eq('user_id', CURRENT_USER_ID)
+        .single();
 
-  const addWishListCountry = () => {
+      if (error && error.code !== 'PGRST116') { // PGRST116 indicates no rows found
+        console.error('Error fetching wishlist countries:', error);
+      } else if (data) {
+        setWishListCountries(data.country || []);
+      }
+    };
+
+    fetchWishListCountries();
+  }, [CURRENT_USER_ID]);
+
+  const addWishListCountry = async () => {
     if (newWishList) {
-      setWishListCountries([...wishListCountries, newWishList]);
+      const updatedWishList = [...wishListCountries, newWishList];
+      setWishListCountries(updatedWishList);
       setNewWishList('');
+
+      const { error } = await supabase
+        .from('DesiredDestinationProfile')
+        .upsert({ user_id: CURRENT_USER_ID, country: updatedWishList }, { onConflict: ['user_id'] });
+
+      if (error) {
+        console.error('Error updating wishlist countries:', error);
+      }
     }
     setShowWishListInput(false);
   };
 
-  const removeVisitedCountry = (index) => {
-    const updatedCountries = [...visitedCountries];
-    updatedCountries.splice(index, 1);
-    setVisitedCountries(updatedCountries);
-  };
-
-  const removeWishListCountry = (index) => {
+  const removeWishListCountry = async (index) => {
     const updatedCountries = [...wishListCountries];
     updatedCountries.splice(index, 1);
     setWishListCountries(updatedCountries);
+
+    const { error } = await supabase
+      .from('DesiredDestinationProfile')
+      .upsert({ user_id: CURRENT_USER_ID, country: updatedCountries }, { onConflict: ['user_id'] });
+
+    if (error) {
+      console.error('Error updating wishlist countries:', error);
+    }
   };
 
   return (
@@ -64,18 +87,18 @@ export default function ProfileScreen () {
       setShowVisitedInput(false);
       setShowWishListInput(false);
     }}>
-      <View style={[styles.containerProfileScreen, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
+      <ScrollView style={[styles.containerProfileScreen, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
         <View style={[styles.profileSection, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF',}]}>
           <Image
             source={{uri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/PICA.jpg/1200px-PICA.jpg'}}
             style={styles.profileImage}
           />
-          <Text style={[styles.name, {color: isDarkMode ? '#FFFDF3' : '#000000'  }]}>{ user.user_metadata.username }</Text>
-          <Text style={[styles.details, {color: isDarkMode ? '#FFFDF3' : '#000000'  }]}>{ user.email }</Text>
+          <Text style={[styles.name, {color: isDarkMode ? '#FFFDF3' : '#000000'  }]}>{ CURRENT_USER.user_metadata.username }</Text>
+          <Text style={[styles.details, {color: isDarkMode ? '#FFFDF3' : '#000000'  }]}>{ CURRENT_USER.email }</Text>
           <View style={styles.row}>
             <Icon name="birthday-cake" size={14} style={[styles.iconRightMargin, , {color: isDarkMode ? '#FFFDF3' : '#000000'  }]} />
             <Text style={[styles.details, , {color: isDarkMode ? '#FFFDF3' : '#000000'  }]}>
-              { user.user_metadata.birthday ?  user.user_metadata.birthday  : 'No birthdate configured'}
+              { CURRENT_USER.user_metadata.birthday ?  CURRENT_USER.user_metadata.birthday  : 'No birthdate configured'}
             </Text>
           </View>
           <View style={styles.row}>
@@ -102,7 +125,7 @@ export default function ProfileScreen () {
                 placeholder="Neues Ziel hinzufügen"
                 placeholderTextColor="#cccccc"
               />
-              <Button onPress={addWishListCountry} color="#58CFEC">Hinzufügen</Button>
+              <Button onPress={addVisitedCountry} color="#58CFEC">Hinzufügen</Button>
             </>
           )}
           {!showVisitedInput && (
@@ -114,21 +137,25 @@ export default function ProfileScreen () {
         </View>
         <View style={styles.infoSection}>
           <Text style={styles.header}>Wunschreiseziele:</Text>
-          {wishListCountries.map((country, index) => (
-            <View key={index} style={styles.countryItem}>
-              <Text style={styles.details}>{country}</Text>
-              <TouchableOpacity onPress={() => removeWishListCountry(index)} style={styles.removeButton}>
-                <Icon name="trash" size={20} color="#FFFDF3" />
-              </TouchableOpacity>
-            </View>
-          ))}
+          {wishListCountries.length === 0 ? (
+            <Text style={styles.details}>Keine Wunschziele hinzugefügt</Text>
+          ) : (
+            wishListCountries.map((country, index) => (
+              <View key={index} style={styles.countryItem}>
+                <Text style={styles.details}>{country}</Text>
+                <TouchableOpacity onPress={() => removeWishListCountry(index)} style={styles.removeButton}>
+                  <Icon name="trash" size={20} color="#FFFDF3" />
+                </TouchableOpacity>
+              </View>
+            ))
+          )}
           {showWishListInput && (
             <>
               <TextInput
                 style={styles.input}
                 onChangeText={setNewWishList}
                 value={newWishList}
-                placeholder=""
+                placeholder="Neues Wunschziel hinzufügen"
                 placeholderTextColor="#cccccc"
               />
               <Button onPress={addWishListCountry} color="#58CFEC">Hinzufügen</Button>
@@ -142,13 +169,11 @@ export default function ProfileScreen () {
           )}
         </View>
         <View style={[styles.container]}>
-        <TouchableOpacity
-          onPress={() => navigation.navigate('Settings')} >
-          <Button mode="contained"> Zu den Einstellungen</Button>
-        </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
+            <Button mode="contained"> Zu den Einstellungen</Button>
+          </TouchableOpacity>
         </View>
-        </View>
+      </ScrollView>
     </TouchableWithoutFeedback>
   );
 };
-
