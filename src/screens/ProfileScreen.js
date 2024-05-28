@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -6,7 +6,6 @@ import {
   StyleSheet,
   ScrollView,
   TextInput,
-  Button,
   TouchableOpacity,
   Keyboard,
   TouchableWithoutFeedback,
@@ -14,61 +13,252 @@ import {
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Flag from 'react-native-flags';
 import { useDarkMode } from './DarkModeContext';
-import { useNavigation } from '@react-navigation/native'; // Importiere useNavigation
-import AuthService from '../User-Auth/auth'
+import { useNavigation } from '@react-navigation/native';
+import AuthService from '../User-Auth/auth';
+import Button from '../components/Button';
+import { styles } from '../style/styles';
+import { supabase } from '../User-Auth/supabase';
 
 export default function ProfileScreen() {
+<<<<<<< HEAD
   user = AuthService.getUser();
+=======
+  const CURRENT_USER = AuthService.getUser();
+  const CURRENT_USER_ID = CURRENT_USER.id;
+>>>>>>> ec26d2c5e9b5247ea177365d15c577e37b241711
   const { isDarkMode, toggleDarkMode } = useDarkMode();
-  const [visitedCountries, setVisitedCountries] = useState(['Italien', 'Spanien', 'Frankreich']);
-  const [wishListCountries, setWishListCountries] = useState(['Japan', 'Neuseeland', 'Brasilien']);
+  const [visitedCountries, setVisitedCountries] = useState([]);
+  const [wishListCountries, setWishListCountries] = useState([]);
   const [newVisited, setNewVisited] = useState('');
   const [newWishList, setNewWishList] = useState('');
   const [showVisitedInput, setShowVisitedInput] = useState(false);
   const [showWishListInput, setShowWishListInput] = useState(false);
 
-  const navigation = useNavigation(); // Navigation Hook
+  const navigation = useNavigation();
 
-  const addVisitedCountry = () => {
+  // Lädt die besuchten Länder und Wunschländer, wenn die Komponente geladen wird
+  useEffect(() => {
+    const fetchVisitedCountries = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('Visited Countries')
+          .select(`
+            Country_ID,
+            verified,
+            Country (Countryname)
+          `)
+          .eq('user_id', CURRENT_USER_ID);
+
+        if (error) {
+          throw error;
+        }
+
+        // Formatiert die Daten in ein passendes Format für die Anzeige
+        const countries = data.map(item => ({
+          name: item.Country.Countryname,
+          verified: item.verified
+        }));
+        setVisitedCountries(countries);
+      } catch (error) {
+        console.error('Error fetching visited countries:', error);
+      }
+    };
+
+    const fetchWishListCountries = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('DesiredDestinationProfile')
+          .select('country')
+          .eq('user_id', CURRENT_USER_ID)
+          .single();
+
+        if (error && error.code !== 'PGRST116') { // PGRST116 bedeutet, dass keine Zeilen gefunden wurden
+          throw error;
+        }
+
+        setWishListCountries(data ? data.country : []);
+      } catch (error) {
+        console.error('Error fetching wishlist countries:', error);
+      }
+    };
+
+    fetchVisitedCountries();
+    fetchWishListCountries();
+  }, [CURRENT_USER_ID]);
+
+  // Überprüft, ob das Land in der Tabelle "Country" existiert
+  const validateCountry = async (countryName) => {
+    try {
+      const { data, error } = await supabase
+        .from('Country')
+        .select('Country_ID')
+        .ilike('Countryname', countryName);
+
+      if (error || !data || data.length === 0) {
+        throw error || new Error('Country not found');
+      }
+
+      return data[0].Country_ID;
+    } catch (error) {
+      console.error('Error validating country:', error);
+      return null;
+    }
+  };
+
+  // Fügt ein neues Land zu den besuchten Ländern hinzu
+  const addVisitedCountry = async () => {
     if (newVisited) {
-      setVisitedCountries([...visitedCountries, newVisited]);
+      // Überprüft, ob das Land bereits in der Liste der besuchten Länder enthalten ist
+      if (visitedCountries.some(country => country.name.toLowerCase() === newVisited.toLowerCase())) {
+        alert('Das Land ist bereits in der Liste der besuchten Länder.');
+        return;
+      }
+
+      const countryId = await validateCountry(newVisited);
+
+      if (!countryId) {
+        alert('Das eingegebene Land ist nicht in der Tabelle "Country" vorhanden.');
+        return;
+      }
+
+      const updatedVisited = [...visitedCountries, { name: newVisited, verified: false }];
+      setVisitedCountries(updatedVisited);
       setNewVisited('');
+
+      try {
+        const { error } = await supabase
+          .from('Visited Countries')
+          .insert({
+            user_id: CURRENT_USER_ID,
+            Country_ID: countryId,
+            verified: false
+          });
+
+        if (error) {
+          throw error;
+        }
+      } catch (error) {
+        console.error('Error adding visited country:', error);
+      }
     }
     setShowVisitedInput(false);
   };
 
-  const addWishListCountry = () => {
+  // Fügt ein neues Land zur Wunschliste hinzu
+  const addWishListCountry = async () => {
     if (newWishList) {
-      setWishListCountries([...wishListCountries, newWishList]);
+      // Überprüft, ob das Land bereits in der Wunschliste enthalten ist
+      if (wishListCountries.some(country => country.toLowerCase() === newWishList.toLowerCase())) {
+        alert('Das Land ist bereits in der Wunschliste.');
+        return;
+      }
+
+      const countryId = await validateCountry(newWishList);
+
+      if (!countryId) {
+        alert('Das eingegebene Land ist nicht in der Tabelle "Country" vorhanden.');
+        return;
+      }
+
+      const updatedWishList = [...wishListCountries, newWishList];
+      setWishListCountries(updatedWishList);
       setNewWishList('');
+
+      try {
+        const { error } = await supabase
+          .from('DesiredDestinationProfile')
+          .upsert({ user_id: CURRENT_USER_ID, country: updatedWishList }, { onConflict: ['user_id'] });
+
+        if (error) {
+          throw error;
+        }
+      } catch (error) {
+        console.error('Error updating wishlist countries:', error);
+      }
     }
     setShowWishListInput(false);
   };
 
-  const removeVisitedCountry = (index) => {
+  // Entfernt ein Land aus den besuchten Ländern
+  const removeVisitedCountry = async (index) => {
+    const countryToRemove = visitedCountries[index];
     const updatedCountries = [...visitedCountries];
     updatedCountries.splice(index, 1);
     setVisitedCountries(updatedCountries);
+
+    try {
+      const { data, error } = await supabase
+        .from('Country')
+        .select('Country_ID')
+        .ilike('Countryname', countryToRemove.name);
+
+      if (error || !data || data.length === 0) {
+        throw error || new Error('Country not found');
+      }
+
+      const { error: deleteError } = await supabase
+        .from('Visited Countries')
+        .delete()
+        .eq('user_id', CURRENT_USER_ID)
+        .eq('Country_ID', data[0].Country_ID);
+
+      if (deleteError) {
+        throw deleteError;
+      }
+    } catch (error) {
+      console.error('Error deleting visited country:', error);
+    }
   };
 
-  const removeWishListCountry = (index) => {
+  // Entfernt ein Land aus der Wunschliste
+  const removeWishListCountry = async (index) => {
     const updatedCountries = [...wishListCountries];
     updatedCountries.splice(index, 1);
     setWishListCountries(updatedCountries);
+
+    try {
+      if (updatedCountries.length === 0) {
+        const { error } = await supabase
+          .from('DesiredDestinationProfile')
+          .delete()
+          .eq('user_id', CURRENT_USER_ID);
+
+        if (error) {
+          throw error;
+        }
+      } else {
+        const { error } = await supabase
+          .from('DesiredDestinationProfile')
+          .upsert({ user_id: CURRENT_USER_ID, country: updatedCountries }, { onConflict: ['user_id'] });
+
+        if (error) {
+          throw error;
+        }
+      }
+    } catch (error) {
+      console.error('Error updating wishlist countries:', error);
+    }
   };
 
   return (
     <TouchableWithoutFeedback onPress={() => {
+      // Schließt die Tastatur, wenn der Benutzer außerhalb der Eingabefelder tippt
       Keyboard.dismiss();
       setShowVisitedInput(false);
       setShowWishListInput(false);
     }}>
+<<<<<<< HEAD
       <ScrollView style={[styles.container, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
         <View style={[styles.profileSection, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF', }]}>
+=======
+      <ScrollView style={[styles.containerProfileScreen, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
+        <View style={[styles.profileSection, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF',}]}>
+>>>>>>> ec26d2c5e9b5247ea177365d15c577e37b241711
           <Image
             source={{ uri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/PICA.jpg/1200px-PICA.jpg' }}
             style={styles.profileImage}
           />
+<<<<<<< HEAD
           <Text style={[styles.name, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>
             {user.user_metadata.username ? user.user_metadata.username : 'Usernamen Festlegen'}
           </Text>
@@ -77,23 +267,42 @@ export default function ProfileScreen() {
             <Icon name="birthday-cake" size={14} style={[styles.iconRightMargin, , { color: isDarkMode ? '#FFFDF3' : '#000000' }]} />
             <Text style={[styles.details, , { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>
               {user.user_metadata.birthday ? user.user_metadata.birthday : 'No birthdate configured'}
+=======
+          <Text style={[styles.name, {color: isDarkMode ? '#FFFDF3' : '#000000'  }]}>{ CURRENT_USER.user_metadata.username }</Text>
+          <Text style={[styles.details, {color: isDarkMode ? '#FFFDF3' : '#000000'  }]}>{ CURRENT_USER.email }</Text>
+          <View style={styles.row}>
+            <Icon name="birthday-cake" size={14} style={[styles.iconRightMargin, {color: isDarkMode ? '#FFFDF3' : '#000000'  }]} />
+            <Text style={[styles.details, {color: isDarkMode ? '#FFFDF3' : '#000000'  }]}>
+              { CURRENT_USER.user_metadata.birthday ?  CURRENT_USER.user_metadata.birthday  : 'No birthdate configured'}
+>>>>>>> ec26d2c5e9b5247ea177365d15c577e37b241711
             </Text>
           </View>
           <View style={styles.row}>
             <Flag code="DE" size={16} style={styles.iconRightMargin} />
+<<<<<<< HEAD
             <Text style={[styles.details, , { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>Deutschland</Text>
+=======
+            <Text style={[styles.details, {color: isDarkMode ? '#FFFDF3' : '#000000'  }]}>Deutschland</Text>
+>>>>>>> ec26d2c5e9b5247ea177365d15c577e37b241711
           </View>
         </View>
         <View style={styles.infoSection}>
           <Text style={styles.header}>Bereits besuchte Länder:</Text>
-          {visitedCountries.map((country, index) => (
-            <View key={index} style={styles.countryItem}>
-              <Text style={styles.details}>{country}</Text>
-              <TouchableOpacity onPress={() => removeVisitedCountry(index)} style={styles.removeButton}>
-                <Icon name="trash" size={20} color="#FFFDF3" />
-              </TouchableOpacity>
-            </View>
-          ))}
+          {visitedCountries.length === 0 ? (
+            <Text style={styles.details}>Keine besuchten Länder hinzugefügt</Text>
+          ) : (
+            visitedCountries.map((country, index) => (
+              <View key={index} style={styles.countryItem}>
+                <View style={localStyles.countryTextContainer}>
+                  <Text style={styles.details}>{country.name}</Text>
+                  {country.verified && <Icon name="check-circle" size={16} color="green" style={localStyles.verifiedIcon} />}
+                </View>
+                <TouchableOpacity onPress={() => removeVisitedCountry(index)} style={styles.removeButton}>
+                  <Icon name="trash" size={20} color="#FFFDF3" />
+                </TouchableOpacity>
+              </View>
+            ))
+          )}
           {showVisitedInput && (
             <>
               <TextInput
@@ -103,7 +312,7 @@ export default function ProfileScreen() {
                 placeholder="Neues Ziel hinzufügen"
                 placeholderTextColor="#cccccc"
               />
-              <Button title="Hinzufügen" onPress={addVisitedCountry} color="#58CFEC" />
+              <Button onPress={addVisitedCountry} color="#58CFEC">Hinzufügen</Button>
             </>
           )}
           {!showVisitedInput && (
@@ -115,14 +324,18 @@ export default function ProfileScreen() {
         </View>
         <View style={styles.infoSection}>
           <Text style={styles.header}>Wunschreiseziele:</Text>
-          {wishListCountries.map((country, index) => (
-            <View key={index} style={styles.countryItem}>
-              <Text style={styles.details}>{country}</Text>
-              <TouchableOpacity onPress={() => removeWishListCountry(index)} style={styles.removeButton}>
-                <Icon name="trash" size={20} color="#FFFDF3" />
-              </TouchableOpacity>
-            </View>
-          ))}
+          {wishListCountries.length === 0 ? (
+            <Text style={styles.details}>Keine Wunschziele hinzugefügt</Text>
+          ) : (
+            wishListCountries.map((country, index) => (
+              <View key={index} style={styles.countryItem}>
+                <Text style={styles.details}>{country}</Text>
+                <TouchableOpacity onPress={() => removeWishListCountry(index)} style={styles.removeButton}>
+                  <Icon name="trash" size={20} color="#FFFDF3" />
+                </TouchableOpacity>
+              </View>
+            ))
+          )}
           {showWishListInput && (
             <>
               <TextInput
@@ -132,7 +345,7 @@ export default function ProfileScreen() {
                 placeholder="Neues Wunschziel hinzufügen"
                 placeholderTextColor="#cccccc"
               />
-              <Button title="Hinzufügen" onPress={addWishListCountry} color="#58CFEC" />
+              <Button onPress={addWishListCountry} color="#58CFEC">Hinzufügen</Button>
             </>
           )}
           {!showWishListInput && (
@@ -142,104 +355,24 @@ export default function ProfileScreen() {
             </TouchableOpacity>
           )}
         </View>
-        {/* Hinzufügung des Navigation Buttons */}
-        <TouchableOpacity
-          onPress={() => navigation.navigate('Settings')}
-          style={styles.navButton}
-        >
-          <Text style={styles.navButtonText}>Zu den Einstellungen</Text>
-        </TouchableOpacity>
+        <View style={[styles.infoSection, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
+          <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
+            <Button mode="contained"> 
+            Zu den Einstellungen
+            </Button>
+          </TouchableOpacity>
+        </View>
       </ScrollView>
     </TouchableWithoutFeedback>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  profileSection: {
-    alignItems: 'center',
-    marginVertical: 20,
-  },
-  profileImage: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    borderColor: '#3EAAE9',
-    borderWidth: 3,
-  },
-  name: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginTop: 10,
-  },
-  details: {
-    fontSize: 16,
-    marginVertical: 2,
-  },
-  header: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#58CFEC',
-    marginLeft: 10,
-  },
-  infoSection: {
-    backgroundColor: '#3D52D5',
-    marginHorizontal: 10,
-    padding: 10,
-    borderRadius: 10,
-    marginTop: 10,
-  },
-  input: {
-    backgroundColor: '#FFFDF3',
-    color: '#070A0F',
-    padding: 10,
-    marginVertical: 10,
-    borderRadius: 5,
-    fontSize: 16,
-  },
-  addButton: {
+const localStyles = StyleSheet.create({
+  countryTextContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 10,
   },
-  addButtonText: {
-    fontSize: 16,
-    color: '#FFFDF3',
-  },
-  countryItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 5,
-    marginLeft: 10,
-  },
-  removeButton: {
-    padding: 5,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: 2,
-  },
-  iconRightMargin: {
-    marginRight: 5,
-  },
-  navButton: {
-    backgroundColor: '#3D52D5',
-    padding: 15,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginVertical: 10,
-    marginLeft: 10,
-    marginRight: 10,
-  },
-  navButtonText: {
-    color: '#FFFDF3',
-    fontSize: 18,
+  verifiedIcon: {
+    marginLeft: 5,
   },
 });
-
