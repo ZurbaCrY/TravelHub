@@ -6,7 +6,6 @@ import {
   StyleSheet,
   ScrollView,
   TextInput,
-  Button,
   TouchableOpacity,
   Keyboard,
   TouchableWithoutFeedback,
@@ -16,6 +15,8 @@ import Flag from 'react-native-flags';
 import { useDarkMode } from './DarkModeContext';
 import { useNavigation } from '@react-navigation/native'; // Importiere useNavigation
 import AuthService from '../User-Auth/auth'
+import Button from '../components/Button';
+import { styles } from '../style/styles';
 
 export default function ProfileScreen () {
   user = AuthService.getUser();
@@ -63,7 +64,7 @@ export default function ProfileScreen () {
       setShowVisitedInput(false);
       setShowWishListInput(false);
     }}>
-      <ScrollView style={[styles.container, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
+      <View style={[styles.containerProfileScreen, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
         <View style={[styles.profileSection, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF',}]}>
           <Image
             source={{uri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/PICA.jpg/1200px-PICA.jpg'}}
@@ -101,7 +102,7 @@ export default function ProfileScreen () {
                 placeholder="Neues Ziel hinzufügen"
                 placeholderTextColor="#cccccc"
               />
-              <Button title="Hinzufügen" onPress={addVisitedCountry} color="#58CFEC" />
+              <Button onPress={addWishListCountry} color="#58CFEC">Hinzufügen</Button>
             </>
           )}
           {!showVisitedInput && (
@@ -127,10 +128,10 @@ export default function ProfileScreen () {
                 style={styles.input}
                 onChangeText={setNewWishList}
                 value={newWishList}
-                placeholder="Neues Wunschziel hinzufügen"
+                placeholder=""
                 placeholderTextColor="#cccccc"
               />
-              <Button title="Hinzufügen" onPress={addWishListCountry} color="#58CFEC" />
+              <Button onPress={addWishListCountry} color="#58CFEC">Hinzufügen</Button>
             </>
           )}
           {!showWishListInput && (
@@ -140,104 +141,14 @@ export default function ProfileScreen () {
             </TouchableOpacity>
           )}
         </View>
-        {/* Hinzufügung des Navigation Buttons */}
+        <View style={[styles.container]}>
         <TouchableOpacity
-          onPress={() => navigation.navigate('Settings')}
-          style={styles.navButton}
-        >
-          <Text style={styles.navButtonText}>Zu den Einstellungen</Text>
+          onPress={() => navigation.navigate('Settings')} >
+          <Button mode="contained"> Zu den Einstellungen</Button>
         </TouchableOpacity>
-      </ScrollView>
+        </View>
+        </View>
     </TouchableWithoutFeedback>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  profileSection: {
-    alignItems: 'center',
-    marginVertical: 20,
-  },
-  profileImage: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    borderColor: '#3EAAE9',
-    borderWidth: 3,
-  },
-  name: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginTop: 10,
-  },
-  details: {
-    fontSize: 16,
-    marginVertical: 2,
-  },
-  header: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#58CFEC',
-    marginLeft: 10,
-  },
-  infoSection: {
-    backgroundColor: '#3D52D5',
-    marginHorizontal: 10,
-    padding: 10,
-    borderRadius: 10,
-    marginTop: 10,
-  },
-  input: {
-    backgroundColor: '#FFFDF3',
-    color: '#070A0F',
-    padding: 10,
-    marginVertical: 10,
-    borderRadius: 5,
-    fontSize: 16,
-  },
-  addButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 10,
-  },
-  addButtonText: {
-    fontSize: 16,
-    color: '#FFFDF3',
-  },
-  countryItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 5,
-    marginLeft: 10,
-  },
-  removeButton: {
-    padding: 5,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: 2,
-  },
-  iconRightMargin: {
-    marginRight: 5,
-  },
-  navButton: {
-    backgroundColor: '#3D52D5',
-    padding: 15,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginVertical: 10,
-    marginLeft: 10,
-    marginRight: 10,
-  },
-  navButtonText: {
-    color: '#FFFDF3',
-    fontSize: 18,
-  },
-});
 
