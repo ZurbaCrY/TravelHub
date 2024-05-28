@@ -11,6 +11,7 @@ import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplet
 import { Button } from 'react-native-paper'
 import { createClient } from '@supabase/supabase-js';
 import { supabase } from '../User-Auth/supabase';
+import AuthService from '../User-Auth/auth';
 
 const { width } = Dimensions.get('window');
 
@@ -126,7 +127,8 @@ export default function MapScreen() {
   const [selectedCoordinates, setSelectedCoordinates] = useState(null);
   const [continentsData, setContinentsData] = useState([]);
 
-
+const CURRENT_USER = AuthService.getUser();
+const CURRENT_USER_ID = CURRENT_USER.id;
   /**
    * Use Effect Methoden für erstmaliges Aufrufen - Laden der Karte und Daten aus DB.
    * Aktualisieren der Position und der nächstliegenden Stadt
@@ -254,7 +256,61 @@ export default function MapScreen() {
                               longitudeDelta: 0.0421,
                             }));
       console.log("folgendes Land wurde besucht: " + country.countryId);
-    }
+      updateOrCreateVisitedCountry(country.countryId, CURRENT_USER_ID);
+    };
+
+   const updateOrCreateVisitedCountry = async (countryId, userId) => {
+     try {
+       // Überprüfe, ob ein Eintrag für die gegebene Country_ID und user_id existiert
+       const { data, error } = await supabase
+         .from('Visited Countries')
+         .select('VisitedCountries_ID, verified')
+         .eq('Country_ID', countryId)
+         .eq('user_id', userId)
+         .single();
+
+       if (error && error.code !== 'PGRST116') { // PGRST116: Single row expected, multiple rows found
+         throw error;
+       }
+
+       if (data) {
+         // Eintrag existiert bereits, überprüfe den Wert von verified
+         if (data.verified) {
+           // Wenn verified bereits true ist, gib den bestehenden Eintrag zurück
+           return data;
+         }
+
+         // Setze verified auf true, da es noch nicht true ist
+         const { data: updatedEntry, error: updateError } = await supabase
+           .from('Visited Countries')
+           .update({ verified: true })
+           .eq('VisitedCountries_ID', data.VisitedCountries_ID)
+           .select();
+
+         if (updateError) {
+           throw updateError;
+         }
+
+         return updatedEntry;
+       } else {
+         // Eintrag existiert nicht, erstelle einen neuen Eintrag
+         const { data: newEntry, error: insertError } = await supabase
+           .from('Visited Countries')
+           .insert([{ Country_ID: countryId, user_id: userId, verified: true }])
+           .select();
+
+         if (insertError) {
+           throw insertError;
+         }
+
+         return newEntry;
+       }
+     } catch (error) {
+       console.error('Fehler beim Aktualisieren oder Erstellen des Eintrags:', error.message);
+       return null;
+     }
+   };
+
 
   /**
    * Funktionen zum rendern der Details auf der Map.
