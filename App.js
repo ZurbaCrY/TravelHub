@@ -37,16 +37,17 @@ function MainTabs() {
         tabBarStyle: { backgroundColor: "#3EAAE9" },
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
-          if (route.name === "HomeScreen") {
-            iconName = "home";
-          } else if (route.name === "CommunityScreen") {
+          // if (route.name === "HomeScreen") {
+          //   iconName = "home";
+          // } else 
+          if (route.name === "Map") {
+          iconName = "map-marker-alt";
+          } else if (route.name === "Community") {
             iconName = "users";
-          } else if (route.name === "MapScreen") {
-            iconName = "map-marker-alt";
-          } else if (route.name === "ProfileScreen") {
-            iconName = "user";
-          } else if (route.name === "ChatListScreen") {
+          } else if (route.name === "Chats") {
             iconName = "comments";
+          } else if (route.name === "Profile") {
+            iconName = "user";
           }
           return (
             <Animated.View
@@ -62,11 +63,11 @@ function MainTabs() {
         headerShown: false,
       })}
     >
-      <Tab.Screen name="HomeScreen" component={HomeScreen} />
-      <Tab.Screen name="MapScreen" component={MapScreen} />
-      <Tab.Screen name="CommunityScreen" component={CommunityScreen} />
-      <Tab.Screen name="ChatListScreen" component={ChatListScreen} />
-      <Tab.Screen name="ProfileScreen" component={ProfileScreen} />
+      {/* <Tab.Screen name="HomeScreen" component={HomeScreen} /> */}
+      <Tab.Screen name="Map" component={MapScreen} />
+      <Tab.Screen name="Community" component={CommunityScreen} />
+      <Tab.Screen name="Chats" component={ChatListScreen} />
+      <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>
   );
 }

@@ -8,17 +8,7 @@ class AuthService {
     this.user = null;
     this.loadUser();
 
-    // AppState.addEventListener("change", (this.handleAppStateChange))
   }
-
-  // handleAppStateChange = (state) => {
-  //   if (state === "active") {
-  //     this.supabase.auth.startAutoRefresh();
-  //     this.update();
-  //   } else {
-  //     this.supabase.auth.stopAutoRefresh();
-  //   }
-  // }
 
   async loadUser() {
     try {
