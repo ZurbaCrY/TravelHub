@@ -26,4 +26,4 @@ jobs:
       run: |
         npm install
         npm install -g expo-cli
-        grunt
+        npm run lint
