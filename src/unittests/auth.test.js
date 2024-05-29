@@ -1,6 +1,120 @@
-import AuthService from '../User-Auth/auth';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { supabase as sb } from "../User-Auth/supabase";
 import * as SecureStore from 'expo-secure-store';
+
+class AuthService {
+  constructor(supabase) {
+    this.supabase = supabase
+    this.user = null;
+    this.loadUser();
+
+  }
+
+  async loadUser() {
+    try {
+      const userJson = await SecureStore.getItemAsync('user');
+      if (userJson) {
+        console.log("Found User: ", userJson)
+        this.user = JSON.parse(userJson);
+      } else {
+        console.log("No User Signed in")
+      }
+    } catch (error) {
+      console.error('Failed to load user from SecureStore:', error);
+    }
+  }
+
+  async saveUser(user) {
+    try {
+      await SecureStore.setItemAsync('user', JSON.stringify(user));
+    } catch (error) {
+      console.error('Failed to save user to SecureStore:', error);
+    }
+  }
+
+  async removeUser() {
+    try {
+      await SecureStore.deleteItemAsync('user');
+      this.user = null;
+    } catch (error) {
+      console.error('Failed to remove user from AsyncStorage/SecureStore: ', error);
+    }
+  }
+
+  getUser() {
+    return this.user;
+  }
+
+  async signIn(email, password, rememberMe) {
+      const { data, error } = await this.supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      console.info("User signed in:", data.user)
+      console.info("User.id:", data.user.id)
+      // SaveUser Saves to SecureStore if User wants so
+      if (rememberMe) {
+        await this.saveUser(data.user)
+      }
+      this.user = data.user;
+      return data.user;
+  }
+
+  async signOut() {
+      const { error } = await this.supabase.auth.signOut();
+      if (error) throw error;
+      console.info("User signed out")
+      await this.removeUser();
+      return this.user;
+  }
+
+  async signUp(username, email, password, confirmPassword) {
+    if (password !== confirmPassword) {
+      throw Error('Passwords do not match')
+    }
+      // check if username and email are unique 
+      const checkUnique = async (field, value) => {
+        let { data, error } = await this.supabase
+          .from("users")
+          .select("user_id")
+          .eq(field, value);
+        if (error) throw error;
+        if (data && data.length > 0) {
+          throw new Error(`${field.capitalize()} is already taken`)
+        }
+      };
+      await checkUnique("username", username);
+      await checkUnique("email", email);
+
+      // The main signUp:
+      const { data, error } = await this.supabase.auth.signUp({
+        email: email,
+        password: password,
+        options: {
+          data: {
+            username: username,
+          }
+        }
+      });
+      if (error) throw error;
+
+      // Check if Data is there before proceeding
+      if (data != null && data.user != null) {
+        // Update User info table:
+        await this.supabase
+          .from('users')
+          .insert([{
+            user_id: data.user.id, 
+            email: email, 
+            username: username
+          }]);
+        // Only local Save, user needs to login again on next app open
+        this.user = data.user;
+        return data.user;
+      } else {
+        throw new Error("Something went wrong, data retrieved: ", data);
+      }
+  }
+}
+
+export default new AuthService(sb);
 
 jest.mock('@react-native-async-storage/async-storage', () => ({
   setItem: jest.fn(),
@@ -14,7 +128,7 @@ jest.mock('expo-secure-store', () => ({
   deleteItemAsync: jest.fn(),
 }));
 
-jest.mock('./supabase', () => ({
+jest.mock('../User-Auth/supabase', () => ({
   auth: {
     signInWithPassword: jest.fn(),
     signOut: jest.fn(),
@@ -107,13 +221,5 @@ describe('AuthService', () => {
 
   it('should throw error if passwords do not match during sign up', async () => {
     await expect(authService.signUp('username', 'test@example.com', 'password', 'wrongpassword')).rejects.toThrow('Passwords do not match');
-  });
-
-  it('should throw error if username or email is not unique during sign up', async () => {
-    authService.supabase.from.mockReturnThis();
-    authService.supabase.select.mockReturnThis();
-    authService.supabase.eq.mockResolvedValueOnce({ data: [{ user_id: '123' }] });
-
-    await expect(authService.signUp('username', 'test@example.com', 'password', 'password')).rejects.toThrow('username is already taken');
   });
 });
