@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { View, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
+import { View, TouchableOpacity } from 'react-native';
 import { Input, Text } from 'react-native-elements';
 import { styles } from '../style/styles';
 import Button from '../components/Button';
 import AuthService from '../User-Auth/auth';
+import PropTypes from 'prop-types';
 
 const SignUpScreen = ({ navigation, setUser, setLoading }) => {
   const [username, setUsername] = useState('');
@@ -83,5 +84,11 @@ const SignUpScreen = ({ navigation, setUser, setLoading }) => {
     </View>
   );
 }
+
+SignUpScreen.propTypes = {
+  navigation: PropTypes.object.isRequired,
+  setUser: PropTypes.func.isRequired,
+  setLoading: PropTypes.func.isRequired
+};
 
 export default SignUpScreen;

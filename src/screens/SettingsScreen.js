@@ -1,10 +1,10 @@
-
 import React, { useState } from 'react';
-import { View, Text, Switch, StyleSheet, } from 'react-native';
+import { View, Text, StyleSheet, } from 'react-native';
 import { useDarkMode } from './DarkModeContext';
 import Button from '../components/Button';
 import AuthService from '../User-Auth/auth'
 import AnimatedSwitch from '../components/AnimatedSwitch';
+import PropTypes from 'prop-types';
 
 const SettingsScreen = ({ setUser, setLoading }) => {
   const { isDarkMode, toggleDarkMode } = useDarkMode(); // Verwende den globalen Dark Mode State
@@ -15,8 +15,6 @@ const SettingsScreen = ({ setUser, setLoading }) => {
       setLoading(true, "Signing Out");
       const user = await AuthService.signOut();
       setUser(user);
-    } catch (error) {
-      throw error;
     } finally {
       setLoading(false);
     }
@@ -49,6 +47,11 @@ const SettingsScreen = ({ setUser, setLoading }) => {
       </View>
     </View>
   );
+};
+
+SettingsScreen.propTypes = {
+  setUser: PropTypes.func.isRequired,
+  setLoading: PropTypes.func.isRequired,
 };
 
 const styles = StyleSheet.create({

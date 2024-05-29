@@ -22,7 +22,7 @@ import { supabase } from '../User-Auth/supabase';
 export default function ProfileScreen() {
   const CURRENT_USER = AuthService.getUser();
   const CURRENT_USER_ID = CURRENT_USER.id;
-  const { isDarkMode, toggleDarkMode } = useDarkMode();
+  const { isDarkMode } = useDarkMode();
   const [visitedCountries, setVisitedCountries] = useState([]);
   const [wishListCountries, setWishListCountries] = useState([]);
   const [newVisited, setNewVisited] = useState('');

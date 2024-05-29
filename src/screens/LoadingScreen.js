@@ -1,5 +1,7 @@
 import React from 'react';
 import { Text, View, ActivityIndicator, StyleSheet } from 'react-native';
+import PropTypes from 'prop-types';
+
 
 const LoadingScreen = ({ loadingMessage }) => {
   return (
@@ -8,6 +10,10 @@ const LoadingScreen = ({ loadingMessage }) => {
       <Text>{loadingMessage}</Text>
     </View>
   );
+};
+
+LoadingScreen.propTypes = {
+  loadingMessage: PropTypes.string.isRequired,
 };
 
 const styles = StyleSheet.create({

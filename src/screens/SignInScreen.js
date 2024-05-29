@@ -10,6 +10,7 @@ import { styles } from '../style/styles';
 import Button from "../components/Button";
 import AuthService from "../User-Auth/auth"
 import AnimatedSwitch from "../components/AnimatedSwitch";
+import PropTypes from 'prop-types';
 
 const SignInScreen = ({ navigation, setUser, setLoading }) => {
   const [email, setEmail] = useState("");
@@ -41,7 +42,7 @@ const SignInScreen = ({ navigation, setUser, setLoading }) => {
       <Text style={styles.title}>Login</Text>
       <TouchableOpacity style={styles.authSwitchTouchable} onPress={authSwitchToSignUp}>
         <Text style={styles.switchText}>
-          Don't have an account? Sign Up instead
+          Dont have an account? Sign Up instead
         </Text>
       </TouchableOpacity>
       <View style={styles.inputView}>
@@ -86,5 +87,11 @@ const SignInScreen = ({ navigation, setUser, setLoading }) => {
     </View>
   );
 }
+
+SignInScreen.propTypes = {
+  navigation: PropTypes.object.isRequired,
+  setUser: PropTypes.func.isRequired,
+  setLoading: PropTypes.func.isRequired
+};
 
 export default SignInScreen;

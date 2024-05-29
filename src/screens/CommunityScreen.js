@@ -1,6 +1,6 @@
 import 'react-native-url-polyfill/auto';
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, TextInput, Button, Image, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TextInput, Image, TouchableOpacity } from 'react-native';
 import { useDarkMode } from './DarkModeContext';
 import { supabase } from '../User-Auth/supabase';
 import * as ImagePicker from 'expo-image-picker';

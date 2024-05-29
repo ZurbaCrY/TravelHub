@@ -22,9 +22,6 @@ export const styles = StyleSheet.create({
     width: "80%",
     marginBottom: 20,
   },
-  input: {
-    marginBottom: 15,
-  },
   rememberView: {
     width: "80%",
     flexDirection: "row",
@@ -101,6 +98,7 @@ export const styles = StyleSheet.create({
     marginTop: 10,
   },
   input: {
+    marginBottom: 15,
     backgroundColor: '#FFFDF3',
     color: '#070A0F',
     padding: 10,

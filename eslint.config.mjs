@@ -19,6 +19,15 @@ export default [
     ignores: [
       "node_modules/",
       "src/archive/",
+      "src/unittests/",
+      "src/screens/MapScreen.js"
     ],
   },
+  {
+    settings: {
+      react: {
+        version: "detect"
+      }
+    }
+  }
 ];

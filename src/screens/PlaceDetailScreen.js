@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, Modal, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import PropTypes from 'prop-types';
 
 const PlaceDetailModal = ({ visible, place, onClose }) => {
   if (!visible || !place) {
@@ -44,6 +45,21 @@ const PlaceDetailModal = ({ visible, place, onClose }) => {
       </View>
     </Modal>
   );
+};
+
+PlaceDetailModal.propTypes = {
+  visible: PropTypes.bool.isRequired,
+  place: PropTypes.shape({
+    link: PropTypes.string,
+    name: PropTypes.string.isRequired,
+    description: PropTypes.string,
+    type: PropTypes.string.isRequired,
+    entranceFee: PropTypes.number,
+    priceLevel: PropTypes.string,
+    isOpen: PropTypes.bool,
+    viewpointType: PropTypes.string,
+  }).isRequired,
+  onClose: PropTypes.func.isRequired,
 };
 
 const styles = StyleSheet.create({

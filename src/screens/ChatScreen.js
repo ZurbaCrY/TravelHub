@@ -4,6 +4,7 @@ import { GiftedChat } from 'react-native-gifted-chat';
 import { useDarkMode } from './DarkModeContext';
 import { supabase } from '../User-Auth/supabase';
 import AuthService from '../User-Auth/auth';
+import PropTypes from 'prop-types';
 
 
 export default function ChatScreen({ route, navigation }) {
@@ -107,6 +108,19 @@ export default function ChatScreen({ route, navigation }) {
     </View>
   );
 }
+
+ChatScreen.propTypes = {
+  route: PropTypes.shape({
+    params: PropTypes.shape({
+      chatId: PropTypes.string.isRequired,
+      chatName: PropTypes.string.isRequired,
+    }).isRequired,
+  }).isRequired,
+  navigation: PropTypes.shape({
+    setOptions: PropTypes.func.isRequired,
+  }).isRequired,
+};
+
 
 const styles = StyleSheet.create({
   container: {

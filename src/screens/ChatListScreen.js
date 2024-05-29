@@ -5,6 +5,7 @@ import { supabase } from '../User-Auth/supabase';
 import AuthService from '../User-Auth/auth';
 import Button from '../components/Button';
 import { styles as st } from '../style/styles';
+import PropTypes from 'prop-types';
 
 export default function ChatListScreen({ navigation }) {
   const CURRENT_USER = AuthService.getUser();
@@ -15,6 +16,7 @@ export default function ChatListScreen({ navigation }) {
   const [usernames, setUsernames] = useState({});
   const [selectedUser, setSelectedUser] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
+  console.log(usernames);
 
   const [loading, setLoading] = useState(true);
 
@@ -369,6 +371,12 @@ export default function ChatListScreen({ navigation }) {
     );
   }
 }
+
+ChatListScreen.propTypes = {
+  navigation: PropTypes.shape({
+    navigate: PropTypes.func.isRequired,
+  }).isRequired,
+};
 
 const styles = StyleSheet.create({
   container: {

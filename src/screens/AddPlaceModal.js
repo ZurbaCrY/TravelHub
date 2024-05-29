@@ -4,17 +4,16 @@ import { Dropdown } from 'react-native-element-dropdown';
 import MapView, { Marker } from 'react-native-maps'; // assuming you have 'react-native-maps' installed
 import { customMapStyle } from '../resources/customMapStyle';
 import { supabase } from '../User-Auth/supabase';
+import PropTypes from 'prop-types';
 
-const AddPlaceModal = ({ visible, onClose, onFetchData, continentsData }) => {
+const AddPlaceModal = ({ visible, onClose, continentsData }) => {
   const [placeName, setPlaceName] = useState('');
   const [placeDescription, setPlaceDescription] = useState('');
   const [placeType, setPlaceType] = useState('');
   const [entranceFee, setEntranceFee] = useState('');
-  const [priceLevel, setPriceLevel] = useState('');
-  const [isOpen, setIsOpen] = useState('');
-  const [viewpointType, setViewpointType] = useState('');
   const [coordinates, setCoordinates] = useState(null);
   const [showMap, setShowMap] = useState(false);
+  let cityId;
 
   const data = [
     { label: 'Sehenswürdigkeit', value: 'Sehenswürdigkeit' },
@@ -190,6 +189,12 @@ const AddPlaceModal = ({ visible, onClose, onFetchData, continentsData }) => {
       </View>
     </Modal>
   );
+};
+
+AddPlaceModal.propTypes = {
+  visible: PropTypes.bool.isRequired, // Erforderlich und vom Typ boolean
+  onClose: PropTypes.func.isRequired, // Erforderlich und vom Typ Funktion
+  continentsData: PropTypes.array.isRequired // Erforderlich und vom Typ Array
 };
 
 const styles = StyleSheet.create({

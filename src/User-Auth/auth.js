@@ -1,5 +1,4 @@
 import { supabase as sb } from "./supabase";
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SecureStore from 'expo-secure-store';
 
 class AuthService {
@@ -46,7 +45,6 @@ class AuthService {
   }
 
   async signIn(email, password, rememberMe) {
-    try {
       const { data, error } = await this.supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
       console.info("User signed in:", data.user)
@@ -57,28 +55,20 @@ class AuthService {
       }
       this.user = data.user;
       return data.user;
-    } catch (error) {
-      throw error;
-    }
   }
 
   async signOut() {
-    try {
       const { error } = await this.supabase.auth.signOut();
       if (error) throw error;
       console.info("User signed out")
       await this.removeUser();
       return this.user;
-    } catch (error) {
-      throw error;
-    };
   }
 
   async signUp(username, email, password, confirmPassword) {
     if (password !== confirmPassword) {
       throw Error('Passwords do not match')
     }
-    try {
       // check if username and email are unique 
       const checkUnique = async (field, value) => {
         let { data, error } = await this.supabase
@@ -121,9 +111,6 @@ class AuthService {
       } else {
         throw new Error("Something went wrong, data retrieved: ", data);
       }
-    } catch (error) {
-      throw error;
-    }
   }
 }
 

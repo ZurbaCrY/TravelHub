@@ -4,17 +4,15 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
 import { StatusBar } from "expo-status-bar";
 import { FontAwesome5 } from "@expo/vector-icons";
-import { Animated, View, ActivityIndicator, Text } from "react-native";
+import { Animated } from "react-native";
 import { DarkModeProvider } from "./src/screens/DarkModeContext";
 import "react-native-url-polyfill/auto";
 import { useState, useEffect } from "react";
-import { supabase } from "./src/User-Auth/supabase";
 import {
   MapScreen,
   CommunityScreen,
   ProfileScreen,
   SettingsScreen,
-  HomeScreen,
   StartingScreen,
   SignInScreen,
   SignUpScreen,
@@ -35,7 +33,7 @@ function MainTabs() {
         tabBarActiveTintColor: "#ffffff",
         tabBarInactiveTintColor: "gray",
         tabBarStyle: { backgroundColor: "#3EAAE9" },
-        tabBarIcon: ({ focused, color, size }) => {
+        tabBarIcon: ({ focused, color }) => {
           let iconName;
           // if (route.name === "HomeScreen") {
           //   iconName = "home";

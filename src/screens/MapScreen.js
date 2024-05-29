@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, View, Modal, Text, TextInput, ScrollView, TouchableOpacity, Dimensions, Image } from 'react-native';
-import MapView, { PROVIDER_GOOGLE, Polygon, Marker } from 'react-native-maps';
+import { StyleSheet, View, Modal, Text, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
+import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { customMapStyle } from '../resources/customMapStyle';
 import { MaterialIcons } from '@expo/vector-icons'; // Beispiel für ein Icon-Paket, hier MaterialIcons von Expo
@@ -9,7 +9,6 @@ import PlaceDetailScreen from './PlaceDetailScreen';
 import AddPlaceModal from './AddPlaceModal';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { Button } from 'react-native-paper'
-import { createClient } from '@supabase/supabase-js';
 import { supabase } from '../User-Auth/supabase';
 import AuthService from '../User-Auth/auth';
 
