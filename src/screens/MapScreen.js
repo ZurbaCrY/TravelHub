@@ -328,7 +328,7 @@ const isFavourite = async (placeId, userId) => {
     }
 
     // Wenn ein Eintrag existiert, gib true zurück, ansonsten false
-    console.log(!!data);
+    //console.log(!!data);
     return !!data;
   } catch (error) {
     console.error('Fehler beim Überprüfen des Favoritenstatus:', error.message);
