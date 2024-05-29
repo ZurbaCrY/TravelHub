@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, TouchableOpacity, Animated, StyleSheet } from 'react-native';
+import PropTypes from 'prop-types'; // Importiere PropTypes
 
 const AnimatedSwitch = ({ value, onValueChange }) => {
   const [animValue] = useState(new Animated.Value(value ? 1 : 0));
@@ -33,6 +34,12 @@ const AnimatedSwitch = ({ value, onValueChange }) => {
       </View>
     </TouchableOpacity>
   );
+};
+
+// Definiere PropTypes für value und onValueChange
+AnimatedSwitch.propTypes = {
+  value: PropTypes.bool.isRequired,
+  onValueChange: PropTypes.func.isRequired,
 };
 
 const styles = StyleSheet.create({

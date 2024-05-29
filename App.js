@@ -63,10 +63,10 @@ function MainTabs() {
       })}
     >
       <Tab.Screen name="HomeScreen" component={HomeScreen} />
-      <Tab.Screen name="MapScreen" component={MapScreen} />
       <Tab.Screen name="CommunityScreen" component={CommunityScreen} />
-      <Tab.Screen name="ChatListScreen" component={ChatListScreen} />
+      <Tab.Screen name="MapScreen" component={MapScreen} />
       <Tab.Screen name="ProfileScreen" component={ProfileScreen} />
+      <Tab.Screen name="ChatListScreen" component={ChatListScreen} />
     </Tab.Navigator>
   );
 }

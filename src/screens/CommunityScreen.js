@@ -1,15 +1,15 @@
-import 'react-native-url-polyfill/auto'
-import React, { useState, useEffect } from 'react'; import { View, Text, StyleSheet, FlatList, TextInput, Button, Image, TouchableOpacity } from 'react-native';
+import 'react-native-url-polyfill/auto';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, FlatList, TextInput, Button, Image, TouchableOpacity } from 'react-native';
 import { useDarkMode } from './DarkModeContext';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '../User-Auth/supabase';
 import * as ImagePicker from 'expo-image-picker';
 import AuthService from '../User-Auth/auth';
-import { supabase } from '../User-Auth/supabase';
 
 export default function CommunityScreen() {
-  user = AuthService.getUser();
+  const user = AuthService.getUser();
   const user_username = user.user_metadata.username;
-  const { isDarkMode, toggleDarkMode } = useDarkMode();
+  const { isDarkMode } = useDarkMode();
   const [posts, setPosts] = useState([]);
   const [newPostContent, setNewPostContent] = useState('');
 
@@ -34,7 +34,7 @@ export default function CommunityScreen() {
   // Abschicken einer Nachricht
   const createNewPost = async () => {
     try {
-      const { data, error } = await supabase.from('posts').insert([{ content: newPostContent, author: user_username, upvotes: 0, downvotes: 0 }]);
+      const { error } = await supabase.from('posts').insert([{ content: newPostContent, author: user_username, upvotes: 0, downvotes: 0 }]);
       if (error) {
         console.error('Error creating post:', error.message);
       } else {
@@ -104,43 +104,37 @@ export default function CommunityScreen() {
       });
   
       // Überprüfe, ob das Bild ausgewählt wurde und nicht abgebrochen wurde
-        console.log(result)
+      if (!result.canceled && result.assets.length > 0) {
         const firstAsset = result.assets[0];
         const fileUri = firstAsset.uri;
-        console.log(fileUri)
         const fileName = fileUri.substring(fileUri.lastIndexOf('/') + 1);
-        console.log(fileName)
   
         // Lade das Bild hoch zu Supabase Storage
         const response = await fetch(fileUri);
         const blob = await response.blob();
-        // const avatarFile = event.target.files[0]
-        console.log(blob)
-        const { data, error } = await supabase
+  
+        const { error } = await supabase
           .storage
           .from('Storage')
-          .upload('./images/picture.png', blob, {
-          cacheControl: '3600',
-          upsert: false
-        });
+          .upload(`images/${fileName}`, blob, {
+            cacheControl: '3600',
+            upsert: false,
+          });
   
         if (error) {
           throw error;
         }
   
         // Konstruiere den URI des hochgeladenen Bildes
-        const imageUrl = `${REACT_APP_SUPABASE_URL}/storage/v1/object/Storage/${fileName}`;
+        const imageUrl = `${process.env.REACT_APP_SUPABASE_URL}/storage/v1/object/public/Storage/images/${fileName}`;
         console.log('Image URL:', imageUrl);
+      }
     } catch (error) {
       console.error('Fehler beim Hochladen des Bildes:', error.message);
     }
   };
-  
-  
 
-
-
-  //Elemente der Communityseite  
+  // Elemente der Communityseite  
   return (
     <View style={[styles.container, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
       <FlatList
@@ -165,7 +159,7 @@ export default function CommunityScreen() {
         )}
         keyExtractor={item => item.id.toString()}
       />
-      <View style={{ flexDirection: 'row', alignItems: 'center', }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
         <TextInput
           style={[styles.input, { backgroundColor: isDarkMode ? '#374151' : '#E5E7EB', color: isDarkMode ? '#FFF' : '#000' }]}
           placeholder="Type here.."
@@ -183,14 +177,13 @@ export default function CommunityScreen() {
   );
 }
 
-//Design 
+// Design 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
     paddingTop: 20,
-    flex: 1,
-    justifyContent: 'flex-end',
+    justifyContent: 'flex-end', // Korrigiere den doppelten Schlüssel
   },
   input: {
     width: '70%',
@@ -200,6 +193,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     marginVertical: 10,
     marginTop: 'auto',
-    borderColor: '#8a8a8a'
+    borderColor: '#8a8a8a',
   },
 });

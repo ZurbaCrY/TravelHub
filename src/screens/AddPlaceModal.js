@@ -2,14 +2,8 @@ import React, { useState } from 'react';
 import { View, Text, Modal, TouchableOpacity, StyleSheet, TextInput } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
 import MapView, { Marker } from 'react-native-maps'; // assuming you have 'react-native-maps' installed
-import AntDesign from '@expo/vector-icons/AntDesign';
 import { customMapStyle } from '../resources/customMapStyle';
-import { createClient } from '@supabase/supabase-js';
-
-const REACT_APP_SUPABASE_URL = "https://zjnvamrbnqzefncmdpaf.supabase.co";
-const REACT_APP_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpqbnZhbXJibnF6ZWZuY21kcGFmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTQ0NjgzMDIsImV4cCI6MjAzMDA0NDMwMn0.O4S0x7F-5df2hR218qrO4VJbDOLK1Gzsvb3a8SGqwvY";
-
-const supabase = createClient(REACT_APP_SUPABASE_URL, REACT_APP_ANON_KEY);
+import { supabase } from '../User-Auth/supabase';
 
 const AddPlaceModal = ({ visible, onClose, onFetchData, continentsData }) => {
   const [placeName, setPlaceName] = useState('');

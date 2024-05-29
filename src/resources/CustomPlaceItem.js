@@ -1,12 +1,13 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons'; // Oder aus einem anderen Icon-Pack
+import PropTypes from 'prop-types'; // Importiere PropTypes
 
 const CustomPlaceItem = ({ place, handleMarkerPress, handleStarClick, handlePlaceDetail, image, selected }) => {
   const isFavourite = place.favourite;
-    const handlePress = () => {
-      handleMarkerPress(place);
-    };
+  const handlePress = () => {
+    handleMarkerPress(place);
+  };
 
   return (
     <TouchableOpacity
@@ -35,6 +36,15 @@ const CustomPlaceItem = ({ place, handleMarkerPress, handleStarClick, handlePlac
       </View>
     </TouchableOpacity>
   );
+};
+
+CustomPlaceItem.propTypes = {
+  place: PropTypes.object.isRequired,
+  handleMarkerPress: PropTypes.func.isRequired,
+  handleStarClick: PropTypes.func.isRequired,
+  handlePlaceDetail: PropTypes.func.isRequired,
+  image: PropTypes.string.isRequired,
+  selected: PropTypes.bool.isRequired,
 };
 
 const styles = StyleSheet.create({
