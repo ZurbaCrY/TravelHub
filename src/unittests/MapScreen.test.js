@@ -1,4 +1,4 @@
-const { Continent, Country, City, Place, SightseeingSpot, Restaurant, ShoppingStore, Viewpoint } = require('./MapScreen');
+const { Continent, Country, City, Place, SightseeingSpot, Restaurant, ShoppingStore, Viewpoint } = require('../screens/MapScreen');
 
 describe('Class Definitions for Map in OOP', () => {
   afterEach(() => {
