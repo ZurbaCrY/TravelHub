@@ -11,6 +11,7 @@ import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplet
 import { Button } from 'react-native-paper'
 import { createClient } from '@supabase/supabase-js';
 import { supabase } from '../User-Auth/supabase';
+import AuthService from '../User-Auth/auth';
 
 const { width } = Dimensions.get('window');
 
@@ -28,7 +29,8 @@ class Continent {
 }
 
 class Country {
-  constructor(name, cities) {
+  constructor(countryId, name, cities) {
+    this.countryId = countryId;
     this.name = name;
     this.cities = cities;
     this.locked = true; // Annahme: alle Länder sind zu Beginn gesperrt
@@ -47,11 +49,12 @@ class City {
 }
 
 class Place {
-  constructor(name, coordinates, type, description, link) {
+  constructor(placeId, name, coordinates, type, description, link, fave) {
+    this.placeId = placeId;
     this.name = name;
     this.coordinates = coordinates;
     this.type = type; // Der Ortstyp (z.B. 'Sehenswürdigkeit', 'Restaurant', 'Einkaufsladen', 'Aussichtspunkt')
-    this.favourite = false;
+    this.favourite = fave;
     this.description = description;
     this.link = link;
   }
@@ -62,16 +65,16 @@ class Place {
 }
 
 class SightseeingSpot extends Place {
-  constructor(name, coordinates, description, entranceFee, link) {
-    super(name, coordinates, description, link);
+  constructor(placeId, name, coordinates, description, entranceFee, link, fave) {
+    super(placeId, name, coordinates, description, link, fave);
     this.type = 'Sehenswürdigkeit';
     this.entranceFee = entranceFee; // Eintrittsgebühr für Sehenswürdigkeiten
   }
 }
 
 class Restaurant extends Place {
-  constructor(name, coordinates, description, priceLevel, cuisineType, link) {
-    super(name, coordinates, description, link);
+  constructor(placeId, name, coordinates, description, priceLevel, cuisineType, link, fave) {
+    super(placeId, name, coordinates, description, link, fave);
     this.type = 'Restaurant';
     this.priceLevel = priceLevel; // Preisniveau des Restaurants
     this.cuisineType = cuisineType; // Art der Küche im Restaurant
@@ -79,8 +82,8 @@ class Restaurant extends Place {
 }
 
 class ShoppingStore extends Place {
-  constructor(name, coordinates, description, category, isOpen, link) {
-    super(name, coordinates, description, link);
+  constructor(placeId, name, coordinates, description, category, isOpen, link, fave) {
+    super(placeId, name, coordinates, description, link, fave);
     this.type = 'Einkaufsladen';
     this.category = category; // Kategorie des Geschäfts (z.B. Bekleidung, Souvenirs, Lebensmittel)
     this.isOpen = isOpen; // Gibt an, ob der Laden geöffnet ist oder nicht
@@ -88,8 +91,8 @@ class ShoppingStore extends Place {
 }
 
 class Viewpoint extends Place {
-  constructor(name, coordinates, description, viewpointType, height, link) {
-    super(name, coordinates, description, link);
+  constructor(placeId, name, coordinates, description, viewpointType, height, link, fave) {
+    super(placeId, name, coordinates, description, link, fave);
     this.type = 'Aussichtspunkt';
     this.viewpointType = viewpointType; // Art des Aussichtspunkts (z.B. Berggipfel, Wolkenkratzer, Aussichtsturm)
     this.height = height; // Höhe des Aussichtspunkts über dem Meeresspiegel oder der umgebenden Landschaft
@@ -125,7 +128,8 @@ export default function MapScreen() {
   const [selectedCoordinates, setSelectedCoordinates] = useState(null);
   const [continentsData, setContinentsData] = useState([]);
 
-
+const CURRENT_USER = AuthService.getUser();
+const CURRENT_USER_ID = CURRENT_USER.id;
   /**
    * Use Effect Methoden für erstmaliges Aufrufen - Laden der Karte und Daten aus DB.
    * Aktualisieren der Position und der nächstliegenden Stadt
@@ -134,12 +138,7 @@ export default function MapScreen() {
   useEffect(() => {
     fetchData();
     if (location) {
-      console.log("folgendes Land wurde besucht: " + findCountry(findNearestCity({
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-        latitudeDelta: 0.0922,
-        longitudeDelta: 0.0421,
-      })).name);
+        updateVisitedCountry();
     }
   }, []);
 
@@ -214,31 +213,38 @@ export default function MapScreen() {
       const cities = await fetchCities();
       const attractions = await fetchPlaces();
 
-      const continentsData = [
-        new Continent('World', countries.map(country => {
-          const countryCities = cities
-            .filter(city => city.Country_ID === country.Country_ID)
-            .map(city => {
-              const cityAttractions = attractions
-                .filter(attraction => attraction.City_ID === city.City_ID)
-                .map(attraction => new Place(
-                  attraction.Attraction_Name,
-                  { latitude: parseFloat(attraction.Latitude), longitude: parseFloat(attraction.Longitude) },
-                  attraction.Type_of_Attraction,
-                  attraction.Description,
-                  attraction.Link
-                ));
+       const continentsData = await Promise.all([
+         new Continent('World', await Promise.all(countries.map(async (country) => {
+           const countryCities = await Promise.all(cities
+             .filter(city => city.Country_ID === country.Country_ID)
+             .map(async (city) => {
+               const cityAttractions = await Promise.all(attractions
+                 .filter(attraction => attraction.City_ID === city.City_ID)
+                 .map(async (attraction) => {
+                   const favourite = await isFavourite(attraction.Attraction_ID, CURRENT_USER_ID);
+                   return new Place(
+                     attraction.Attraction_ID,
+                     attraction.Attraction_Name,
+                     { latitude: parseFloat(attraction.Latitude), longitude: parseFloat(attraction.Longitude) },
+                     attraction.Type_of_Attraction,
+                     attraction.Description,
+                     attraction.Link,
+                     favourite
+                   );
+                 })
+               );
 
-              const cityCoordinates = [
-                { latitude: parseFloat(city.latitude), longitude: parseFloat(city.longitude) } // Hier sollten die Stadtgrenzen hinzugefügt werden, falls vorhanden
-              ];
+               const cityCoordinates = [
+                 { latitude: parseFloat(city.latitude), longitude: parseFloat(city.longitude) }
+               ];
 
-              return new City(city.City_ID, city.Cityname, cityCoordinates, cityAttractions);
-            });
+               return new City(city.City_ID, city.Cityname, cityCoordinates, cityAttractions);
+             })
+           );
 
-          return new Country(country.Countryname, countryCities);
-        }))
-      ];
+           return new Country(country.Country_ID, country.Countryname, countryCities);
+         })))
+       ]);
 
       setContinentsData(continentsData);
     } catch (error) {
@@ -246,14 +252,158 @@ export default function MapScreen() {
     }
 
     if (location) {
-      console.log("folgendes Land wurde besucht: " + findCountry(findNearestCity({
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-        latitudeDelta: 0.0922,
-        longitudeDelta: 0.0421,
-      })).name);
+        updateVisitedCountry();
     }
   };
+
+const updateFavourite = async (attractionId, userId) => {
+  try {
+    // Überprüfen, ob ein Eintrag für die gegebene Attractions_ID und user_id existiert
+    const { data, error } = await supabase
+      .from('DesiredDestination')
+      .select('Desired_Destination_ID')
+      .eq('Attractions_ID', attractionId)
+      .eq('User_ID', userId)
+      .single();
+
+    if (error && error.code !== 'PGRST116') { // PGRST116: Single row expected, multiple rows found
+      throw error;
+    }
+
+    // Wenn ein Eintrag existiert, gib den bestehenden Eintrag zurück
+    if (data) {
+      return data;
+    } else {
+      // Eintrag existiert nicht, erstelle einen neuen Eintrag
+      const { data: newEntry, error: insertError } = await supabase
+        .from('DesiredDestination')
+        .insert([{ Attractions_ID: attractionId, User_ID: userId }])
+        .select()
+        .single();
+
+      if (insertError) {
+        throw insertError;
+      }
+
+      return newEntry;
+    }
+  } catch (error) {
+    console.error('Fehler beim Erstellen des Eintrags in DesiredDestination:', error.message);
+    return null;
+  }
+};
+
+const deleteFavourite = async (attractionId, userId) => {
+  try {
+    // Lösche den Eintrag für die gegebene Attractions_ID und user_id
+    const { data, error } = await supabase
+      .from('DesiredDestination')
+      .delete()
+      .eq('Attractions_ID', attractionId)
+      .eq('User_ID', userId);
+
+    if (error) {
+      throw error;
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Fehler beim Löschen des Eintrags aus DesiredDestination:', error.message);
+    return null;
+  }
+};
+
+const isFavourite = async (placeId, userId) => {
+  try {
+    // Überprüfe, ob ein Eintrag für die gegebene Attractions_ID und user_id existiert
+    const { data, error } = await supabase
+      .from('DesiredDestination')
+      .select('Attractions_ID')
+      .eq('Attractions_ID', placeId)
+      .eq('User_ID', userId)
+      .single();
+
+    if (error && error.code !== 'PGRST116') { // PGRST116: Single row expected, multiple rows found
+      throw error;
+    }
+
+    // Wenn ein Eintrag existiert, gib true zurück, ansonsten false
+    //console.log(!!data);
+    return !!data;
+  } catch (error) {
+    console.error('Fehler beim Überprüfen des Favoritenstatus:', error.message);
+    return false;
+  }
+};
+
+
+
+  /**
+   * Funktionen zum Verifizieren der besuchten Länder.
+   *
+   */
+    const updateVisitedCountry = () => {
+        let country = findCountry(findNearestCity({
+                              latitude: location.coords.latitude,
+                              longitude: location.coords.longitude,
+                              latitudeDelta: 0.0922,
+                              longitudeDelta: 0.0421,
+                            }));
+      console.log("folgendes Land wurde besucht: " + country.countryId);
+      updateOrCreateVisitedCountry(country.countryId, CURRENT_USER_ID);
+    };
+
+   const updateOrCreateVisitedCountry = async (countryId, userId) => {
+     try {
+       // Überprüfe, ob ein Eintrag für die gegebene Country_ID und user_id existiert
+       const { data, error } = await supabase
+         .from('Visited Countries')
+         .select('VisitedCountries_ID, verified')
+         .eq('Country_ID', countryId)
+         .eq('user_id', userId)
+         .single();
+
+       if (error && error.code !== 'PGRST116') { // PGRST116: Single row expected, multiple rows found
+         throw error;
+       }
+
+       if (data) {
+         // Eintrag existiert bereits, überprüfe den Wert von verified
+         if (data.verified) {
+           // Wenn verified bereits true ist, gib den bestehenden Eintrag zurück
+           return data;
+         }
+
+         // Setze verified auf true, da es noch nicht true ist
+         const { data: updatedEntry, error: updateError } = await supabase
+           .from('Visited Countries')
+           .update({ verified: true })
+           .eq('VisitedCountries_ID', data.VisitedCountries_ID)
+           .select();
+
+         if (updateError) {
+           throw updateError;
+         }
+
+         return updatedEntry;
+       } else {
+         // Eintrag existiert nicht, erstelle einen neuen Eintrag
+         const { data: newEntry, error: insertError } = await supabase
+           .from('Visited Countries')
+           .insert([{ Country_ID: countryId, user_id: userId, verified: true }])
+           .select();
+
+         if (insertError) {
+           throw insertError;
+         }
+
+         return newEntry;
+       }
+     } catch (error) {
+       console.error('Fehler beim Aktualisieren oder Erstellen des Eintrags:', error.message);
+       return null;
+     }
+   };
 
 
   /**
@@ -543,7 +693,12 @@ export default function MapScreen() {
     return place.favourite;
   };
 
-  const handleStarClick = (place) => {
+  const handleStarClick = async (place) => {
+    if(!place.favourite){
+        await updateFavourite(place.placeId, CURRENT_USER_ID);
+    } else {
+        await deleteFavourite(place.placeId, CURRENT_USER_ID);
+    }
     place.toggleFavourite();
     //console.log(place.favourite);
     setForceUpdate(prevState => !prevState);
