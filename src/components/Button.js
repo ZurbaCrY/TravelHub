@@ -1,6 +1,6 @@
 import React from "react";
 import { Button as PaperButton } from 'react-native-paper';
-import PropTypes from 'prop-types'; // Importiere PropTypes
+import PropTypes from 'prop-types';
 import { styles } from '../style/styles';
 
 export default function Button({ mode = "contained", ...props }) {

@@ -1,23 +1,20 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons'; // Oder aus einem anderen Icon-Pack
-import PropTypes from 'prop-types'; // Importiere PropTypes
+import { MaterialIcons } from '@expo/vector-icons';
+import PropTypes from 'prop-types';
 
 const CustomPlaceItem = ({ place, handleMarkerPress, handleStarClick, handlePlaceDetail, image, selected }) => {
   const isFavourite = place.favourite;
-  const handlePress = () => {
-    handleMarkerPress(place);
-  };
 
   return (
     <TouchableOpacity
       style={selected ? [styles.customPlaceItem, styles.selectedItem] : styles.customPlaceItem}
-      onPress={handlePress}
+      onPress={handleMarkerPress(place)}
     >
       <View style={styles.customPlaceItemContainer}>
         {/* Bild links */}
         <Image
-          source={{ uri: image }} // Hier wird die URI verwendet
+          source={{ uri: image }}
           style={styles.customPlaceItemImage}
         />
         {/* Name und Beschreibung rechts daneben */}

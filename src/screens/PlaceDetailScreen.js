@@ -18,7 +18,11 @@ const PlaceDetailModal = ({ visible, place, onClose }) => {
         <View style={styles.modalContent}>
           {/* Bild des Ortes (Platzhalter verwenden, wenn kein Bild vorhanden ist) */}
           {place.link ? (
-            <Image source={{ uri: place.link }} style={styles.placeImage} />
+            <Image
+              source={{ uri: place.link }}
+              style={styles.placeImage}
+              onError={() => console.log("Image failed to load")}
+            />
           ) : (
             <View style={styles.placeholderImage} />
           )}
