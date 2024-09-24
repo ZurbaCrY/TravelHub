@@ -1,4 +1,4 @@
-import AuthService from '../User-Auth/auth';
+import AuthService from './path/to/AuthService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SecureStore from 'expo-secure-store';
 
