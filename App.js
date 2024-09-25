@@ -21,7 +21,7 @@ import {
   ChatListScreen,
 } from './src/screens'
 import { DarkModeProvider } from "./src/context/DarkModeContext";
-import AuthService from "./src/User-Auth/auth"
+import AuthService from "./src/services/auth"
 
 const Tab = createBottomTabNavigator();
 const RootStack = createStackNavigator();
@@ -130,7 +130,7 @@ export default function App() {
               name="Main"
               component={MainTabs}
               options={{ headerShown: false }}
-              />
+            />
             <RootStack.Screen name="Settings">
               {props => <SettingsScreen {...props} setUser={setUser} setLoading={setLoadingStatus} />}
 
