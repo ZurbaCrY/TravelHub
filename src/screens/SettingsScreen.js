@@ -15,10 +15,13 @@ const SettingsScreen = ({ setUser, setLoading }) => {
       setLoading(true, "Signing Out");
       const user = await AuthService.signOut();
       setUser(user);
+    } catch (error) {
+      Alert.alert("Fehler", "Beim Abmelden ist ein Fehler aufgetreten.");
+      console.error('Sign-out error:', error);
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   return (
     <View style={[styles.container, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>

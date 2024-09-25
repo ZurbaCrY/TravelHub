@@ -5,7 +5,6 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { Input, Text } from "react-native-elements";
-// import { useNavigation } from "@react-navigation/native";
 import { styles } from '../style/styles';
 import Button from "../components/Button";
 import AuthService from "../User-Auth/auth"
@@ -19,11 +18,12 @@ const SignInScreen = ({ navigation, setUser, setLoading }) => {
 
   const handleSignIn = async () => {
     try {
-      setLoading(true, "Signing in")
+      setLoading(true, "Signing in");
       const user = await AuthService.signIn(email, password, remember);
       setUser(user);
     } catch (error) {
-      throw Error;
+      Alert.alert("Sign-In Error", "Unable to sign in. Please check your credentials and try again.");
+      console.error('Sign-in error:', error);
     } finally {
       setLoading(false);
     }
@@ -49,7 +49,7 @@ const SignInScreen = ({ navigation, setUser, setLoading }) => {
         <Input
           label="Email"
           leftIcon={{ type: "font-awesome", name: "envelope" }}
-          onChangeText={(text) => setEmail(text)}
+          onChangeText={setEmail}
           value={email}
           placeholder="email@address.com"
           autoCapitalize={"none"}
@@ -58,7 +58,7 @@ const SignInScreen = ({ navigation, setUser, setLoading }) => {
         <Input
           label="Password"
           leftIcon={{ type: "font-awesome", name: "lock" }}
-          onChangeText={(text) => setPassword(text)}
+          onChangeText={setPassword}
           value={password}
           secureTextEntry={true}
           placeholder="Password"

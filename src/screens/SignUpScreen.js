@@ -13,12 +13,18 @@ const SignUpScreen = ({ navigation, setUser, setLoading }) => {
   const [confirmPassword, setConfirmPassword] = useState('');
 
   const handleSignUp = async () => {
+    if (password !== confirmPassword) {
+      Alert.alert("Passwords do not match", "Please ensure both passwords are the same.");
+      return;
+    }
+
     try {
       setLoading(true, "Signing Up");
-      const user = await AuthService.signUp(username, email, password, confirmPassword)
+      const user = await AuthService.signUp(username, email, password, confirmPassword);
       setUser(user);
     } catch (error) {
-      console.error(error)
+      Alert.alert("Sign-Up Error", "An error occurred during sign-up. Please try again.");
+      console.error(error);
     } finally {
       setLoading(false);
     }

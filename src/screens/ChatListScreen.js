@@ -16,7 +16,6 @@ export default function ChatListScreen({ navigation }) {
   const [usernames, setUsernames] = useState({});
   const [selectedUser, setSelectedUser] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
-  console.log(usernames);
 
   const [loading, setLoading] = useState(true);
 

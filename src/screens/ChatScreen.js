@@ -30,14 +30,7 @@ export default function ChatScreen({ route, navigation }) {
           console.error('Error fetching messages:', error);
         } else {
           console.log('Fetched messages:', data);
-          const formattedMessages = data.map(message => ({
-            _id: message.id,
-            text: message.content,
-            createdAt: new Date(message.created_at),
-            user: {
-              _id: message.user_id,
-            },
-          }));
+          const formattedMessages = formatMessages(data);
           setMessages(formattedMessages);
           console.log('Formatted messages:', formattedMessages);
         }
@@ -70,6 +63,15 @@ export default function ChatScreen({ route, navigation }) {
       supabase.removeChannel(messageSubscription);
     };
   }, [chatId, chatName, navigation]);
+
+  const formatMessages = (data) => {
+    return data.map(message => ({
+      _id: message.id,
+      text: message.content,
+      createdAt: new Date(message.created_at),
+      user: { _id: message.user_id },
+    }));
+  };
 
   const onSend = useCallback(async (newMessages = []) => {
     const message = newMessages[0];
