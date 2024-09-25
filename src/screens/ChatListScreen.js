@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, View, Text, FlatList, TouchableOpacity, StyleSheet, Modal, TouchableWithoutFeedback, Alert } from 'react-native';
-import { useDarkMode } from './DarkModeContext';
-import { supabase } from '../User-Auth/supabase';
-import AuthService from '../User-Auth/auth';
+import { useDarkMode } from '../context/DarkModeContext';
+import { supabase } from '../services/supabase';
+import AuthService from '../services/auth'
 import Button from '../components/Button';
 import { styles as st } from '../style/styles';
 import PropTypes from 'prop-types';

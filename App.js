@@ -20,7 +20,7 @@ import {
   ChatScreen,
   ChatListScreen,
 } from './src/screens'
-import { DarkModeProvider } from "./src/screens/DarkModeContext";
+import { DarkModeProvider } from "./src/context/DarkModeContext";
 import AuthService from "./src/User-Auth/auth"
 
 const Tab = createBottomTabNavigator();

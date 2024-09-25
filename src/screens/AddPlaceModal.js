@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { View, Text, Modal, TouchableOpacity, StyleSheet, TextInput } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
-import MapView, { Marker } from 'react-native-maps'; // assuming you have 'react-native-maps' installed
-import { customMapStyle } from '../resources/customMapStyle';
-import { supabase } from '../User-Auth/supabase';
+import MapView, { Marker } from 'react-native-maps';
+import { customMapStyle } from '../styles/customMapStyle';
+import { supabase } from '../services/supabase';
 import PropTypes from 'prop-types';
+import { useDarkMode } from '../context/DarkModeContext';
 
 const AddPlaceModal = ({ visible, onClose, continentsData }) => {
   const [placeName, setPlaceName] = useState('');

@@ -1,9 +1,9 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { GiftedChat } from 'react-native-gifted-chat';
-import { useDarkMode } from './DarkModeContext';
-import { supabase } from '../User-Auth/supabase';
-import AuthService from '../User-Auth/auth';
+import { useDarkMode } from '../context/DarkModeContext';
+import { supabase } from '../services/supabase';
+import AuthService from '../services/auth'
 import PropTypes from 'prop-types';
 
 

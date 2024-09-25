@@ -2,15 +2,16 @@ import React, { useState, useEffect, useRef } from 'react';
 import { StyleSheet, View, Modal, Text, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
 import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
-import { customMapStyle } from '../resources/customMapStyle';
-import { MaterialIcons } from '@expo/vector-icons'; // Beispiel für ein Icon-Paket, hier MaterialIcons von Expo
-import CustomPlaceItem from '../resources/CustomPlaceItem'; // Annahme: Pfad zur Datei mit der CustomPlaceItem-Komponente
+import { customMapStyle } from '../styles/customMapStyle';
+import { MaterialIcons } from '@expo/vector-icons';
+import CustomPlaceItem from '../components/CustomPlaceItem';
 import PlaceDetailScreen from './PlaceDetailScreen';
 import AddPlaceModal from './AddPlaceModal';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { Button } from 'react-native-paper'
-import { supabase } from '../User-Auth/supabase';
-import AuthService from '../User-Auth/auth';
+import { supabase } from '../services/supabase';
+import AuthService from '../services/auth'
+import { useDarkMode } from '../context/DarkModeContext';
 
 const { width } = Dimensions.get('window');
 
@@ -411,19 +412,19 @@ const isFavourite = async (placeId, userId) => {
    */
   const getImageForPlace = (place) => {
     if (place === selectedPlace) {
-      return require('../resources/travel-marker-x.png');
+      return require('../assets/images/travel-marker-x.png');
     }
     switch (place.type) {
       case 'Sehenswürdigkeit':
-        return require('../resources/travel-marker-s.png');
+        return require('../assets/images/travel-marker-s.png');
       case 'Restaurant':
-        return require('../resources/travel-marker-r.png');
+        return require('../assets/images/travel-marker-r.png');
       case 'Einkaufsladen':
-        return require('../resources/travel-marker-m.png');
+        return require('../assets/images/travel-marker-m.png');
       case 'Aussichtspunkt':
-        return require('../resources/travel-marker-v.png');
+        return require('../assets/images/travel-marker-v.png');
       default:
-        return require('../resources/travel-marker-x.png');
+        return require('../assets/images/travel-marker-x.png');
     }
   };
 

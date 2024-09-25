@@ -3,6 +3,7 @@ import { View, Text } from 'react-native';
 import Button from '../components/Button';
 import { useNavigation } from '@react-navigation/native';
 import { styles } from '../style/styles';
+import { useDarkMode } from '../context/DarkModeContext';
 
 export default function StartingScreen() {
   const navigation = useNavigation();

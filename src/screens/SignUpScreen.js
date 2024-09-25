@@ -3,8 +3,9 @@ import { View, TouchableOpacity } from 'react-native';
 import { Input, Text } from 'react-native-elements';
 import { styles } from '../style/styles';
 import Button from '../components/Button';
-import AuthService from '../User-Auth/auth';
+import AuthService from '../services/auth';
 import PropTypes from 'prop-types';
+import { useDarkMode } from '../context/DarkModeContext';
 
 const SignUpScreen = ({ navigation, setUser, setLoading }) => {
   const [username, setUsername] = useState('');

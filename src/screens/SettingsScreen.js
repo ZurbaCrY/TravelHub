@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, } from 'react-native';
-import { useDarkMode } from './DarkModeContext';
+import { useDarkMode } from '../context/DarkModeContext';
 import Button from '../components/Button';
-import AuthService from '../User-Auth/auth'
+import AuthService from '../services/auth'
 import AnimatedSwitch from '../components/AnimatedSwitch';
 import PropTypes from 'prop-types';
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, Modal, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import PropTypes from 'prop-types';
+import { useDarkMode } from '../context/DarkModeContext';
 
 const PlaceDetailModal = ({ visible, place, onClose }) => {
   if (!visible || !place) {

@@ -12,9 +12,9 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Flag from 'react-native-flags';
-import { useDarkMode } from './DarkModeContext';
+import { useDarkMode } from '../context/DarkModeContext';
 import { useNavigation } from '@react-navigation/native';
-import AuthService from '../User-Auth/auth';
+import AuthService from '../services/auth'
 import Button from '../components/Button';
 import { styles } from '../style/styles';
 import { supabase } from '../User-Auth/supabase';

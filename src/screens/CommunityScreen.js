@@ -1,10 +1,10 @@
 import 'react-native-url-polyfill/auto';
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, TextInput, Image, TouchableOpacity } from 'react-native';
-import { useDarkMode } from './DarkModeContext';
+import { useDarkMode } from '../context/DarkModeContext';
 import { supabase } from '../User-Auth/supabase';
 import * as ImagePicker from 'expo-image-picker';
-import AuthService from '../User-Auth/auth';
+import AuthService from '../services/auth'
 
 export default function CommunityScreen() {
   const user = AuthService.getUser();
@@ -145,11 +145,11 @@ export default function CommunityScreen() {
               <Text style={{ color: isDarkMode ? '#FFF' : '#000' }}>{item.content}</Text>
               <View style={{ flexDirection: 'row' }}>
                 <TouchableOpacity onPress={() => handleUpvote(item.id)} style={{ flexDirection: 'row', alignItems: 'center', marginRight: 10 }}>
-                  <Image source={require('./images/thumbs-up.png')} style={{ width: 20, height: 20 }} />
+                  <Image source={require('../assets/images/thumbs-up.png')} style={{ width: 20, height: 20 }} />
                   <Text style={{ color: isDarkMode ? '#FFF' : '#000', fontSize: 12, marginLeft: 3 }}>{item.upvotes}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => handleDownvote(item.id)} style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <Image source={require('./images/thumbs-down.png')} style={{ width: 20, height: 20 }} />
+                  <Image source={require('../assets/images/thumbs-down.png')} style={{ width: 20, height: 20 }} />
                   <Text style={{ color: isDarkMode ? '#FFF' : '#000', fontSize: 12, marginLeft: 3 }}>{item.downvotes}</Text>
                 </TouchableOpacity>
               </View>
@@ -167,10 +167,10 @@ export default function CommunityScreen() {
           onChangeText={text => setNewPostContent(text)}
         />
         <TouchableOpacity onPress={handleImageUpload}>
-          <Image source={require('./images/picture.png')} style={{ width: 50, height: 50 }} />
+          <Image source={require('../assets/images/picture.png')} style={{ width: 50, height: 50 }} />
         </TouchableOpacity>
         <TouchableOpacity onPress={createNewPost}>
-          <Image source={require('./images/message_send.png')} style={{ width: 55, height: 55 }} />
+          <Image source={require('../assets/images/message_send.png')} style={{ width: 55, height: 55 }} />
         </TouchableOpacity>
       </View>
     </View>

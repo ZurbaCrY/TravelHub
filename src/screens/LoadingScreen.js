@@ -1,6 +1,7 @@
 import React from 'react';
 import { Text, View, ActivityIndicator, StyleSheet } from 'react-native';
 import PropTypes from 'prop-types';
+import { useDarkMode } from '../context/DarkModeContext';
 
 
 const LoadingScreen = ({ loadingMessage = 'Loading...' }) => {

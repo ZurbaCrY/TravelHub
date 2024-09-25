@@ -7,9 +7,10 @@ import {
 import { Input, Text } from "react-native-elements";
 import { styles } from '../style/styles';
 import Button from "../components/Button";
-import AuthService from "../User-Auth/auth"
+import AuthService from "../services/auth"
 import AnimatedSwitch from "../components/AnimatedSwitch";
 import PropTypes from 'prop-types';
+import { useDarkMode } from '../context/DarkModeContext';
 
 const SignInScreen = ({ navigation, setUser, setLoading }) => {
   const [email, setEmail] = useState("");
