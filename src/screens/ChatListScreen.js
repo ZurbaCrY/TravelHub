@@ -4,7 +4,7 @@ import { useDarkMode } from '../context/DarkModeContext';
 import { supabase } from '../services/supabase';
 import AuthService from '../services/auth'
 import Button from '../components/Button';
-import { styles as st } from '../style/styles';
+import { styles as st } from '../styles/styles';
 import PropTypes from 'prop-types';
 
 export default function ChatListScreen({ navigation }) {

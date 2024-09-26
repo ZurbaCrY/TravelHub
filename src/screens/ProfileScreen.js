@@ -16,8 +16,8 @@ import { useDarkMode } from '../context/DarkModeContext';
 import { useNavigation } from '@react-navigation/native';
 import AuthService from '../services/auth'
 import Button from '../components/Button';
-import { styles } from '../style/styles';
-import { supabase } from '../User-Auth/supabase';
+import { styles } from '../styles/styles';
+import { supabase } from '../services/supabase';
 
 export default function ProfileScreen() {
   const CURRENT_USER = AuthService.getUser();

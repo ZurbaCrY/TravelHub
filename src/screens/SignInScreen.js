@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { Input, Text } from "react-native-elements";
-import { styles } from '../style/styles';
+import { styles } from '../styles/styles';
 import Button from "../components/Button";
 import AuthService from "../services/auth"
 import AnimatedSwitch from "../components/AnimatedSwitch";
