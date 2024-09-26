@@ -84,3 +84,59 @@ export const deleteFavourite = async (attractionId, userId) => {
     return null;
   }
 };
+
+/**
+ * Funktion, die den richtigen Marker für einen Ort zurückgibt.
+ */
+export const getMarkerForPlace = (place, selectedPlace) => {
+  if (place === selectedPlace) {
+    return require('../assets/images/travel-marker-x.png');
+  }
+  switch (place.type) {
+    case 'Sehenswürdigkeit':
+      return require('../assets/images/travel-marker-s.png');
+    case 'Restaurant':
+      return require('../assets/images/travel-marker-r.png');
+    case 'Einkaufsladen':
+      return require('../assets/images/travel-marker-m.png');
+    case 'Aussichtspunkt':
+      return require('../assets/images/travel-marker-v.png');
+    default:
+      return require('../assets/images/travel-marker-x.png');
+  }
+};
+
+/**
+ * Funktion, die die Beschreibung eines Ortes zurückgibt.
+ */
+export const getDescriptionForPlace = (place, selectedPlace) => {
+  if (place === selectedPlace) {
+    if (place.type === 'Sehenswürdigkeit') {
+      return (place instanceof SightseeingSpot) ? `Eintritt: ${place.entranceFee || 'N/A'}` : 'N/A';
+    } else if (place.type === 'Restaurant') {
+      return `Preisniveau: ${place.priceLevel || 'N/A'}, Küche: ${place.cuisineType || 'N/A'}`;
+    } else {
+      return 'N/A';
+    }
+  } else {
+    return null;
+  }
+};
+
+/**
+ * Funktion, die das Bild eines Ortes zurückgibt.
+ */
+export const getListImage = (place) => {
+  return place.link;
+};
+
+/**
+ * Funktion, die den Namen eines Ortes zurückgibt.
+ */
+export const getNameForPlace = (place, selectedPlace) => {
+  if (place === selectedPlace) {
+    return place.name;
+  } else {
+    return null;
+  }
+};

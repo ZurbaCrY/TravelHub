@@ -21,7 +21,7 @@ import { Continent,
     ShoppingStore,
     Viewpoint } from '../backend/MapClasses';
 import { fetchData, updateVisitedCountry, updateOrCreateVisitedCountry } from '../backend/LoadEditMapData';
-import { updateFavourite, deleteFavourite } from '../backend/LoadEditPlaceData';
+import { updateFavourite, deleteFavourite, getMarkerForPlace, getDescriptionForPlace, getListImage, getNameForPlace } from '../backend/LoadEditPlaceData';
 
 const { width } = Dimensions.get('window');
 
@@ -103,55 +103,6 @@ export default function MapScreen() {
         }
       })();
   }, []);
-
-
-  /**
-   * Funktionen zum rendern der Details auf der Map.
-   *
-   */
-  const getImageForPlace = (place) => {
-    if (place === selectedPlace) {
-      return require('../assets/images/travel-marker-x.png');
-    }
-    switch (place.type) {
-      case 'Sehenswürdigkeit':
-        return require('../assets/images/travel-marker-s.png');
-      case 'Restaurant':
-        return require('../assets/images/travel-marker-r.png');
-      case 'Einkaufsladen':
-        return require('../assets/images/travel-marker-m.png');
-      case 'Aussichtspunkt':
-        return require('../assets/images/travel-marker-v.png');
-      default:
-        return require('../assets/images/travel-marker-x.png');
-    }
-  };
-
-  const getDescriptionForPlace = (place) => {
-    if (place === selectedPlace) {
-      if (place.type === 'Sehenswürdigkeit') {
-        return (place instanceof SightseeingSpot) ? `Eintritt: ${place.entranceFee || 'N/A'}` : 'N/A';
-      } else if (place.type === 'Restaurant') {
-        return `Preisniveau: ${place.priceLevel || 'N/A'}, Küche: ${place.cuisineType || 'N/A'}`;
-      } else {
-        return 'N/A';
-      }
-    } else {
-      return null;
-    }
-  };
-
-  const getListImage = (place) => {
-    return place.link;
-  };
-
-  const getNameForPlace = (place) => {
-    if (place === selectedPlace) {
-      return place.name;
-    } else {
-      return null;
-    }
-  }
 
   const findMiddleCoordinate = (coordinates) => {
     if (coordinates.length === 0) {
@@ -515,7 +466,7 @@ export default function MapScreen() {
                     title={getNameForPlace(place)}
                     description={getDescriptionForPlace(place)}
                     calloutEnabled={true}
-                    image={getImageForPlace(place)} // Hier das Bild für den benutzerdefinierten Marker angeben
+                    image={getMarkerForPlace(place)} // Hier das Bild für den benutzerdefinierten Marker angeben
                     style={{ width: 20, height: 20 }} // Anpassung der Größe des Markers
                   />
                 ))
