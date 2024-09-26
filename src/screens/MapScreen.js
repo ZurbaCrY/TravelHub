@@ -20,7 +20,7 @@ import { Continent,
     Restaurant,
     ShoppingStore,
     Viewpoint } from '../backend/MapClasses';
-import { fetchData } from '../backend/LoadMapData';
+import { fetchData, updateVisitedCountry, updateOrCreateVisitedCountry } from '../backend/LoadEditMapData';
 
 const { width } = Dimensions.get('window');
 
@@ -64,7 +64,7 @@ export default function MapScreen() {
       fetchData(setContinentsData, CURRENT_USER_ID);
 
       if (location) {
-        updateVisitedCountry();
+        updateVisitedCountry(location, findCountry, findNearestCity, CURRENT_USER_ID);
       }
   }, []);
 
@@ -75,6 +75,10 @@ export default function MapScreen() {
 
         scrollViewRef.current.scrollTo({ x: offsetX, y: 0, animated: true });
       }
+
+        if (location) {
+          updateVisitedCountry(location, findCountry, findNearestCity, CURRENT_USER_ID);
+        }
   }, [selectedPlace]);
 
   useEffect(() => {
@@ -101,42 +105,42 @@ export default function MapScreen() {
   }, []);
 
 
-const updateFavourite = async (attractionId, userId) => {
-  try {
-    // Überprüfen, ob ein Eintrag für die gegebene Attractions_ID und user_id existiert
-    const { data, error } = await supabase
-      .from('DesiredDestination')
-      .select('Desired_Destination_ID')
-      .eq('Attractions_ID', attractionId)
-      .eq('User_ID', userId)
-      .single();
+  const updateFavourite = async (attractionId, userId) => {
+      try {
+        // Überprüfen, ob ein Eintrag für die gegebene Attractions_ID und user_id existiert
+        const { data, error } = await supabase
+          .from('DesiredDestination')
+          .select('Desired_Destination_ID')
+          .eq('Attractions_ID', attractionId)
+          .eq('User_ID', userId)
+          .single();
 
-    if (error && error.code !== 'PGRST116') { // PGRST116: Single row expected, multiple rows found
-      throw error;
-    }
+        if (error && error.code !== 'PGRST116') { // PGRST116: Single row expected, multiple rows found
+          throw error;
+        }
 
-    // Wenn ein Eintrag existiert, gib den bestehenden Eintrag zurück
-    if (data) {
-      return data;
-    } else {
-      // Eintrag existiert nicht, erstelle einen neuen Eintrag
-      const { data: newEntry, error: insertError } = await supabase
-        .from('DesiredDestination')
-        .insert([{ Attractions_ID: attractionId, User_ID: userId }])
-        .select()
-        .single();
+        // Wenn ein Eintrag existiert, gib den bestehenden Eintrag zurück
+        if (data) {
+          return data;
+        } else {
+          // Eintrag existiert nicht, erstelle einen neuen Eintrag
+          const { data: newEntry, error: insertError } = await supabase
+            .from('DesiredDestination')
+            .insert([{ Attractions_ID: attractionId, User_ID: userId }])
+            .select()
+            .single();
 
-      if (insertError) {
-        throw insertError;
+          if (insertError) {
+            throw insertError;
+          }
+
+          return newEntry;
+        }
+      } catch (error) {
+        console.error('Fehler beim Erstellen des Eintrags in DesiredDestination:', error.message);
+        return null;
       }
-
-      return newEntry;
-    }
-  } catch (error) {
-    console.error('Fehler beim Erstellen des Eintrags in DesiredDestination:', error.message);
-    return null;
-  }
-};
+  };
 
 const deleteFavourite = async (attractionId, userId) => {
   try {
@@ -157,75 +161,6 @@ const deleteFavourite = async (attractionId, userId) => {
     return null;
   }
 };
-
-  /**
-   * Funktionen zum Verifizieren der besuchten Länder.
-   *
-   */
-    const updateVisitedCountry = () => {
-        let country = findCountry(findNearestCity({
-                              latitude: location.coords.latitude,
-                              longitude: location.coords.longitude,
-                              latitudeDelta: 0.0922,
-                              longitudeDelta: 0.0421,
-                            }));
-      console.log("folgendes Land wurde besucht: " + country.countryId);
-      updateOrCreateVisitedCountry(country.countryId, CURRENT_USER_ID);
-    };
-
-   const updateOrCreateVisitedCountry = async (countryId, userId) => {
-     try {
-       // Überprüfe, ob ein Eintrag für die gegebene Country_ID und user_id existiert
-       const { data, error } = await supabase
-         .from('Visited Countries')
-         .select('VisitedCountries_ID, verified')
-         .eq('Country_ID', countryId)
-         .eq('user_id', userId)
-         .single();
-
-       if (error && error.code !== 'PGRST116') { // PGRST116: Single row expected, multiple rows found
-         throw error;
-       }
-
-       if (data) {
-         // Eintrag existiert bereits, überprüfe den Wert von verified
-         if (data.verified) {
-           // Wenn verified bereits true ist, gib den bestehenden Eintrag zurück
-           return data;
-         }
-
-         // Setze verified auf true, da es noch nicht true ist
-         const { data: updatedEntry, error: updateError } = await supabase
-           .from('Visited Countries')
-           .update({ verified: true })
-           .eq('VisitedCountries_ID', data.VisitedCountries_ID)
-           .select();
-
-         if (updateError) {
-           throw updateError;
-         }
-
-         return updatedEntry;
-       } else {
-         // Eintrag existiert nicht, erstelle einen neuen Eintrag
-         const { data: newEntry, error: insertError } = await supabase
-           .from('Visited Countries')
-           .insert([{ Country_ID: countryId, user_id: userId, verified: true }])
-           .select();
-
-         if (insertError) {
-           throw insertError;
-         }
-
-         return newEntry;
-       }
-     } catch (error) {
-       console.error('Fehler beim Aktualisieren oder Erstellen des Eintrags:', error.message);
-       return null;
-     }
-   };
-
-
   /**
    * Funktionen zum rendern der Details auf der Map.
    *
