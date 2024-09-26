@@ -21,7 +21,7 @@ import { Continent,
     ShoppingStore,
     Viewpoint } from '../backend/MapClasses';
 import { fetchData, updateVisitedCountry, updateOrCreateVisitedCountry } from '../backend/LoadEditMapData';
-import { updateFavourite, deleteFavourite, getMarkerForPlace, getDescriptionForPlace, getListImage, getNameForPlace } from '../backend/LoadEditPlaceData';
+import { updateFavourite, deleteFavourite, getMarkerForPlace, getDescriptionForPlace, getListImage, getNameForPlace, handleStarClick } from '../backend/LoadEditPlaceData';
 
 const { width } = Dimensions.get('window');
 
@@ -103,6 +103,7 @@ export default function MapScreen() {
         }
       })();
   }, []);
+
 
   const findMiddleCoordinate = (coordinates) => {
     if (coordinates.length === 0) {
@@ -339,20 +340,6 @@ export default function MapScreen() {
     fetchData(setContinentsData, CURRENT_USER_ID);
   };
 
-  const isStarred = (place) => {
-    return place.favourite;
-  };
-
-  const handleStarClick = async (place) => {
-    if(!place.favourite){
-        await updateFavourite(place.placeId, CURRENT_USER_ID);
-    } else {
-        await deleteFavourite(place.placeId, CURRENT_USER_ID);
-    }
-    place.toggleFavourite();
-    //console.log(place.favourite);
-    setForceUpdate(prevState => !prevState);
-  }
 
   /**
    * Funktionen zum Öffnen von extra seiten für Attraction Details.
@@ -527,7 +514,7 @@ export default function MapScreen() {
                 key={`${place.name}-${forceUpdate}`}
                 place={place}
                 handleMarkerPress={handleMarkerPress}
-                handleStarClick={handleStarClick}
+                handleStarClick={(place) => handleStarClick(place, CURRENT_USER_ID, setForceUpdate)} // Hier die ausgelagerte Funktion verwenden
                 image={getListImage(place)}
                 handlePlaceDetail={handlePlaceDetail} // Diese Prop hinzufügen
                 selected={selectedPlace === place} // Hier wird selected übergeben

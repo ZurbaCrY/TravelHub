@@ -85,6 +85,21 @@ export const deleteFavourite = async (attractionId, userId) => {
   }
 };
 
+
+/**
+ * Funktion zum Rendern der Änderung des Favoritenstatus.
+ */
+export const handleStarClick = async (place, currentUserId, setForceUpdate) => {
+  if (!place.favourite) {
+    await updateFavourite(place.placeId, currentUserId);
+  } else {
+    await deleteFavourite(place.placeId, currentUserId);
+  }
+  place.toggleFavourite();
+  setForceUpdate(prevState => !prevState);
+};
+
+
 /**
  * Funktion, die den richtigen Marker für einen Ort zurückgibt.
  */
