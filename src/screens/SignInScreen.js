@@ -3,9 +3,9 @@ import {
   Alert,
   View,
   TouchableOpacity,
-  Text,  // Hier das Text-Element von react-native verwenden
+  Text,  
 } from "react-native";
-import { Input } from "react-native-elements"; // Lass Input aus react-native-elements
+import { Input } from "react-native-elements"; 
 import { styles } from '../styles/styles';
 import Button from "../components/Button";
 import AuthService from "../services/auth";
