@@ -46,12 +46,16 @@ export default function ChatListScreen({ navigation }) {
     };
     fetchChatsAndUsers();
 
-    // Anpassen des Message-Subscribers
+    // Subscriber für INSERT- und DELETE-Events auf Nachrichten
     const messageSubscription = supabase
       .channel('public:messages')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, payload => {
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
         console.log('New message received!', payload);
-        updateChatWithNewMessage(payload.new); // Aktualisieren des betroffenen Chats
+        updateChatWithNewMessage(payload.new); // Aktualisieren des betroffenen Chats bei neuer Nachricht
+      })
+      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'messages' }, payload => {
+        console.log('Message deleted!', payload);
+        fetchChats(); // Bei gelöschter Nachricht Chatliste neu laden
       })
       .subscribe();
 
