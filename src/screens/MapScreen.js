@@ -20,7 +20,7 @@ import { Continent,
     Restaurant,
     ShoppingStore,
     Viewpoint } from '../backend/MapClasses';
-
+import { fetchData } from '../backend/LoadMapData';
 
 const { width } = Dimensions.get('window');
 
@@ -53,133 +53,54 @@ export default function MapScreen() {
   const [selectedCoordinates, setSelectedCoordinates] = useState(null);
   const [continentsData, setContinentsData] = useState([]);
 
-const CURRENT_USER = AuthService.getUser();
-const CURRENT_USER_ID = CURRENT_USER.id;
+  const CURRENT_USER = AuthService.getUser();
+  const CURRENT_USER_ID = CURRENT_USER.id;
+
   /**
-   * Use Effect Methoden für erstmaliges Aufrufen - Laden der Karte und Daten aus DB.
-   * Aktualisieren der Position und der nächstliegenden Stadt
-   *
-   */
+     * UseEffect-Hooks für das erstmalige Aufrufen - Laden der Karte und Daten aus der DB.
+     * Aktualisieren der Position und der nächstgelegenen Stadt.
+  */
   useEffect(() => {
-    fetchData();
-    if (location) {
-        updateVisitedCountry();
-    }
-  }, []);
+      fetchData(setContinentsData, CURRENT_USER_ID);
 
-  useEffect(() => {
-    // Scrollen zur ausgewählten Position in der ScrollView
-    if (scrollViewRef.current && selectedPlace) {
-      const index = searchResult.places.findIndex(place => place === selectedPlace);
-      const offsetX = index * 120; // Breite des Platzhalters plus Abstand
-
-      scrollViewRef.current.scrollTo({ x: offsetX, y: 0, animated: true });
-    }
-  }, [selectedPlace]); // Füge selectedPlace als Abhängigkeit hinzu
-
-  useEffect(() => {
-    (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        setErrorMsg('Permission to access location was denied');
-        return;
-      }
-
-      fetchData();
-      console.log("data fetched");
-      let location = await Location.getCurrentPositionAsync({});
-      setLocation(location);
       if (location) {
-        setRegion({
-          latitude: location.coords.latitude,
-          longitude: location.coords.longitude,
-          latitudeDelta: 0.0922,
-          longitudeDelta: 0.0421,
-        }); // Setze die anfängliche Kartenregion
-        /*if(continentsData){
-            console.log("folgendes Land wurde besucht: " + findCountry(findNearestCity({
-                latitude: location.coords.latitude,
-                longitude: location.coords.longitude,
-                latitudeDelta: 0.0922,
-                longitudeDelta: 0.0421,
-            })).name);
-        }*/
+        updateVisitedCountry();
       }
-    })();
   }, []);
 
-  const fetchCountries = async () => {
-    const { data, error } = await supabase.from('Country').select('*');
-    if (error) {
-      throw new Error(error.message);
-    }
-    return data;
-  };
+  useEffect(() => {
+      if (scrollViewRef.current && selectedPlace) {
+        const index = searchResult.places.findIndex(place => place === selectedPlace);
+        const offsetX = index * 120; // Breite des Platzhalters plus Abstand
 
-  const fetchCities = async () => {
-    const { data, error } = await supabase.from('City').select('*');
-    if (error) {
-      throw new Error(error.message);
-    }
-    return data;
-  };
+        scrollViewRef.current.scrollTo({ x: offsetX, y: 0, animated: true });
+      }
+  }, [selectedPlace]);
 
-  const fetchPlaces = async () => {
-    const { data, error } = await supabase.from('Attraction').select('*');
-    if (error) {
-      throw new Error(error.message);
-    }
-    return data;
-  };
+  useEffect(() => {
+      (async () => {
+        let { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') {
+          setErrorMsg('Permission to access location was denied');
+          return;
+        }
 
-  const fetchData = async () => {
-    try {
-      const countries = await fetchCountries();
-      const cities = await fetchCities();
-      const attractions = await fetchPlaces();
+        let currentLocation = await Location.getCurrentPositionAsync({});
+        setLocation(currentLocation);
 
-       const continentsData = await Promise.all([
-         new Continent('World', await Promise.all(countries.map(async (country) => {
-           const countryCities = await Promise.all(cities
-             .filter(city => city.Country_ID === country.Country_ID)
-             .map(async (city) => {
-               const cityAttractions = await Promise.all(attractions
-                 .filter(attraction => attraction.City_ID === city.City_ID)
-                 .map(async (attraction) => {
-                   const favourite = await isFavourite(attraction.Attraction_ID, CURRENT_USER_ID);
-                   return new Place(
-                     attraction.Attraction_ID,
-                     attraction.Attraction_Name,
-                     { latitude: parseFloat(attraction.Latitude), longitude: parseFloat(attraction.Longitude) },
-                     attraction.Type_of_Attraction,
-                     attraction.Description,
-                     attraction.Link,
-                     favourite
-                   );
-                 })
-               );
+        if (currentLocation) {
+          setRegion({
+            latitude: currentLocation.coords.latitude,
+            longitude: currentLocation.coords.longitude,
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421,
+          });
 
-               const cityCoordinates = [
-                 { latitude: parseFloat(city.latitude), longitude: parseFloat(city.longitude) }
-               ];
+          updateVisitedCountry();
+        }
+      })();
+  }, []);
 
-               return new City(city.City_ID, city.Cityname, cityCoordinates, cityAttractions);
-             })
-           );
-
-           return new Country(country.Country_ID, country.Countryname, countryCities);
-         })))
-       ]);
-
-      setContinentsData(continentsData);
-    } catch (error) {
-      console.error('Error fetching data:', error.message);
-    }
-
-    if (location) {
-        updateVisitedCountry();
-    }
-  };
 
 const updateFavourite = async (attractionId, userId) => {
   try {
@@ -237,31 +158,6 @@ const deleteFavourite = async (attractionId, userId) => {
     return null;
   }
 };
-
-const isFavourite = async (placeId, userId) => {
-  try {
-    // Überprüfe, ob ein Eintrag für die gegebene Attractions_ID und user_id existiert
-    const { data, error } = await supabase
-      .from('DesiredDestination')
-      .select('Attractions_ID')
-      .eq('Attractions_ID', placeId)
-      .eq('User_ID', userId)
-      .single();
-
-    if (error && error.code !== 'PGRST116') { // PGRST116: Single row expected, multiple rows found
-      throw error;
-    }
-
-    // Wenn ein Eintrag existiert, gib true zurück, ansonsten false
-    //console.log(!!data);
-    return !!data;
-  } catch (error) {
-    console.error('Fehler beim Überprüfen des Favoritenstatus:', error.message);
-    return false;
-  }
-};
-
-
 
   /**
    * Funktionen zum Verifizieren der besuchten Länder.
@@ -611,7 +507,7 @@ const isFavourite = async (placeId, userId) => {
 
   const scrollToTop = () => {
     setShowList(true);
-    fetchData();
+    fetchData(setContinentsData, CURRENT_USER_ID);
   };
 
   const isStarred = (place) => {
