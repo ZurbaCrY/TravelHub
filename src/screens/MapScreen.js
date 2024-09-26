@@ -21,6 +21,7 @@ import { Continent,
     ShoppingStore,
     Viewpoint } from '../backend/MapClasses';
 import { fetchData, updateVisitedCountry, updateOrCreateVisitedCountry } from '../backend/LoadEditMapData';
+import { updateFavourite, deleteFavourite } from '../backend/LoadEditPlaceData';
 
 const { width } = Dimensions.get('window');
 
@@ -76,9 +77,9 @@ export default function MapScreen() {
         scrollViewRef.current.scrollTo({ x: offsetX, y: 0, animated: true });
       }
 
-        if (location) {
+      if (location) {
           updateVisitedCountry(location, findCountry, findNearestCity, CURRENT_USER_ID);
-        }
+      }
   }, [selectedPlace]);
 
   useEffect(() => {
@@ -99,68 +100,11 @@ export default function MapScreen() {
             latitudeDelta: 0.0922,
             longitudeDelta: 0.0421,
           });
-
         }
       })();
   }, []);
 
 
-  const updateFavourite = async (attractionId, userId) => {
-      try {
-        // Überprüfen, ob ein Eintrag für die gegebene Attractions_ID und user_id existiert
-        const { data, error } = await supabase
-          .from('DesiredDestination')
-          .select('Desired_Destination_ID')
-          .eq('Attractions_ID', attractionId)
-          .eq('User_ID', userId)
-          .single();
-
-        if (error && error.code !== 'PGRST116') { // PGRST116: Single row expected, multiple rows found
-          throw error;
-        }
-
-        // Wenn ein Eintrag existiert, gib den bestehenden Eintrag zurück
-        if (data) {
-          return data;
-        } else {
-          // Eintrag existiert nicht, erstelle einen neuen Eintrag
-          const { data: newEntry, error: insertError } = await supabase
-            .from('DesiredDestination')
-            .insert([{ Attractions_ID: attractionId, User_ID: userId }])
-            .select()
-            .single();
-
-          if (insertError) {
-            throw insertError;
-          }
-
-          return newEntry;
-        }
-      } catch (error) {
-        console.error('Fehler beim Erstellen des Eintrags in DesiredDestination:', error.message);
-        return null;
-      }
-  };
-
-const deleteFavourite = async (attractionId, userId) => {
-  try {
-    // Lösche den Eintrag für die gegebene Attractions_ID und user_id
-    const { data, error } = await supabase
-      .from('DesiredDestination')
-      .delete()
-      .eq('Attractions_ID', attractionId)
-      .eq('User_ID', userId);
-
-    if (error) {
-      throw error;
-    }
-
-    return data;
-  } catch (error) {
-    console.error('Fehler beim Löschen des Eintrags aus DesiredDestination:', error.message);
-    return null;
-  }
-};
   /**
    * Funktionen zum rendern der Details auf der Map.
    *
