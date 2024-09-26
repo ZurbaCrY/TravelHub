@@ -96,7 +96,6 @@ export default function MapScreen() {
             longitudeDelta: 0.0421,
           });
 
-          updateVisitedCountry();
         }
       })();
   }, []);
