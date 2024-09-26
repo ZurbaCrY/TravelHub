@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     paddingTop: 20,
-    justifyContent: 'flex-end', // Korrigiere den doppelten Schlüssel
+    justifyContent: 'flex-end', 
   },
   input: {
     width: '70%',
