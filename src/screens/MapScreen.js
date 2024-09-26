@@ -5,8 +5,8 @@ import * as Location from 'expo-location';
 import { customMapStyle } from '../styles/customMapStyle';
 import { MaterialIcons } from '@expo/vector-icons';
 import CustomPlaceItem from '../components/CustomPlaceItem';
-import PlaceDetailScreen from './PlaceDetailScreen';
-import AddPlaceModal from './AddPlaceModal';
+import PlaceDetailScreen from '../components/PlaceDetailScreen';
+import AddPlaceModal from '../components/AddPlaceModal';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { Button } from 'react-native-paper'
 import { supabase } from '../services/supabase';
