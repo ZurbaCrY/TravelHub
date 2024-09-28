@@ -12,8 +12,8 @@ export default function ChatScreen({ route, navigation }) {
   const CURRENT_USER_ID = CURRENT_USER.id;
   const { chatId, chatName } = route.params;
   const [messages, setMessages] = useState([]);
-  const [selectedMessage, setSelectedMessage] = useState(null); // Nachricht für das Löschen
-  const [isDeleteModalVisible, setDeleteModalVisible] = useState(false); // Sichtbarkeit des Lösch-Menüs
+  const [selectedMessage, setSelectedMessage] = useState(null);
+  const [isDeleteModalVisible, setDeleteModalVisible] = useState(false);
   const { isDarkMode } = useDarkMode();
 
   useEffect(() => {
