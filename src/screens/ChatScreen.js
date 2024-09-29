@@ -97,7 +97,8 @@ export default function ChatScreen({ route, navigation }) {
         const { error } = await supabase
           .from('messages')
           .delete()
-          .eq('id', selectedMessage._id);
+          .eq('id', selectedMessage._id)
+          .eq('user_id', CURRENT_USER_ID);
           
         if (error) {
           console.error('Error deleting message:', error);
