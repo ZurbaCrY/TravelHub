@@ -6,7 +6,6 @@ import { supabase } from '../services/supabase';
 import AuthService from '../services/auth';
 import PropTypes from 'prop-types';
 
-
 export default function ChatScreen({ route, navigation }) {
   const CURRENT_USER = AuthService.getUser();
   const CURRENT_USER_ID = CURRENT_USER.id;
@@ -117,6 +116,12 @@ export default function ChatScreen({ route, navigation }) {
     setDeleteModalVisible(true);
   };
 
+  const handleLongPress = (context, message) => {
+    if (message.user._id === CURRENT_USER_ID) {
+      openDeleteModal(message);
+    }
+  };
+
   return (
     <View style={[styles.container, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
       <GiftedChat
@@ -126,7 +131,7 @@ export default function ChatScreen({ route, navigation }) {
           _id: CURRENT_USER_ID,
         }}
         textInputStyle={{ color: isDarkMode ? '#FFF' : '#000' }}
-        onLongPress={(context, message) => openDeleteModal(message)}
+        onLongPress={handleLongPress}
       />
 
       <Modal
