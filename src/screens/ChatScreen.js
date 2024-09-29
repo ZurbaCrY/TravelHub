@@ -104,6 +104,26 @@ export default function ChatScreen({ route, navigation }) {
         } else {
           setMessages(prevMessages => prevMessages.filter(msg => msg._id !== selectedMessage._id));
           setDeleteModalVisible(false);
+          const { count, error: countError } = await supabase
+          .from('messages')
+          .select('id', { count: 'exact' })
+          .eq('chat_id', chatId);
+
+        if (countError) {
+          console.error('Error counting messages:', countError);
+        } else if (count === 0) {
+          // Wenn keine Nachrichten mehr vorhanden sind, lösche den Chat
+          const { error: chatDeleteError } = await supabase
+            .from('chat_user')
+            .delete()
+            .eq('chat_id', chatId);
+
+          if (chatDeleteError) {
+            console.error('Error deleting chat:', chatDeleteError);
+          } else {
+            navigation.goBack();
+          }
+        }
         }
       } catch (error) {
         console.error('Error deleting message:', error);
