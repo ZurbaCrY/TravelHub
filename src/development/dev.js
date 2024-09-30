@@ -22,11 +22,11 @@ export default function DevelopmentScreen() {
   }, []);
 
   const acceptFriendRequest = async () => {
-    await FriendService.respondToFriendRequest(35, "accept");
+    await FriendService.respondToFriendRequest(42, "accept");
   };
 
   const declineFriendRequest = async () => {
-    await FriendService.respondToFriendRequest(33, "decline");
+    await FriendService.respondToFriendRequest(42, "decline");
   };
 
   return (

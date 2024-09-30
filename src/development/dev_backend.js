@@ -73,10 +73,32 @@ class FriendService {
     });
   }
 
+
   async sendFriendRequest(receiver_id) {
-    if (this.user.id === receiver_id) {
+    if (receiver_id === this.user.id) {
       throw new Error("You can't send a friend request to yourself");
     }
+
+    // Check if the user is already a friend
+    this.isFriend(receiver_id);
+
+    // Check if there is already a pending request to the receiver
+    const existingRequest = this.friendRequests.sent.pending.find(
+      req => req.receiver_id === receiver_id || req.sender_id === receiver_id
+    );
+    if (existingRequest) {
+      throw new Error("Friend request already sent.");
+    }
+
+    // Check if there is a pending request from the receiver
+    const receivedRequest = this.friendRequests.received.pending.find(
+      req => req.sender_id === receiver_id
+    );
+    if (receivedRequest) {
+      throw new Error("You have already received a friend request from this user.");
+    }
+
+    // Insert the friend request if none exists
     const { data, error } = await this.supabase
       .from("friend_requests")
       .insert({ sender_id: this.user.id, receiver_id })
@@ -88,7 +110,30 @@ class FriendService {
     return data;
   }
 
+  isFriend(receiver_id) {
+    const isFriend = this.friends.find(friend => friend.friend_id === receiver_id);
+    if (isFriend) {
+      throw new Error("You are already friends with this user.");
+    }
+  }
+
   async respondToFriendRequest(requestId, action) {
+    // Find the request in local state (pending, accepted, or declined)
+    const request = this.friendRequests.received.pending.find(req => req.friend_request_id === requestId) ||
+      this.friendRequests.received.accepted.find(req => req.friend_request_id === requestId) ||
+      this.friendRequests.received.declined.find(req => req.friend_request_id === requestId);
+    if (!request) {
+      throw new Error("Friend request not found.");
+    }
+    if ((action === "accept" && request.status === "accepted") ||
+      (action === "decline" && request.status === "declined")) {
+      throw new Error(`This friend request has already been ${request.status}.`);
+    }
+
+    // Check if the user is already a friend
+    this.isFriend(request.sender_id);
+
+    // Update the status
     const status =
       action === "accept" ? "accepted" : "declined";
     const { data, error } = await this.supabase
@@ -100,13 +145,26 @@ class FriendService {
     if (error) {
       throw new Error("Error responding to friend request: " + error.message);
     }
-    if (action == "accept") {
+    if (action === "accept") {
       await this.addFriend(data.receiver_id);
     }
     this.updateRequestStatus(requestId, "received", status);
   }
 
   async addFriend(friend_id) {
+    // Check if the friendship already exists
+    const { data: existingFriendship, error: fetchError } = await this.supabase
+      .from("friends")
+      .select("*")
+      .or(`(user_id.eq.${this.user.id}, friend_id.eq.${friend_id}), (user_id.eq.${friend_id}, friend_id.eq.${this.user.id})`);
+    if (fetchError) {
+      throw new Error("Error checking for existing friendships: " + fetchError.message);
+    }
+    if (existingFriendship.length > 0) {
+      throw new Error("You are already friends with this user");
+    }
+
+    // Insert the friendship if none exists
     const { data, error } = await this.supabase
       .from("friends")
       .insert([
@@ -117,7 +175,6 @@ class FriendService {
     if (error) throw error;
 
     const friendEntry = data.find(entry => entry.user_id === this.user.id);
-
     this.friends.push(friendEntry)
     return friendEntry;
   }
@@ -143,6 +200,7 @@ class FriendService {
   getFriends() {
     return this.friends
   }
+  
 }
 
 export default new FriendService(supabase);
