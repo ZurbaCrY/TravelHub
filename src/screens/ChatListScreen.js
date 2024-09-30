@@ -6,8 +6,8 @@ import AuthService from '../services/auth';
 import Button from '../components/Button';
 import { styles as st } from '../styles/styles';
 import PropTypes from 'prop-types';
+import { useFocusEffect } from '@react-navigation/native';
 
-// Helper-Funktion für Supabase-Abfragen
 const fetchFromSupabase = async (table, select, filters = []) => {
   let query = supabase.from(table).select(select);
   filters.forEach(([key, operator, value]) => {
@@ -33,56 +33,23 @@ export default function ChatListScreen({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchChatsAndUsers = async () => {
-      try {
-        await fetchChats();
-        await fetchUsers();
-      } catch (error) {
-        console.error('Error fetching chats and users:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchChatsAndUsers();
-
-    // Subscriber für INSERT- und DELETE-Events auf Nachrichten
-    const messageSubscription = supabase
-      .channel('public:messages')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
-        console.log('New message received!', payload);
-        updateChatWithNewMessage(payload.new); // Aktualisieren des betroffenen Chats bei neuer Nachricht
-      })
-      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'messages' }, payload => {
-        console.log('Message deleted!', payload);
-        fetchChats(); // Bei gelöschter Nachricht Chatliste neu laden
-      })
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(messageSubscription);
-    };
-  }, []);
-
-  // Funktion zum Aktualisieren eines spezifischen Chats mit der neuen Nachricht
-  const updateChatWithNewMessage = (newMessage) => {
-    setChats((prevChats) => {
-      const updatedChats = prevChats.map(chat => {
-        if (chat.chat_id === newMessage.chat_id) {
-          return {
-            ...chat,
-            latestMessage: newMessage // Setze die neueste Nachricht
-          };
+  // Verwende useFocusEffect, um sicherzustellen, dass die Chats aktualisiert werden, wenn der Benutzer zurückkehrt
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchChatsAndUsers = async () => {
+        try {
+          await fetchChats();
+          await fetchUsers();
+        } catch (error) {
+          console.error('Error fetching chats and users:', error);
+        } finally {
+          setLoading(false);
         }
-        return chat;
-      });
+      };
+      fetchChatsAndUsers();
+    }, [])
+  );
 
-      // Sortiere die Chats so, dass der Chat mit der neuesten Nachricht oben steht
-      return updatedChats.sort((a, b) => new Date(b.latestMessage.created_at) - new Date(a.latestMessage.created_at));
-    });
-  };
-
-  // Funktion zum Abrufen der Chats des aktuellen Benutzers
   const fetchChats = async () => {
     const chatUserData = await fetchFromSupabase('chat_user', 'chat_id', [['eq', 'user_id', CURRENT_USER_ID]]);
     const chatIds = chatUserData.map(chatUser => chatUser.chat_id);
@@ -95,7 +62,6 @@ export default function ChatListScreen({ navigation }) {
     const messages = await fetchFromSupabase('messages', 'chat_id, content, created_at, user_id', [['in', 'chat_id', chatIds]]);
     const chatMap = new Map();
     messages.forEach(message => {
-      // Die neueste Nachricht für jeden Chat ermitteln
       if (!chatMap.has(message.chat_id) || new Date(message.created_at) > new Date(chatMap.get(message.chat_id).created_at)) {
         chatMap.set(message.chat_id, message);
       }
@@ -115,12 +81,10 @@ export default function ChatListScreen({ navigation }) {
       };
     }));
 
-    // Sortiere die Chats nach der neuesten Nachricht
     chatList.sort((a, b) => new Date(b.latestMessage.created_at) - new Date(a.latestMessage.created_at));
     setChats(chatList);
   };
 
-  // Funktion zum Abrufen aller Benutzer, die noch keinen Chat mit dem aktuellen Benutzer haben
   const fetchUsers = async () => {
     const allUsers = await fetchFromSupabase('users', 'user_id, username', [['neq', 'user_id', CURRENT_USER_ID]]);
     const existingChats = await fetchFromSupabase('chat_user', 'chat_id', [['eq', 'user_id', CURRENT_USER_ID]]);
@@ -139,25 +103,21 @@ export default function ChatListScreen({ navigation }) {
     setUsers(availableUsers);
   };
 
-  // Funktion zum Abrufen der Benutzer in einem bestimmten Chat
   const getChatUsers = async (chatId) => {
     return await fetchFromSupabase('chat_user', 'user_id', [['eq', 'chat_id', chatId]]);
   };
 
-  // Funktion zum Abrufen eines Benutzernamens basierend auf der Benutzer-ID
   const fetchUsername = async (userId) => {
     const [user] = await fetchFromSupabase('users', 'username', [['eq', 'user_id', userId]]);
     return user ? user.username : null;
   };
 
-  // Funktion zum Erstellen eines neuen Chats
   const createNewChat = async () => {
     if (!selectedUser || selectedUser.user_id === CURRENT_USER_ID) {
       Alert.alert('Fehler', 'Sie können keinen Chat mit sich selbst erstellen.');
       return;
     }
-
-    const newChat = { chat_id: Date.now().toString(), created_at: new Date().toISOString() };
+    const newChat = { chat_id: Date.now(), created_at: new Date().toISOString() };
     await supabase.from('chat').insert([newChat]);
     const newChatUser = [
       { chat_id: newChat.chat_id, user_id: CURRENT_USER_ID },
@@ -165,7 +125,7 @@ export default function ChatListScreen({ navigation }) {
     ];
     await supabase.from('chat_user').insert(newChatUser);
 
-    const initialMessage = { chat_id: newChat.chat_id, content: `Hallo ${selectedUser.username}`, user_id: CURRENT_USER_ID, created_at: new Date().toISOString() };
+    const initialMessage = { chat_id: newChat.chat_id, content: `Hallo ${selectedUser.username}`, user_id: CURRENT_USER_ID, created_at: new Date().toISOString(), edited: false };
     await supabase.from('messages').insert([initialMessage]);
 
     fetchChats();
@@ -190,7 +150,7 @@ export default function ChatListScreen({ navigation }) {
         styles.userItem,
         selectedUser && selectedUser.user_id === user.user_id && styles.selectedUserItem
       ]}
-      onPress={() => setSelectedUser(user)} // Benutzer auswählen
+      onPress={() => setSelectedUser(user)}
     >
       <Text style={styles.userName}>{user.username}</Text>
     </TouchableOpacity>
@@ -207,8 +167,8 @@ export default function ChatListScreen({ navigation }) {
     return (
       <View style={[styles.container, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
         <Button mode="contained" onPress={() => {
-          setSelectedUser(null); // Reset selection when opening modal
-          fetchUsers(); // Aktualisiert Benutzerliste bei Öffnen des Modals
+          setSelectedUser(null); 
+          fetchUsers();
           setModalVisible(true);
         }}>
           Neuen Chat erstellen
