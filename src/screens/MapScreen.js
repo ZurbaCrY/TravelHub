@@ -23,6 +23,7 @@ import { Continent,
 import { fetchData, updateVisitedCountry, updateOrCreateVisitedCountry } from '../backend/LoadEditMapData';
 import { updateFavourite, deleteFavourite, getMarkerForPlace, getDescriptionForPlace, getListImage, getNameForPlace, handleStarClick } from '../backend/LoadEditPlaceData';
 import { findNearestCity } from '../backend/MapLocationChangeFunctions';
+import MapSearchBar from '../components/MapSearchBar';
 
 const { width } = Dimensions.get('window');
 
@@ -137,88 +138,6 @@ export default function MapScreen() {
     }
   };
 
-  /**
-   * Funktionen für Suchleiste mit Autocomplete.
-   *
-   */
-  const newHandleSearch = () => {
-
-    if (selectedCoordinates) {
-      setSelectedPlace(null);
-      scrollToStart();
-      if (mapRef) {
-        mapRef.animateToRegion({
-          latitude: selectedCoordinates.lat,
-          longitude: selectedCoordinates.lng,
-          latitudeDelta: 1, // Hier kannst du die Zoomstufe einstellen
-          longitudeDelta: 1, // Hier kannst du die Zoomstufe einstellen
-        }, 1000);
-      }
-      const nearestCity = findNearestCity({
-        latitude: selectedCoordinates.lat,
-        longitude: selectedCoordinates.lng,
-        latitudeDelta: 1, // Eine sehr kleine Zahl für einen sehr kleinen Bereich
-        longitudeDelta: 1, // Eine sehr kleine Zahl für einen sehr kleinen Bereich
-      }, continentsData);
-      //console.log(nearestCity.name);
-
-      // Set the searchLocation state to the nearest city
-      setSearchResult(nearestCity);
-      //console.log(searchResult);
-    } else {
-      console.log("ERROR: City not found");
-    }
-
-  }
-
-  const handleSearch = async () => {
-    const result = continentsData.find(continent =>
-      continent.countries.some(country =>
-        country.cities.some(city =>
-          city.name.toLowerCase() === searchQuery.toLowerCase()
-        )
-      )
-    );
-    //console.log(result);
-
-    if (result) {
-      // Durch die Länder des Ergebnisses iterieren
-      const matchingCountry = result.countries.find(country =>
-        country.cities.some(city =>
-          city.name.toLowerCase() === searchQuery.toLowerCase()
-        )
-      ); // Zugriff auf das erste Element des Arrays
-
-      //console.log(matchingCountry);
-
-      if (matchingCountry) {
-        const city = matchingCountry.cities.find(city =>
-          city.name.toLowerCase() === searchQuery.toLowerCase()
-        );
-        //console.log(city);
-        if (city) {
-          setSearchResult(city);
-          setSelectedPlace(null);
-          scrollToStart();
-          const middleCoordinate = findMiddleCoordinate(city.coordinates);
-
-          // Animiere die Karte zur Mitte der gesuchten Stadt über einen Zeitraum von 1000 Millisekunden (1 Sekunde)
-          if (mapRef) {
-            mapRef.animateToRegion({
-              latitude: middleCoordinate.latitude,
-              longitude: middleCoordinate.longitude,
-              latitudeDelta: 1, // Hier kannst du die Zoomstufe einstellen
-              longitudeDelta: 1, // Hier kannst du die Zoomstufe einstellen
-            }, 1000);
-          }
-        } else {
-          setSearchResult(null);
-          setSearchLocation(null);
-        }
-      }
-
-    }
-  };
 
   const handleResetPlaces = () => {
     setShowBottomLine(false); // Setze den Suchergebnis-Status auf null, um den Inhalt der Leiste zurückzusetzen
@@ -239,7 +158,6 @@ export default function MapScreen() {
         longitudeDelta: 0.01, // Hier kannst du die Zoomstufe einstellen
       }, 1000);
     }
-    //console.log(place);
   };
 
   const handleMapPress = () => {
@@ -267,24 +185,6 @@ export default function MapScreen() {
 
   };
 
-  /**
-   * Funktion für API Autocomplete Aufruf.
-   *
-   */
-  const fetchCityCoordinates = async (placeId) => {
-    try {
-      const response = await fetch(`https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=geometry&key=AIzaSyDUMJ0wbXrEYkKY4iN7noJJ7yRp-C86LFU`);
-      const data = await response.json();
-      const { geometry } = data.result;
-      if (geometry) {
-        setSelectedCoordinates(geometry.location);
-        //console.log(selectedCoordinates);
-      }
-    } catch (error) {
-      console.error('Error fetching city coordinates:', error);
-    }
-  };
-
 
   /**
    * tatsächliche Komponenten fürs Rendering.
@@ -293,37 +193,15 @@ export default function MapScreen() {
   return (
     <View style={styles.container}>
 
-      <View style={[styles.searchContainer, showList && styles.disabledContainer]}>
-        <GooglePlacesAutocomplete
-          placeholder='Search for city...'
-          onPress={(data, details = null) => {
-            //console.log('hurensohn');
-            // Extrahiere die Koordinaten aus den Details, falls vorhanden
-            //console.log(data);
-            const { place_id } = details;
-            //console.log(place_id);
-            if (place_id) {
-              fetchCityCoordinates(place_id);
-            }
-          }}
-          query={{
-            key: 'AIzaSyDUMJ0wbXrEYkKY4iN7noJJ7yRp-C86LFU',
-            language: 'en',
-            types: '(cities)',
-          }}
-          styles={{
-            textInput: styles.searchInput,
-            listView: styles.listViewContainer,
-          }}
-        />
-        <Button
-          mode='contained'
-          onPress={newHandleSearch}
-          disabled={showList} // Deaktiviere den Button, wenn showList true ist
-          style={styles.button}
-          labelStyle={styles.buttonText}
-        >Go!</Button>
-      </View>
+      <MapSearchBar
+        styles={styles}
+        mapRef={mapRef}
+        scrollToStart={scrollToStart}
+        setSelectedCoordinates={setSelectedCoordinates}
+        setSelectedPlace={setSelectedPlace}
+        setSearchResult={setSearchResult}
+        continentsData={continentsData}
+      />
 
       {/* Symbol mit einem Plus oben links */}
       <TouchableOpacity style={[styles.addButton, showList && styles.disabledContainer]} onPress={handleOpenModal} >
