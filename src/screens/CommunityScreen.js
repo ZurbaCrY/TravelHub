@@ -5,7 +5,7 @@ import { useDarkMode } from '../context/DarkModeContext';
 import { supabase } from '../services/supabase';
 import * as ImagePicker from 'expo-image-picker';
 import AuthService from '../services/auth';
-// import { SUPABASE_URL, SUPABASE_KEY } from '@env';
+import { handleImageUpload } from '../backend/fileUpload';
 
 export default function CommunityScreen() {
   const user = AuthService.getUser();
@@ -79,39 +79,39 @@ export default function CommunityScreen() {
     }
   };
 
-  const handleImageUpload = async () => {
-    try {
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [4, 3],
-        quality: 1,
-      });
+  // const handleImageUpload = async () => {
+  //   try {
+  //     const result = await ImagePicker.launchImageLibraryAsync({
+  //       mediaTypes: ImagePicker.MediaTypeOptions.Images,
+  //       allowsEditing: true,
+  //       aspect: [4, 3],
+  //       quality: 1,
+  //     });
 
-      if (!result.canceled && result.assets.length > 0) {
-        const firstAsset = result.assets[0];
-        const fileUri = firstAsset.uri;
-        const fileName = fileUri.substring(fileUri.lastIndexOf('/') + 1);
+  //     if (!result.canceled && result.assets.length > 0) {
+  //       const firstAsset = result.assets[0];
+  //       const fileUri = firstAsset.uri;
+  //       const fileName = fileUri.substring(fileUri.lastIndexOf('/') + 1);
 
-        const response = await fetch(fileUri);
-        const blob = await response.blob();
+  //       const response = await fetch(fileUri);
+  //       const blob = await response.blob();
 
-        const { error } = await supabase.storage.from('Storage').upload(`images/${fileName}`, blob, {
-          cacheControl: '3600',
-          upsert: false,
-        });
+  //       const { error } = await supabase.storage.from('Storage').upload(`images/${fileName}`, blob, {
+  //         cacheControl: '3600',
+  //         upsert: false,
+  //       });
 
-        if (error) {
-          throw error;
-        }
+  //       if (error) {
+  //         throw error;
+  //       }
 
-        const imageUrl = `${process.env.REACT_APP_SUPABASE_URL}/storage/v1/object/public/Storage/images/${fileName}`;
-        console.log('Image URL:', imageUrl);
-      }
-    } catch (error) {
-      console.error('Fehler beim Hochladen des Bildes:', error.message);
-    }
-  };
+  //       const imageUrl = `${process.env.REACT_APP_SUPABASE_URL}/storage/v1/object/public/Storage/images/${fileName}`;
+  //       console.log('Image URL:', imageUrl);
+  //     }
+  //   } catch (error) {
+  //     console.error('Fehler beim Hochladen des Bildes:', error.message);
+  //   }
+  // };
 
   return (
     <View style={[styles.container, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
