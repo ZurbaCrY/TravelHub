@@ -73,30 +73,13 @@ class FriendService {
     });
   }
 
-
   async sendFriendRequest(receiver_id) {
     if (receiver_id === this.user.id) {
       throw new Error("You can't send a friend request to yourself");
     }
 
-    // Check if the user is already a friend
-    this.isFriend(receiver_id);
-
-    // Check if there is already a pending request to the receiver
-    const existingRequest = this.friendRequests.sent.pending.find(
-      req => req.receiver_id === receiver_id || req.sender_id === receiver_id
-    );
-    if (existingRequest) {
-      throw new Error("Friend request already sent.");
-    }
-
-    // Check if there is a pending request from the receiver
-    const receivedRequest = this.friendRequests.received.pending.find(
-      req => req.sender_id === receiver_id
-    );
-    if (receivedRequest) {
-      throw new Error("You have already received a friend request from this user.");
-    }
+    this.checkFriendshipLocal(receiver_id);
+    this.checkExistingRequest(receiver_id);
 
     // Insert the friend request if none exists
     const { data, error } = await this.supabase
@@ -110,14 +93,10 @@ class FriendService {
     return data;
   }
 
-  isFriend(receiver_id) {
-    const isFriend = this.friends.find(friend => friend.friend_id === receiver_id);
-    if (isFriend) {
-      throw new Error("You are already friends with this user.");
-    }
-  }
-
   async respondToFriendRequest(requestId, action) {
+    if (!["accept", "decline"].includes(action)) {
+      throw new Error("Invalid action. Must be 'accept' or 'decline'.");
+    }
     // Find the request in local state (pending, accepted, or declined)
     const request = this.friendRequests.received.pending.find(req => req.friend_request_id === requestId) ||
       this.friendRequests.received.accepted.find(req => req.friend_request_id === requestId) ||
@@ -131,7 +110,7 @@ class FriendService {
     }
 
     // Check if the user is already a friend
-    this.isFriend(request.sender_id);
+    this.checkFriendshipLocal(request.sender_id);
 
     // Update the status
     const status =
@@ -152,15 +131,7 @@ class FriendService {
   }
 
   async addFriend(friend_id) {
-    // Check if the friendship already exists
-    const { data: existingFriendship, error: fetchError } = await this.supabase
-      .from("friends")
-      .select("*")
-      .or(`(user_id.eq.${this.user.id}, friend_id.eq.${friend_id}), (user_id.eq.${friend_id}, friend_id.eq.${this.user.id})`);
-    if (fetchError) {
-      throw new Error("Error checking for existing friendships: " + fetchError.message);
-    }
-    if (existingFriendship.length > 0) {
+    if (await this.checkFriendship(friend_id)) {
       throw new Error("You are already friends with this user");
     }
 
@@ -180,6 +151,7 @@ class FriendService {
   }
 
   async removeFriend(friend_id) {
+    // Check if friend exists
     const { error } = await this.supabase
       .from("friends")
       .delete()
@@ -188,7 +160,44 @@ class FriendService {
     this.data.friends = this.data.friends.filter(f => f !== friend_id); // Remove friend from list
   }
 
-  // Update the status of a request in the local store
+  async checkFriendship(friend_id) {
+    // Check if the friendship already exists in local state
+    if (this.checkFriendshipLocal(friend_id)) {
+      throw new Error("You are already friends with this user");
+    }
+
+    const { data: existingFriendship, error } = await this.supabase
+      .from("friends")
+      .select("*")
+      .or(`(user_id.eq.${this.user.id}, friend_id.eq.${friend_id}), (user_id.eq.${friend_id}, friend_id.eq.${this.user.id})`);
+
+    if (error) {
+      throw new Error("Error checking for existing friendships: " + error.message);
+    }
+
+    return existingFriendship.length > 0;
+  }
+
+  checkExistingRequest(receiver_id) {
+    const existingRequest = this.friendRequests.sent.pending.find(
+      req => req.receiver_id === receiver_id || req.sender_id === receiver_id
+    );
+    if (existingRequest) {
+      throw new Error("Friend request already sent.");
+    }
+
+    const receivedRequest = this.friendRequests.received.pending.find(
+      req => req.sender_id === receiver_id
+    );
+    if (receivedRequest) {
+      throw new Error("You have already received a friend request from this user.");
+    }
+  }
+
+  checkFriendshipLocal(friend_id) {
+    return this.friends.some(friend => friend.friend_id === friend_id);
+  }
+
   updateRequestStatus(requestId, type, newStatus) {
     const request = this.friendRequests[type].pending.find(req => req.friend_request_id === requestId);
     if (request) {
@@ -197,10 +206,11 @@ class FriendService {
     }
   }
 
+  // Update and add more get func
   getFriends() {
     return this.friends
   }
-  
+
 }
 
 export default new FriendService(supabase);
