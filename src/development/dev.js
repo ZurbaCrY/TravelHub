@@ -4,15 +4,19 @@ import FriendService from "./dev_backend";
 
 export default function DevelopmentScreen() {
   const [friends, setFriends] = useState([])
+  const [incomingRequests, setIncomingRequests] = useState([])
 
   useEffect(() => {
     const fetchFriends = async () => {
       try {
-        await FriendService.loadUser();
-        console.log(FriendService.friends)
-        console.log(FriendService.friendRequests)
-        const friendList = await FriendService.getFriends();
+        await FriendService.setup();
+        const incomingRequestList = FriendService.getIncomingRequests(true, false, true);
+        setIncomingRequests(incomingRequestList);
+
+        const friendList = FriendService.getFriends();
         setFriends(friendList);
+
+        console.log("friends: ", friendList, "\nincomingRequests: ", incomingRequestList);
       } catch (error) {
         console.error("Error fetching friends:", error);
       }
@@ -21,12 +25,12 @@ export default function DevelopmentScreen() {
     fetchFriends();
   }, []);
 
-  const acceptFriendRequest = async () => {
-    await FriendService.respondToFriendRequest(42, "accept");
+  const acceptFriendRequest = async (requestId) => {
+    await FriendService.respondToFriendRequest(requestId, "accept");
   };
 
-  const declineFriendRequest = async () => {
-    await FriendService.respondToFriendRequest(42, "decline");
+  const declineFriendRequest = async (requestId) => {
+    await FriendService.respondToFriendRequest(requestId, "decline");
   };
 
   return (
@@ -36,8 +40,6 @@ export default function DevelopmentScreen() {
         title="sendFriendRequest"
         onPress={() => FriendService.sendFriendRequest("2472b8e1-8952-4064-a508-7bc44abb66ea")}
       />
-      <Button title="acceptFriendRequest" onPress={acceptFriendRequest} />
-      <Button title="declineFriendRequest" onPress={declineFriendRequest} />
 
       {/* Display list of friends */}
       <FlatList
@@ -45,6 +47,25 @@ export default function DevelopmentScreen() {
         keyExtractor={(item) => item.friend_id}
         renderItem={({ item }) => (
           <Text>{item.friend_id}</Text>
+        )}
+      />
+
+      {/* Display incoming friend requests */}
+      <FlatList
+        data={incomingRequests}
+        keyExtractor={(item) => item.friend_request_id.toString()} // Assuming friend_request_id is a unique identifier
+        renderItem={({ item }) => (
+          <View>
+            <Text>
+              {item.sender_id} - Status: {item.status}
+            </Text>
+            {item.status === "pending" && (
+              <View>
+                <Button title="Accept" onPress={() => acceptFriendRequest(item.friend_request_id)} />
+                <Button title="Decline" onPress={() => declineFriendRequest(item.friend_request_id)} />
+              </View>
+            )}
+          </View>
         )}
       />
     </View>

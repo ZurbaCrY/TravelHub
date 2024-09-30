@@ -119,13 +119,13 @@ class FriendService {
       .from("friend_requests")
       .update({ status })
       .eq("friend_request_id", requestId)
-      .select("receiver_id")
+      .select("sender_id")
       .single();
     if (error) {
       throw new Error("Error responding to friend request: " + error.message);
     }
     if (action === "accept") {
-      await this.addFriend(data.receiver_id);
+      await this.addFriend(data.sender_id);
     }
     this.updateRequestStatus(requestId, "received", status);
   }
@@ -169,7 +169,7 @@ class FriendService {
     const { data: existingFriendship, error } = await this.supabase
       .from("friends")
       .select("*")
-      .or(`(user_id.eq.${this.user.id}, friend_id.eq.${friend_id}), (user_id.eq.${friend_id}, friend_id.eq.${this.user.id})`);
+      .or(`user_id.eq.${this.user.id}, friend_id.eq.${friend_id}), (user_id.eq.${friend_id}, friend_id.eq.${this.user.id}`);
 
     if (error) {
       throw new Error("Error checking for existing friendships: " + error.message);
@@ -206,11 +206,27 @@ class FriendService {
     }
   }
 
-  // Update and add more get func
   getFriends() {
     return this.friends
   }
 
+  getIncomingRequests(pending = true, accepted = true, declined = true) {
+    const requests = [];
+
+    if (pending) {
+      requests.push(...this.friendRequests.received.pending);
+    }
+
+    if (accepted) {
+      requests.push(...this.friendRequests.received.accepted);
+    }
+
+    if (declined) {
+      requests.push(...this.friendRequests.received.declined);
+    }
+
+    return requests;
+  }
 }
 
 export default new FriendService(supabase);
