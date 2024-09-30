@@ -36,6 +36,11 @@ export default function ChatScreen({ route, navigation }) {
       } catch (error) {
         console.error('Error fetching messages:', error);
       }
+      const error = console.error;
+        console.error = (...args) => {
+          if (/defaultProps/.test(args[0])) return;
+          error(...args);
+};
     };
 
     fetchMessages();
