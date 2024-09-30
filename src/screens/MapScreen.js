@@ -129,7 +129,10 @@ export default function MapScreen() {
 
 
   /**
-   * Funktion für BottomBar.
+   * Funktionen für die Veränderung von Map Komponenten.
+   *    - automatisches Zurückscrollen bei Ortswechsel in den Ortslisten
+   *    - Auswählen von Attraktionen durch Klicken auf Marker
+   *    - Öffnen und Schließen der Slide-Up Bar und Attraktionen Screen
    *
    */
   const scrollToStart = () => {
@@ -138,24 +141,19 @@ export default function MapScreen() {
     }
   };
 
-
   const handleResetPlaces = () => {
-    setShowBottomLine(false); // Setze den Suchergebnis-Status auf null, um den Inhalt der Leiste zurückzusetzen
+    setShowBottomLine(false);
     setSelectedPlace(null);
   };
 
-  /**
-   * Funktionen zum Favorisieren von Attractions und Zoomen zu Attractions.
-   *
-   */
   const handleMarkerPress = (place) => {
     setSelectedPlace(place);
     if (mapRef) {
       mapRef.animateToRegion({
         latitude: place.coordinates.latitude,
         longitude: place.coordinates.longitude,
-        latitudeDelta: 0.01, // Hier kannst du die Zoomstufe einstellen
-        longitudeDelta: 0.01, // Hier kannst du die Zoomstufe einstellen
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
       }, 1000);
     }
   };
@@ -169,30 +167,24 @@ export default function MapScreen() {
     fetchData(setContinentsData, CURRENT_USER_ID);
   };
 
-
-  /**
-   * Funktionen zum Öffnen von extra seiten für Attraction Details.
-   *
-   */
   const handlePlaceDetail = (place) => {
     setSelectedPlace(place);
     setShowPlaceDetailModal(true);
   };
 
   const handleOpenModal = () => {
-
     setShowAddModal(true);
-
   };
 
 
   /**
-   * tatsächliche Komponenten fürs Rendering.
+   * tatsächliche Map Komponenten fürs Rendering.
    *
    */
   return (
     <View style={styles.container}>
 
+      {/* Search Bar mit Autocomplete Feature */}
       <MapSearchBar
         styles={styles}
         mapRef={mapRef}
@@ -208,6 +200,7 @@ export default function MapScreen() {
         <MaterialIcons name="add" size={24} color="black" />
       </TouchableOpacity>
 
+      {/* Sobald Standort verfügbar -> Laden der MAP */}
       {location ? (
         <MapView
           provider={PROVIDER_GOOGLE}
@@ -227,7 +220,6 @@ export default function MapScreen() {
           onPress={handleMapPress}
           ref={(ref) => setMapRef(ref)}
         >
-
 
           {/* Markierungen für verschiedene Arten von Orten anzeigen */}
           {showMarkers && continentsData.flatMap(continent =>
@@ -256,6 +248,7 @@ export default function MapScreen() {
         <Text>Map Loading...</Text>
       )}
 
+      {/* Slide-Up Bar unten */}
       <View style={styles.bottomBar}>
         <ScrollView
           ref={scrollViewRef}
@@ -287,7 +280,7 @@ export default function MapScreen() {
         )}
       </View>
 
-      {/* Modal für die Liste von unten */}
+      {/* Modal für die aufgeklappte Liste bzw. Slide-Up Bar */}
       <Modal
         animationType="slide-up"
         transparent={true}
