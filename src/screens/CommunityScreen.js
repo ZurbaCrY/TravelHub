@@ -3,9 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, TextInput, Image, TouchableOpacity } from 'react-native';
 import { useDarkMode } from '../context/DarkModeContext';
 import { supabase } from '../services/supabase';
-import * as ImagePicker from 'expo-image-picker';
 import AuthService from '../services/auth';
-import { SUPABASE_URL, SUPABASE_KEY } from '@env';
+import { handleFileUpload } from '../backend/fileUpload';
 
 export default function CommunityScreen() {
   const user = AuthService.getUser();
@@ -34,12 +33,12 @@ export default function CommunityScreen() {
 
   const createNewPost = async () => {
     try {
-      const { error } = await supabase.from('posts').insert([{ 
-        content: newPostContent, 
-        author: user_username, 
+      const { error } = await supabase.from('posts').insert([{
+        content: newPostContent,
+        author: user_username,
         image_url: imageUrl,  // Speichern der Bild-URL zusammen mit dem Post
-        upvotes: 0, 
-        downvotes: 0 
+        upvotes: 0,
+        downvotes: 0
       }]);
 
       if (error) {
@@ -88,40 +87,39 @@ export default function CommunityScreen() {
     }
   };
 
-  const handleImageUpload = async () => {
-    try {
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [4, 3],
-        quality: 1,
-      });
+  //   const handleImageUpload = async () => {
+  //     try {
+  //       const result = await ImagePicker.launchImageLibraryAsync({
+  //         mediaTypes: ImagePicker.MediaTypeOptions.Images,
+  //         allowsEditing: true,
+  //         aspect: [4, 3],
+  //         quality: 1,
+  //       });
 
-      if (!result.canceled && result.assets.length > 0) {
-        const firstAsset = result.assets[0];
-        const fileUri = firstAsset.uri;
-        const fileName = fileUri.substring(fileUri.lastIndexOf('/') + 1);
+  //       if (!result.canceled && result.assets.length > 0) {
+  //         const firstAsset = result.assets[0];
+  //         const fileUri = firstAsset.uri;
+  //         const fileName = fileUri.substring(fileUri.lastIndexOf('/') + 1);
 
-        const response = await fetch(fileUri);
-        const blob = await response.blob();
+  //         const response = await fetch(fileUri);
+  //         const blob = await response.blob();
 
-        const { error } = await supabase.storage.from('Storage').upload(`images/${fileName}`, blob, {
-          cacheControl: '3600',
-          upsert: false,
-        });
+  //         const { error } = await supabase.storage.from('Storage').upload(`images/${fileName}`, blob, {
+  //           cacheControl: '3600',
+  //           upsert: false,
+  //         });
 
-        if (error) {
-          throw error;
-        }
+  //         if (error) {
+  //           throw error;
+  //         }
 
-        const uploadedImageUrl = `${SUPABASE_URL}/storage/v1/object/public/Storage/images/${fileName}`;
-        setImageUrl(uploadedImageUrl);  // Setze die Bild-URL für den neuen Post
-      }
-    } catch (error) {
-      console.error('Fehler beim Hochladen des Bildes:', error.message);
-    }
-  };
-
+  //         const uploadedImageUrl = `${SUPABASE_URL}/storage/v1/object/public/Storage/images/${fileName}`;
+  //         setImageUrl(uploadedImageUrl);  // Setze die Bild-URL für den neuen Post
+  //       }
+  //     } catch (error) {
+  //       console.error('Fehler beim Hochladen des Bildes:', error.message);
+  //     }
+  //   };
   return (
     <View style={[styles.container, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
       <FlatList
@@ -159,7 +157,7 @@ export default function CommunityScreen() {
           value={newPostContent}
           onChangeText={text => setNewPostContent(text)}
         />
-        <TouchableOpacity onPress={handleImageUpload}>
+        <TouchableOpacity onPress={() => handleFileUpload()}>
           <Image source={require('../assets/images/picture.png')} style={styles.uploadIcon} />
         </TouchableOpacity>
         <TouchableOpacity onPress={createNewPost}>
