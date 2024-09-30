@@ -25,7 +25,6 @@ class AuthService {
     try {
       const userJson = await SecureStore.getItemAsync("user");
       if (userJson) {
-        console.log("Found User: ", userJson);
         this.user = JSON.parse(userJson);
       } else {
         console.log("No User Signed in");
