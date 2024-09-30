@@ -4,6 +4,7 @@ import AuthService from "../services/auth";
 class FriendService {
   constructor(supabase) {
     this.supabase = supabase;
+    this.initialized = false;
     this.user = null;
     this.friendRequests = {
       received: {
@@ -22,6 +23,8 @@ class FriendService {
   }
 
   async setup() {
+    if (this.initialized) return;
+    this.initialized = true;
     try {
       await this.loadUser();
       await this.fetchFriends();
@@ -57,12 +60,13 @@ class FriendService {
     const { data, error } = await this.supabase
       .from("friend_requests")
       .select("*")
-      .or(`receiver_id.eq.${this.user.id},sender_id.eq.${this.user.id}`) // Get all sent and received friend requests
+      .or(`receiver_id.eq.${this.user.id},sender_id.eq.${this.user.id}`)
       .in("status", ["pending", "accepted", "declined"]);
     if (error) {
       throw new Error("Error fetching friend requests: " + error.message);
     }
 
+    console.log("-------------------------", data)
     // Separate requests into sent and received
     data.forEach(req => {
       if (req.receiver_id === this.user.id) {
@@ -225,6 +229,7 @@ class FriendService {
       requests.push(...this.friendRequests.received.declined);
     }
 
+    console.log("here", this.friendRequests.received.pending)
     return requests;
   }
 }

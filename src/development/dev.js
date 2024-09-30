@@ -10,7 +10,7 @@ export default function DevelopmentScreen() {
     const fetchFriends = async () => {
       try {
         await FriendService.setup();
-        const incomingRequestList = FriendService.getIncomingRequests(true, false, true);
+        const incomingRequestList = FriendService.getIncomingRequests(true, true, true);
         setIncomingRequests(incomingRequestList);
 
         const friendList = FriendService.getFriends();
@@ -38,7 +38,7 @@ export default function DevelopmentScreen() {
       {/* Use arrow functions to handle the onPress event properly */}
       <Button
         title="sendFriendRequest"
-        onPress={() => FriendService.sendFriendRequest("2472b8e1-8952-4064-a508-7bc44abb66ea")}
+        onPress={() => FriendService.sendFriendRequest("d3d4312c-9918-4101-b44e-5b7f6951cc31")}
       />
 
       {/* Display list of friends */}
