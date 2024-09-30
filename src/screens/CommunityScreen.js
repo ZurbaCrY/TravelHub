@@ -3,8 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, TextInput, Image, TouchableOpacity } from 'react-native';
 import { useDarkMode } from '../context/DarkModeContext';
 import AuthService from '../services/auth';
-import { handleFileUpload } from '../backend/community/fileUpload';
-import { handleUpvote, handleDownvote, fetchPosts, createNewPost } from '../backend/community/dataInserts';
+import { handleUpvote, handleDownvote, fetchPosts, createNewPost, handleFileUpload } from '../backend/community';
 
 export default function CommunityScreen() {
   const user = AuthService.getUser();
