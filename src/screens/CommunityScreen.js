@@ -5,7 +5,7 @@ import { useDarkMode } from '../context/DarkModeContext';
 import { supabase } from '../services/supabase';
 import AuthService from '../services/auth';
 import { handleFileUpload } from '../backend/community/fileUpload';
-import { handleUpvote, handleDownvote } from '../backend/community/voteHandler';
+import { handleUpvote, handleDownvote, fetchPosts, createNewPost } from '../backend/community/dataInserts';
 
 export default function CommunityScreen() {
   const user = AuthService.getUser();
@@ -16,50 +16,22 @@ export default function CommunityScreen() {
   const [imageUrl, setImageUrl] = useState(null);
 
   useEffect(() => {
-    fetchPosts();
+    loadPosts();
   }, []);
 
-  const fetchPosts = async () => {
-    try {
-      const { data, error } = await supabase.from('posts').select('*').order('timestamp', { ascending: false });
-      if (error) {
-        console.error('Error fetching posts:', error.message);
-      } else {
-        setPosts(data);
-      }
-    } catch (error) {
-      console.error('Error fetching posts:', error.message);
-    }
+  const loadPosts = async () => {
+    const postsData = await fetchPosts();
+    setPosts(postsData);
   };
 
-  const createNewPost = async () => {
-    try {
-      let uploadedImageUrl = null;
-      if (imageUrl) {
-        const { error } = await supabase.storage.from('Storage').upload(`images/${imageUrl}`, imageUrl);
-        if (error) throw error;
-        uploadedImageUrl = imageUrl;
-      }
-
-      const { error } = await supabase.from('posts').insert([{
-        content: newPostContent,
-        author: user_username,
-        image_url: uploadedImageUrl,
-        upvotes: 0,
-        downvotes: 0
-      }]);
-
-      if (error) {
-        console.error('Error creating post:', error.message);
-      } else {
-        setNewPostContent('');
-        setImageUrl(null);
-        fetchPosts();
-      }
-    } catch (error) {
-      console.error('Error creating post:', error.message);
-    }
+  const handleCreateNewPost = async () => {
+    await createNewPost(newPostContent, user_username, imageUrl);
+    setNewPostContent('');
+    setImageUrl(null);
+    loadPosts(); // Lade die Posts nach dem Erstellen neu
   };
+  
+
 
   return (
     <View style={[styles.container, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
@@ -76,11 +48,11 @@ export default function CommunityScreen() {
             )}
             <Text style={styles.postText}>{item.content}</Text>
             <View style={styles.postFooter}>
-              <TouchableOpacity onPress={() => handleUpvote(item.id, fetchPosts)}>
+              <TouchableOpacity onPress={() => handleUpvote(item.id, loadPosts)}>
                 <Image source={require('../assets/images/thumbs-up.png')} style={styles.icon} />
               </TouchableOpacity>
               <Text style={styles.upvoteText}>{item.upvotes}</Text>
-              <TouchableOpacity onPress={() => handleDownvote(item.id, fetchPosts)}>
+              <TouchableOpacity onPress={() => handleDownvote(item.id, loadPosts)}>
                 <Image source={require('../assets/images/thumbs-down.png')} style={styles.icon} />
               </TouchableOpacity>
               <Text style={styles.downvoteText}>{item.downvotes}</Text>
@@ -99,7 +71,7 @@ export default function CommunityScreen() {
         <TouchableOpacity onPress={() => handleFileUpload()}>
           <Image source={require('../assets/images/picture.png')} style={styles.uploadIcon} />
         </TouchableOpacity>
-        <TouchableOpacity onPress={createNewPost}>
+        <TouchableOpacity onPress={handleCreateNewPost}>
           <Image source={require('../assets/images/message_send.png')} style={styles.sendIcon} />
         </TouchableOpacity>
       </View>
@@ -111,7 +83,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: 10,
-    paddingHorizontal: 10, 
+    paddingHorizontal: 10,
   },
   postCard: {
     backgroundColor: '#FFF',
@@ -141,13 +113,13 @@ const styles = StyleSheet.create({
   },
   postText: {
     marginVertical: 5,
-    lineHeight: 20, 
+    lineHeight: 20,
   },
   postFooter: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: 10, 
+    marginTop: 10,
   },
   icon: {
     width: 25,
@@ -156,11 +128,11 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    width: '100%', 
+    width: '100%',
     marginBottom: 20,
-    borderTopWidth: 1, 
-    borderTopColor: '#E1E1E1', 
-    paddingTop: 10, 
+    borderTopWidth: 1,
+    borderTopColor: '#E1E1E1', // Farbe der Trennlinie
+    paddingTop: 10, // Füge oben Padding hinzu
   },
   input: {
     flex: 1,

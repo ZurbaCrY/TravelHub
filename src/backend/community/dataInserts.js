@@ -1,4 +1,5 @@
 import { supabase } from '../../services/supabase';
+import AuthService from '../../services/auth';
 
 export const handleUpvote = async (postId, fetchPosts) => {
   try {
@@ -27,5 +28,43 @@ export const handleDownvote = async (postId, fetchPosts) => {
     fetchPosts();
   } catch (error) {
     console.error('Error downvoting post:', error.message);
+  }
+};
+
+export const fetchPosts = async () => {
+  try {
+    const { data, error } = await supabase.from('posts').select('*').order('timestamp', { ascending: false });
+    if (error) {
+      throw error;
+    }
+    return data; // Gibt die Posts zurück
+  } catch (error) {
+    console.error('Error fetching posts:', error.message);
+    return []; // Rückgabe eines leeren Arrays im Fehlerfall
+  }
+};
+
+export const createNewPost = async (newPostContent, user_username, imageUrl) => {
+  try {
+    let uploadedImageUrl = null;
+    if (imageUrl) {
+      const { error } = await supabase.storage.from('Storage').upload(`images/${imageUrl}`, imageUrl);
+      if (error) throw error;
+      uploadedImageUrl = imageUrl;
+    }
+
+    const { error } = await supabase.from('posts').insert([{
+      content: newPostContent,
+      author: user_username,
+      image_url: uploadedImageUrl,
+      upvotes: 0,
+      downvotes: 0
+    }]);
+
+    if (error) {
+      throw error;
+    }
+  } catch (error) {
+    console.error('Error creating post:', error.message);
   }
 };
