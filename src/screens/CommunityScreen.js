@@ -2,7 +2,6 @@ import 'react-native-url-polyfill/auto';
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, TextInput, Image, TouchableOpacity } from 'react-native';
 import { useDarkMode } from '../context/DarkModeContext';
-import { supabase } from '../services/supabase';
 import AuthService from '../services/auth';
 import { handleFileUpload } from '../backend/community/fileUpload';
 import { handleUpvote, handleDownvote, fetchPosts, createNewPost } from '../backend/community/dataInserts';
@@ -14,25 +13,31 @@ export default function CommunityScreen() {
   const [posts, setPosts] = useState([]);
   const [newPostContent, setNewPostContent] = useState('');
   const [imageUrl, setImageUrl] = useState(null);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     loadPosts();
   }, []);
 
   const loadPosts = async () => {
-    const postsData = await fetchPosts();
-    setPosts(postsData);
+    setRefreshing(true);
+    try {
+      const postsData = await fetchPosts();
+      setPosts(postsData);
+    } catch (error) {
+      console.error("Error fetching posts: ", error);
+    } finally {
+      setRefreshing(false);
+    }
   };
 
   const handleCreateNewPost = async () => {
     await createNewPost(newPostContent, user_username, imageUrl);
     setNewPostContent('');
     setImageUrl(null);
-    loadPosts(); // Lade die Posts nach dem Erstellen neu
+    loadPosts(); 
   };
   
-
-
   return (
     <View style={[styles.container, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
       <FlatList
@@ -60,6 +65,9 @@ export default function CommunityScreen() {
           </View>
         )}
         keyExtractor={item => item.id.toString()}
+        refreshing={refreshing}
+        onRefresh={loadPosts}
+        contentContainerStyle={{ paddingBottom: 20 }} // Ensure there's padding at the bottom
       />
       <View style={styles.inputContainer}>
         <TextInput
@@ -131,8 +139,8 @@ const styles = StyleSheet.create({
     width: '100%',
     marginBottom: 20,
     borderTopWidth: 1,
-    borderTopColor: '#E1E1E1', // Farbe der Trennlinie
-    paddingTop: 10, // Füge oben Padding hinzu
+    borderTopColor: '#E1E1E1',
+    paddingTop: 10,
   },
   input: {
     flex: 1,

@@ -50,13 +50,12 @@ export const createNewPost = async (newPostContent, user_username, imageUrl) => 
     if (imageUrl) {
       const { error } = await supabase.storage.from('Storage').upload(`images/${imageUrl}`, imageUrl);
       if (error) throw error;
-      uploadedImageUrl = imageUrl;
     }
 
     const { error } = await supabase.from('posts').insert([{
       content: newPostContent,
       author: user_username,
-      image_url: uploadedImageUrl,
+      image_url: imageUrl,
       upvotes: 0,
       downvotes: 0
     }]);
