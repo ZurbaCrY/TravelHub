@@ -88,12 +88,12 @@ const AddPlaceModal = ({ visible, onClose, continentsData }) => {
       if (error) {
         throw new Error(error.message);
       }
-      
+
 
       // Task: Look at this:
       console.log('Place added:', data);
 
-      
+
       onClose(); // Consider moving onClose to after success
     } catch (error) {
       console.error('Error adding place:', error.message);
@@ -187,7 +187,7 @@ const AddPlaceModal = ({ visible, onClose, continentsData }) => {
             <TextInput
               style={styles.input}
               placeholder="Eintrittsgebühr"
-              onChangeText={setEntranceFee} 
+              onChangeText={setEntranceFee}
               value={entranceFee}
             />
           )}
