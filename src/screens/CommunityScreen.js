@@ -5,6 +5,7 @@ import { useDarkMode } from '../context/DarkModeContext';
 import { supabase } from '../services/supabase';
 import AuthService from '../services/auth';
 import { handleFileUpload } from '../backend/fileUpload';
+import { handleUpvote, handleDownvote } from '../backend/voteHandler'; // Importiere die Vote-Funktionen
 
 export default function CommunityScreen() {
   const user = AuthService.getUser();
@@ -33,10 +34,17 @@ export default function CommunityScreen() {
 
   const createNewPost = async () => {
     try {
+      let uploadedImageUrl = null;
+      if (imageUrl) {
+        const { error } = await supabase.storage.from('Storage').upload(`images/${imageUrl}`, imageUrl);
+        if (error) throw error;
+        uploadedImageUrl = imageUrl;
+      }
+
       const { error } = await supabase.from('posts').insert([{
         content: newPostContent,
         author: user_username,
-        image_url: imageUrl,  // Speichern der Bild-URL zusammen mit dem Post
+        image_url: uploadedImageUrl,
         upvotes: 0,
         downvotes: 0
       }]);
@@ -45,7 +53,7 @@ export default function CommunityScreen() {
         console.error('Error creating post:', error.message);
       } else {
         setNewPostContent('');
-        setImageUrl(null);  // Nach dem Post zurücksetzen
+        setImageUrl(null);
         fetchPosts();
       }
     } catch (error) {
@@ -53,73 +61,13 @@ export default function CommunityScreen() {
     }
   };
 
-  const handleUpvote = async (postId) => {
-    try {
-      const { data: postData, error } = await supabase.from('posts').select('upvotes', 'downvotes').eq('id', postId).single();
-      if (error) {
-        throw error;
-      }
-      const updatedUpvotes = postData.upvotes + 1;
-      const { error: updateError } = await supabase.from('posts').update({ upvotes: updatedUpvotes }).eq('id', postId);
-      if (updateError) {
-        throw updateError;
-      }
-      fetchPosts();
-    } catch (error) {
-      console.error('Error upvoting post:', error.message);
+  const handleImageUpload = async () => {
+    const result = await handleFileUpload();
+    if (result) {
+      setImageUrl(result);
     }
   };
 
-  const handleDownvote = async (postId) => {
-    try {
-      const { data: postData, error } = await supabase.from('posts').select('downvotes').eq('id', postId).single();
-      if (error) {
-        throw error;
-      }
-      const updatedDownvotes = (postData.downvotes || 0) + 1;
-      const { error: updateError } = await supabase.from('posts').update({ downvotes: updatedDownvotes }).eq('id', postId);
-      if (updateError) {
-        throw updateError;
-      }
-      fetchPosts();
-    } catch (error) {
-      console.error('Error downvoting post:', error.message);
-    }
-  };
-
-  //   const handleImageUpload = async () => {
-  //     try {
-  //       const result = await ImagePicker.launchImageLibraryAsync({
-  //         mediaTypes: ImagePicker.MediaTypeOptions.Images,
-  //         allowsEditing: true,
-  //         aspect: [4, 3],
-  //         quality: 1,
-  //       });
-
-  //       if (!result.canceled && result.assets.length > 0) {
-  //         const firstAsset = result.assets[0];
-  //         const fileUri = firstAsset.uri;
-  //         const fileName = fileUri.substring(fileUri.lastIndexOf('/') + 1);
-
-  //         const response = await fetch(fileUri);
-  //         const blob = await response.blob();
-
-  //         const { error } = await supabase.storage.from('Storage').upload(`images/${fileName}`, blob, {
-  //           cacheControl: '3600',
-  //           upsert: false,
-  //         });
-
-  //         if (error) {
-  //           throw error;
-  //         }
-
-  //         const uploadedImageUrl = `${SUPABASE_URL}/storage/v1/object/public/Storage/images/${fileName}`;
-  //         setImageUrl(uploadedImageUrl);  // Setze die Bild-URL für den neuen Post
-  //       }
-  //     } catch (error) {
-  //       console.error('Fehler beim Hochladen des Bildes:', error.message);
-  //     }
-  //   };
   return (
     <View style={[styles.container, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
       <FlatList
@@ -130,18 +78,16 @@ export default function CommunityScreen() {
               <Image source={require('../assets/images/profilepicture.png')} style={styles.profileImage} />
               <Text style={styles.username}>{item.author}</Text>
             </View>
-            {/* Post Image, falls vorhanden */}
             {item.image_url && (
               <Image source={{ uri: item.image_url }} style={styles.postImage} />
             )}
             <Text style={styles.postText}>{item.content}</Text>
-            {/* Post Footer mit Like/Dislike */}
             <View style={styles.postFooter}>
-              <TouchableOpacity onPress={() => handleUpvote(item.id)}>
+              <TouchableOpacity onPress={() => handleUpvote(item.id, fetchPosts)}>
                 <Image source={require('../assets/images/thumbs-up.png')} style={styles.icon} />
               </TouchableOpacity>
               <Text style={styles.upvoteText}>{item.upvotes}</Text>
-              <TouchableOpacity onPress={() => handleDownvote(item.id)}>
+              <TouchableOpacity onPress={() => handleDownvote(item.id, fetchPosts)}>
                 <Image source={require('../assets/images/thumbs-down.png')} style={styles.icon} />
               </TouchableOpacity>
               <Text style={styles.downvoteText}>{item.downvotes}</Text>
@@ -157,7 +103,7 @@ export default function CommunityScreen() {
           value={newPostContent}
           onChangeText={text => setNewPostContent(text)}
         />
-        <TouchableOpacity onPress={() => handleFileUpload()}>
+        <TouchableOpacity onPress={handleImageUpload}>
           <Image source={require('../assets/images/picture.png')} style={styles.uploadIcon} />
         </TouchableOpacity>
         <TouchableOpacity onPress={createNewPost}>
@@ -171,14 +117,14 @@ export default function CommunityScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
     paddingTop: 10,
+    paddingHorizontal: 10, // Padding an den Seiten
   },
   postCard: {
     backgroundColor: '#FFF',
     borderRadius: 10,
     marginVertical: 10,
-    width: '95%',
+    width: '100%', // Setze die Breite auf 100%
     padding: 15,
   },
   postHeader: {
@@ -202,11 +148,13 @@ const styles = StyleSheet.create({
   },
   postText: {
     marginVertical: 5,
+    lineHeight: 20, // Erhöhe den Zeilenabstand für bessere Lesbarkeit
   },
   postFooter: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    marginTop: 10, // Füge oben einen Abstand hinzu
   },
   icon: {
     width: 25,
@@ -215,8 +163,11 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    width: '95%',
+    width: '100%', // Setze die Breite auf 100%
     marginBottom: 20,
+    borderTopWidth: 1, // Füge oben eine Trennlinie hinzu
+    borderTopColor: '#E1E1E1', // Farbe der Trennlinie
+    paddingTop: 10, // Füge oben Padding hinzu
   },
   input: {
     flex: 1,

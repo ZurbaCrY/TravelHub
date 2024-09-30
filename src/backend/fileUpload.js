@@ -7,12 +7,11 @@ export const handleFileUpload = async () => {
   try {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true, 
-      aspect: [4, 3], 
-      quality: 1, 
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
     });
-
-    // Wenn der Benutzer nicht abgebrochen hat und ein Bild ausgewählt wurde
+    
     if (!result.canceled && result.assets.length > 0) {
       const firstAsset = result.assets[0]; 
       const fileUri = firstAsset.uri; 
@@ -25,10 +24,10 @@ export const handleFileUpload = async () => {
       const arrayBuffer = base64ToArrayBuffer(base64Data); 
 
       // Hochladen in Supabase-Speicher
-      const { error, data } = await supabase.storage
+      const { error } = await supabase.storage
         .from('Storage')
         .upload(`images/${fileName}`, arrayBuffer, {
-          cacheControl: '3600', 
+          cacheControl: '3600',
           upsert: false, // Überschreiben von Dateien verhindern
         });
 
@@ -40,6 +39,7 @@ export const handleFileUpload = async () => {
       // URL des hochgeladenen Bildes generieren
       const imageUrl = `${SUPABASE_URL}/storage/v1/object/public/Storage/images/${fileName}`;
       console.log('Image URL:', imageUrl);
+      return imageUrl; // Gebe die Bild-URL zurück
     }
   } catch (error) {
     // Fehler abfangen und in der Konsole anzeigen
