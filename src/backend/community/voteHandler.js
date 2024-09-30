@@ -1,4 +1,4 @@
-import { supabase } from '../services/supabase';
+import { supabase } from '../../services/supabase';
 
 export const handleUpvote = async (postId, fetchPosts) => {
   try {

@@ -4,8 +4,8 @@ import { View, Text, StyleSheet, FlatList, TextInput, Image, TouchableOpacity } 
 import { useDarkMode } from '../context/DarkModeContext';
 import { supabase } from '../services/supabase';
 import AuthService from '../services/auth';
-import { handleFileUpload } from '../backend/fileUpload';
-import { handleUpvote, handleDownvote } from '../backend/voteHandler'; // Importiere die Vote-Funktionen
+import { handleFileUpload } from '../backend/community/fileUpload';
+import { handleUpvote, handleDownvote } from '../backend/community/voteHandler';
 
 export default function CommunityScreen() {
   const user = AuthService.getUser();
@@ -61,13 +61,6 @@ export default function CommunityScreen() {
     }
   };
 
-  const handleImageUpload = async () => {
-    const result = await handleFileUpload();
-    if (result) {
-      setImageUrl(result);
-    }
-  };
-
   return (
     <View style={[styles.container, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
       <FlatList
@@ -103,7 +96,7 @@ export default function CommunityScreen() {
           value={newPostContent}
           onChangeText={text => setNewPostContent(text)}
         />
-        <TouchableOpacity onPress={handleImageUpload}>
+        <TouchableOpacity onPress={() => handleFileUpload()}>
           <Image source={require('../assets/images/picture.png')} style={styles.uploadIcon} />
         </TouchableOpacity>
         <TouchableOpacity onPress={createNewPost}>
@@ -118,13 +111,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: 10,
-    paddingHorizontal: 10, // Padding an den Seiten
+    paddingHorizontal: 10, 
   },
   postCard: {
     backgroundColor: '#FFF',
     borderRadius: 10,
     marginVertical: 10,
-    width: '100%', // Setze die Breite auf 100%
+    width: '100%',
     padding: 15,
   },
   postHeader: {
@@ -148,13 +141,13 @@ const styles = StyleSheet.create({
   },
   postText: {
     marginVertical: 5,
-    lineHeight: 20, // Erhöhe den Zeilenabstand für bessere Lesbarkeit
+    lineHeight: 20, 
   },
   postFooter: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: 10, // Füge oben einen Abstand hinzu
+    marginTop: 10, 
   },
   icon: {
     width: 25,
@@ -163,11 +156,11 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    width: '100%', // Setze die Breite auf 100%
+    width: '100%', 
     marginBottom: 20,
-    borderTopWidth: 1, // Füge oben eine Trennlinie hinzu
-    borderTopColor: '#E1E1E1', // Farbe der Trennlinie
-    paddingTop: 10, // Füge oben Padding hinzu
+    borderTopWidth: 1, 
+    borderTopColor: '#E1E1E1', 
+    paddingTop: 10, 
   },
   input: {
     flex: 1,

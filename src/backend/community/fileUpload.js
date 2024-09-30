@@ -1,7 +1,7 @@
 import { SUPABASE_URL } from '@env';
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
-import { supabase } from '../services/supabase';
+import { supabase } from '../../services/supabase';
 
 export const handleFileUpload = async () => {
   try {
