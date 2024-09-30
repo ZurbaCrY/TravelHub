@@ -22,7 +22,7 @@ import { Continent,
     Viewpoint } from '../backend/MapClasses';
 import { fetchData, updateVisitedCountry, updateOrCreateVisitedCountry } from '../backend/LoadEditMapData';
 import { updateFavourite, deleteFavourite, getMarkerForPlace, getDescriptionForPlace, getListImage, getNameForPlace, handleStarClick } from '../backend/LoadEditPlaceData';
-import { findMiddleCoordinate, haversineDistance, deg2rad } from '../services/MapMathematics'; // Pfad entsprechend anpassen
+import { findNearestCity } from '../backend/MapLocationChangeFunctions';
 
 const { width } = Dimensions.get('window');
 
@@ -66,7 +66,7 @@ export default function MapScreen() {
       fetchData(setContinentsData, CURRENT_USER_ID);
 
       if (location) {
-        updateVisitedCountry(location, findCountry, findNearestCity, CURRENT_USER_ID);
+        updateVisitedCountry(location, continentsData, CURRENT_USER_ID);
       }
   }, []);
 
@@ -79,7 +79,7 @@ export default function MapScreen() {
       }
 
       if (location) {
-          updateVisitedCountry(location, findCountry, findNearestCity, CURRENT_USER_ID);
+          updateVisitedCountry(location, continentsData, CURRENT_USER_ID);
       }
   }, [selectedPlace]);
 
@@ -106,18 +106,14 @@ export default function MapScreen() {
   }, []);
 
 
-
-
-  /**
+   /**
    * Funktionen zum Verändern der Position der Map.
    *
    */
   const onRegionChangeComplete = (region) => {
-    // Update the zoom level whenever the region changes
     setZoomLevel(region.latitudeDelta);
     setRegion(region);
 
-    // Check the zoom level and decide whether to show markers or not
     if (region.latitudeDelta < 12) {
       setShowMarkers(true);
       setShowBottomLine(true);
@@ -125,54 +121,9 @@ export default function MapScreen() {
       setShowMarkers(false);
       setShowBottomLine(false);
     }
-    // Find the nearest city based on the current region
-    const nearestCity = findNearestCity(region);
+    const nearestCity = findNearestCity(region, continentsData);
 
-    // Set the searchLocation state to the nearest city
     setSearchResult(nearestCity);
-    //console.log(nearestCity.name);
-  };
-
-  /**
-   * Funktion um nächste Stadt zu finden (Banger Funktion).
-   *
-   */
-  const findNearestCity = (region) => {
-    let nearestCity = null;
-    let minDistance = Infinity;
-
-    // Iterate through all cities to find the nearest one
-    continentsData.forEach(continent => {
-      continent.countries.forEach(country => {
-        country.cities.forEach(city => {
-          // Calculate the distance between the current city and the center of the region
-          const distance = haversineDistance(region.latitude, region.longitude, city.coordinates[0].latitude, city.coordinates[0].longitude);
-
-          // Update the nearest city if this city is closer
-          if (distance < minDistance) {
-            minDistance = distance;
-            nearestCity = city;
-          }
-        });
-      });
-    });
-
-    return nearestCity;
-  };
-
-  const findCountry = (city) => {
-    let country = null;
-
-    continentsData.forEach(continent => {
-      continent.countries.forEach(c => {
-        const foundCity = c.cities.find(c => c.name === city.name);
-        if (foundCity) {
-          country = c;
-          return; // Beende die Schleife, wenn die Stadt gefunden wurde
-        }
-      });
-    });
-    return country;
   };
 
 
@@ -208,7 +159,7 @@ export default function MapScreen() {
         longitude: selectedCoordinates.lng,
         latitudeDelta: 1, // Eine sehr kleine Zahl für einen sehr kleinen Bereich
         longitudeDelta: 1, // Eine sehr kleine Zahl für einen sehr kleinen Bereich
-      });
+      }, continentsData);
       //console.log(nearestCity.name);
 
       // Set the searchLocation state to the nearest city
@@ -474,10 +425,10 @@ export default function MapScreen() {
                 key={`${place.name}-${forceUpdate}`}
                 place={place}
                 handleMarkerPress={handleMarkerPress}
-                handleStarClick={(place) => handleStarClick(place, CURRENT_USER_ID, setForceUpdate)} // Hier die ausgelagerte Funktion verwenden
+                handleStarClick={(place) => handleStarClick(place, CURRENT_USER_ID, setForceUpdate)}
                 image={getListImage(place)}
-                handlePlaceDetail={handlePlaceDetail} // Diese Prop hinzufügen
-                selected={selectedPlace === place} // Hier wird selected übergeben
+                handlePlaceDetail={handlePlaceDetail}
+                selected={selectedPlace === place}
               />
             ))}
             <TouchableOpacity onPress={() => setShowList(false)} style={styles.arrowDown}>
@@ -498,8 +449,8 @@ export default function MapScreen() {
       <AddPlaceModal
         visible={showAddModal}
         onClose={() => setShowAddModal(false)}
-        onFetchData={fetchData} // Übergibt die fetchData Funktion als Prop
-        continentsData={continentsData} // Übergibt die aktuelle continentData als Prop
+        onFetchData={fetchData}
+        continentsData={continentsData}
       />
 
     </View>

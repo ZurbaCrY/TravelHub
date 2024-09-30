@@ -1,6 +1,7 @@
 import { supabase } from '../services/supabase';
-import { Continent, Country, City, Place } from './MapClasses'; // Passe den Pfad zu deinen Klassen an
+import { Continent, Country, City, Place } from './MapClasses';
 import { isFavourite } from './LoadEditPlaceData';
+import { findNearestCity, findCountry } from './MapLocationChangeFunctions';
 
 /**
 * Funktionen zum Verifizieren der besuchten Länder.
@@ -58,13 +59,13 @@ export const updateOrCreateVisitedCountry = async (countryId, userId) => {
   }
 };
 
-export const updateVisitedCountry = (location, findCountry, findNearestCity, userId) => {
+export const updateVisitedCountry = (location, continentsData, userId) => {
   let country = findCountry(findNearestCity({
     latitude: location.coords.latitude,
     longitude: location.coords.longitude,
     latitudeDelta: 0.0922,
     longitudeDelta: 0.0421,
-  }));
+  }, continentsData), continentsData);
 
   console.log("folgendes Land wurde besucht: " + country.countryId);
 
