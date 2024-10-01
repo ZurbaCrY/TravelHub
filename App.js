@@ -19,6 +19,7 @@ import {
   LoadingScreen,
   ChatScreen,
   ChatListScreen,
+  CommunityDetailScreen,
 } from './src/screens'
 import { DarkModeProvider } from "./src/context/DarkModeContext";
 import AuthService from "./src/services/auth";
@@ -137,6 +138,9 @@ export default function App() {
             </RootStack.Screen>
             <RootStack.Screen name="Development">
               {props => <DevelopmentScreen {...props} setUser={setUser} setLoading={setLoadingStatus} />}
+            </RootStack.Screen>
+            <RootStack.Screen name="Post">
+              {props => <CommunityDetailScreen {...props} setUser={setUser} setLoading={setLoadingStatus} />}
             </RootStack.Screen>
             <RootStack.Screen name="ChatListScreen" component={ChatListScreen} />
             <RootStack.Screen name="ChatScreen" component={ChatScreen} />

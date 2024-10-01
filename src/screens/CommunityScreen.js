@@ -1,6 +1,6 @@
 import 'react-native-url-polyfill/auto';
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, TextInput, Image, TouchableOpacity, Modal} from 'react-native';
+import { View, Text, StyleSheet, FlatList, TextInput, Image, TouchableOpacity, Modal } from 'react-native';
 import { useDarkMode } from '../context/DarkModeContext';
 import AuthService from '../services/auth';
 import { handleUpvote, handleDownvote, fetchPosts, createNewPost, handleFilePicker } from '../backend/community';
@@ -13,7 +13,7 @@ export default function CommunityScreen({ navigation }) {
   const [newPostContent, setNewPostContent] = useState('');
   const [imageUrl, setImageUrl] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false); 
+  const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
     loadPosts();
@@ -25,7 +25,7 @@ export default function CommunityScreen({ navigation }) {
       const postsData = await fetchPosts();
       setPosts(postsData);
     } catch (error) {
-      console.error("Error fetching posts: ", error);
+      console.error('Error fetching posts: ', error);
     } finally {
       setRefreshing(false);
     }
@@ -35,8 +35,12 @@ export default function CommunityScreen({ navigation }) {
     await createNewPost(newPostContent, user_username, imageUrl);
     setNewPostContent('');
     setImageUrl(null);
-    setModalVisible(false); 
+    setModalVisible(false);
     loadPosts();
+  };
+
+  const handlePostPress = (post) => {
+    navigation.navigate('CommunityDetail', { post });
   };
 
   return (
@@ -44,28 +48,28 @@ export default function CommunityScreen({ navigation }) {
       <FlatList
         data={posts}
         renderItem={({ item }) => (
-          <View style={styles.postCard}>
-            <View style={styles.postHeader}>
-              <Image source={{ uri: item.users.profilepicture_url }} style={styles.profileImage} />
-              <Text style={styles.username}>{item.users.username}</Text>
+          <TouchableOpacity onPress={() => handlePostPress(item)}>
+            <View style={styles.postCard}>
+              <View style={styles.postHeader}>
+                <Image source={{ uri: item.users.profilepicture_url }} style={styles.profileImage} />
+                <Text style={styles.username}>{item.users.username}</Text>
+              </View>
+              {item.image_url && <Image source={{ uri: item.image_url }} style={styles.postImage} />}
+              <Text style={styles.postText}>{item.content}</Text>
+              <View style={styles.postFooter}>
+                <TouchableOpacity onPress={() => handleUpvote(item.id, loadPosts)}>
+                  <Image source={require('../assets/images/thumbs-up.png')} style={styles.icon} />
+                </TouchableOpacity>
+                <Text style={styles.upvoteText}>{item.upvotes}</Text>
+                <TouchableOpacity onPress={() => handleDownvote(item.id, loadPosts)}>
+                  <Image source={require('../assets/images/thumbs-down.png')} style={styles.icon} />
+                </TouchableOpacity>
+                <Text style={styles.downvoteText}>{item.downvotes}</Text>
+              </View>
             </View>
-            {item.image_url && (
-              <Image source={{ uri: item.image_url }} style={styles.postImage} />
-            )}
-            <Text style={styles.postText}>{item.content}</Text>
-            <View style={styles.postFooter}>
-              <TouchableOpacity onPress={() => handleUpvote(item.id, loadPosts)}>
-                <Image source={require('../assets/images/thumbs-up.png')} style={styles.icon} />
-              </TouchableOpacity>
-              <Text style={styles.upvoteText}>{item.upvotes}</Text>
-              <TouchableOpacity onPress={() => handleDownvote(item.id, loadPosts)}>
-                <Image source={require('../assets/images/thumbs-down.png')} style={styles.icon} />
-              </TouchableOpacity>
-              <Text style={styles.downvoteText}>{item.downvotes}</Text>
-            </View>
-          </View>
+          </TouchableOpacity>
         )}
-        keyExtractor={item => item.id.toString()}
+        keyExtractor={(item) => item.id.toString()}
         refreshing={refreshing}
         onRefresh={loadPosts}
         contentContainerStyle={{ paddingBottom: 20 }}
@@ -77,7 +81,7 @@ export default function CommunityScreen({ navigation }) {
         animationType="slide"
         transparent={true}
         visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)} 
+        onRequestClose={() => setModalVisible(false)}
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalView}>
@@ -86,12 +90,14 @@ export default function CommunityScreen({ navigation }) {
               style={styles.input}
               placeholder="What's on your mind?"
               value={newPostContent}
-              onChangeText={text => setNewPostContent(text)}
+              onChangeText={(text) => setNewPostContent(text)}
             />
-            <TouchableOpacity onPress={async () => {
-              const image = await handleFilePicker(); 
-              setImageUrl(image); 
-            }}>
+            <TouchableOpacity
+              onPress={async () => {
+                const image = await handleFilePicker();
+                setImageUrl(image);
+              }}
+            >
               <Image source={require('../assets/images/picture.png')} style={styles.uploadIcon} />
             </TouchableOpacity>
             {imageUrl && <Image source={{ uri: imageUrl }} style={styles.previewImage} />}
@@ -109,6 +115,7 @@ export default function CommunityScreen({ navigation }) {
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
