@@ -35,85 +35,95 @@ export const handleDownvote = async (postId, fetchPosts) => {
 
 export const fetchPosts = async () => {
   try {
-    const { data, error } = await supabase.from('posts').select('*').order('timestamp', { ascending: false });
+    const { data, error } = await supabase
+      .from('posts')
+      .select('id, content, author, image_url, upvotes, downvotes, timestamp')  // image_url hinzugefügt
+      .order('timestamp', { ascending: false });  // Sortierung nach timestamp
+    
     if (error) {
-      throw error;
+      throw error;  // Fehler werfen, falls beim Abrufen etwas schiefgeht
     }
-    return data; // Gibt die Posts zurück
+
+    return data;  // Gibt die Posts (inkl. image_url) zurück
   } catch (error) {
     console.error('Error fetching posts:', error.message);
-    return []; // Rückgabe eines leeren Arrays im Fehlerfall
+    return [];  // Gibt ein leeres Array zurück, falls ein Fehler auftritt
   }
 };
+
 
 export const createNewPost = async (newPostContent, user_username, imageUrl) => {
   try {
     let uploadedImageUrl = null;
+
     if (imageUrl) {
-      const { error } = await supabase.storage.from('Storage').upload(`images/${imageUrl}`, imageUrl);
-      if (error) throw error;
+      // Lade das Bild hoch
+      const fileUri = imageUrl;
+      const fileName = fileUri.substring(fileUri.lastIndexOf('/') + 1);
+      
+      // Lese die Datei als Base64
+      const base64Data = await FileSystem.readAsStringAsync(fileUri, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+
+      // Erstelle ein ArrayBuffer aus den Base64-Daten
+      const arrayBuffer = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
+
+      // Hochladen des Bildes
+      const { error: uploadError } = await supabase.storage
+        .from('Images')
+        .upload(`images/${fileName}`, arrayBuffer, {
+          contentType: 'image/jpeg', // Stelle sicher, dass der richtige Inhaltstyp verwendet wird
+          upsert: true, // Erlaube das Überschreiben
+        });
+
+      if (uploadError) {
+        throw new Error('Error uploading image: ' + uploadError.message);
+      }
+
+      // Generiere die öffentliche URL des hochgeladenen Bildes
+      uploadedImageUrl = `${SUPABASE_URL}/storage/v1/object/public/Images/images/${fileName}`;
     }
 
-    const { error } = await supabase.from('posts').insert([{
+    // Erstelle den Post nach dem Hochladen des Bildes
+    const { error: postError } = await supabase.from('posts').insert([{
       content: newPostContent,
       author: user_username,
-      image_url: imageUrl,
+      image_url: uploadedImageUrl,  // Verwende die hochgeladene Bild-URL
       upvotes: 0,
       downvotes: 0
     }]);
 
-    if (error) {
-      throw error;
+    if (postError) {
+      throw new Error('Error creating post: ' + postError.message);
     }
   } catch (error) {
     console.error('Error creating post:', error.message);
   }
 };
 
-
-export const handleFileUpload = async () => {
+export const handleFilePicker = async () => {
   try {
+    // Öffne den Bildauswähler
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
     });
-    
+
     if (!result.canceled && result.assets.length > 0) {
-      const firstAsset = result.assets[0]; 
-      const fileUri = firstAsset.uri; 
-      const fileName = fileUri.substring(fileUri.lastIndexOf('/') + 1); 
-
-      console.log('Fetching file from URI:', fileUri);
-
-      // Konvertiere das Bild in Base64
-      const base64Data = await FileSystem.readAsStringAsync(fileUri, { encoding: FileSystem.EncodingType.Base64 });
-      const arrayBuffer = base64ToArrayBuffer(base64Data); 
-
-      // Hochladen in Supabase-Speicher
-      const { error } = await supabase.storage
-        .from('Storage')
-        .upload(`images/${fileName}`, arrayBuffer, {
-          cacheControl: '3600',
-          upsert: false, // Überschreiben von Dateien verhindern
-        });
-
-      if (error) {
-        console.error('Upload Error Details:', error);
-        throw error; 
-      }
-
-      // URL des hochgeladenen Bildes generieren
-      const imageUrl = `${SUPABASE_URL}/storage/v1/object/public/Storage/images/${fileName}`;
-      console.log('Image URL:', imageUrl);
+      const firstAsset = result.assets[0];
+      const imageUrl = firstAsset.uri; 
       return imageUrl; // Gebe die Bild-URL zurück
     }
   } catch (error) {
-    // Fehler abfangen und in der Konsole anzeigen
-    console.error('Fehler beim Hochladen des Bildes:', error.message);
+    console.error('Error picking file:', error.message);
   }
 };
+
+
+
 
 // Hilfsfunktion: Konvertiere Base64 in ArrayBuffer
 function base64ToArrayBuffer(base64) {
