@@ -25,6 +25,7 @@ import { updateFavourite, deleteFavourite, getMarkerForPlace, getDescriptionForP
 import { findNearestCity } from '../backend/MapLocationChangeFunctions';
 import MapSearchBar from '../components/MapSearchBar';
 import Map from '../components/Map';
+import SlideUpBar from '../components/SlideUpBar';
 
 const { width } = Dimensions.get('window');
 
@@ -220,35 +221,15 @@ export default function MapScreen() {
       />
 
       {/* Slide-Up Bar unten */}
-      <View style={styles.bottomBar}>
-        <ScrollView
-          ref={scrollViewRef}
-          contentContainerStyle={styles.bottomBarContent}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-        >
-          {/*  Liste der Orte für die gesuchte Stadt anzeigen */}
-          {showBottomLine && searchResult && searchResult.places.map(place => (
-            <TouchableOpacity
-              key={place.name}
-              style={
-                selectedPlace === place ?
-                  [styles.placeItem, styles.selectedPlaceItem] :
-                  styles.placeItem
-              }
-              onPress={() => handleMarkerPress(place)}
-            >
-              <Text>{place.name}</Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-        {showBottomLine && searchResult.places.length > 0 && (
-          <TouchableOpacity onPress={scrollToTop}
-            style={styles.arrowButton}>
-            <MaterialIcons name="keyboard-arrow-up" size={24} color="black" />
-          </TouchableOpacity>
-        )}
-      </View>
+      <SlideUpBar
+          scrollViewRef={scrollViewRef}
+          styles={styles}
+          showBottomLine={showBottomLine}
+          searchResult={searchResult}
+          selectedPlace={selectedPlace}
+          handleMarkerPress={handleMarkerPress}
+          scrollToTop={scrollToTop}
+      />
 
       {/* Modal für die aufgeklappte Liste bzw. Slide-Up Bar */}
       <Modal
