@@ -105,3 +105,33 @@ export const handleSearchLocal = (searchQuery, setSearchResult, setSelectedPlace
     }
   }
 };
+
+/**
+ * Searches the local data for cities or places that match the user's input.
+ *
+ * @param {string} query - The user's input.
+ * @param {array} continentsData - The local data containing information about cities and places.
+ * @returns {array} - A list of matching cities or places.
+ */
+export const handleSearchLocalAutocomplete = (input, continentsData) => {
+  if (!input || input.length === 0) {
+    return []; // Kein Input, keine Vorschläge
+  }
+
+  const lowercaseInput = input.toLowerCase(); // Das wird jetzt nur aufgerufen, wenn input gesetzt ist
+
+  // Durchsuche die continentsData nach passenden Städten
+  const results = [];
+  continentsData.forEach(continent => {
+    continent.countries.forEach(country => {
+      country.cities.forEach(city => {
+        if (city.name.toLowerCase().includes(lowercaseInput)) {
+          results.push(city);
+        }
+      });
+    });
+  });
+
+  // Rückgabe der Vorschläge
+  return results;
+};
