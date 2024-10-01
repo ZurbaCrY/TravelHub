@@ -195,7 +195,7 @@ export default function MapScreen() {
         continentsData={continentsData}
       />
 
-      {/* Symbol mit einem Plus oben links */}
+      {/* Symbol mit einem Plus oben links um "Ort-hinzufügen" Modul zu öffnen*/}
       <TouchableOpacity style={[styles.addButton, showList && styles.disabledContainer]} onPress={handleOpenModal} >
         <MaterialIcons name="add" size={24} color="black" />
       </TouchableOpacity>
@@ -220,13 +220,11 @@ export default function MapScreen() {
           onPress={handleMapPress}
           ref={(ref) => setMapRef(ref)}
         >
-
           {/* Markierungen für verschiedene Arten von Orten anzeigen */}
           {showMarkers && continentsData.flatMap(continent =>
             continent.countries.flatMap(country =>
               country.cities.flatMap(city =>
                 city.places.map(place => (
-
                   <Marker
                     key={`${continent.name}-${country.name}-${city.name}-${place.name}-${selectedPlace && selectedPlace.name === place.name ? 'selected' : 'unselected'}`}
                     coordinate={place.coordinates} // Die Koordinaten des Ortes werden von der Stadt übernommen
@@ -241,9 +239,7 @@ export default function MapScreen() {
               )
             )
           )}
-
         </MapView>
-
       ) : (
         <Text>Map Loading...</Text>
       )}
@@ -271,7 +267,6 @@ export default function MapScreen() {
             </TouchableOpacity>
           ))}
         </ScrollView>
-
         {showBottomLine && searchResult.places.length > 0 && (
           <TouchableOpacity onPress={scrollToTop}
             style={styles.arrowButton}>
