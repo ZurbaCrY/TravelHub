@@ -239,8 +239,7 @@ export default function ChatScreen({ route, navigation }) {
 ChatScreen.propTypes = {
   route: PropTypes.shape({
     params: PropTypes.shape({
-      chatId: PropTypes.number.isRequired,
-      chatId: PropTypes.string.isRequired,
+      chatId: PropTypes.number.isRequired || PropTypes.string.isRequired,
       chatName: PropTypes.string.isRequired,
     }).isRequired,
   }).isRequired,
