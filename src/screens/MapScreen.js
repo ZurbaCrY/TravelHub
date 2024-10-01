@@ -26,6 +26,7 @@ import { findNearestCity } from '../backend/MapLocationChangeFunctions';
 import MapSearchBar from '../components/MapSearchBar';
 import Map from '../components/Map';
 import SlideUpBar from '../components/SlideUpBar';
+import SlideUpList from '../components/SlideUpList';
 
 const { width } = Dimensions.get('window');
 
@@ -232,33 +233,20 @@ export default function MapScreen() {
       />
 
       {/* Modal für die aufgeklappte Liste bzw. Slide-Up Bar */}
-      <Modal
-        animationType="slide-up"
-        transparent={true}
-        visible={showList}
-        onRequestClose={() => {
-          setShowList(false);
-        }}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            {searchResult && searchResult.places.map(place => (
-              <CustomPlaceItem
-                key={`${place.name}-${forceUpdate}`}
-                place={place}
-                handleMarkerPress={handleMarkerPress}
-                handleStarClick={(place) => handleStarClick(place, CURRENT_USER_ID, setForceUpdate)}
-                image={getListImage(place)}
-                handlePlaceDetail={handlePlaceDetail}
-                selected={selectedPlace === place}
-              />
-            ))}
-            <TouchableOpacity onPress={() => setShowList(false)} style={styles.arrowDown}>
-              <MaterialIcons name="keyboard-arrow-down" size={24} color="black" />
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
+      <SlideUpList
+        showList={showList}
+        setShowList={setShowList}
+        searchResult={searchResult}
+        handleMarkerPress={handleMarkerPress}
+        handleStarClick={handleStarClick}
+        getListImage={getListImage}
+        handlePlaceDetail={handlePlaceDetail}
+        selectedPlace={selectedPlace}
+        setForceUpdate={setForceUpdate}
+        forceUpdate={forceUpdate}
+        styles={styles}
+        CURRENT_USER_ID={CURRENT_USER_ID}
+      />
 
       {/* Das Modal für die Ortseinzelheiten */}
       <PlaceDetailScreen
