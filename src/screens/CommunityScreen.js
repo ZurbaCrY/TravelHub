@@ -2,9 +2,8 @@ import 'react-native-url-polyfill/auto';
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, TextInput, Image, TouchableOpacity } from 'react-native';
 import { useDarkMode } from '../context/DarkModeContext';
-import { supabase } from '../services/supabase';
-import * as ImagePicker from 'expo-image-picker';
-import AuthService from '../services/auth'
+import AuthService from '../services/auth';
+import { handleUpvote, handleDownvote, fetchPosts, createNewPost, handleFileUpload } from '../backend/community';
 
 export default function CommunityScreen() {
   const user = AuthService.getUser();
@@ -12,187 +11,150 @@ export default function CommunityScreen() {
   const { isDarkMode } = useDarkMode();
   const [posts, setPosts] = useState([]);
   const [newPostContent, setNewPostContent] = useState('');
+  const [imageUrl, setImageUrl] = useState(null);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
-    fetchPosts();
+    loadPosts();
   }, []);
 
-  // Abrufen der geschriebenen Nachrichten
-  const fetchPosts = async () => {
+  const loadPosts = async () => {
+    setRefreshing(true);
     try {
-      const { data, error } = await supabase.from('posts').select('*').order('timestamp', { ascending: false });
-      if (error) {
-        console.error('Error fetching posts:', error.message);
-      } else {
-        setPosts(data);
-      }
+      const postsData = await fetchPosts();
+      setPosts(postsData);
     } catch (error) {
-      console.error('Error fetching posts:', error.message);
+      console.error("Error fetching posts: ", error);
+    } finally {
+      setRefreshing(false);
     }
   };
 
-  // Abschicken einer Nachricht
-  const createNewPost = async () => {
-    try {
-      const { error } = await supabase.from('posts').insert([{ content: newPostContent, author: user_username, upvotes: 0, downvotes: 0 }]);
-      if (error) {
-        console.error('Error creating post:', error.message);
-      } else {
-        console.log('Post created successfully');
-        setNewPostContent('');
-        fetchPosts();
-      }
-    } catch (error) {
-      console.error('Error creating post:', error.message);
-    }
+  const handleCreateNewPost = async () => {
+    await createNewPost(newPostContent, user_username, imageUrl);
+    setNewPostContent('');
+    setImageUrl(null);
+    loadPosts(); 
   };
-
-  // Upvote geben für eine Nachricht
-  const handleUpvote = async (postId) => {
-    try {
-      const { data: postData, error } = await supabase.from('posts').select('upvotes', 'downvotes').eq('id', postId).single();
-      if (error) {
-        throw error;
-      }
-      const updatedUpvotes = postData.upvotes + 1;
-      const { error: updateError } = await supabase.from('posts').update({ upvotes: updatedUpvotes }).eq('id', postId);
-      if (updateError) {
-        throw updateError;
-      }
-      fetchPosts();
-    } catch (error) {
-      console.error('Error upvoting post:', error.message);
-    }
-  };
-
-  // Downvote geben für eine Nachricht
-  const handleDownvote = async (postId) => {
-    try {
-      const { data: postData, error } = await supabase
-        .from('posts')
-        .select('downvotes')
-        .eq('id', postId)
-        .single();
-
-      if (error) {
-        throw error;
-      }
-      const updatedDownvotes = (postData.downvotes || 0) + 1;
-      const { error: updateError } = await supabase
-        .from('posts')
-        .update({ downvotes: updatedDownvotes })
-        .eq('id', postId);
-
-      if (updateError) {
-        throw updateError;
-      }
-
-      fetchPosts();
-    } catch (error) {
-      console.error('Error downvoting post:', error.message);
-    }
-  };
-
-  const handleImageUpload = async () => {
-    try {
-      // Öffne den Dateiauswähler für den Benutzer
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [4, 3],
-        quality: 1,
-      });
   
-      // Überprüfe, ob das Bild ausgewählt wurde und nicht abgebrochen wurde
-      if (!result.canceled && result.assets.length > 0) {
-        const firstAsset = result.assets[0];
-        const fileUri = firstAsset.uri;
-        const fileName = fileUri.substring(fileUri.lastIndexOf('/') + 1);
-  
-        // Lade das Bild hoch zu Supabase Storage
-        const response = await fetch(fileUri);
-        const blob = await response.blob();
-  
-        const { error } = await supabase
-          .storage
-          .from('Storage')
-          .upload(`images/${fileName}`, blob, {
-            cacheControl: '3600',
-            upsert: false,
-          });
-  
-        if (error) {
-          throw error;
-        }
-  
-        // Konstruiere den URI des hochgeladenen Bildes
-        const imageUrl = `${process.env.REACT_APP_SUPABASE_URL}/storage/v1/object/public/Storage/images/${fileName}`;
-        console.log('Image URL:', imageUrl);
-      }
-    } catch (error) {
-      console.error('Fehler beim Hochladen des Bildes:', error.message);
-    }
-  };
-
-  // Elemente der Communityseite  
   return (
     <View style={[styles.container, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
       <FlatList
         data={posts}
         renderItem={({ item }) => (
-          <View style={{ backgroundColor: isDarkMode ? '#374151' : '#E5E7EB', padding: 10, marginVertical: 5, width: 350 }}>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5, alignItems: 'center' }}>
-              <Text style={{ color: isDarkMode ? '#FFF' : '#000' }}>{item.content}</Text>
-              <View style={{ flexDirection: 'row' }}>
-                <TouchableOpacity onPress={() => handleUpvote(item.id)} style={{ flexDirection: 'row', alignItems: 'center', marginRight: 10 }}>
-                  <Image source={require('../assets/images/thumbs-up.png')} style={{ width: 20, height: 20 }} />
-                  <Text style={{ color: isDarkMode ? '#FFF' : '#000', fontSize: 12, marginLeft: 3 }}>{item.upvotes}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => handleDownvote(item.id)} style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <Image source={require('../assets/images/thumbs-down.png')} style={{ width: 20, height: 20 }} />
-                  <Text style={{ color: isDarkMode ? '#FFF' : '#000', fontSize: 12, marginLeft: 3 }}>{item.downvotes}</Text>
-                </TouchableOpacity>
-              </View>
+          <View style={styles.postCard}>
+            <View style={styles.postHeader}>
+              <Image source={require('../assets/images/profilepicture.png')} style={styles.profileImage} />
+              <Text style={styles.username}>{item.author}</Text>
             </View>
-            <Text style={{ color: isDarkMode ? '#9CA3AF' : '#6B7280', fontSize: 12 }}>{item.author}</Text>
+            {item.image_url && (
+              <Image source={{ uri: item.image_url }} style={styles.postImage} />
+            )}
+            <Text style={styles.postText}>{item.content}</Text>
+            <View style={styles.postFooter}>
+              <TouchableOpacity onPress={() => handleUpvote(item.id, loadPosts)}>
+                <Image source={require('../assets/images/thumbs-up.png')} style={styles.icon} />
+              </TouchableOpacity>
+              <Text style={styles.upvoteText}>{item.upvotes}</Text>
+              <TouchableOpacity onPress={() => handleDownvote(item.id, loadPosts)}>
+                <Image source={require('../assets/images/thumbs-down.png')} style={styles.icon} />
+              </TouchableOpacity>
+              <Text style={styles.downvoteText}>{item.downvotes}</Text>
+            </View>
           </View>
         )}
         keyExtractor={item => item.id.toString()}
+        refreshing={refreshing}
+        onRefresh={loadPosts}
+        contentContainerStyle={{ paddingBottom: 20 }} // Ensure there's padding at the bottom
       />
-      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+      <View style={styles.inputContainer}>
         <TextInput
-          style={[styles.input, { backgroundColor: isDarkMode ? '#374151' : '#E5E7EB', color: isDarkMode ? '#FFF' : '#000' }]}
+          style={styles.input}
           placeholder="Type here.."
           value={newPostContent}
           onChangeText={text => setNewPostContent(text)}
         />
-        <TouchableOpacity onPress={handleImageUpload}>
-          <Image source={require('../assets/images/picture.png')} style={{ width: 50, height: 50 }} />
+        <TouchableOpacity onPress={() => handleFileUpload()}>
+          <Image source={require('../assets/images/picture.png')} style={styles.uploadIcon} />
         </TouchableOpacity>
-        <TouchableOpacity onPress={createNewPost}>
-          <Image source={require('../assets/images/message_send.png')} style={{ width: 55, height: 55 }} />
+        <TouchableOpacity onPress={handleCreateNewPost}>
+          <Image source={require('../assets/images/message_send.png')} style={styles.sendIcon} />
         </TouchableOpacity>
       </View>
     </View>
   );
 }
 
-// Design 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingTop: 10,
+    paddingHorizontal: 10,
+  },
+  postCard: {
+    backgroundColor: '#FFF',
+    borderRadius: 10,
+    marginVertical: 10,
+    width: '100%',
+    padding: 15,
+  },
+  postHeader: {
+    flexDirection: 'row',
     alignItems: 'center',
-    paddingTop: 20,
-    justifyContent: 'flex-end', 
+  },
+  profileImage: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+  },
+  username: {
+    marginLeft: 10,
+    fontWeight: 'bold',
+  },
+  postImage: {
+    width: '100%',
+    height: 300,
+    marginVertical: 10,
+    borderRadius: 10,
+  },
+  postText: {
+    marginVertical: 5,
+    lineHeight: 20,
+  },
+  postFooter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 10,
+  },
+  icon: {
+    width: 25,
+    height: 25,
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+    marginBottom: 20,
+    borderTopWidth: 1,
+    borderTopColor: '#E1E1E1',
+    paddingTop: 10,
   },
   input: {
-    width: '70%',
+    flex: 1,
     height: 40,
-    borderWidth: 3,
-    borderRadius: 50,
+    backgroundColor: '#F1F1F1',
+    borderRadius: 20,
     paddingHorizontal: 10,
-    marginVertical: 10,
-    marginTop: 'auto',
-    borderColor: '#8a8a8a',
+    marginRight: 10,
+  },
+  uploadIcon: {
+    width: 40,
+    height: 40,
+  },
+  sendIcon: {
+    width: 40,
+    height: 40,
   },
 });
