@@ -115,12 +115,11 @@ export const handleSearchLocal = (searchQuery, setSearchResult, setSelectedPlace
  */
 export const handleSearchLocalAutocomplete = (input, continentsData) => {
   if (!input || input.length === 0) {
-    return []; // Kein Input, keine Vorschläge
+    return [];
   }
 
-  const lowercaseInput = input.toLowerCase(); // Das wird jetzt nur aufgerufen, wenn input gesetzt ist
+  const lowercaseInput = input.toLowerCase();
 
-  // Durchsuche die continentsData nach passenden Städten
   const results = [];
   continentsData.forEach(continent => {
     continent.countries.forEach(country => {
@@ -132,6 +131,5 @@ export const handleSearchLocalAutocomplete = (input, continentsData) => {
     });
   });
 
-  // Rückgabe der Vorschläge
   return results;
 };
