@@ -37,17 +37,17 @@ export const fetchPosts = async () => {
   try {
     const { data, error } = await supabase
       .from('posts')
-      .select('id, content, author, image_url, upvotes, downvotes, timestamp')  // image_url hinzugefügt
-      .order('timestamp', { ascending: false });  // Sortierung nach timestamp
+      .select('id, content, author, image_url, upvotes, downvotes, timestamp')  
+      .order('timestamp', { ascending: false });  
     
     if (error) {
-      throw error;  // Fehler werfen, falls beim Abrufen etwas schiefgeht
+      throw error;  
     }
 
-    return data;  // Gibt die Posts (inkl. image_url) zurück
+    return data;  
   } catch (error) {
     console.error('Error fetching posts:', error.message);
-    return [];  // Gibt ein leeres Array zurück, falls ein Fehler auftritt
+    return [];  
   }
 };
 
@@ -73,15 +73,15 @@ export const createNewPost = async (newPostContent, user_username, imageUrl) => 
       const { error: uploadError } = await supabase.storage
         .from('Images')
         .upload(`images/${fileName}`, arrayBuffer, {
-          contentType: 'image/jpeg', // Stelle sicher, dass der richtige Inhaltstyp verwendet wird
-          upsert: true, // Erlaube das Überschreiben
+          contentType: 'image/jpeg', 
+          upsert: true, // Überschreiben erlaubt
         });
 
       if (uploadError) {
         throw new Error('Error uploading image: ' + uploadError.message);
       }
 
-      // Generiere die öffentliche URL des hochgeladenen Bildes
+      // Öffentliche URL
       uploadedImageUrl = `${SUPABASE_URL}/storage/v1/object/public/Images/images/${fileName}`;
     }
 
@@ -89,7 +89,7 @@ export const createNewPost = async (newPostContent, user_username, imageUrl) => 
     const { error: postError } = await supabase.from('posts').insert([{
       content: newPostContent,
       author: user_username,
-      image_url: uploadedImageUrl,  // Verwende die hochgeladene Bild-URL
+      image_url: uploadedImageUrl,  
       upvotes: 0,
       downvotes: 0
     }]);
@@ -104,7 +104,6 @@ export const createNewPost = async (newPostContent, user_username, imageUrl) => 
 
 export const handleFilePicker = async () => {
   try {
-    // Öffne den Bildauswähler
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
@@ -121,17 +120,3 @@ export const handleFilePicker = async () => {
     console.error('Error picking file:', error.message);
   }
 };
-
-
-
-
-// Hilfsfunktion: Konvertiere Base64 in ArrayBuffer
-function base64ToArrayBuffer(base64) {
-  const binaryString = atob(base64);
-  const len = binaryString.length;
-  const bytes = new Uint8Array(len);
-  for (let i = 0; i < len; i++) {
-    bytes[i] = binaryString.charCodeAt(i);
-  }
-  return bytes.buffer;
-}

@@ -13,7 +13,7 @@ export default function CommunityScreen({ navigation }) {
   const [newPostContent, setNewPostContent] = useState('');
   const [imageUrl, setImageUrl] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false); // New state for Modal visibility
+  const [modalVisible, setModalVisible] = useState(false); 
 
   useEffect(() => {
     loadPosts();
@@ -35,7 +35,7 @@ export default function CommunityScreen({ navigation }) {
     await createNewPost(newPostContent, user_username, imageUrl);
     setNewPostContent('');
     setImageUrl(null);
-    setModalVisible(false); // Close the modal after creating the post
+    setModalVisible(false); 
     loadPosts();
   };
 
@@ -73,13 +73,11 @@ export default function CommunityScreen({ navigation }) {
       <TouchableOpacity style={styles.newPostButton} onPress={() => setModalVisible(true)}>
         <Text style={styles.newPostButtonText}>New Post</Text>
       </TouchableOpacity>
-
-      {/* Modal for new post */}
       <Modal
         animationType="slide"
         transparent={true}
         visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)} // Close the modal if back button is pressed on Android
+        onRequestClose={() => setModalVisible(false)} 
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalView}>
@@ -91,8 +89,8 @@ export default function CommunityScreen({ navigation }) {
               onChangeText={text => setNewPostContent(text)}
             />
             <TouchableOpacity onPress={async () => {
-              const image = await handleFilePicker(); // Open file picker and handle image upload
-              setImageUrl(image); // Set the uploaded image URL
+              const image = await handleFilePicker(); 
+              setImageUrl(image); 
             }}>
               <Image source={require('../assets/images/picture.png')} style={styles.uploadIcon} />
             </TouchableOpacity>
@@ -131,13 +129,13 @@ const styles = StyleSheet.create({
     padding: 15,
     marginBottom: 10,
     alignItems: 'center',
-    width: '100%', // Full width for a cleaner look
+    width: '100%', 
   },
   newPostButtonText: {
     color: 'white',
     fontWeight: 'bold',
     fontSize: 16,
-    textAlign: 'center', // Center the text
+    textAlign: 'center', 
   },
   postHeader: {
     flexDirection: 'row',
