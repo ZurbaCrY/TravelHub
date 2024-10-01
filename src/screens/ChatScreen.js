@@ -177,7 +177,7 @@ export default function ChatScreen({ route, navigation }) {
     setDeleteModalVisible(false);
   };
 
-  const handleLongPress = (context, message) => {
+  const handleLongPress = (message) => {
     if (message.user._id === CURRENT_USER_ID) {
       setSelectedMessage(message);
       setDeleteModalVisible(true);
