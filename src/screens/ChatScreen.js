@@ -1,11 +1,11 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View } from 'react-native';
 import { GiftedChat } from 'react-native-gifted-chat';
 import { useDarkMode } from './DarkModeContext';
 import { supabase } from '../User-Auth/supabase';
 import AuthService from '../User-Auth/auth';
 import PropTypes from 'prop-types';
-
+import { styles } from '../style/styles.js'; // Relativer Pfad
 
 export default function ChatScreen({ route, navigation }) {
   const CURRENT_USER = AuthService.getUser();
@@ -48,7 +48,6 @@ export default function ChatScreen({ route, navigation }) {
 
     fetchMessages();
 
-    // Subscription einrichten
     const messageSubscription = supabase
       .channel(`public:messages:chat_id=eq.${chatId}`)
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `chat_id=eq.${chatId}` }, payload => {
@@ -65,7 +64,6 @@ export default function ChatScreen({ route, navigation }) {
       })
       .subscribe();
 
-    // Cleanup function
     return () => {
       supabase.removeChannel(messageSubscription);
     };
@@ -82,7 +80,7 @@ export default function ChatScreen({ route, navigation }) {
             user_id: CURRENT_USER_ID,
             content: message.text,
             chat_id: chatId,
-            created_at: new Date().toISOString(), // Use ISO string format
+            created_at: new Date().toISOString(),
           },
         ]);
       if (error) {
@@ -96,7 +94,7 @@ export default function ChatScreen({ route, navigation }) {
   }, [chatId]);
 
   return (
-    <View style={[styles.container, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
+    <View style={[styles.chatContainer, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
       <GiftedChat
         messages={messages}
         onSend={(messages) => onSend(messages)}
@@ -120,10 +118,3 @@ ChatScreen.propTypes = {
     setOptions: PropTypes.func.isRequired,
   }).isRequired,
 };
-
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});

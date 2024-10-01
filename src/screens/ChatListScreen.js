@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, View, Text, FlatList, TouchableOpacity, StyleSheet, Modal, TouchableWithoutFeedback, Alert } from 'react-native';
+import { ActivityIndicator, View, Text, FlatList, TouchableOpacity, Modal, TouchableWithoutFeedback, Alert } from 'react-native';
 import { useDarkMode } from './DarkModeContext';
 import { supabase } from '../User-Auth/supabase';
 import AuthService from '../User-Auth/auth';
 import Button from '../components/Button';
-import { styles as st } from '../style/styles';
+import { styles } from '../style/styles.js'; // Relativer Pfad
 import PropTypes from 'prop-types';
 
 export default function ChatListScreen({ navigation }) {
@@ -16,8 +16,6 @@ export default function ChatListScreen({ navigation }) {
   const [usernames, setUsernames] = useState({});
   const [selectedUser, setSelectedUser] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
-  console.log(usernames);
-
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -108,7 +106,6 @@ export default function ChatListScreen({ navigation }) {
     }));
 
     chatList.sort((a, b) => new Date(b.latestMessage.created_at) - new Date(a.latestMessage.created_at));
-    console.log('Fetched chats:', chatList);
     setChats(chatList);
   };
 
@@ -134,11 +131,9 @@ export default function ChatListScreen({ navigation }) {
       return acc;
     }, {});
 
-    console.log('Fetched usernames:', usernameMap);
     setUsernames(usernameMap);
   };
 
-  // Funktion zum Abrufen eines Benutzernamens basierend auf der Benutzer-ID
   const fetchUsername = async (userId) => {
     const { data, error } = await supabase
       .from('users')
@@ -154,9 +149,7 @@ export default function ChatListScreen({ navigation }) {
     return data.username;
   };
 
-  // Funktion zum Abrufen aller Benutzer, die noch keinen Chat mit dem aktuellen Benutzer haben
   const fetchUsers = async () => {
-    // Alle Benutzer abrufen, außer dem aktuellen Benutzer
     const { data: allUsers, error: userError } = await supabase
       .from('users')
       .select('user_id, username')
@@ -167,7 +160,6 @@ export default function ChatListScreen({ navigation }) {
       return;
     }
 
-    // Bestehende Chats abrufen
     const { data: existingChats, error: chatError } = await supabase
       .from('chat_user')
       .select('chat_id')
@@ -197,13 +189,11 @@ export default function ChatListScreen({ navigation }) {
 
     const flattenedUserIds = existingChatUserIds.flat();
 
-    // Benutzer filtern, um diejenigen auszuschließen, die bereits Chats haben
     const filteredUsers = allUsers.filter(user => !flattenedUserIds.includes(user.user_id));
 
     setUsers(filteredUsers);
   };
 
-  // Funktion zum Abrufen der Benutzer in einem bestimmten Chat
   const getChatUsers = async (chatId) => {
     const { data, error } = await supabase
       .from('chat_user')
@@ -218,7 +208,6 @@ export default function ChatListScreen({ navigation }) {
     return data;
   };
 
-  // Funktion zum Erstellen eines neuen Chats
   const createNewChat = async () => {
     if (!selectedUser) {
       console.error('No user selected');
@@ -323,7 +312,7 @@ export default function ChatListScreen({ navigation }) {
 
   if (loading) {
     return (
-      <View style={st.container}>
+      <View style={styles.container}>
         <ActivityIndicator size="large" color="#3EAAE9" />
         <Text>Loading Chats...</Text>
       </View>
@@ -377,53 +366,3 @@ ChatListScreen.propTypes = {
     navigate: PropTypes.func.isRequired,
   }).isRequired,
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    marginTop: 20,
-  },
-  chatItem: {
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-  },
-  chatName: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  lastMessage: {
-    fontSize: 14,
-    marginTop: 5,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalContent: {
-    backgroundColor: '#FFF',
-    padding: 20,
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  userItem: {
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-  },
-  selectedUserItem: {
-    backgroundColor: '#007BFF',
-  },
-  userName: {
-    fontSize: 16,
-  },
-});

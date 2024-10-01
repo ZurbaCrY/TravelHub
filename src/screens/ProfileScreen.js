@@ -3,7 +3,6 @@ import {
   View,
   Text,
   Image,
-  StyleSheet,
   ScrollView,
   TextInput,
   TouchableOpacity,
@@ -16,7 +15,7 @@ import { useDarkMode } from './DarkModeContext';
 import { useNavigation } from '@react-navigation/native';
 import AuthService from '../User-Auth/auth';
 import Button from '../components/Button';
-import { styles } from '../style/styles';
+import { styles } from '../style/styles'; // Import der ausgelagerten Styles
 import { supabase } from '../User-Auth/supabase';
 
 export default function ProfileScreen() {
@@ -49,7 +48,6 @@ export default function ProfileScreen() {
           throw error;
         }
 
-        // Formatiert die Daten in ein passendes Format für die Anzeige
         const countries = data.map(item => ({
           name: item.Country.Countryname,
           verified: item.verified
@@ -68,7 +66,7 @@ export default function ProfileScreen() {
           .eq('user_id', CURRENT_USER_ID)
           .single();
 
-        if (error && error.code !== 'PGRST116') { // PGRST116 bedeutet, dass keine Zeilen gefunden wurden
+        if (error && error.code !== 'PGRST116') {
           throw error;
         }
 
@@ -82,7 +80,6 @@ export default function ProfileScreen() {
     fetchWishListCountries();
   }, [CURRENT_USER_ID]);
 
-  // Überprüft, ob das Land in der Tabelle "Country" existiert
   const validateCountry = async (countryName) => {
     try {
       const { data, error } = await supabase
@@ -101,10 +98,8 @@ export default function ProfileScreen() {
     }
   };
 
-  // Fügt ein neues Land zu den besuchten Ländern hinzu
   const addVisitedCountry = async () => {
     if (newVisited) {
-      // Überprüft, ob das Land bereits in der Liste der besuchten Länder enthalten ist
       if (visitedCountries.some(country => country.name.toLowerCase() === newVisited.toLowerCase())) {
         alert('Das Land ist bereits in der Liste der besuchten Länder.');
         return;
@@ -140,10 +135,8 @@ export default function ProfileScreen() {
     setShowVisitedInput(false);
   };
 
-  // Fügt ein neues Land zur Wunschliste hinzu
   const addWishListCountry = async () => {
     if (newWishList) {
-      // Überprüft, ob das Land bereits in der Wunschliste enthalten ist
       if (wishListCountries.some(country => country.toLowerCase() === newWishList.toLowerCase())) {
         alert('Das Land ist bereits in der Wunschliste.');
         return;
@@ -175,7 +168,6 @@ export default function ProfileScreen() {
     setShowWishListInput(false);
   };
 
-  // Entfernt ein Land aus den besuchten Ländern
   const removeVisitedCountry = async (index) => {
     const countryToRemove = visitedCountries[index];
     const updatedCountries = [...visitedCountries];
@@ -206,7 +198,6 @@ export default function ProfileScreen() {
     }
   };
 
-  // Entfernt ein Land aus der Wunschliste
   const removeWishListCountry = async (index) => {
     const updatedCountries = [...wishListCountries];
     updatedCountries.splice(index, 1);
@@ -238,13 +229,12 @@ export default function ProfileScreen() {
 
   return (
     <TouchableWithoutFeedback onPress={() => {
-      // Schließt die Tastatur, wenn der Benutzer außerhalb der Eingabefelder tippt
       Keyboard.dismiss();
       setShowVisitedInput(false);
       setShowWishListInput(false);
     }}>
       <ScrollView style={[styles.containerProfileScreen, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
-        <View style={[styles.profileSection, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF', }]}>
+        <View style={[styles.profileSection, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
           <Image
             source={{ uri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/PICA.jpg/1200px-PICA.jpg' }}
             style={styles.profileImage}
@@ -269,9 +259,9 @@ export default function ProfileScreen() {
           ) : (
             visitedCountries.map((country, index) => (
               <View key={index} style={styles.countryItem}>
-                <View style={localStyles.countryTextContainer}>
+                <View style={styles.countryTextContainer}>
                   <Text style={styles.details}>{country.name}</Text>
-                  {country.verified && <Icon name="check-circle" size={16} color="green" style={localStyles.verifiedIcon} />}
+                  {country.verified && <Icon name="check-circle" size={16} color="green" style={styles.verifiedIcon} />}
                 </View>
                 <TouchableOpacity onPress={() => removeVisitedCountry(index)} style={styles.removeButton}>
                   <Icon name="trash" size={20} color="#FFFDF3" />
@@ -341,14 +331,4 @@ export default function ProfileScreen() {
       </ScrollView>
     </TouchableWithoutFeedback>
   );
-};
-
-const localStyles = StyleSheet.create({
-  countryTextContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  verifiedIcon: {
-    marginLeft: 5,
-  },
-});
+}
