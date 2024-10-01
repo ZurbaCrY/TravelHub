@@ -1,4 +1,3 @@
-
 import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
@@ -376,6 +375,7 @@ export const styles = StyleSheet.create({
     width: 50,
     height: 50,
   },
+
   // Styles für PlaceDetailModal
   modalContainer: {
     flex: 1,
@@ -446,8 +446,8 @@ export const styles = StyleSheet.create({
     color: 'black',
   },
 
-   // Neue Styles für ProfileScreen
-   countryTextContainer: {
+  // Neue Styles für ProfileScreen
+  countryTextContainer: {
     flexDirection: 'row',
     alignItems: 'center',
   },

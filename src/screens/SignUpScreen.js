@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, TouchableOpacity } from 'react-native';
 import { Input, Text } from 'react-native-elements';
-import { styles } from '../style/styles';
+import { styles } from '../style/styles.js'; // Relativer Pfad
 import Button from '../components/Button';
 import AuthService from '../User-Auth/auth';
 import PropTypes from 'prop-types';
@@ -15,10 +15,10 @@ const SignUpScreen = ({ navigation, setUser, setLoading }) => {
   const handleSignUp = async () => {
     try {
       setLoading(true, "Signing Up");
-      const user = await AuthService.signUp(username, email, password, confirmPassword)
+      const user = await AuthService.signUp(username, email, password, confirmPassword);
       setUser(user);
     } catch (error) {
-      console.error(error)
+      console.error(error);
     } finally {
       setLoading(false);
     }

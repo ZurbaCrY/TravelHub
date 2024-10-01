@@ -5,10 +5,9 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { Input, Text } from "react-native-elements";
-// import { useNavigation } from "@react-navigation/native";
-import { styles } from '../style/styles';
+import { styles } from '../style/styles.js'; // Relativer Pfad
 import Button from "../components/Button";
-import AuthService from "../User-Auth/auth"
+import AuthService from "../User-Auth/auth";
 import AnimatedSwitch from "../components/AnimatedSwitch";
 import PropTypes from 'prop-types';
 
@@ -19,7 +18,7 @@ const SignInScreen = ({ navigation, setUser, setLoading }) => {
 
   const handleSignIn = async () => {
     try {
-      setLoading(true, "Signing in")
+      setLoading(true, "Signing in");
       const user = await AuthService.signIn(email, password, remember);
       setUser(user);
     } catch (error) {
@@ -42,7 +41,7 @@ const SignInScreen = ({ navigation, setUser, setLoading }) => {
       <Text style={styles.title}>Login</Text>
       <TouchableOpacity style={styles.authSwitchTouchable} onPress={authSwitchToSignUp}>
         <Text style={styles.switchText}>
-          Dont have an account? Sign Up instead
+          Don't have an account? Sign Up instead
         </Text>
       </TouchableOpacity>
       <View style={styles.inputView}>
@@ -71,7 +70,6 @@ const SignInScreen = ({ navigation, setUser, setLoading }) => {
           <AnimatedSwitch
             value={remember}
             onValueChange={setRemember}
-            // trackColor={{ true: "green", false: "gray" }}
           />
           <Text style={styles.rememberText}>Remember Me</Text>
         </View>
@@ -86,12 +84,12 @@ const SignInScreen = ({ navigation, setUser, setLoading }) => {
       </View>
     </View>
   );
-}
+};
 
 SignInScreen.propTypes = {
   navigation: PropTypes.object.isRequired,
   setUser: PropTypes.func.isRequired,
-  setLoading: PropTypes.func.isRequired
+  setLoading: PropTypes.func.isRequired,
 };
 
 export default SignInScreen;
