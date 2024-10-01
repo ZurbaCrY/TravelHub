@@ -1,6 +1,6 @@
 import 'react-native-url-polyfill/auto';
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, TextInput, Image, TouchableOpacity, Modal, Button } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TextInput, Image, TouchableOpacity, Modal} from 'react-native';
 import { useDarkMode } from '../context/DarkModeContext';
 import AuthService from '../services/auth';
 import { handleUpvote, handleDownvote, fetchPosts, createNewPost, handleFilePicker } from '../backend/community';
@@ -46,8 +46,8 @@ export default function CommunityScreen({ navigation }) {
         renderItem={({ item }) => (
           <View style={styles.postCard}>
             <View style={styles.postHeader}>
-              <Image source={require('../assets/images/profilepicture.png')} style={styles.profileImage} />
-              <Text style={styles.username}>{item.author}</Text>
+              <Image source={{ uri: item.users.profilepicture_url }} style={styles.profileImage} />
+              <Text style={styles.username}>{item.users.username}</Text>
             </View>
             {item.image_url && (
               <Image source={{ uri: item.image_url }} style={styles.postImage} />
