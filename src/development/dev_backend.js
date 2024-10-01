@@ -66,7 +66,6 @@ class FriendService {
       throw new Error("Error fetching friend requests: " + error.message);
     }
 
-    console.log("-------------------------", data)
     // Separate requests into sent and received
     data.forEach(req => {
       if (req.receiver_id === this.user.id) {
@@ -229,7 +228,6 @@ class FriendService {
       requests.push(...this.friendRequests.received.declined);
     }
 
-    console.log("here", this.friendRequests.received.pending)
     return requests;
   }
 }

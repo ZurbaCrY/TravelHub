@@ -1,20 +1,36 @@
 import React, { useEffect, useState } from "react";
 import { View, Button, FlatList, Text } from "react-native";
 import FriendService from "./dev_backend";
+import getUsernamesByUserIds from "../services/getUsernamesByUserIds";
 
 export default function DevelopmentScreen() {
   const [friends, setFriends] = useState([])
   const [incomingRequests, setIncomingRequests] = useState([])
+  const [friendUsernames, setFriendUsernames] = useState({});
+  const [incomingRequestUsernames, setIncomingRequestUsernames] = useState({});
 
   useEffect(() => {
     const fetchFriends = async () => {
       try {
         await FriendService.setup();
+
         const incomingRequestList = FriendService.getIncomingRequests(true, true, true);
         setIncomingRequests(incomingRequestList);
 
         const friendList = FriendService.getFriends();
         setFriends(friendList);
+
+        // Fetch usernames for friends
+        const friendIds = friendList.map(friend => friend.friend_id); // Extract friend IDs
+        const fetchedFriendUsernames = await getUsernamesByUserIds(friendIds);
+        const friendUsernameMap = Object.fromEntries(fetchedFriendUsernames.map(user => [user.id, user.username]));
+        setFriendUsernames(friendUsernameMap); // Store usernames in state
+
+        // Fetch usernames for incoming requests
+        const requestSenderIds = incomingRequestList.map(request => request.sender_id); // Extract sender IDs
+        const fetchedRequestUsernames = await getUsernamesByUserIds(requestSenderIds);
+        const requestUsernameMap = Object.fromEntries(fetchedRequestUsernames.map(user => [user.id, user.username]));
+        setIncomingRequestUsernames(requestUsernameMap); // Store usernames in state
 
         console.log("friends: ", friendList, "\nincomingRequests: ", incomingRequestList);
       } catch (error) {
@@ -46,7 +62,9 @@ export default function DevelopmentScreen() {
         data={friends}
         keyExtractor={(item) => item.friend_id}
         renderItem={({ item }) => (
-          <Text>{item.friend_id}</Text>
+          <Text>
+            {friendUsernames[item.friend_id] || item.friend_id} {/* Display username or friend_id if not found */}
+            </Text>
         )}
       />
 
@@ -57,7 +75,7 @@ export default function DevelopmentScreen() {
         renderItem={({ item }) => (
           <View>
             <Text>
-              {item.sender_id} - Status: {item.status}
+              {incomingRequestUsernames[item.sender_id] || item.sender_id} - Status: {item.status}
             </Text>
             {item.status === "pending" && (
               <View>
