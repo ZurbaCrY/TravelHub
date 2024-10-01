@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { ActivityIndicator, View, Text, FlatList, TouchableOpacity, StyleSheet, Modal, TouchableWithoutFeedback, Alert } from 'react-native';
 import { useDarkMode } from '../context/DarkModeContext';
 import { supabase } from '../services/supabase';
@@ -33,7 +33,6 @@ export default function ChatListScreen({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // Verwende useFocusEffect, um sicherzustellen, dass die Chats aktualisiert werden, wenn der Benutzer zurückkehrt
   useFocusEffect(
     React.useCallback(() => {
       const fetchChatsAndUsers = async () => {
