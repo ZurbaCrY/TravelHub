@@ -24,6 +24,7 @@ import { fetchData, updateVisitedCountry, updateOrCreateVisitedCountry } from '.
 import { updateFavourite, deleteFavourite, getMarkerForPlace, getDescriptionForPlace, getListImage, getNameForPlace, handleStarClick } from '../backend/LoadEditPlaceData';
 import { findNearestCity } from '../backend/MapLocationChangeFunctions';
 import MapSearchBar from '../components/MapSearchBar';
+import Map from '../components/Map';
 
 const { width } = Dimensions.get('window');
 
@@ -107,10 +108,10 @@ export default function MapScreen() {
   }, []);
 
 
-   /**
+  /**
    * Funktionen zum Verändern der Position der Map.
    *
-   */
+  */
   const onRegionChangeComplete = (region) => {
     setZoomLevel(region.latitudeDelta);
     setRegion(region);
@@ -201,48 +202,22 @@ export default function MapScreen() {
       </TouchableOpacity>
 
       {/* Sobald Standort verfügbar -> Laden der MAP */}
-      {location ? (
-        <MapView
-          provider={PROVIDER_GOOGLE}
-          style={styles.map}
-          mapType={"mutedStandard"}
-          showsUserLocation={true} // Zeige den Standort des Benutzers als blauen Punkt an
-          region={region}
-          backgroundColor="lightblue" // Hintergrundfarbe der gesamten Karte
-          onRegionChangeComplete={onRegionChangeComplete}
-          showsPointsOfInterest={false} // Entferne vordefinierte Orte wie Geschäfte, Restaurants, etc.
-          showsTraffic={false}
-          customMapStyle={customMapStyle}
-          showsIndoors={false}
-          showsIndoorLevelPicker={false}
-          rotateEnabled={false} // Rotation der Karte deaktivieren
-          showsCompass={false} // Kompass ausblenden
-          onPress={handleMapPress}
-          ref={(ref) => setMapRef(ref)}
-        >
-          {/* Markierungen für verschiedene Arten von Orten anzeigen */}
-          {showMarkers && continentsData.flatMap(continent =>
-            continent.countries.flatMap(country =>
-              country.cities.flatMap(city =>
-                city.places.map(place => (
-                  <Marker
-                    key={`${continent.name}-${country.name}-${city.name}-${place.name}-${selectedPlace && selectedPlace.name === place.name ? 'selected' : 'unselected'}`}
-                    coordinate={place.coordinates} // Die Koordinaten des Ortes werden von der Stadt übernommen
-                    onPress={() => handleMarkerPress(place)} // Handler für das Anklicken des Markers
-                    title={getNameForPlace(place)}
-                    description={getDescriptionForPlace(place)}
-                    calloutEnabled={true}
-                    image={getMarkerForPlace(place)} // Hier das Bild für den benutzerdefinierten Marker angeben
-                    style={{ width: 20, height: 20 }} // Anpassung der Größe des Markers
-                  />
-                ))
-              )
-            )
-          )}
-        </MapView>
-      ) : (
-        <Text>Map Loading...</Text>
-      )}
+      <Map
+        location={location}
+        region={region}
+        onRegionChangeComplete={onRegionChangeComplete}
+        handleMapPress={handleMapPress}
+        handleMarkerPress={handleMarkerPress}
+        setMapRef={setMapRef}
+        continentsData={continentsData}
+        showMarkers={showMarkers}
+        selectedPlace={selectedPlace}
+        getMarkerForPlace={getMarkerForPlace}
+        getNameForPlace={getNameForPlace}
+        getDescriptionForPlace={getDescriptionForPlace}
+        customMapStyle={customMapStyle}
+        styles={styles}
+      />
 
       {/* Slide-Up Bar unten */}
       <View style={styles.bottomBar}>
