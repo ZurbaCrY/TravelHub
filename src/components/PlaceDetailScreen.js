@@ -63,7 +63,7 @@ PlaceDetailModal.propTypes = {
     priceLevel: PropTypes.string,
     isOpen: PropTypes.bool,
     viewpointType: PropTypes.string,
-  }).isRequired,
+  }),
   onClose: PropTypes.func.isRequired,
 };
 

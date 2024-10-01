@@ -63,7 +63,7 @@ export default function MapScreen() {
   const CURRENT_USER_ID = CURRENT_USER.id;
 
   /**
-     * UseEffect-Hooks für das erstmalige Aufrufen - Laden der Karte und Daten aus der DB.
+     * UseEffect-Hooks für das erstmalige Aufrufen -> Laden der Karte und Daten aus der DB.
      * Aktualisieren der Position und der nächstgelegenen Stadt.
   */
   useEffect(() => {
