@@ -1,25 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { StyleSheet, View, Modal, Text, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
-import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { customMapStyle } from '../styles/customMapStyle';
 import { MaterialIcons } from '@expo/vector-icons';
 import CustomPlaceItem from '../components/CustomPlaceItem';
 import PlaceDetailScreen from '../components/PlaceDetailScreen';
 import AddPlaceModal from '../components/AddPlaceModal';
-import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { Button } from 'react-native-paper'
 import { supabase } from '../services/supabase';
 import AuthService from '../services/auth'
 import { useDarkMode } from '../context/DarkModeContext';
-import { Continent,
-    Country,
-    City,
-    Place,
-    SightseeingSpot,
-    Restaurant,
-    ShoppingStore,
-    Viewpoint } from '../backend/MapClasses';
 import { fetchData, updateVisitedCountry, updateOrCreateVisitedCountry } from '../backend/LoadEditMapData';
 import { updateFavourite, deleteFavourite, getMarkerForPlace, getDescriptionForPlace, getListImage, getNameForPlace, handleStarClick } from '../backend/LoadEditPlaceData';
 import { findNearestCity } from '../backend/MapLocationChangeFunctions';
@@ -44,7 +34,6 @@ export default function MapScreen() {
   const [errorMsg, setErrorMsg] = useState(null);
   const [zoomLevel, setZoomLevel] = useState(null);
   const [showMarkers, setShowMarkers] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
   const [searchResult, setSearchResult] = useState(null);
   const [searchLocation, setSearchLocation] = useState(null);
   const [region, setRegion] = useState(null); // Zustand für die aktuelle Kartenregion
