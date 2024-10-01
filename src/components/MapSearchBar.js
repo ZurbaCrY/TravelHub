@@ -7,18 +7,14 @@ const MapSearchBar = ({ styles, mapRef, scrollToStart, setSelectedPlace, setSear
   const [query, setQuery] = useState('');
   const [bestMatch, setBestMatch] = useState(null);
 
-  // Handler für die Eingabeveränderung
   const handleInputChange = (input) => {
     setQuery(input || ''); // Setze einen leeren String, wenn input undefined ist
     const results = handleSearchLocalAutocomplete(input || '', continentsData); // Nutze einen leeren String für die Suche
-    // Setze den besten Vorschlag, falls einer existiert
     setBestMatch(results.length > 0 ? results[0] : null);
   };
 
-  // Handle Button-Klick
   const handleButtonPress = () => {
     if (bestMatch) {
-      // Hier prüfen, ob die Koordinaten existieren
       if (bestMatch.coordinates && bestMatch.coordinates.length > 0) {
         const middleCoordinate = findMiddleCoordinate(bestMatch.coordinates);
         mapRef.animateToRegion({
@@ -28,7 +24,7 @@ const MapSearchBar = ({ styles, mapRef, scrollToStart, setSelectedPlace, setSear
           longitudeDelta: 0.0421,
         }, 1000);
         setSearchResult(bestMatch);
-        setQuery(bestMatch.name); // Update das Suchfeld mit dem besten Vorschlag
+        setQuery(bestMatch.name);
       }
     }
   };
@@ -43,7 +39,7 @@ const MapSearchBar = ({ styles, mapRef, scrollToStart, setSelectedPlace, setSear
         style={styles.searchInput}
       />
 
-      {/* Zeige den besten Vorschlag in grauer Schrift */}
+      {/* bester Vorschlag in grauer Schrift */}
       {bestMatch && (
         <TextInput
           value={bestMatch.name}
@@ -61,7 +57,7 @@ const MapSearchBar = ({ styles, mapRef, scrollToStart, setSelectedPlace, setSear
   );
 };
 
-// Styles hier definiert
+// Styles hier definiert, muss noch verschönert und ausgelagert werden
 const localStyles = StyleSheet.create({
   searchContainer: {
     position: 'relative',
