@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 
-export default function PostDetailScreen({ route, navigation }) {
+export default function CommunityDetailScreen({ route, navigation }) {
   const { post } = route.params;
 
   return (

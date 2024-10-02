@@ -40,7 +40,7 @@ export default function CommunityScreen({ navigation }) {
   };
 
   const handlePostPress = (post) => {
-    navigation.navigate('CommunityDetail', { post });
+    navigation.navigate('CommunityDetailScreen', { post });
   };
 
   return (

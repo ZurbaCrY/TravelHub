@@ -132,17 +132,19 @@ export default function App() {
               name="Main"
               component={MainTabs}
               options={{ headerShown: false }}
-              />
+            />
             <RootStack.Screen name="Settings">
               {props => <SettingsScreen {...props} setUser={setUser} setLoading={setLoadingStatus} />}
             </RootStack.Screen>
             <RootStack.Screen name="Development">
               {props => <DevelopmentScreen {...props} setUser={setUser} setLoading={setLoadingStatus} />}
             </RootStack.Screen>
-            <RootStack.Screen name="Post">
-              {props => <CommunityDetailScreen {...props} setUser={setUser} setLoading={setLoadingStatus} />}
-            </RootStack.Screen>
             <RootStack.Screen name="ChatListScreen" component={ChatListScreen} />
+            <RootStack.Screen
+              name="CommunityDetailScreen"
+              component={CommunityDetailScreen}
+              options={{ title: 'Post' }}
+            />
             <RootStack.Screen name="ChatScreen" component={ChatScreen} />
           </RootStack.Navigator>
           <StatusBar style="auto" />

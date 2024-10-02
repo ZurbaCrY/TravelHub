@@ -1,8 +1,10 @@
-import { SUPABASE_URL } from '@env';
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
 import { supabase } from '../services/supabase';
 import AuthService from '../services/auth'
+import { SUPABASE_URL } from '@env';
+
+
 
 export const handleUpvote = async (postId, fetchPosts) => {
   try {
@@ -56,7 +58,6 @@ export const fetchPosts = async () => {
     if (error) {
       throw error;
     }
-    console.log(data);
     return data;
   } catch (error) {
     console.error('Error fetching posts:', error.message);
@@ -71,6 +72,7 @@ export const createNewPost = async (newPostContent, user_username, imageUrl) => 
     let uploadedImageUrl = null;
     const CURRENT_USER = AuthService.getUser();
     const CURRENT_USER_ID = CURRENT_USER.id;
+
 
     if (imageUrl) {
       // Lade das Bild hoch
@@ -205,8 +207,6 @@ export const getProfilePictureUrlByUserId = async () => {
       console.error('Error fetching profile picture URL:', error);
       return null;
     }
-    
-    console.log(data.profilepicture_url);
     return data ? data.profilepicture_url : null; // Return the URL or null if not found
   } catch (error) {
     console.error('Unexpected error:', error);
