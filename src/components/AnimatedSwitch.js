@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { View, TouchableOpacity, Animated } from 'react-native';
 import PropTypes from 'prop-types';
 import { styles } from '../style/styles.js'; // Relativer Pfad
 
 const AnimatedSwitch = ({ value, onValueChange }) => {
-  const [animValue] = useState(new Animated.Value(value ? 1 : 0));
+  const animValue = useRef(new Animated.Value(value ? 1 : 0)).current;
 
   useEffect(() => {
     Animated.timing(animValue, {
@@ -15,14 +15,16 @@ const AnimatedSwitch = ({ value, onValueChange }) => {
   }, [value]);
 
   const toggleSwitch = () => {
-    onValueChange && onValueChange(!value);
+    if (onValueChange) {
+      onValueChange(!value);
+    }
   };
 
   const translateX = animValue.interpolate({
     inputRange: [0, 1],
     outputRange: [0, 22],
   });
-
+  
   return (
     <TouchableOpacity onPress={toggleSwitch} activeOpacity={0.8}>
       <View style={styles.buttonViewAnimatedSwitch}>

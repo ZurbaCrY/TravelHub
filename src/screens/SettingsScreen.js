@@ -1,28 +1,48 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, } from 'react-native';
-import { useDarkMode } from './DarkModeContext';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Image, Modal, Alert } from 'react-native';
+import { useDarkMode } from '../context/DarkModeContext';
 import Button from '../components/Button';
-import AuthService from '../User-Auth/auth'
+import AuthService from '../services/auth';
 import AnimatedSwitch from '../components/AnimatedSwitch';
 import PropTypes from 'prop-types';
+import { handleFilePicker, handleNewProfilePicture } from '../backend/community';
 
 const SettingsScreen = ({ setUser, setLoading }) => {
-  const { isDarkMode, toggleDarkMode } = useDarkMode(); // Verwende den globalen Dark Mode State
+  const { isDarkMode, toggleDarkMode } = useDarkMode();
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [imageUrl, setImageUrl] = useState(null); 
+  const [modalVisible, setModalVisible] = useState(false); 
 
   const handleSignOut = async () => {
     try {
       setLoading(true, "Signing Out");
       const user = await AuthService.signOut();
       setUser(user);
+    } catch (error) {
+      Alert.alert("Fehler", "Beim Abmelden ist ein Fehler aufgetreten.");
+      console.error('Sign-out error:', error);
     } finally {
       setLoading(false);
     }
-  }
+  };
+
+  const handleImageChange = async () => {
+    const image = await handleFilePicker();
+    if (image) {
+      setImageUrl(image);
+      setModalVisible(true);
+    }
+  };
 
   return (
     <View style={[styles.container, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
       <Text style={[styles.header, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>Einstellungen</Text>
+      <View style={styles.setting}>
+        <Text style={[styles.settingLabel, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>Profilbild wechseln </Text>
+        <TouchableOpacity onPress={handleImageChange}>
+          <Image source={require('../assets/images/picture.png')} style={styles.uploadIcon} />
+        </TouchableOpacity>
+      </View>
 
       <View style={styles.setting}>
         <Text style={[styles.settingLabel, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>Darkmode</Text>
@@ -45,6 +65,38 @@ const SettingsScreen = ({ setUser, setLoading }) => {
           Sign out
         </Button>
       </View>
+
+      {/* Modal für die Bildvorschau */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(!modalVisible);
+        }}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalView}>
+            {imageUrl && (
+              <Image source={{ uri: imageUrl }} style={styles.previewImage} />
+            )}
+            <Button mode="contained" onPress={() => setModalVisible(false)}>
+              Schließen
+            </Button>
+            <TouchableOpacity
+              style={styles.submitButton}
+              onPress={async () => {
+                const success = await handleNewProfilePicture(imageUrl);
+                setModalVisible(false);
+              }}
+            >
+              <Button mode="contained">
+                Posten
+              </Button>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -74,23 +126,30 @@ const styles = StyleSheet.create({
   settingLabel: {
     fontSize: 18,
   },
-  input: {
-    padding: 10,
-    borderRadius: 5,
-    fontSize: 16,
+  uploadIcon: {
+    width: 40,
+    height: 40,
+    marginBottom: 15,
+  },
+  modalContainer: {
     flex: 1,
-  },
-  button: {
-    backgroundColor: '#3D52D5',
-    padding: 15,
-    borderRadius: 10,
+    justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 10,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent Hintergrund
   },
-  buttonText: {
-    color: '#FFFDF3',
-    fontSize: 18,
-  }
+  modalView: {
+    width: '80%',
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 20,
+    alignItems: 'center',
+  },
+  previewImage: {
+    width: '100%',
+    height: 200,
+    borderRadius: 10,
+    marginBottom: 15,
+  },
 });
 
 export default SettingsScreen;

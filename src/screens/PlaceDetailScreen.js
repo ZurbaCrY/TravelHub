@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, Modal, TouchableOpacity, Image } from 'react-native';
 import PropTypes from 'prop-types';
+import { useDarkMode } from '../context/DarkModeContext';
 import { styles } from '../style/styles.js'; // Relativer Pfad
 
 const PlaceDetailModal = ({ visible, place, onClose }) => {
@@ -19,7 +20,11 @@ const PlaceDetailModal = ({ visible, place, onClose }) => {
         <View style={styles.modalContent}>
           {/* Bild des Ortes (Platzhalter verwenden, wenn kein Bild vorhanden ist) */}
           {place.link ? (
-            <Image source={{ uri: place.link }} style={styles.placeImage} />
+            <Image
+              source={{ uri: place.link }}
+              style={styles.placeImage}
+              onError={() => console.log("Image failed to load")}
+            />
           ) : (
             <View style={styles.placeholderImage} />
           )}

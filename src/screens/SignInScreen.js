@@ -3,15 +3,17 @@ import {
   Alert,
   View,
   TouchableOpacity,
+  Text,  
 } from "react-native";
-import { Input, Text } from "react-native-elements";
-import { styles } from '../style/styles.js'; // Relativer Pfad
+import { Input } from "react-native-elements"; 
+import { styles } from '../styles/styles';
 import Button from "../components/Button";
-import AuthService from "../User-Auth/auth";
+import AuthService from "../services/auth";
 import AnimatedSwitch from "../components/AnimatedSwitch";
 import PropTypes from 'prop-types';
+import { useDarkMode } from '../context/DarkModeContext';
 
-const SignInScreen = ({ navigation, setUser, setLoading }) => {
+const SignInScreen = ({ navigation, setUser = () => {}, setLoading = () => {} }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
@@ -22,7 +24,8 @@ const SignInScreen = ({ navigation, setUser, setLoading }) => {
       const user = await AuthService.signIn(email, password, remember);
       setUser(user);
     } catch (error) {
-      throw Error;
+      Alert.alert("Sign-In Error", "Unable to sign in. Please check your credentials and try again.");
+      console.error('Sign-in error:', error);
     } finally {
       setLoading(false);
     }
@@ -48,7 +51,7 @@ const SignInScreen = ({ navigation, setUser, setLoading }) => {
         <Input
           label="Email"
           leftIcon={{ type: "font-awesome", name: "envelope" }}
-          onChangeText={(text) => setEmail(text)}
+          onChangeText={setEmail}
           value={email}
           placeholder="email@address.com"
           autoCapitalize={"none"}
@@ -57,7 +60,7 @@ const SignInScreen = ({ navigation, setUser, setLoading }) => {
         <Input
           label="Password"
           leftIcon={{ type: "font-awesome", name: "lock" }}
-          onChangeText={(text) => setPassword(text)}
+          onChangeText={setPassword}
           value={password}
           secureTextEntry={true}
           placeholder="Password"

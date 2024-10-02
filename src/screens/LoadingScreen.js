@@ -1,9 +1,11 @@
 import React from 'react';
 import { Text, View, ActivityIndicator } from 'react-native';
 import PropTypes from 'prop-types';
+import { useDarkMode } from '../context/DarkModeContext';
 import { styles } from '../style/styles.js'; // Relativer Pfad
 
-const LoadingScreen = ({ loadingMessage }) => {
+
+const LoadingScreen = ({ loadingMessage = 'Loading...' }) => {
   return (
     <View style={styles.container}>
       <ActivityIndicator size="large" color="#3EAAE9" />
@@ -17,3 +19,4 @@ LoadingScreen.propTypes = {
 };
 
 export default LoadingScreen;
+

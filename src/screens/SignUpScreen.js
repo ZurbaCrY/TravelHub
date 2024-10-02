@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { View, TouchableOpacity } from 'react-native';
 import { Input, Text } from 'react-native-elements';
-import { styles } from '../style/styles.js'; // Relativer Pfad
+import { styles } from '../styles/styles';
 import Button from '../components/Button';
-import AuthService from '../User-Auth/auth';
+import AuthService from '../services/auth';
 import PropTypes from 'prop-types';
+import { useDarkMode } from '../context/DarkModeContext';
 
 const SignUpScreen = ({ navigation, setUser, setLoading }) => {
   const [username, setUsername] = useState('');
@@ -13,11 +14,17 @@ const SignUpScreen = ({ navigation, setUser, setLoading }) => {
   const [confirmPassword, setConfirmPassword] = useState('');
 
   const handleSignUp = async () => {
+    if (password !== confirmPassword) {
+      Alert.alert("Passwords do not match", "Please ensure both passwords are the same.");
+      return;
+    }
+
     try {
       setLoading(true, "Signing Up");
       const user = await AuthService.signUp(username, email, password, confirmPassword);
       setUser(user);
     } catch (error) {
+      Alert.alert("Sign-Up Error", "An error occurred during sign-up. Please try again.");
       console.error(error);
     } finally {
       setLoading(false);

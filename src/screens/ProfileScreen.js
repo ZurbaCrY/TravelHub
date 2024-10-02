@@ -11,12 +11,13 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Flag from 'react-native-flags';
-import { useDarkMode } from './DarkModeContext';
+import { useDarkMode } from '../context/DarkModeContext';
 import { useNavigation } from '@react-navigation/native';
-import AuthService from '../User-Auth/auth';
+import AuthService from '../services/auth'
 import Button from '../components/Button';
-import { styles } from '../style/styles'; // Import der ausgelagerten Styles
-import { supabase } from '../User-Auth/supabase';
+import { styles } from '../styles/styles';
+import { supabase } from '../services/supabase';
+import { getProfilePictureUrlByUserId } from '../backend/community';
 
 export default function ProfileScreen() {
   const CURRENT_USER = AuthService.getUser();
@@ -28,6 +29,16 @@ export default function ProfileScreen() {
   const [newWishList, setNewWishList] = useState('');
   const [showVisitedInput, setShowVisitedInput] = useState(false);
   const [showWishListInput, setShowWishListInput] = useState(false);
+  const [profilePictureUrl, setProfilePictureUrl] = useState(null);
+
+  useEffect(() => {
+    const fetchProfilePictureUrl = async () => {
+      const url = await getProfilePictureUrlByUserId();
+      setProfilePictureUrl(url); // Directly assigning the fetched URL to state
+    };
+
+    fetchProfilePictureUrl();
+  }, []);
 
   const navigation = useNavigation();
 
@@ -47,7 +58,7 @@ export default function ProfileScreen() {
         if (error) {
           throw error;
         }
-
+        // Formatiert die Daten in ein passendes Format für die Anzeige
         const countries = data.map(item => ({
           name: item.Country.Countryname,
           verified: item.verified
@@ -80,6 +91,7 @@ export default function ProfileScreen() {
     fetchWishListCountries();
   }, [CURRENT_USER_ID]);
 
+  // Überprüft, ob das Land in der Tabelle "Country" existiert
   const validateCountry = async (countryName) => {
     try {
       const { data, error } = await supabase
@@ -98,8 +110,10 @@ export default function ProfileScreen() {
     }
   };
 
+  // Fügt ein neues Land zu den besuchten Ländern hinzu
   const addVisitedCountry = async () => {
     if (newVisited) {
+      // Überprüft, ob das Land bereits in der Liste der besuchten Länder enthalten ist
       if (visitedCountries.some(country => country.name.toLowerCase() === newVisited.toLowerCase())) {
         alert('Das Land ist bereits in der Liste der besuchten Länder.');
         return;
@@ -134,9 +148,10 @@ export default function ProfileScreen() {
     }
     setShowVisitedInput(false);
   };
-
+  // Fügt ein neues Land zur Wunschliste hinzu
   const addWishListCountry = async () => {
     if (newWishList) {
+      // Überprüft, ob das Land bereits in der Wunschliste enthalten ist
       if (wishListCountries.some(country => country.toLowerCase() === newWishList.toLowerCase())) {
         alert('Das Land ist bereits in der Wunschliste.');
         return;
@@ -168,6 +183,7 @@ export default function ProfileScreen() {
     setShowWishListInput(false);
   };
 
+  // Entfernt ein Land aus den besuchten Ländern
   const removeVisitedCountry = async (index) => {
     const countryToRemove = visitedCountries[index];
     const updatedCountries = [...visitedCountries];
@@ -198,6 +214,7 @@ export default function ProfileScreen() {
     }
   };
 
+  // Entfernt ein Land aus der Wunschliste
   const removeWishListCountry = async (index) => {
     const updatedCountries = [...wishListCountries];
     updatedCountries.splice(index, 1);
@@ -229,6 +246,7 @@ export default function ProfileScreen() {
 
   return (
     <TouchableWithoutFeedback onPress={() => {
+      // Schließt die Tastatur, wenn der Benutzer außerhalb der Eingabefelder tippt
       Keyboard.dismiss();
       setShowVisitedInput(false);
       setShowWishListInput(false);
@@ -236,7 +254,7 @@ export default function ProfileScreen() {
       <ScrollView style={[styles.containerProfileScreen, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
         <View style={[styles.profileSection, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
           <Image
-            source={{ uri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/PICA.jpg/1200px-PICA.jpg' }}
+            source={{ uri: profilePictureUrl }}
             style={styles.profileImage}
           />
           <Text style={[styles.name, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>{CURRENT_USER.user_metadata.username}</Text>
@@ -325,6 +343,11 @@ export default function ProfileScreen() {
           <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
             <Button mode="contained">
               Zu den Einstellungen
+            </Button>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('Development')}>
+            <Button mode="contained">
+              Zum Dev Screen
             </Button>
           </TouchableOpacity>
         </View>

@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, View, Text, FlatList, TouchableOpacity, Modal, TouchableWithoutFeedback, Alert } from 'react-native';
-import { useDarkMode } from './DarkModeContext';
-import { supabase } from '../User-Auth/supabase';
-import AuthService from '../User-Auth/auth';
+import { ActivityIndicator, View, Text, FlatList, TouchableOpacity, StyleSheet, Modal, TouchableWithoutFeedback, Alert } from 'react-native';
+import { useDarkMode } from '../context/DarkModeContext';
+import { supabase } from '../services/supabase';
+import AuthService from '../services/auth'
 import Button from '../components/Button';
-import { styles } from '../style/styles.js'; // Relativer Pfad
+import { styles as st } from '../styles/styles';
+import { styles } from '../styles/styles.js'; // Relativer Pfad
 import PropTypes from 'prop-types';
 
 export default function ChatListScreen({ navigation }) {
@@ -16,6 +17,7 @@ export default function ChatListScreen({ navigation }) {
   const [usernames, setUsernames] = useState({});
   const [selectedUser, setSelectedUser] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
+
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -312,7 +314,7 @@ export default function ChatListScreen({ navigation }) {
 
   if (loading) {
     return (
-      <View style={styles.container}>
+      <View style={st.container}>
         <ActivityIndicator size="large" color="#3EAAE9" />
         <Text>Loading Chats...</Text>
       </View>
