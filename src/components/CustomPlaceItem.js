@@ -9,7 +9,7 @@ const CustomPlaceItem = ({ place, handleMarkerPress, handleStarClick, handlePlac
   return (
     <TouchableOpacity
       style={selected ? [styles.customPlaceItem, styles.selectedItem] : styles.customPlaceItem}
-      onPress={handleMarkerPress(place)}
+      onPress={() => handleMarkerPress(place)}
     >
       <View style={styles.customPlaceItemContainer}>
         {/* Bild links */}
@@ -40,7 +40,7 @@ CustomPlaceItem.propTypes = {
   handleMarkerPress: PropTypes.func.isRequired,
   handleStarClick: PropTypes.func.isRequired,
   handlePlaceDetail: PropTypes.func.isRequired,
-  image: PropTypes.string.isRequired,
+  image: PropTypes.string,
   selected: PropTypes.bool.isRequired,
 };
 
