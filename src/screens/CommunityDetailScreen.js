@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, RefreshControl, FlatList } from 'react-native';
-import { handleDownvote, handleUpvote, fetchPosts, getUpvoters, getDownvoters } from '../backend/community';
+import { View, Text, Image, StyleSheet, TouchableOpacity, RefreshControl, FlatList, TextInput } from 'react-native';
+import { handleDownvote, handleUpvote, fetchPosts, getUpvoters, getDownvoters, fetchComments, addComment } from '../backend/community'; // Stelle sicher, dass addComment importiert wird
 import AuthService from '../services/auth';
 
 export default function CommunityDetailScreen({ route, navigation }) {
@@ -12,6 +12,8 @@ export default function CommunityDetailScreen({ route, navigation }) {
   const [downvoters, setDownvoters] = useState([]);
   const [showUpvoters, setShowUpvoters] = useState(false);
   const [showDownvoters, setShowDownvoters] = useState(false);
+  const [comments, setComments] = useState([]);
+  const [newComment, setNewComment] = useState('');
 
   useEffect(() => {
     const fetchVoters = async () => {
@@ -25,7 +27,17 @@ export default function CommunityDetailScreen({ route, navigation }) {
       }
     };
 
+    const fetchCommentsData = async () => {
+      try {
+        const commentsData = await fetchComments(post.id); // Funktion zum Abrufen der Kommentare
+        setComments(commentsData);
+      } catch (error) {
+        console.error('Error fetching comments:', error);
+      }
+    };
+
     fetchVoters();
+    fetchCommentsData();
   }, [post.id]);
 
   useEffect(() => {
@@ -48,7 +60,21 @@ export default function CommunityDetailScreen({ route, navigation }) {
   };
 
   const onRefresh = () => {
-    loadPosts(); // Funktion zum Neuladen der Posts bei "Pull-to-Refresh"
+    loadPosts();
+  };
+
+  const handleSubmitComment = async () => {
+    if (newComment.trim()) {
+      try {
+        await addComment(post.id, user.id, newComment); // Funktion zum Hinzufügen eines Kommentars
+        setNewComment('');
+        // Kommentar nach dem Hinzufügen erneut abrufen
+        const updatedComments = await fetchComments(post.id);
+        setComments(updatedComments);
+      } catch (error) {
+        console.error('Error adding comment:', error);
+      }
+    }
   };
 
   const renderVotersList = (voters) => (
@@ -67,7 +93,7 @@ export default function CommunityDetailScreen({ route, navigation }) {
   return (
     <View style={styles.container}>
       <FlatList
-        data={[postData]} // Nur das aktuelle Post-Objekt wird angezeigt
+        data={[postData]}
         keyExtractor={(item) => item.id.toString()}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -94,7 +120,6 @@ export default function CommunityDetailScreen({ route, navigation }) {
                   <Text style={styles.voteCount}>{postData.upvotes} Upvotes</Text>
                 </TouchableOpacity>
               </View>
-
               {/* Downvotes Section */}
               <View style={styles.voteContainer}>
                 <TouchableOpacity onPress={() => handleDownvote(postData.id, user.id, loadPosts)}>
@@ -119,6 +144,30 @@ export default function CommunityDetailScreen({ route, navigation }) {
                 {renderVotersList(downvoters)}
               </View>
             )}
+
+            {/* Comments Section */}
+            <View style={styles.commentSection}>
+              <TextInput
+                style={styles.commentInput}
+                placeholder="Add a comment..."
+                value={newComment}
+                onChangeText={setNewComment}
+              />
+              <TouchableOpacity onPress={handleSubmitComment}>
+                <Image source={require('../assets/images/message_send.png')} style={{ width: 50, height: 50 }} />
+              </TouchableOpacity>
+            </View>
+            <FlatList
+              data={comments}
+              keyExtractor={(item) => item.id.toString()}
+              renderItem={({ item }) => (
+                <View style={styles.commentItem}>
+                  <Image source={{ uri: item.users.profilepicture_url }} style={styles.commentProfileImage} />
+                  <Text style={styles.commentUsername}>{item.users.username}:</Text>
+                  <Text style={styles.commentText}>{item.content}</Text>
+                </View>
+              )}
+            />
           </>
         )}
       />
@@ -169,6 +218,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
+  voterProfileImage: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    marginRight: 10,
+  },
+  voterUsername: {
+    fontSize: 16,
+  },
   voteCount: {
     marginHorizontal: 10,
     fontSize: 16,
@@ -180,6 +238,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginTop: 5,
     width: '50%',
+    alignSelf: 'flex-start',
   },
   downdropdown: {
     backgroundColor: '#F0F0F0',
@@ -187,24 +246,51 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginTop: 5,
     width: '50%',
+    alignSelf: 'flex-end',
   },
-  dropdownHeader: {
+  commentSection: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  marginVertical: 10,
+},
+  commentInput: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    padding: 5,
+    marginRight: 10,
+  },
+  commentButton: {
+    backgroundColor: '#007BFF',
+    padding: 10,
+    borderRadius: 5,
+  },
+  commentButtonText: {
+    color: '#FFF',
     fontWeight: 'bold',
-    marginBottom: 5,
+  },
+  commentItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 5,
+  },
+  commentProfileImage: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    marginRight: 10,
+  },
+  commentUsername: {
+    fontWeight: 'bold',
+    marginRight: 5,
+  },
+  commentText: {
     fontSize: 16,
   },
   voterItem: {
     flexDirection: 'row',
     alignItems: 'center',
     marginVertical: 5,
-  },
-  voterProfileImage: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    marginRight: 10,
-  },
-  voterUsername: {
-    fontSize: 16,
   },
 });

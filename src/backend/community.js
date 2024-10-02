@@ -4,21 +4,51 @@ import { supabase } from '../services/supabase';
 import AuthService from '../services/auth'
 import { SUPABASE_URL } from '@env';
 
+export const addComment = async (postId, userId, content) => {
+  try {
+    const response = await supabase
+      .from('comments')
+      .insert([{ post_id: postId, user_id: userId, content }]);
+    return response.data; 
+  } catch (error) {
+    console.error('Error adding comment:', error);
+  }
+};
 
-// Funktion, um Usernames für Upvotes zu erhalten
+export const fetchComments = async (postId) => {
+  try {
+    const { data, error } = await supabase
+      .from('comments')
+      .select(`
+        *,
+        users (
+          username,
+          profilepicture_url
+        )
+      `) 
+      .eq('post_id', postId)
+      .order('created_at', { ascending: true });
+
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error('Error fetching comments:', error);
+  }
+};
+
 export const getUpvoters = async (postId) => {
   try {
     const { data, error } = await supabase
-      .from('post_votes') // Die Tabelle, die die Votes speichert
+      .from('post_votes') 
       .select(`
         user_id,
         users (
           username,
           profilepicture_url
         )
-      `) // Korrekte Klammer- und Formatierung
+      `) 
       .eq('post_id', postId)
-      .eq('vote_type', 1); // Nur Upvotes auswählen (vote_type == 1)
+      .eq('vote_type', 1); 
 
     if (error) throw error;
     
@@ -32,20 +62,19 @@ export const getUpvoters = async (postId) => {
   }
 };
 
-// Funktion, um Usernames für Downvotes zu erhalten
 export const getDownvoters = async (postId) => {
   try {
     const { data, error } = await supabase
-      .from('post_votes') // Die Tabelle, die die Votes speichert
+      .from('post_votes') 
       .select(`
         user_id,
         users (
           username,
           profilepicture_url
         )
-      `) // Korrekte Klammer- und Formatierung
+      `) 
       .eq('post_id', postId)
-      .eq('vote_type', -1); // Nur Downvotes auswählen (vote_type == -1)
+      .eq('vote_type', -1); 
 
     if (error) throw error;
 
@@ -58,7 +87,6 @@ export const getDownvoters = async (postId) => {
     console.error('Error fetching downvoters:', error.message);
   }
 };
-
 
 export const handleUpvote = async (postId, userId, fetchPosts) => {
   try {
