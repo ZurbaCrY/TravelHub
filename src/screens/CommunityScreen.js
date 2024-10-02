@@ -43,7 +43,7 @@ export default function CommunityScreen({ navigation }) {
     navigation.navigate('CommunityDetailScreen', { post });
   };
 
-  return (
+  return(
     <View style={[styles.container, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
       <FlatList
         data={posts}
@@ -57,11 +57,11 @@ export default function CommunityScreen({ navigation }) {
               {item.image_url && <Image source={{ uri: item.image_url }} style={styles.postImage} />}
               <Text style={styles.postText}>{item.content}</Text>
               <View style={styles.postFooter}>
-                <TouchableOpacity onPress={() => handleUpvote(item.id, loadPosts)}>
+                <TouchableOpacity onPress={() => handleUpvote(item.id, user.id, loadPosts)}>
                   <Image source={require('../assets/images/thumbs-up.png')} style={styles.icon} />
                 </TouchableOpacity>
-                <Text style={styles.upvoteText}>{item.upvotes}</Text>
-                <TouchableOpacity onPress={() => handleDownvote(item.id, loadPosts)}>
+                <Text style={styles.downvoteText}>{item.upvotes}</Text>
+                <TouchableOpacity onPress={() => handleDownvote(item.id, user.id, loadPosts)}>
                   <Image source={require('../assets/images/thumbs-down.png')} style={styles.icon} />
                 </TouchableOpacity>
                 <Text style={styles.downvoteText}>{item.downvotes}</Text>
@@ -73,6 +73,8 @@ export default function CommunityScreen({ navigation }) {
         refreshing={refreshing}
         onRefresh={loadPosts}
         contentContainerStyle={{ paddingBottom: 20 }}
+        // Hier wird die graue Linie hinzugefügt
+        ItemSeparatorComponent={() => <View style={styles.separator} />}
       />
       <TouchableOpacity style={styles.newPostButton} onPress={() => setModalVisible(true)}>
         <Text style={styles.newPostButtonText}>New Post</Text>
@@ -123,6 +125,11 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     paddingHorizontal: 10,
   },
+  separator: {
+    height: 1,
+    backgroundColor: '#ccc',  
+    marginVertical: 10,       
+  },
   postCard: {
     backgroundColor: '#FFF',
     borderRadius: 10,
@@ -136,13 +143,13 @@ const styles = StyleSheet.create({
     padding: 15,
     marginBottom: 10,
     alignItems: 'center',
-    width: '100%', 
+    width: '100%',
   },
   newPostButtonText: {
     color: 'white',
     fontWeight: 'bold',
     fontSize: 16,
-    textAlign: 'center', 
+    textAlign: 'center',
   },
   postHeader: {
     flexDirection: 'row',
