@@ -9,7 +9,6 @@ import { findNearestCity, findCountry } from './MapLocationChangeFunctions';
 */
 export const updateOrCreateVisitedCountry = async (countryId, userId) => {
   try {
-    // Überprüfe, ob ein Eintrag für die gegebene Country_ID und user_id existiert
     const { data, error } = await supabase
       .from('Visited Countries')
       .select('VisitedCountries_ID, verified')
@@ -17,14 +16,12 @@ export const updateOrCreateVisitedCountry = async (countryId, userId) => {
       .eq('user_id', userId)
       .single();
 
-    if (error && error.code !== 'PGRST116') { // PGRST116: Single row expected, multiple rows found
+    if (error && error.code !== 'PGRST116') {
       throw error;
     }
 
     if (data) {
-      // Eintrag existiert bereits, überprüfe den Wert von verified
       if (data.verified) {
-        // Wenn verified bereits true ist, gib den bestehenden Eintrag zurück
         return data;
       }
 
@@ -41,7 +38,6 @@ export const updateOrCreateVisitedCountry = async (countryId, userId) => {
 
       return updatedEntry;
     } else {
-      // Eintrag existiert nicht, erstelle einen neuen Eintrag
       const { data: newEntry, error: insertError } = await supabase
         .from('Visited Countries')
         .insert([{ Country_ID: countryId, user_id: userId, verified: true }])
@@ -66,8 +62,6 @@ export const updateVisitedCountry = (location, continentsData, userId) => {
     latitudeDelta: 0.0922,
     longitudeDelta: 0.0421,
   }, continentsData), continentsData);
-
-  console.log("folgendes Land wurde besucht: " + country.countryId);
 
   updateOrCreateVisitedCountry(country.countryId, userId);
 };

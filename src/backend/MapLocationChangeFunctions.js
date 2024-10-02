@@ -48,7 +48,7 @@ export const findCountry = (city, continentsData) => {
       const foundCity = c.cities.find(cityObj => cityObj.name === city.name);
       if (foundCity) {
         country = c;
-        return; // Beende die Schleife, wenn die Stadt gefunden wurde
+        return;
       }
     });
   });
