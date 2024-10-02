@@ -218,17 +218,17 @@ export default function ChatScreen({ route, navigation }) {
         animationType="slide"
         onRequestClose={() => setDeleteModalVisible(false)}
       >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Bearbeiten oder Löschen</Text>
-            <TouchableOpacity style={styles.modalButton} onPress={deleteMessage}>
-              <Text style={styles.modalButtonText}>Nachricht löschen</Text>
+        <View style={styles.modalOverlayChatScreen}>
+          <View style={styles.modalContentChatScreen}>
+            <Text style={styles.modalTitleChatScreen}>Bearbeiten oder Löschen</Text>
+            <TouchableOpacity style={styles.modalButtonChatScreen} onPress={deleteMessage}>
+              <Text style={styles.modalButtonTextChatScreen}>Nachricht löschen</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.modalButton} onPress={() => openEditModal(selectedMessage)}>
-              <Text style={styles.modalButtonText}>Text bearbeiten</Text>
+            <TouchableOpacity style={styles.modalButtonChatScreen} onPress={() => openEditModal(selectedMessage)}>
+              <Text style={styles.modalButtonTextChatScreen}>Text bearbeiten</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.modalButton} onPress={() => setDeleteModalVisible(false)}>
-              <Text style={styles.modalButtonText}>Abbrechen</Text>
+            <TouchableOpacity style={styles.modalButtonChatScreen} onPress={() => setDeleteModalVisible(false)}>
+              <Text style={styles.modalButtonTextChatScreen}>Abbrechen</Text>
             </TouchableOpacity>
           </View>
         </View>

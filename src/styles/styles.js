@@ -317,28 +317,28 @@ export const styles = StyleSheet.create({
   chatInputDarkMode: {
     color: '#FFF',
   },
-  modalOverlay: {
+  modalOverlayChatScreen: {
     flex: 1,
     justifyContent: 'flex-end',
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
-  modalContent: {
+  modalContentChatScreen: {
     backgroundColor: '#FFF',
     padding: 20,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
   },
-  modalTitle: {
+  modalTitleChatScreen: {
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 15,
   },
-  modalButtonText: {
+  modalButtonTextChatScreen: {
     color: '#000000',
     fontSize: 16,
     fontWeight: 'bold',
   },
-  modalButton: {
+  modalButtonChatScreen: {
     backgroundColor: '#D3D3D3',
     padding: 10,
     borderRadius: 10,
