@@ -133,3 +133,29 @@ export const handleSearchLocalAutocomplete = (input, continentsData) => {
 
   return results;
 };
+
+/**
+ * Searches the local data for cities or places that match the user's input.
+ *
+ * @param {string} query - The user's input.
+ * @param {array} continentsData - The local data containing information about cities and places.
+ * @returns {array} - A list of matching cities or places.
+ */
+export const handleSearchLocalAutocompleteCountries = (input, continentsData) => {
+  if (!input || input.length === 0) {
+    return [];
+  }
+
+  const lowercaseInput = input.toLowerCase();
+
+  const results = [];
+  continentsData.forEach(continent => {
+    continent.countries.forEach(country => {
+        if (country.name.toLowerCase().includes(lowercaseInput)) {
+          results.push(country);
+        }
+    });
+  });
+
+  return results;
+};
