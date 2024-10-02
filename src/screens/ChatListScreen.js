@@ -1,12 +1,26 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { ActivityIndicator, View, Text, FlatList, TouchableOpacity, StyleSheet, Modal, TouchableWithoutFeedback, Alert } from 'react-native';
 import { useDarkMode } from '../context/DarkModeContext';
 import { supabase } from '../services/supabase';
-import AuthService from '../services/auth'
+import AuthService from '../services/auth';
 import Button from '../components/Button';
-import { styles as st } from '../styles/styles';
-import { styles } from '../styles/styles.js'; // Relativer Pfad
+import { styles as st} from '../styles/styles.js'; // Relativer Pfad
 import PropTypes from 'prop-types';
+import { useFocusEffect } from '@react-navigation/native';
+
+const fetchFromSupabase = async (table, select, filters = []) => {
+  let query = supabase.from(table).select(select);
+  filters.forEach(([key, operator, value]) => {
+    query = query[key](operator, value);
+  });
+
+  const { data, error } = await query;
+  if (error) {
+    console.error(`Error fetching data from ${table}:`, error);
+    return [];
+  }
+  return data;
+};
 
 export default function ChatListScreen({ navigation }) {
   const CURRENT_USER = AuthService.getUser();
@@ -14,87 +28,46 @@ export default function ChatListScreen({ navigation }) {
   const { isDarkMode } = useDarkMode();
   const [chats, setChats] = useState([]);
   const [users, setUsers] = useState([]);
-  const [usernames, setUsernames] = useState({});
+  const [existingChatUserIds, setExistingChatUserIds] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
-
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchChatsAndUsers = async () => {
-      try {
-        await fetchChats();
-        await fetchUsers();
-      } catch (error) {
-        console.error('Error fetching chats and users:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchChatsAndUsers();
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchChatsAndUsers = async () => {
+        try {
+          await fetchChats();
+          await fetchUsers();
+        } catch (error) {
+          console.error('Error fetching chats and users:', error);
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchChatsAndUsers();
+    }, [])
+  );
 
-    const messageSubscription = supabase
-      .channel('public:messages')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, payload => {
-        console.log('Change received!', payload);
-        fetchChats();
-      })
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(messageSubscription);
-    };
-  }, []);
-
-  // Funktion zum Abrufen der Chats des aktuellen Benutzers
   const fetchChats = async () => {
-    const { data, error } = await supabase
-      .from('chat_user')
-      .select('chat_id')
-      .eq('user_id', CURRENT_USER_ID);
-
-    if (error) {
-      console.error(error);
-      return;
-    }
-
-    const chatIds = data.map(chatUser => chatUser.chat_id);
+    const chatUserData = await fetchFromSupabase('chat_user', 'chat_id', [['eq', 'user_id', CURRENT_USER_ID]]);
+    const chatIds = chatUserData.map(chatUser => chatUser.chat_id);
 
     if (chatIds.length === 0) {
       console.log("No chats found for the current user.");
       return;
     }
 
-    const { data: messages, error: messageError } = await supabase
-      .from('messages')
-      .select('chat_id, content, created_at, user_id')
-      .in('chat_id', chatIds)
-      .order('created_at', { ascending: false });
-
-    if (messageError) {
-      console.error('Error fetching messages:', messageError);
-      return;
-    }
-
+    const messages = await fetchFromSupabase('messages', 'chat_id, content, created_at, user_id', [['in', 'chat_id', chatIds]]);
     const chatMap = new Map();
     messages.forEach(message => {
-      if (!chatMap.has(message.chat_id)) {
+      if (!chatMap.has(message.chat_id) || new Date(message.created_at) > new Date(chatMap.get(message.chat_id).created_at)) {
         chatMap.set(message.chat_id, message);
       }
     });
 
-    const { data: chatData, error: chatError } = await supabase
-      .from('chat')
-      .select('*')
-      .in('chat_id', Array.from(chatMap.keys()));
-
-    if (chatError) {
-      console.error('Error fetching chats:', chatError);
-      return;
-    }
-
+    const chatData = await fetchFromSupabase('chat', '*', [['in', 'chat_id', Array.from(chatMap.keys())]]);
     const userIds = Array.from(new Set(messages.map(message => message.user_id)));
-    await fetchUsernames(userIds);
 
     const chatList = await Promise.all(chatData.map(async (chat) => {
       const chatUsers = await getChatUsers(chat.chat_id);
@@ -111,191 +84,48 @@ export default function ChatListScreen({ navigation }) {
     setChats(chatList);
   };
 
-  // Funktion zum Abrufen der Benutzernamen basierend auf Benutzer-IDs
-  const fetchUsernames = async (userIds) => {
-    if (userIds.length === 0) {
-      console.log("No user IDs to fetch.");
-      return;
-    }
-
-    const { data, error } = await supabase
-      .from('users')
-      .select('user_id, username')
-      .in('user_id', userIds);
-
-    if (error) {
-      console.error('Error fetching usernames:', error);
-      return;
-    }
-
-    const usernameMap = data.reduce((acc, user) => {
-      acc[user.user_id] = user.username;
-      return acc;
-    }, {});
-
-    setUsernames(usernameMap);
-  };
-
-  const fetchUsername = async (userId) => {
-    const { data, error } = await supabase
-      .from('users')
-      .select('username')
-      .eq('user_id', userId)
-      .single();
-
-    if (error) {
-      console.error(`Error fetching username for user_id ${userId}:`, error);
-      return null;
-    }
-
-    return data.username;
-  };
-
   const fetchUsers = async () => {
-    const { data: allUsers, error: userError } = await supabase
-      .from('users')
-      .select('user_id, username')
-      .neq('user_id', CURRENT_USER_ID);
-
-    if (userError) {
-      console.error('Error fetching users:', userError);
-      return;
-    }
-
-    const { data: existingChats, error: chatError } = await supabase
-      .from('chat_user')
-      .select('chat_id')
-      .eq('user_id', CURRENT_USER_ID);
-
-    if (chatError) {
-      console.error('Error fetching existing chats:', chatError);
-      return;
-    }
+    const allUsers = await fetchFromSupabase('users', 'user_id, username', [['neq', 'user_id', CURRENT_USER_ID]]);
+    const existingChats = await fetchFromSupabase('chat_user', 'chat_id', [['eq', 'user_id', CURRENT_USER_ID]]);
 
     const existingChatUserIds = await Promise.all(
       existingChats.map(async (chat) => {
-        const { data, error } = await supabase
-          .from('chat_user')
-          .select('user_id')
-          .eq('chat_id', chat.chat_id)
-          .neq('user_id', CURRENT_USER_ID);
-
-        if (error) {
-          console.error('Error fetching chat users:', error);
-          return [];
-        }
-
-        return data.map(user => user.user_id);
+        const chatUsers = await fetchFromSupabase('chat_user', 'user_id', [['eq', 'chat_id', chat.chat_id], ['neq', 'user_id', CURRENT_USER_ID]]);
+        return chatUsers.map(user => user.user_id);
       })
     );
 
     const flattenedUserIds = existingChatUserIds.flat();
+    setExistingChatUserIds(flattenedUserIds);
 
-    const filteredUsers = allUsers.filter(user => !flattenedUserIds.includes(user.user_id));
-
-    setUsers(filteredUsers);
+    const availableUsers = allUsers.filter(user => !flattenedUserIds.includes(user.user_id));
+    setUsers(availableUsers);
   };
 
   const getChatUsers = async (chatId) => {
-    const { data, error } = await supabase
-      .from('chat_user')
-      .select('user_id')
-      .eq('chat_id', chatId);
+    return await fetchFromSupabase('chat_user', 'user_id', [['eq', 'chat_id', chatId]]);
+  };
 
-    if (error) {
-      console.error('Error fetching chat users:', error);
-      return [];
-    }
-
-    return data;
+  const fetchUsername = async (userId) => {
+    const [user] = await fetchFromSupabase('users', 'username', [['eq', 'user_id', userId]]);
+    return user ? user.username : null;
   };
 
   const createNewChat = async () => {
-    if (!selectedUser) {
-      console.error('No user selected');
-      return;
-    }
-
-    if (selectedUser.user_id === CURRENT_USER_ID) {
+    if (!selectedUser || selectedUser.user_id === CURRENT_USER_ID) {
       Alert.alert('Fehler', 'Sie können keinen Chat mit sich selbst erstellen.');
       return;
     }
-
-    const { data: existingChatUsers, error: existingChatError } = await supabase
-      .from('chat_user')
-      .select('chat_id')
-      .eq('user_id', CURRENT_USER_ID)
-      .in('chat_id', await (async () => {
-        const { data, error } = await supabase
-          .from('chat_user')
-          .select('chat_id')
-          .eq('user_id', selectedUser.user_id);
-        if (error) {
-          console.error('Error checking existing chats:', error);
-          return [];
-        }
-        return data.map(d => d.chat_id);
-      })());
-
-    if (existingChatError) {
-      console.error('Error checking existing chats:', existingChatError);
-      return;
-    }
-
-    if (existingChatUsers.length > 0) {
-      Alert.alert('Fehler', 'Ein Chat mit diesem Benutzer existiert bereits.');
-      return;
-    }
-
-    const newChat = {
-      chat_id: Date.now().toString(),
-      created_at: new Date().toISOString(),
-    };
-
-    const { error: chatError } = await supabase
-      .from('chat')
-      .insert([newChat]);
-
-    if (chatError) {
-      console.error('Error creating new chat:', chatError);
-      return;
-    }
-
+    const newChat = { chat_id: Date.now(), created_at: new Date().toISOString() };
+    await supabase.from('chat').insert([newChat]);
     const newChatUser = [
-      {
-        chat_id: newChat.chat_id,
-        user_id: CURRENT_USER_ID,
-      },
-      {
-        chat_id: newChat.chat_id,
-        user_id: selectedUser.user_id,
-      },
+      { chat_id: newChat.chat_id, user_id: CURRENT_USER_ID },
+      { chat_id: newChat.chat_id, user_id: selectedUser.user_id },
     ];
+    await supabase.from('chat_user').insert(newChatUser);
 
-    const { error: chatUserError } = await supabase
-      .from('chat_user')
-      .insert(newChatUser);
-
-    if (chatUserError) {
-      console.error('Error creating chat user link:', chatUserError);
-      return;
-    }
-
-    const initialMessage = {
-      chat_id: newChat.chat_id,
-      content: `Hallo ${selectedUser.username}`,
-      user_id: CURRENT_USER_ID,
-      created_at: new Date().toISOString(),
-    };
-
-    const { error: messageError } = await supabase
-      .from('messages')
-      .insert([initialMessage]);
-
-    if (messageError) {
-      console.error('Error creating initial message:', messageError);
-      return;
-    }
+    const initialMessage = { chat_id: newChat.chat_id, content: `Hallo ${selectedUser.username}`, user_id: CURRENT_USER_ID, created_at: new Date().toISOString(), edited: false };
+    await supabase.from('messages').insert([initialMessage]);
 
     fetchChats();
     setModalVisible(false);
@@ -312,6 +142,19 @@ export default function ChatListScreen({ navigation }) {
     </TouchableOpacity>
   );
 
+  const renderUserItem = (user) => (
+    <TouchableOpacity
+      key={user.user_id}
+      style={[
+        styles.userItem,
+        selectedUser && selectedUser.user_id === user.user_id && styles.selectedUserItem
+      ]}
+      onPress={() => setSelectedUser(user)}
+    >
+      <Text style={styles.userName}>{user.username}</Text>
+    </TouchableOpacity>
+  );
+
   if (loading) {
     return (
       <View style={st.container}>
@@ -322,7 +165,11 @@ export default function ChatListScreen({ navigation }) {
   } else {
     return (
       <View style={[styles.container, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
-        <Button mode="contained" onPress={() => setModalVisible(true)}>
+        <Button mode="contained" onPress={() => {
+          setSelectedUser(null); 
+          fetchUsers();
+          setModalVisible(true);
+        }}>
           Neuen Chat erstellen
         </Button>
         <FlatList
@@ -334,27 +181,18 @@ export default function ChatListScreen({ navigation }) {
           animationType="slide"
           transparent={true}
           visible={modalVisible}
-          onRequestClose={() => {
-            setModalVisible(!modalVisible);
-          }}
+          onRequestClose={() => setModalVisible(!modalVisible)}
         >
           <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
             <View style={styles.modalOverlay} />
           </TouchableWithoutFeedback>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Wähle einen Benutzer für den Chat</Text>
-            {users.map((user) => (
-              <TouchableOpacity
-                key={user.user_id}
-                style={[
-                  styles.userItem,
-                  selectedUser && selectedUser.user_id === user.user_id && styles.selectedUserItem
-                ]}
-                onPress={() => setSelectedUser(user)}
-              >
-                <Text style={styles.userName}>{user.username}</Text>
-              </TouchableOpacity>
-            ))}
+            {users.length > 0 ? (
+              users.map(renderUserItem)
+            ) : (
+              <Text style={styles.noUsersText}>Keine neuen Benutzer verfügbar</Text>
+            )}
             <Button onPress={createNewChat} disabled={!selectedUser}>Chat starten</Button>
           </View>
         </Modal>
@@ -368,3 +206,59 @@ ChatListScreen.propTypes = {
     navigate: PropTypes.func.isRequired,
   }).isRequired,
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    marginTop: 20,
+  },
+  chatItem: {
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+  },
+  chatName: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  lastMessage: {
+    fontSize: 14,
+    marginTop: 5,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: '#FFF',
+    padding: 20,
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  userItem: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+  },
+  selectedUserItem: {
+    backgroundColor: '#007BFF',
+  },
+  userName: {
+    fontSize: 16,
+  },
+  noUsersText: {
+    textAlign: 'center',
+    marginTop: 20,
+    fontSize: 16,
+    color: '#999',
+  },
+});
