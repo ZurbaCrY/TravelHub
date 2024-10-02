@@ -7,6 +7,7 @@ import "react-native-url-polyfill/auto";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
+import FriendService from "./src/services/friendService";
 
 import {
   MapScreen,
@@ -93,6 +94,7 @@ export default function App() {
   useEffect(() => {
     const initUser = async () => {
       try {
+        setLoadingStatus(true)
         await AuthService.loadUser();
         const currentUser = await AuthService.getUser();
         console.log(currentUser);
@@ -103,7 +105,20 @@ export default function App() {
         setLoadingStatus(false);
       }
     };
+
+    const initFriends = async () => {
+      try {
+        setLoadingStatus(true)
+        await FriendService.setup();
+      } catch (error) {
+        console.error('Error loading friends: ', error)
+      } finally {
+        setLoadingStatus(false)
+      }
+    };
+
     initUser();
+    initFriends();
   }, []);
 
   // User state prints
@@ -131,7 +146,7 @@ export default function App() {
               name="Main"
               component={MainTabs}
               options={{ headerShown: false }}
-              />
+            />
             <RootStack.Screen name="Settings">
               {props => <SettingsScreen {...props} setUser={setUser} setLoading={setLoadingStatus} />}
             </RootStack.Screen>

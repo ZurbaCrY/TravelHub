@@ -1,44 +1,47 @@
 import React, { useEffect, useState } from "react";
 import { View, Button, FlatList, Text } from "react-native";
-import FriendService from "./dev_backend";
+import FriendService from "../services/friendService";
 import getUsernamesByUserIds from "../services/getUsernamesByUserIds";
 
 export default function DevelopmentScreen() {
-  const [friends, setFriends] = useState([])
-  const [incomingRequests, setIncomingRequests] = useState([])
-  const [friendUsernames, setFriendUsernames] = useState({});
-  const [incomingRequestUsernames, setIncomingRequestUsernames] = useState({});
+  const [friends, setFriends] = useState([]);
+  const [incomingRequests, setIncomingRequests] = useState([]);
+  const [usernames, setUsernames] = useState({}); // Store usernames in a dictionary
 
   useEffect(() => {
-    const fetchFriends = async () => {
+    const fetchFriendsAndRequests = async () => {
       try {
-        await FriendService.setup();
+        // Fetch friend list and incoming requests from FriendService
+        const friendList = FriendService.getFriends(); // Assuming this returns an array of friends
+        const incomingRequestList = FriendService.getIncomingRequests(true, true, true); // Assuming this returns an array of requests
+        
+        // Extract IDs from friends and requests
+        const friendIds = friendList.map(friend => friend.friend_id); // Extract friend_ids
+        const requestSenderIds = incomingRequestList.map(request => request.sender_id); // Extract sender_ids
+        
+        // Combine all user IDs
+        const allUserIds = [...friendIds, ...requestSenderIds];
 
-        const incomingRequestList = FriendService.getIncomingRequests(true, true, true);
-        setIncomingRequests(incomingRequestList);
+        // Fetch usernames for all user IDs
+        const fetchedUsernames = await getUsernamesByUserIds(allUserIds);
 
-        const friendList = FriendService.getFriends();
+        // Create a map from user ID to username
+        const usernameMap = {};
+        fetchedUsernames.forEach(user => {
+          usernameMap[user.user_id] = user.username;
+        });
+
+        // Update state with the friends, incoming requests, and username map
         setFriends(friendList);
-
-        // Fetch usernames for friends
-        const friendIds = friendList.map(friend => friend.friend_id); // Extract friend IDs
-        const fetchedFriendUsernames = await getUsernamesByUserIds(friendIds);
-        const friendUsernameMap = Object.fromEntries(fetchedFriendUsernames.map(user => [user.id, user.username]));
-        setFriendUsernames(friendUsernameMap); // Store usernames in state
-
-        // Fetch usernames for incoming requests
-        const requestSenderIds = incomingRequestList.map(request => request.sender_id); // Extract sender IDs
-        const fetchedRequestUsernames = await getUsernamesByUserIds(requestSenderIds);
-        const requestUsernameMap = Object.fromEntries(fetchedRequestUsernames.map(user => [user.id, user.username]));
-        setIncomingRequestUsernames(requestUsernameMap); // Store usernames in state
-
-        console.log("friends: ", friendList, "\nincomingRequests: ", incomingRequestList);
+        setIncomingRequests(incomingRequestList);
+        setUsernames(usernameMap);
+        
       } catch (error) {
-        console.error("Error fetching friends:", error);
+        console.error("Error fetching friends or usernames:", error);
       }
     };
 
-    fetchFriends();
+    fetchFriendsAndRequests();
   }, []);
 
   const acceptFriendRequest = async (requestId) => {
@@ -51,9 +54,9 @@ export default function DevelopmentScreen() {
 
   return (
     <View>
-      {/* Use arrow functions to handle the onPress event properly */}
+      {/* Button to send a friend request */}
       <Button
-        title="sendFriendRequest"
+        title="Send Friend Request"
         onPress={() => FriendService.sendFriendRequest("d3d4312c-9918-4101-b44e-5b7f6951cc31")}
       />
 
@@ -63,19 +66,20 @@ export default function DevelopmentScreen() {
         keyExtractor={(item) => item.friend_id}
         renderItem={({ item }) => (
           <Text>
-            {friendUsernames[item.friend_id] || item.friend_id} {/* Display username or friend_id if not found */}
-            </Text>
+            {usernames[item.friend_id] || item.friend_id} {/* Display username if available, else friend_id */}
+          </Text>
         )}
       />
 
       {/* Display incoming friend requests */}
       <FlatList
         data={incomingRequests}
-        keyExtractor={(item) => item.friend_request_id.toString()} // Assuming friend_request_id is a unique identifier
+        keyExtractor={(item) => item.friend_request_id.toString()} // Assuming friend_request_id is unique
         renderItem={({ item }) => (
           <View>
             <Text>
-              {incomingRequestUsernames[item.sender_id] || item.sender_id} - Status: {item.status}
+              {usernames[item.sender_id] || item.sender_id} {/* Display username if available, else sender_id */}
+              {" - Status: "}{item.status} 
             </Text>
             {item.status === "pending" && (
               <View>
