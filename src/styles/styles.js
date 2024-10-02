@@ -71,7 +71,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     marginVertical: 20,
   },
-  profileImage: {
+  profileImageScreen: {
     width: 120,
     height: 120,
     borderRadius: 60,
@@ -136,6 +136,14 @@ export const styles = StyleSheet.create({
   },
   iconRightMargin: {
     marginRight: 5,
+  },
+  // New styles for ProfileScreen
+  countryTextContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  verifiedIcon: {
+    marginLeft: 5,
   },
 
   // AnimatedSwitch styles
@@ -346,10 +354,15 @@ export const styles = StyleSheet.create({
   },
 
   // CommunityScreen styles
-  container: {
+  communityContainer: {
     flex: 1,
     paddingTop: 10,
     paddingHorizontal: 10,
+  },
+  separator: {
+    height: 1,
+    backgroundColor: '#ccc',  
+    marginVertical: 10,       
   },
   postCard: {
     backgroundColor: '#FFF',
@@ -364,13 +377,13 @@ export const styles = StyleSheet.create({
     padding: 15,
     marginBottom: 10,
     alignItems: 'center',
-    width: '100%', 
+    width: '100%',
   },
   newPostButtonText: {
     color: 'white',
     fontWeight: 'bold',
     fontSize: 16,
-    textAlign: 'center', 
+    textAlign: 'center',
   },
   postHeader: {
     flexDirection: 'row',
@@ -468,6 +481,125 @@ export const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
   },
+  
+  //communityDetailScreen
+  CommunityDetailContainer: {
+    flex: 1,
+    padding: 10,
+    backgroundColor: '#FFF',
+  },
+  icon: {
+    width: 25,
+    height: 25,
+  },
+  postHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  profileImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+  },
+  username: {
+    marginLeft: 10,
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  postImage: {
+    width: '100%',
+    height: 300,
+    marginVertical: 10,
+    borderRadius: 10,
+  },
+  postText: {
+    fontSize: 16,
+    lineHeight: 22,
+  },
+  voteRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginVertical: 10,
+  },
+  voteContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  voterProfileImage: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    marginRight: 10,
+  },
+  voterUsername: {
+    fontSize: 16,
+  },
+  voteCount: {
+    marginHorizontal: 10,
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  updropdown: {
+    backgroundColor: '#F0F0F0',
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 5,
+    width: '50%',
+    alignSelf: 'flex-start',
+  },
+  downdropdown: {
+    backgroundColor: '#F0F0F0',
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 5,
+    width: '50%',
+    alignSelf: 'flex-end',
+  },
+  commentSection: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  marginVertical: 10,
+},
+  commentInput: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    padding: 5,
+    marginRight: 10,
+  },
+  commentButton: {
+    backgroundColor: '#007BFF',
+    padding: 10,
+    borderRadius: 5,
+  },
+  commentButtonText: {
+    color: '#FFF',
+    fontWeight: 'bold',
+  },
+  commentItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 5,
+  },
+  commentProfileImage: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    marginRight: 10,
+  },
+  commentUsername: {
+    fontWeight: 'bold',
+    marginRight: 5,
+  },
+  commentText: {
+    fontSize: 16,
+  },
+  voterItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 5,
+  },
 
   // PlaceDetailModal styles
   modalContainer: {
@@ -537,14 +669,5 @@ export const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: 'black',
-  },
-
-  // New styles for ProfileScreen
-  countryTextContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  verifiedIcon: {
-    marginLeft: 5,
   },
 });

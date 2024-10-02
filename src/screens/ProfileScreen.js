@@ -255,7 +255,7 @@ export default function ProfileScreen() {
         <View style={[styles.profileSection, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
           <Image
             source={{ uri: profilePictureUrl }}
-            style={styles.profileImage}
+            style={styles.profileImageScreen}
           />
           <Text style={[styles.name, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>{CURRENT_USER.user_metadata.username}</Text>
           <Text style={[styles.details, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>{CURRENT_USER.email}</Text>
