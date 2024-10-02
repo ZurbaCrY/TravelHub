@@ -26,7 +26,7 @@ const AddPlaceModal = ({ visible, onClose, continentsData }) => {
 
   const handleAddPlace = () => {
     if (!placeName || !placeDescription || !placeType || !coordinates) {
-      alert('Bitte füllen Sie alle erforderlichen Felder aus.'); // Consider a better notification method
+      alert('Bitte füllen Sie alle erforderlichen Felder aus.');
       return;
     }
     addPlace(placeName,
@@ -72,7 +72,7 @@ const AddPlaceModal = ({ visible, onClose, continentsData }) => {
       }
       
       console.log('Place added');
-
+      alert("Attraktion hinzugefügt!");
       onClose();
     } catch (error) {
       console.error('Error adding place:', error.message);
