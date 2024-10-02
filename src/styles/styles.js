@@ -99,7 +99,7 @@ export const styles = StyleSheet.create({
     borderRadius: 10,
     marginTop: 10,
   },
-  input: {
+  inputLogin: {
     marginBottom: 15,
     backgroundColor: '#FFFDF3',
     color: '#070A0F',

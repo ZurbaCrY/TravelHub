@@ -55,7 +55,7 @@ const SignInScreen = ({ navigation, setUser = () => {}, setLoading = () => {} })
           value={email}
           placeholder="email@address.com"
           autoCapitalize={"none"}
-          containerStyle={styles.input}
+          containerStyle={styles.inputLogin}
         />
         <Input
           label="Password"
@@ -65,7 +65,7 @@ const SignInScreen = ({ navigation, setUser = () => {}, setLoading = () => {} })
           secureTextEntry={true}
           placeholder="Password"
           autoCapitalize={"none"}
-          containerStyle={styles.input}
+          containerStyle={styles.inputLogin}
         />
       </View>
       <View style={styles.rememberView}>
