@@ -57,7 +57,6 @@ const AddPlaceModal = ({ visible, onClose, continentsData }) => {
     return d;
   };
 
-  // Function to convert degrees to radians
   const deg2rad = (deg) => {
     return deg * (Math.PI / 180);
   };
@@ -72,8 +71,8 @@ const AddPlaceModal = ({ visible, onClose, continentsData }) => {
       cityId = findNearestCityId({
         latitude: latitude,
         longitude: longitude,
-        latitudeDelta: 1, // Eine sehr kleine Zahl für einen sehr kleinen Bereich
-        longitudeDelta: 1, // Eine sehr kleine Zahl für einen sehr kleinen Bereich
+        latitudeDelta: 1,
+        longitudeDelta: 1,
       }, continentsData);
       const { data, error } = await supabase
         .from('Attraction')
@@ -89,19 +88,16 @@ const AddPlaceModal = ({ visible, onClose, continentsData }) => {
         throw new Error(error.message);
       }
       
-
-      // Task: Look at this:
       console.log('Place added:', data);
 
-      
-      onClose(); // Consider moving onClose to after success
+      onClose();
     } catch (error) {
       console.error('Error adding place:', error.message);
     }
   };
 
   const handleConfirmLocation = () => {
-    setShowMap(false); // Verstecke die Karte nach der Bestätigung
+    setShowMap(false);
   };
 
   const findNearestCityId = (region, continentsData) => {
@@ -111,13 +107,11 @@ const AddPlaceModal = ({ visible, onClose, continentsData }) => {
     continentsData.forEach(continent => {
       continent.countries.forEach(country => {
         country.cities.forEach(city => {
-          // Calculate the distance between the current city and the region
           const distance = haversineDistance(region.latitude,
             region.longitude,
             city.coordinates[0].latitude,
             city.coordinates[0].longitude);
 
-          // Update the nearest city if this city is closer
           if (distance < minDistance) {
             minDistance = distance;
             nearestCityId = city.cityId;

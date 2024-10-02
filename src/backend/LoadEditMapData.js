@@ -25,7 +25,6 @@ export const updateOrCreateVisitedCountry = async (countryId, userId) => {
         return data;
       }
 
-      // Setze verified auf true, da es noch nicht true ist
       const { data: updatedEntry, error: updateError } = await supabase
         .from('Visited Countries')
         .update({ verified: true })
@@ -95,7 +94,6 @@ export const fetchPlaces = async () => {
   return data;
 };
 
-// Abrufen und Zusammenfügen der Daten für Kontinente, Länder, Städte und Orte
 export const fetchData = async (setContinentsData, CURRENT_USER_ID) => {
   try {
     const countries = await fetchCountries();

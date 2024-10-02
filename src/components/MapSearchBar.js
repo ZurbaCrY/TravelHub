@@ -8,8 +8,8 @@ const MapSearchBar = ({ styles, mapRef, scrollToStart, setSelectedPlace, setSear
   const [bestMatch, setBestMatch] = useState(null);
 
   const handleInputChange = (input) => {
-    setQuery(input || ''); // Setze einen leeren String, wenn input undefined ist
-    const results = handleSearchLocalAutocomplete(input || '', continentsData); // Nutze einen leeren String für die Suche
+    setQuery(input || '');
+    const results = handleSearchLocalAutocomplete(input || '', continentsData);
     setBestMatch(results.length > 0 ? results[0] : null);
   };
 
