@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, Modal, TouchableOpacity, TextInput } from 'react-native';
+import { View, Text, Modal, TouchableOpacity, StyleSheet, TextInput } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
 import MapView, { Marker } from 'react-native-maps';
 import { customMapStyle } from '../styles/customMapStyle';
 import { supabase } from '../services/supabase';
-import { styles } from '../style/styles.js'; // Relativer Pfad
 import PropTypes from 'prop-types';
+import { styles } from '../styles/styles.js'; // Relativer Pfad
 import { useDarkMode } from '../context/DarkModeContext';
 
 const AddPlaceModal = ({ visible, onClose, continentsData }) => {
@@ -26,12 +26,6 @@ const AddPlaceModal = ({ visible, onClose, continentsData }) => {
 
   const handleAddPlace = () => {
     if (!placeName || !placeDescription || !placeType || !coordinates) {
-      alert('Bitte füllen Sie alle erforderlichen Felder aus.');
-    } else {
-      console.log(coordinates);
-      addPlace(placeName, placeType, placeDescription, coordinates.latitude, coordinates.longitude);
-      onClose();
-    }
       alert('Bitte füllen Sie alle erforderlichen Felder aus.'); // Consider a better notification method
       return;
     }
@@ -50,6 +44,7 @@ const AddPlaceModal = ({ visible, onClose, continentsData }) => {
     setPlaceName('');
   };
 
+  // Function to calculate the distance between two coordinates using the Haversine formula
   const haversineDistance = (lat1, lon1, lat2, lon2) => {
     const R = 6371; // Radius of the earth in km
     const dLat = deg2rad(lat2 - lat1);
@@ -63,6 +58,7 @@ const AddPlaceModal = ({ visible, onClose, continentsData }) => {
     return d;
   };
 
+  // Function to convert degrees to radians
   const deg2rad = (deg) => {
     return deg * (Math.PI / 180);
   };
@@ -77,34 +73,11 @@ const AddPlaceModal = ({ visible, onClose, continentsData }) => {
       cityId = findNearestCityId({
         latitude: latitude,
         longitude: longitude,
-        latitudeDelta: 1,
-        longitudeDelta: 1,
-      }, continentsData);
-
-      if (!cityId) {
-        console.error('Keine Stadt in der Nähe gefunden.');
-        return;
-      }
-
-      cityId = findNearestCityId({
-        latitude: latitude,
-        longitude: longitude,
         latitudeDelta: 1, // Eine sehr kleine Zahl für einen sehr kleinen Bereich
         longitudeDelta: 1, // Eine sehr kleine Zahl für einen sehr kleinen Bereich
       }, continentsData);
       const { data, error } = await supabase
         .from('Attraction')
-        .insert([
-          {
-            Attraction_Name: attractionName,
-            City_ID: cityId,
-            Type_of_Attraction: typeOfAttraction,
-            Description: description,
-            Latitude: latitude,
-            Longitude: longitude,
-          },
-        ]);
-
         .insert([{
           Attraction_Name: attractionName,
           City_ID: cityId,
@@ -116,8 +89,6 @@ const AddPlaceModal = ({ visible, onClose, continentsData }) => {
       if (error) {
         throw new Error(error.message);
       }
-
-      return data;
       
 
       // Task: Look at this:
@@ -128,7 +99,6 @@ const AddPlaceModal = ({ visible, onClose, continentsData }) => {
     } catch (error) {
       console.error('Error adding place:', error.message);
     }
-    onClose();
   };
 
   const handleConfirmLocation = () => {
@@ -138,27 +108,7 @@ const AddPlaceModal = ({ visible, onClose, continentsData }) => {
   const findNearestCityId = (region, continentsData) => {
     let nearestCityId = null;
     let minDistance = Infinity;
-  const findNearestCityId = (region, continentsData) => {
-    let nearestCityId = null;
-    let minDistance = Infinity;
 
-    continentsData.forEach(continent => {
-      continent.countries.forEach(country => {
-        country.cities.forEach(city => {
-          const distance = haversineDistance(
-            region.latitude,
-            region.longitude,
-            city.coordinates[0].latitude,
-            city.coordinates[0].longitude
-          );
-
-          if (distance < minDistance) {
-            minDistance = distance;
-            nearestCityId = city.cityId;
-          }
-        });
-      });
-    });
     continentsData.forEach(continent => {
       continent.countries.forEach(country => {
         country.cities.forEach(city => {
@@ -177,8 +127,6 @@ const AddPlaceModal = ({ visible, onClose, continentsData }) => {
       });
     });
 
-    return nearestCityId;
-  };
     return nearestCityId;
   };
 
@@ -204,35 +152,9 @@ const AddPlaceModal = ({ visible, onClose, continentsData }) => {
             onChangeText={setPlaceDescription}
             value={placeDescription}
           />
-          <TouchableOpacity
-            onPress={() => setShowMap(true)}
-            style={[styles.locationButton, coordinates ? styles.locationButtonSelected : null]}
-          >
-            <Text style={styles.locationInput}>
-              {coordinates ? 'Standort ausgewählt' : 'Standort wählen'}
-            </Text>
-          </TouchableOpacity>
           <TouchableOpacity onPress={() => setShowMap(true)} style={[styles.locationButton, coordinates ? styles.locationButtonSelected : null]}>
             <Text style={styles.locationInput}>{coordinates ? 'Standort ausgewählt' : 'Standort wählen'}</Text>
           </TouchableOpacity>
-
-          {showMap && (
-            <View style={styles.mapContainer}>
-              <MapView
-                style={styles.map}
-                onPress={(event) => setCoordinates(event.nativeEvent.coordinate)}
-                customMapStyle={customMapStyle}
-                rotateEnabled={false}
-                showsCompass={false}
-                showsUserLocation={true}
-              >
-                {coordinates && <Marker coordinate={coordinates} />}
-              </MapView>
-              <TouchableOpacity onPress={handleConfirmLocation} style={styles.confirmButton}>
-                <Text style={styles.buttonText}>OK</Text>
-              </TouchableOpacity>
-            </View>
-          )}
 
           {showMap && (
             <View style={styles.mapContainer}>
@@ -262,7 +184,6 @@ const AddPlaceModal = ({ visible, onClose, continentsData }) => {
               onChange={item => setPlaceType(item.value)}
             />
           </View>
-
           {placeType === 'Sehenswürdigkeit' && (
             <TextInput
               style={styles.input}
@@ -271,13 +192,11 @@ const AddPlaceModal = ({ visible, onClose, continentsData }) => {
               value={entranceFee}
             />
           )}
-
-          <TouchableOpacity onPress={handleAddPlace} style={styles.addButtonModal}>
           {/* Additional conditions for other place types could go here */}
           <TouchableOpacity onPress={handleAddPlace} style={styles.addButton}>
             <Text style={styles.buttonText}>Ort hinzufügen</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={onClose} style={styles.closeButtonModal}>
+          <TouchableOpacity onPress={onClose} style={styles.closeButton}>
             <Text style={styles.buttonText}>Abbrechen</Text>
           </TouchableOpacity>
         </View>
@@ -287,9 +206,6 @@ const AddPlaceModal = ({ visible, onClose, continentsData }) => {
 };
 
 AddPlaceModal.propTypes = {
-  visible: PropTypes.bool.isRequired,
-  onClose: PropTypes.func.isRequired,
-  continentsData: PropTypes.array.isRequired,
   visible: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   continentsData: PropTypes.array.isRequired

@@ -4,7 +4,7 @@ import { View, Text, StyleSheet, FlatList, TextInput, Image, TouchableOpacity, M
 import { useDarkMode } from '../context/DarkModeContext';
 import AuthService from '../services/auth';
 import { handleUpvote, handleDownvote, fetchPosts, createNewPost, handleFilePicker } from '../backend/community';
-import { styles } from '../style/styles'; // Importiere die zentralisierten Styles
+//import { styles} from '../styles/styles'; // Importiere die zentralisierten Styles
 
 export default function CommunityScreen({ navigation }) {
   const user = AuthService.getUser();

@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, Modal, TouchableOpacity, Image } from 'react-native';
 import PropTypes from 'prop-types';
 import { useDarkMode } from '../context/DarkModeContext';
-import { styles } from '../style/styles.js'; // Relativer Pfad
+import { styles } from '../styles/styles.js'; // Relativer Pfad
 
 const PlaceDetailModal = ({ visible, place, onClose }) => {
   if (!visible || !place) {

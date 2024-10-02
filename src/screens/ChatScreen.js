@@ -5,7 +5,7 @@ import { useDarkMode } from '../context/DarkModeContext';
 import { supabase } from '../services/supabase';
 import AuthService from '../services/auth'
 import PropTypes from 'prop-types';
-import { styles } from '../style/styles.js'; // Relativer Pfad
+import { styles } from '../styles/styles.js'; // Relativer Pfad
 
 export default function ChatScreen({ route, navigation }) {
   const CURRENT_USER = AuthService.getUser();

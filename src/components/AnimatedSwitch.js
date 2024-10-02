@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import { View, TouchableOpacity, Animated } from 'react-native';
 import PropTypes from 'prop-types';
-import { styles } from '../style/styles.js'; // Relativer Pfad
+import { styles } from '../styles/styles.js'; // Relativer Pfad
 
 const AnimatedSwitch = ({ value, onValueChange }) => {
   const animValue = useRef(new Animated.Value(value ? 1 : 0)).current;
