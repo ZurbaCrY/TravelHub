@@ -18,6 +18,7 @@ import AuthService from '../services/auth'
 import Button from '../components/Button';
 import { styles } from '../styles/styles';
 import { supabase } from '../services/supabase';
+import { getProfilePictureUrlByUserId } from '../backend/community';
 
 export default function ProfileScreen() {
   const CURRENT_USER = AuthService.getUser();
@@ -29,6 +30,16 @@ export default function ProfileScreen() {
   const [newWishList, setNewWishList] = useState('');
   const [showVisitedInput, setShowVisitedInput] = useState(false);
   const [showWishListInput, setShowWishListInput] = useState(false);
+  const [profilePictureUrl, setProfilePictureUrl] = useState(null);
+
+  useEffect(() => {
+    const fetchProfilePictureUrl = async () => {
+      const url = await getProfilePictureUrlByUserId();
+      setProfilePictureUrl(url); // Directly assigning the fetched URL to state
+    };
+
+    fetchProfilePictureUrl();
+  }, []);
 
   const navigation = useNavigation();
 
@@ -246,7 +257,7 @@ export default function ProfileScreen() {
       <ScrollView style={[styles.containerProfileScreen, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
         <View style={[styles.profileSection, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF', }]}>
           <Image
-            source={{ uri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/PICA.jpg/1200px-PICA.jpg' }}
+            source={{ uri: profilePictureUrl }}
             style={styles.profileImage}
           />
           <Text style={[styles.name, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>{CURRENT_USER.user_metadata.username}</Text>

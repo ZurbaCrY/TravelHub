@@ -1,11 +1,11 @@
 import 'react-native-url-polyfill/auto';
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, TextInput, Image, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TextInput, Image, TouchableOpacity, Modal} from 'react-native';
 import { useDarkMode } from '../context/DarkModeContext';
 import AuthService from '../services/auth';
-import { handleUpvote, handleDownvote, fetchPosts, createNewPost, handleFileUpload } from '../backend/community';
+import { handleUpvote, handleDownvote, fetchPosts, createNewPost, handleFilePicker } from '../backend/community';
 
-export default function CommunityScreen() {
+export default function CommunityScreen({ navigation }) {
   const user = AuthService.getUser();
   const user_username = user.user_metadata.username;
   const { isDarkMode } = useDarkMode();
@@ -13,6 +13,7 @@ export default function CommunityScreen() {
   const [newPostContent, setNewPostContent] = useState('');
   const [imageUrl, setImageUrl] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false); 
 
   useEffect(() => {
     loadPosts();
@@ -34,9 +35,10 @@ export default function CommunityScreen() {
     await createNewPost(newPostContent, user_username, imageUrl);
     setNewPostContent('');
     setImageUrl(null);
-    loadPosts(); 
+    setModalVisible(false); 
+    loadPosts();
   };
-  
+
   return (
     <View style={[styles.container, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
       <FlatList
@@ -44,8 +46,8 @@ export default function CommunityScreen() {
         renderItem={({ item }) => (
           <View style={styles.postCard}>
             <View style={styles.postHeader}>
-              <Image source={require('../assets/images/profilepicture.png')} style={styles.profileImage} />
-              <Text style={styles.username}>{item.author}</Text>
+              <Image source={{ uri: item.users.profilepicture_url }} style={styles.profileImage} />
+              <Text style={styles.username}>{item.users.username}</Text>
             </View>
             {item.image_url && (
               <Image source={{ uri: item.image_url }} style={styles.postImage} />
@@ -66,22 +68,44 @@ export default function CommunityScreen() {
         keyExtractor={item => item.id.toString()}
         refreshing={refreshing}
         onRefresh={loadPosts}
-        contentContainerStyle={{ paddingBottom: 20 }} // Ensure there's padding at the bottom
+        contentContainerStyle={{ paddingBottom: 20 }}
       />
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder="Type here.."
-          value={newPostContent}
-          onChangeText={text => setNewPostContent(text)}
-        />
-        <TouchableOpacity onPress={() => handleFileUpload()}>
-          <Image source={require('../assets/images/picture.png')} style={styles.uploadIcon} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={handleCreateNewPost}>
-          <Image source={require('../assets/images/message_send.png')} style={styles.sendIcon} />
-        </TouchableOpacity>
-      </View>
+      <TouchableOpacity style={styles.newPostButton} onPress={() => setModalVisible(true)}>
+        <Text style={styles.newPostButtonText}>New Post</Text>
+      </TouchableOpacity>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)} 
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalText}>Create New Post</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="What's on your mind?"
+              value={newPostContent}
+              onChangeText={text => setNewPostContent(text)}
+            />
+            <TouchableOpacity onPress={async () => {
+              const image = await handleFilePicker(); 
+              setImageUrl(image); 
+            }}>
+              <Image source={require('../assets/images/picture.png')} style={styles.uploadIcon} />
+            </TouchableOpacity>
+            {imageUrl && <Image source={{ uri: imageUrl }} style={styles.previewImage} />}
+            <View style={styles.modalButtons}>
+              <TouchableOpacity style={styles.cancelButton} onPress={() => setModalVisible(false)}>
+                <Text style={styles.cancelButtonText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.submitButton} onPress={handleCreateNewPost}>
+                <Text style={styles.submitButtonText}>Post</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -98,6 +122,20 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     width: '100%',
     padding: 15,
+  },
+  newPostButton: {
+    backgroundColor: '#3498DB',
+    borderRadius: 20,
+    padding: 15,
+    marginBottom: 10,
+    alignItems: 'center',
+    width: '100%', 
+  },
+  newPostButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
+    textAlign: 'center', 
   },
   postHeader: {
     flexDirection: 'row',
@@ -132,29 +170,68 @@ const styles = StyleSheet.create({
     width: 25,
     height: 25,
   },
-  inputContainer: {
-    flexDirection: 'row',
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
-    width: '100%',
-    marginBottom: 20,
-    borderTopWidth: 1,
-    borderTopColor: '#E1E1E1',
-    paddingTop: 10,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalView: {
+    width: '90%',
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 20,
+    alignItems: 'center',
+  },
+  modalText: {
+    fontSize: 18,
+    marginBottom: 10,
   },
   input: {
-    flex: 1,
+    width: '100%',
     height: 40,
     backgroundColor: '#F1F1F1',
     borderRadius: 20,
     paddingHorizontal: 10,
-    marginRight: 10,
+    marginBottom: 15,
   },
   uploadIcon: {
     width: 40,
     height: 40,
+    marginBottom: 15,
   },
-  sendIcon: {
-    width: 40,
-    height: 40,
+  previewImage: {
+    width: '100%',
+    height: 200,
+    borderRadius: 10,
+    marginBottom: 15,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  cancelButton: {
+    backgroundColor: '#E74C3C',
+    borderRadius: 10,
+    padding: 10,
+    width: '48%',
+    alignItems: 'center',
+  },
+  cancelButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  submitButton: {
+    backgroundColor: '#3498DB',
+    borderRadius: 10,
+    padding: 10,
+    width: '48%',
+    alignItems: 'center',
+  },
+  submitButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
 });
+
