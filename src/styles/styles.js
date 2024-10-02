@@ -306,77 +306,170 @@ export const styles = StyleSheet.create({
   chatContainer: {
     flex: 1,
   },
-  chatInput: {
-    color: '#000',
-  },
   chatInputDarkMode: {
     color: '#FFF',
   },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: '#FFF',
+    padding: 20,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 15,
+  },
+  modalButtonText: {
+    color: '#000000',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  modalButton: {
+    backgroundColor: '#D3D3D3',
+    padding: 10,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  editedText: {
+    fontSize: 10,
+    color: '#ffffff',
+    marginTop: 2,
+    marginRight: 8,
+    textAlign: 'right',
+  },
 
   // CommunityScreen styles
-  communityPostContainer: {
-    backgroundColor: '#E5E7EB',
-    padding: 10,
+  container: {
+    flex: 1,
+    paddingTop: 10,
+    paddingHorizontal: 10,
+  },
+  postCard: {
+    backgroundColor: '#FFF',
+    borderRadius: 10,
+    marginVertical: 10,
+    width: '100%',
+    padding: 15,
+  },
+  newPostButton: {
+    backgroundColor: '#3498DB',
+    borderRadius: 20,
+    padding: 15,
+    marginBottom: 10,
+    alignItems: 'center',
+    width: '100%', 
+  },
+  newPostButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
+    textAlign: 'center', 
+  },
+  postHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  profileImage: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+  },
+  username: {
+    marginLeft: 10,
+    fontWeight: 'bold',
+  },
+  postImage: {
+    width: '100%',
+    height: 300,
+    marginVertical: 10,
+    borderRadius: 10,
+  },
+  postText: {
     marginVertical: 5,
-    width: 350,
-  },
-  communityPostContainerDark: {
-    backgroundColor: '#374151',
-  },
-  postContent: {
-    color: '#000',
-  },
-  postContentDark: {
-    color: '#FFF',
+    lineHeight: 20,
   },
   postFooter: {
     flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: 5,
+    marginTop: 10,
+  },
+  icon: {
+    width: 25,
+    height: 25,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalView: {
+    width: '90%',
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 20,
     alignItems: 'center',
   },
-  postAuthor: {
-    color: '#6B7280',
-    fontSize: 12,
+  modalText: {
+    fontSize: 18,
+    marginBottom: 10,
   },
-  postAuthorDark: {
-    color: '#9CA3AF',
-  },
-  inputPost: {
-    width: '70%',
+  input: {
+    width: '100%',
     height: 40,
-    borderWidth: 3,
-    borderRadius: 50,
+    backgroundColor: '#F1F1F1',
+    borderRadius: 20,
     paddingHorizontal: 10,
-    marginVertical: 10,
-    borderColor: '#8a8a8a',
+    marginBottom: 15,
   },
-  postActions: {
-    flexDirection: 'row',
+  uploadIcon: {
+    width: 40,
+    height: 40,
+    marginBottom: 15,
   },
-  voteButton: {
+  previewImage: {
+    width: '100%',
+    height: 200,
+    borderRadius: 10,
+    marginBottom: 15,
+  },
+  modalButtons: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  cancelButton: {
+    backgroundColor: '#E74C3C',
+    borderRadius: 10,
+    padding: 10,
+    width: '48%',
     alignItems: 'center',
-    marginRight: 10,
   },
-  voteIcon: {
-    width: 20,
-    height: 20,
+  cancelButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
-  voteText: {
-    fontSize: 12,
-    marginLeft: 3,
-    color: '#000',
+  submitButton: {
+    backgroundColor: '#3498DB',
+    borderRadius: 10,
+    padding: 10,
+    width: '48%',
+    alignItems: 'center',
   },
-  voteTextDark: {
-    color: '#FFF',
-  },
-  imageIcon: {
-    width: 50,
-    height: 50,
+  submitButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
 
-  // Styles für PlaceDetailModal
+  // PlaceDetailModal styles
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -446,7 +539,7 @@ export const styles = StyleSheet.create({
     color: 'black',
   },
 
-  // Neue Styles für ProfileScreen
+  // New styles for ProfileScreen
   countryTextContainer: {
     flexDirection: 'row',
     alignItems: 'center',
