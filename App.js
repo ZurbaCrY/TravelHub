@@ -22,6 +22,7 @@ import {
 } from './src/screens'
 import { DarkModeProvider } from "./src/context/DarkModeContext";
 import AuthService from "./src/services/auth";
+import DevelopmentScreen from "./src/development/dev";
 
 const Tab = createBottomTabNavigator();
 const RootStack = createStackNavigator();
@@ -133,7 +134,9 @@ export default function App() {
               />
             <RootStack.Screen name="Settings">
               {props => <SettingsScreen {...props} setUser={setUser} setLoading={setLoadingStatus} />}
-
+            </RootStack.Screen>
+            <RootStack.Screen name="Development">
+              {props => <DevelopmentScreen {...props} setUser={setUser} setLoading={setLoadingStatus} />}
             </RootStack.Screen>
             <RootStack.Screen name="ChatListScreen" component={ChatListScreen} />
             <RootStack.Screen name="ChatScreen" component={ChatScreen} />
