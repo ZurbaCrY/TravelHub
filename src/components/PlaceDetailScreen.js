@@ -58,12 +58,12 @@ PlaceDetailModal.propTypes = {
     link: PropTypes.string,
     name: PropTypes.string.isRequired,
     description: PropTypes.string,
-    type: PropTypes.string.isRequired,
+    type: PropTypes.string,
     entranceFee: PropTypes.number,
     priceLevel: PropTypes.string,
     isOpen: PropTypes.bool,
     viewpointType: PropTypes.string,
-  }).isRequired,
+  }),
   onClose: PropTypes.func.isRequired,
 };
 
