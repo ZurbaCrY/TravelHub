@@ -20,6 +20,7 @@ import {
   LoadingScreen,
   ChatScreen,
   ChatListScreen,
+  PublicProfileScreen,
 } from './src/screens'
 import { DarkModeProvider } from "./src/context/DarkModeContext";
 import AuthService from "./src/services/auth";
@@ -155,6 +156,7 @@ export default function App() {
             </RootStack.Screen>
             <RootStack.Screen name="ChatListScreen" component={ChatListScreen} />
             <RootStack.Screen name="ChatScreen" component={ChatScreen} />
+            <RootStack.Screen name="PublicProfileScreen" component={PublicProfileScreen} />
           </RootStack.Navigator>
           <StatusBar style="auto" />
         </DarkModeProvider>

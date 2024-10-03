@@ -1,6 +1,6 @@
 import 'react-native-url-polyfill/auto';
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, TextInput, Image, TouchableOpacity, Modal} from 'react-native';
+import { View, Text, StyleSheet, FlatList, TextInput, Image, TouchableOpacity, Modal } from 'react-native';
 import { useDarkMode } from '../context/DarkModeContext';
 import AuthService from '../services/auth';
 import { handleUpvote, handleDownvote, fetchPosts, createNewPost, handleFilePicker } from '../backend/community';
@@ -13,7 +13,7 @@ export default function CommunityScreen({ navigation }) {
   const [newPostContent, setNewPostContent] = useState('');
   const [imageUrl, setImageUrl] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false); 
+  const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
     loadPosts();
@@ -35,9 +35,13 @@ export default function CommunityScreen({ navigation }) {
     await createNewPost(newPostContent, user_username, imageUrl);
     setNewPostContent('');
     setImageUrl(null);
-    setModalVisible(false); 
+    setModalVisible(false);
     loadPosts();
   };
+
+  const navigateUserProfile = (user_id) => {
+    navigation.navigate('PublicProfileScreen', { user_id: user_id })
+  }
 
   return (
     <View style={[styles.container, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
@@ -45,10 +49,12 @@ export default function CommunityScreen({ navigation }) {
         data={posts}
         renderItem={({ item }) => (
           <View style={styles.postCard}>
-            <View style={styles.postHeader}>
-              <Image source={{ uri: item.users.profilepicture_url }} style={styles.profileImage} />
-              <Text style={styles.username}>{item.users.username}</Text>
-            </View>
+            <TouchableOpacity onPress={() => navigateUserProfile(item.user_id)}>
+              <View style={styles.postHeader}>
+                <Image source={{ uri: item.users.profilepicture_url }} style={styles.profileImage} />
+                <Text style={styles.username}>{item.users.username}</Text>
+              </View>
+            </TouchableOpacity>
             {item.image_url && (
               <Image source={{ uri: item.image_url }} style={styles.postImage} />
             )}
@@ -77,7 +83,7 @@ export default function CommunityScreen({ navigation }) {
         animationType="slide"
         transparent={true}
         visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)} 
+        onRequestClose={() => setModalVisible(false)}
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalView}>
@@ -89,8 +95,8 @@ export default function CommunityScreen({ navigation }) {
               onChangeText={text => setNewPostContent(text)}
             />
             <TouchableOpacity onPress={async () => {
-              const image = await handleFilePicker(); 
-              setImageUrl(image); 
+              const image = await handleFilePicker();
+              setImageUrl(image);
             }}>
               <Image source={require('../assets/images/picture.png')} style={styles.uploadIcon} />
             </TouchableOpacity>
@@ -129,13 +135,13 @@ const styles = StyleSheet.create({
     padding: 15,
     marginBottom: 10,
     alignItems: 'center',
-    width: '100%', 
+    width: '100%',
   },
   newPostButtonText: {
     color: 'white',
     fontWeight: 'bold',
     fontSize: 16,
-    textAlign: 'center', 
+    textAlign: 'center',
   },
   postHeader: {
     flexDirection: 'row',
