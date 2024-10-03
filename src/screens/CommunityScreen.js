@@ -4,6 +4,7 @@ import { View, Text, StyleSheet, FlatList, TextInput, Image, TouchableOpacity, M
 import { useDarkMode } from '../context/DarkModeContext';
 import AuthService from '../services/auth';
 import { handleUpvote, handleDownvote, fetchPosts, createNewPost, handleFilePicker } from '../backend/community';
+import { styles } from '../styles/styles';
 
 export default function CommunityScreen({ navigation }) {
   const user = AuthService.getUser();
@@ -25,7 +26,7 @@ export default function CommunityScreen({ navigation }) {
       const postsData = await fetchPosts();
       setPosts(postsData);
     } catch (error) {
-      console.error("Error fetching posts: ", error);
+      console.error('Error fetching posts: ', error);
     } finally {
       setRefreshing(false);
     }
@@ -43,22 +44,29 @@ export default function CommunityScreen({ navigation }) {
     navigation.navigate('PublicProfileScreen', { user_id: user_id })
   }
 
+  const handlePostPress = (post) => {
+    navigation.navigate('CommunityDetailScreen', { post });
+  };
+
   return (
-    <View style={[styles.container, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
+    <View style={[styles.communityContainer, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
       <FlatList
         data={posts}
         renderItem={({ item }) => (
           <View style={styles.postCard}>
             <TouchableOpacity onPress={() => navigateUserProfile(item.user_id)}>
+
               <View style={styles.postHeader}>
                 <Image source={{ uri: item.users.profilepicture_url }} style={styles.profileImage} />
                 <Text style={styles.username}>{item.users.username}</Text>
               </View>
             </TouchableOpacity>
-            {item.image_url && (
-              <Image source={{ uri: item.image_url }} style={styles.postImage} />
-            )}
-            <Text style={styles.postText}>{item.content}</Text>
+            <TouchableOpacity onPress={() => handlePostPress(item)}>
+              {item.image_url && (
+                <Image source={{ uri: item.image_url }} style={styles.postImage} />
+              )}
+              <Text style={styles.postText}>{item.content}</Text>
+            </TouchableOpacity>
             <View style={styles.postFooter}>
               <TouchableOpacity onPress={() => handleUpvote(item.id, loadPosts)}>
                 <Image source={require('../assets/images/thumbs-up.png')} style={styles.icon} />
@@ -71,10 +79,12 @@ export default function CommunityScreen({ navigation }) {
             </View>
           </View>
         )}
-        keyExtractor={item => item.id.toString()}
+        keyExtractor={(item) => item.id.toString()}
         refreshing={refreshing}
         onRefresh={loadPosts}
         contentContainerStyle={{ paddingBottom: 20 }}
+        // Hier wird die graue Linie hinzugefügt
+        ItemSeparatorComponent={() => <View style={styles.separator} />}
       />
       <TouchableOpacity style={styles.newPostButton} onPress={() => setModalVisible(true)}>
         <Text style={styles.newPostButtonText}>New Post</Text>
@@ -92,12 +102,14 @@ export default function CommunityScreen({ navigation }) {
               style={styles.input}
               placeholder="What's on your mind?"
               value={newPostContent}
-              onChangeText={text => setNewPostContent(text)}
+              onChangeText={(text) => setNewPostContent(text)}
             />
-            <TouchableOpacity onPress={async () => {
-              const image = await handleFilePicker();
-              setImageUrl(image);
-            }}>
+            <TouchableOpacity
+              onPress={async () => {
+                const image = await handleFilePicker();
+                setImageUrl(image);
+              }}
+            >
               <Image source={require('../assets/images/picture.png')} style={styles.uploadIcon} />
             </TouchableOpacity>
             {imageUrl && <Image source={{ uri: imageUrl }} style={styles.previewImage} />}
@@ -115,129 +127,3 @@ export default function CommunityScreen({ navigation }) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingTop: 10,
-    paddingHorizontal: 10,
-  },
-  postCard: {
-    backgroundColor: '#FFF',
-    borderRadius: 10,
-    marginVertical: 10,
-    width: '100%',
-    padding: 15,
-  },
-  newPostButton: {
-    backgroundColor: '#3498DB',
-    borderRadius: 20,
-    padding: 15,
-    marginBottom: 10,
-    alignItems: 'center',
-    width: '100%',
-  },
-  newPostButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 16,
-    textAlign: 'center',
-  },
-  postHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  profileImage: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-  },
-  username: {
-    marginLeft: 10,
-    fontWeight: 'bold',
-  },
-  postImage: {
-    width: '100%',
-    height: 300,
-    marginVertical: 10,
-    borderRadius: 10,
-  },
-  postText: {
-    marginVertical: 5,
-    lineHeight: 20,
-  },
-  postFooter: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: 10,
-  },
-  icon: {
-    width: 25,
-    height: 25,
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalView: {
-    width: '90%',
-    backgroundColor: 'white',
-    borderRadius: 20,
-    padding: 20,
-    alignItems: 'center',
-  },
-  modalText: {
-    fontSize: 18,
-    marginBottom: 10,
-  },
-  input: {
-    width: '100%',
-    height: 40,
-    backgroundColor: '#F1F1F1',
-    borderRadius: 20,
-    paddingHorizontal: 10,
-    marginBottom: 15,
-  },
-  uploadIcon: {
-    width: 40,
-    height: 40,
-    marginBottom: 15,
-  },
-  previewImage: {
-    width: '100%',
-    height: 200,
-    borderRadius: 10,
-    marginBottom: 15,
-  },
-  modalButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
-  },
-  cancelButton: {
-    backgroundColor: '#E74C3C',
-    borderRadius: 10,
-    padding: 10,
-    width: '48%',
-    alignItems: 'center',
-  },
-  cancelButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
-  },
-  submitButton: {
-    backgroundColor: '#3498DB',
-    borderRadius: 10,
-    padding: 10,
-    width: '48%',
-    alignItems: 'center',
-  },
-  submitButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
-  },
-});
-

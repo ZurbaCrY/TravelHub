@@ -51,7 +51,7 @@ const SignUpScreen = ({ navigation, setUser, setLoading }) => {
           value={username}
           placeholder="Give yourself a Username"
           autoCapitalize="none"
-          containerStyle={styles.input}
+          containerStyle={styles.inputLogin}
         />
         <Input
           label="Email"
@@ -60,7 +60,7 @@ const SignUpScreen = ({ navigation, setUser, setLoading }) => {
           value={email}
           placeholder="email@address.com"
           autoCapitalize="none"
-          containerStyle={styles.input}
+          containerStyle={styles.inputLogin}
         />
         <Input
           label="Password"
@@ -70,7 +70,7 @@ const SignUpScreen = ({ navigation, setUser, setLoading }) => {
           secureTextEntry
           placeholder="Password"
           autoCapitalize="none"
-          containerStyle={styles.input}
+          containerStyle={styles.inputLogin}
         />
         <Input
           label="Confirm Password"
@@ -80,7 +80,7 @@ const SignUpScreen = ({ navigation, setUser, setLoading }) => {
           secureTextEntry
           placeholder="Confirm Password"
           autoCapitalize="none"
-          containerStyle={styles.input}
+          containerStyle={styles.inputLogin}
         />
       </View>
       <View style={styles.buttonView}>

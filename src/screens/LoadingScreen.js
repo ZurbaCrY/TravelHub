@@ -1,7 +1,8 @@
 import React from 'react';
-import { Text, View, ActivityIndicator, StyleSheet } from 'react-native';
+import { Text, View, ActivityIndicator } from 'react-native';
 import PropTypes from 'prop-types';
 import { useDarkMode } from '../context/DarkModeContext';
+import { styles } from '../styles/styles.js'; // Relativer Pfad
 
 
 const LoadingScreen = ({ loadingMessage = 'Loading...' }) => {
@@ -17,12 +18,5 @@ LoadingScreen.propTypes = {
   loadingMessage: PropTypes.string.isRequired,
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-});
-
 export default LoadingScreen;
+

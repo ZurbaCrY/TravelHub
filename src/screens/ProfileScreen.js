@@ -3,7 +3,6 @@ import {
   View,
   Text,
   Image,
-  StyleSheet,
   ScrollView,
   TextInput,
   TouchableOpacity,
@@ -59,7 +58,6 @@ export default function ProfileScreen() {
         if (error) {
           throw error;
         }
-
         // Formatiert die Daten in ein passendes Format für die Anzeige
         const countries = data.map(item => ({
           name: item.Country.Countryname,
@@ -79,7 +77,7 @@ export default function ProfileScreen() {
           .eq('user_id', CURRENT_USER_ID)
           .single();
 
-        if (error && error.code !== 'PGRST116') { // PGRST116 bedeutet, dass keine Zeilen gefunden wurden
+        if (error && error.code !== 'PGRST116') {
           throw error;
         }
 
@@ -150,7 +148,6 @@ export default function ProfileScreen() {
     }
     setShowVisitedInput(false);
   };
-
   // Fügt ein neues Land zur Wunschliste hinzu
   const addWishListCountry = async () => {
     if (newWishList) {
@@ -255,10 +252,10 @@ export default function ProfileScreen() {
       setShowWishListInput(false);
     }}>
       <ScrollView style={[styles.containerProfileScreen, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
-        <View style={[styles.profileSection, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF', }]}>
+        <View style={[styles.profileSection, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
           <Image
             source={{ uri: profilePictureUrl }}
-            style={styles.profileImage}
+            style={styles.profileImageScreen}
           />
           <Text style={[styles.name, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>{CURRENT_USER.user_metadata.username}</Text>
           <Text style={[styles.details, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>{CURRENT_USER.email}</Text>
@@ -280,9 +277,9 @@ export default function ProfileScreen() {
           ) : (
             visitedCountries.map((country, index) => (
               <View key={index} style={styles.countryItem}>
-                <View style={localStyles.countryTextContainer}>
+                <View style={styles.countryTextContainer}>
                   <Text style={styles.details}>{country.name}</Text>
-                  {country.verified && <Icon name="check-circle" size={16} color="green" style={localStyles.verifiedIcon} />}
+                  {country.verified && <Icon name="check-circle" size={16} color="green" style={styles.verifiedIcon} />}
                 </View>
                 <TouchableOpacity onPress={() => removeVisitedCountry(index)} style={styles.removeButton}>
                   <Icon name="trash" size={20} color="#FFFDF3" />
@@ -357,14 +354,4 @@ export default function ProfileScreen() {
       </ScrollView>
     </TouchableWithoutFeedback>
   );
-};
-
-const localStyles = StyleSheet.create({
-  countryTextContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  verifiedIcon: {
-    marginLeft: 5,
-  },
-});
+}

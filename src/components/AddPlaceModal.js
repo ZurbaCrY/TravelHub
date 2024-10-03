@@ -5,7 +5,9 @@ import MapView, { Marker } from 'react-native-maps';
 import { customMapStyle } from '../styles/customMapStyle';
 import { supabase } from '../services/supabase';
 import PropTypes from 'prop-types';
+import { styles } from '../styles/styles.js'; // Relativer Pfad
 import { useDarkMode } from '../context/DarkModeContext';
+import { haversineDistance, deg2rad } from '../services/MapMathematics';
 
 const AddPlaceModal = ({ visible, onClose, continentsData }) => {
   const [placeName, setPlaceName] = useState('');
@@ -25,7 +27,7 @@ const AddPlaceModal = ({ visible, onClose, continentsData }) => {
 
   const handleAddPlace = () => {
     if (!placeName || !placeDescription || !placeType || !coordinates) {
-      alert('Bitte füllen Sie alle erforderlichen Felder aus.'); // Consider a better notification method
+      alert('Bitte füllen Sie alle erforderlichen Felder aus.');
       return;
     }
     addPlace(placeName,
@@ -43,25 +45,6 @@ const AddPlaceModal = ({ visible, onClose, continentsData }) => {
     setPlaceName('');
   };
 
-  // Function to calculate the distance between two coordinates using the Haversine formula
-  const haversineDistance = (lat1, lon1, lat2, lon2) => {
-    const R = 6371; // Radius of the earth in km
-    const dLat = deg2rad(lat2 - lat1);
-    const dLon = deg2rad(lon2 - lon1);
-    const a =
-      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
-      Math.sin(dLon / 2) * Math.sin(dLon / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    const d = R * c; // Distance in km
-    return d;
-  };
-
-  // Function to convert degrees to radians
-  const deg2rad = (deg) => {
-    return deg * (Math.PI / 180);
-  };
-
   const addPlace = async (
     attractionName,
     typeOfAttraction,
@@ -72,8 +55,8 @@ const AddPlaceModal = ({ visible, onClose, continentsData }) => {
       cityId = findNearestCityId({
         latitude: latitude,
         longitude: longitude,
-        latitudeDelta: 1, // Eine sehr kleine Zahl für einen sehr kleinen Bereich
-        longitudeDelta: 1, // Eine sehr kleine Zahl für einen sehr kleinen Bereich
+        latitudeDelta: 1,
+        longitudeDelta: 1,
       }, continentsData);
       const { data, error } = await supabase
         .from('Attraction')
@@ -88,20 +71,17 @@ const AddPlaceModal = ({ visible, onClose, continentsData }) => {
       if (error) {
         throw new Error(error.message);
       }
-
-
-      // Task: Look at this:
-      console.log('Place added:', data);
-
-
-      onClose(); // Consider moving onClose to after success
+      
+      console.log('Place added');
+      alert("Attraktion hinzugefügt!");
+      onClose();
     } catch (error) {
       console.error('Error adding place:', error.message);
     }
   };
 
   const handleConfirmLocation = () => {
-    setShowMap(false); // Verstecke die Karte nach der Bestätigung
+    setShowMap(false);
   };
 
   const findNearestCityId = (region, continentsData) => {
@@ -111,13 +91,11 @@ const AddPlaceModal = ({ visible, onClose, continentsData }) => {
     continentsData.forEach(continent => {
       continent.countries.forEach(country => {
         country.cities.forEach(city => {
-          // Calculate the distance between the current city and the region
           const distance = haversineDistance(region.latitude,
             region.longitude,
             city.coordinates[0].latitude,
             city.coordinates[0].longitude);
 
-          // Update the nearest city if this city is closer
           if (distance < minDistance) {
             minDistance = distance;
             nearestCityId = city.cityId;
@@ -210,100 +188,5 @@ AddPlaceModal.propTypes = {
   continentsData: PropTypes.array.isRequired
 };
 
-const styles = StyleSheet.create({
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalContent: {
-    backgroundColor: 'white',
-    padding: 20,
-    borderRadius: 10,
-    width: '90%',
-    alignItems: 'center',
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  input: {
-    width: '100%',
-    height: 40,
-    borderWidth: 1,
-    borderColor: 'gray',
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    marginBottom: 10,
-  },
-  addButton: {
-    backgroundColor: 'lightblue',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    marginTop: 20,
-  },
-  closeButton: {
-    backgroundColor: 'lightgray',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    marginTop: 10,
-  },
-  buttonText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: 'black',
-  },
-  dropdownContainer: {
-    width: '100%',
-    marginBottom: 10,
-  },
-  dropdown: {
-    width: '100%',
-    height: 40,
-    borderWidth: 1,
-    borderColor: 'gray',
-    borderRadius: 5,
-    paddingHorizontal: 10,
-  },
-  locationButton: {
-    width: '100%',
-    height: 40,
-    borderWidth: 1,
-    borderColor: 'gray',
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    marginBottom: 10,
-  },
-  locationButtonSelected: {
-    backgroundColor: "lightgreen",
-  },
-  locationInput: {
-    color: 'gray',
-    marginTop: 7,
-    fontSize: 15,
-  },
-  mapContainer: {
-    width: '100%',
-    height: 300,
-    marginTop: 10,
-    marginBottom: 10,
-  },
-  map: {
-    flex: 1,
-  },
-  confirmButton: {
-    position: 'absolute',
-    bottom: 10,
-    right: 10,
-    backgroundColor: 'lightblue',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-  },
-});
 
 export default AddPlaceModal;
