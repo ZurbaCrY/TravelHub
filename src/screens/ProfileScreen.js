@@ -345,11 +345,11 @@ export default function ProfileScreen() {
               Zu den Einstellungen
             </Button>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigation.navigate('Development')}>
+          {/* <TouchableOpacity onPress={() => navigation.navigate('Development')}>
             <Button mode="contained">
               Zum Dev Screen
             </Button>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
       </ScrollView>
     </TouchableWithoutFeedback>

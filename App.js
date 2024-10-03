@@ -21,7 +21,6 @@ import {
   ChatScreen,
   ChatListScreen,
   CommunityDetailScreen,
-  PublicProfileScreen,
 } from './src/screens'
 import { DarkModeProvider } from "./src/context/DarkModeContext";
 import AuthService from "./src/services/auth";
@@ -162,7 +161,6 @@ export default function App() {
               options={{ title: 'Post' }}
             />
             <RootStack.Screen name="ChatScreen" component={ChatScreen} />
-            <RootStack.Screen name="PublicProfileScreen" component={PublicProfileScreen} />
           </RootStack.Navigator>
           <StatusBar style="auto" />
         </DarkModeProvider>

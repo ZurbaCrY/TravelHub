@@ -1,6 +1,6 @@
 import 'react-native-url-polyfill/auto';
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, TextInput, Image, TouchableOpacity, Modal } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TextInput, Image, TouchableOpacity, Modal, TouchableWithoutFeedback } from 'react-native';
 import { useDarkMode } from '../context/DarkModeContext';
 import AuthService from '../services/auth';
 import { handleUpvote, handleDownvote, fetchPosts, createNewPost, handleFilePicker } from '../backend/community';
@@ -14,7 +14,9 @@ export default function CommunityScreen({ navigation }) {
   const [newPostContent, setNewPostContent] = useState('');
   const [imageUrl, setImageUrl] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false);
+  const [newPostModalVisible, setNewPostModalVisible] = useState(false);
+  const [userProfileModal, setUserProfileModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
 
   useEffect(() => {
     loadPosts();
@@ -36,17 +38,18 @@ export default function CommunityScreen({ navigation }) {
     await createNewPost(newPostContent, user_username, imageUrl);
     setNewPostContent('');
     setImageUrl(null);
-    setModalVisible(false);
+    setNewPostModalVisible(false);
     loadPosts();
   };
-
-  const navigateUserProfile = (user_id) => {
-    navigation.navigate('PublicProfileScreen', { user_id: user_id })
-  }
 
   const handlePostPress = (post) => {
     navigation.navigate('CommunityDetailScreen', { post });
   };
+
+  const handleUserPress = (user) => {
+    setSelectedUser(user);
+    setUserProfileModal(true);
+  }
 
   return (
     <View style={[styles.communityContainer, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
@@ -54,8 +57,7 @@ export default function CommunityScreen({ navigation }) {
         data={posts}
         renderItem={({ item }) => (
           <View style={styles.postCard}>
-            <TouchableOpacity onPress={() => navigateUserProfile(item.user_id)}>
-
+            <TouchableOpacity onPress={() => handleUserPress(item.users)}>
               <View style={styles.postHeader}>
                 <Image source={{ uri: item.users.profilepicture_url }} style={styles.profileImage} />
                 <Text style={styles.username}>{item.users.username}</Text>
@@ -86,43 +88,72 @@ export default function CommunityScreen({ navigation }) {
         // Hier wird die graue Linie hinzugefügt
         ItemSeparatorComponent={() => <View style={styles.separator} />}
       />
-      <TouchableOpacity style={styles.newPostButton} onPress={() => setModalVisible(true)}>
+      <TouchableOpacity style={styles.newPostButton} onPress={() => setNewPostModalVisible(true)}>
         <Text style={styles.newPostButtonText}>New Post</Text>
       </TouchableOpacity>
       <Modal
         animationType="slide"
         transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
+        visible={newPostModalVisible}
+        onRequestClose={() => setNewPostModalVisible(false)}
       >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalView}>
-            <Text style={styles.modalText}>Create New Post</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="What's on your mind?"
-              value={newPostContent}
-              onChangeText={(text) => setNewPostContent(text)}
-            />
-            <TouchableOpacity
-              onPress={async () => {
-                const image = await handleFilePicker();
-                setImageUrl(image);
-              }}
-            >
-              <Image source={require('../assets/images/picture.png')} style={styles.uploadIcon} />
-            </TouchableOpacity>
-            {imageUrl && <Image source={{ uri: imageUrl }} style={styles.previewImage} />}
-            <View style={styles.modalButtons}>
-              <TouchableOpacity style={styles.cancelButton} onPress={() => setModalVisible(false)}>
-                <Text style={styles.cancelButtonText}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.submitButton} onPress={handleCreateNewPost}>
-                <Text style={styles.submitButtonText}>Post</Text>
-              </TouchableOpacity>
-            </View>
+        <TouchableWithoutFeedback onPress={() => setNewPostModalVisible(false)}>
+          <View style={styles.modalContainer}>
+            <TouchableWithoutFeedback>
+              <View style={styles.modalView}>
+                <Text style={styles.modalText}>Create New Post</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="What's on your mind?"
+                  value={newPostContent}
+                  onChangeText={(text) => setNewPostContent(text)}
+                />
+                <TouchableOpacity
+                  onPress={async () => {
+                    const image = await handleFilePicker();
+                    setImageUrl(image);
+                  }}
+                >
+                  <Image source={require('../assets/images/picture.png')} style={styles.uploadIcon} />
+                </TouchableOpacity>
+                {imageUrl && <Image source={{ uri: imageUrl }} style={styles.previewImage} />}
+                <View style={styles.modalButtons}>
+                  <TouchableOpacity style={styles.cancelButton} onPress={() => setNewPostModalVisible(false)}>
+                    <Text style={styles.cancelButtonText}>Cancel</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.submitButton} onPress={handleCreateNewPost}>
+                    <Text style={styles.submitButtonText}>Post</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </TouchableWithoutFeedback>
           </View>
-        </View>
+        </TouchableWithoutFeedback>
+      </Modal>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={userProfileModal}
+        onRequestClose={() => setUserProfileModal(!userProfileModal)}
+      >
+        <TouchableWithoutFeedback onPress={() => setUserProfileModal(false)}>
+          <View style={styles.modalContainer}>
+            <TouchableWithoutFeedback>
+              {/* The content inside the modal should not trigger the dismissal */}
+              <View style={styles.modalView}>
+                {selectedUser && (
+                  <>
+                    <Text style={styles.modalTitle}>{selectedUser.username}</Text>
+                    <Image source={{ uri: selectedUser.profilepicture_url }} style={styles.profileImageScreen} />
+                  </>
+                )}
+                <TouchableOpacity style={styles.closeButton} onPress={() => setUserProfileModal(false)}>
+                  <Text style={styles.closeButtonText}>Close</Text>
+                </TouchableOpacity>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
       </Modal>
     </View>
   );
