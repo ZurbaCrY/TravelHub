@@ -8,6 +8,8 @@ import {
   TouchableOpacity,
   Keyboard,
   TouchableWithoutFeedback,
+  Modal,
+  FlatList
 } from 'react-native';
 import Flag from 'react-native-flags';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -28,6 +30,9 @@ import {
   addWishListCountry,
   removeWishListCountry,
 } from '../backend/Profile';
+import friendService from '../services/friendService';
+import getUsernamesByUserIds from '../services/getUsernamesByUserIds'
+import { getUserStats } from '../services/getUserStats';
 
 export default function ProfileScreen() {
   const { isDarkMode } = useDarkMode();
@@ -39,6 +44,12 @@ export default function ProfileScreen() {
   const [showWishListInput, setShowWishListInput] = useState(false);
   const [profilePictureUrl, setProfilePictureUrl] = useState(null);
   const [user, setUser] = useState({ id: null, user_metadata: {}, email: '' });
+  const [travelBuddiesModalVisible, setTravelBuddiesModalVisible] = useState(false);
+  const [travelBuddies, setTravelBuddies] = useState([]);
+  const [postCount, setPostCount] = useState(0);
+  const [upvoteCount, setUpvoteCount] = useState(0); 
+  const [downvoteCount, setDownvoteCount] = useState(0); 
+
 
   const navigation = useNavigation();
 
@@ -74,10 +85,22 @@ export default function ProfileScreen() {
 
         const wishListCountriesData = await fetchWishListCountries(user.id);
         setWishListCountries(wishListCountriesData);
+
+        // Fetch travel buddies
+        const travelBuddiesData = await friendService.getFriends();
+        const travelBuddiesIds = travelBuddiesData.map(buddy => buddy.friend_id);
+        const travelBuddiesNames = await getUsernamesByUserIds(travelBuddiesIds);
+        setTravelBuddies(travelBuddiesNames);
+
+        // Fetch user stats
+        const stats = await getUserStats(user.id, getFriendCount = false);
+        setPostCount(stats.postCount);
+        setUpvoteCount(stats.upvoteCount);
+        setDownvoteCount(stats.downvoteCount);
       } catch (error) {
         console.error('Error fetching profile data:', error);
       }
-    }
+    };
 
     fetchProfilePictureUrl();
     fetchProfileData();
@@ -85,14 +108,12 @@ export default function ProfileScreen() {
 
   const handleAddVisitedCountry = async () => {
     if (newVisited) {
-      // Check if the country is already in the list of visited countries
       if (visitedCountries.some(country => country.name.toLowerCase() === newVisited.toLowerCase())) {
         alert('Das Land ist bereits in der Liste der besuchten Länder.');
         return;
       }
 
       const countryId = await validateCountry(newVisited);
-
       if (!countryId) {
         alert('Das eingegebene Land ist nicht in der Tabelle "Country" vorhanden.');
         return;
@@ -113,14 +134,12 @@ export default function ProfileScreen() {
 
   const handleAddWishListCountry = async () => {
     if (newWishList) {
-      // Check if the country is already in the wishlist
       if (wishListCountries.some(country => country.toLowerCase() === newWishList.toLowerCase())) {
         alert('Das Land ist bereits in der Wunschliste.');
         return;
       }
 
       const countryId = await validateCountry(newWishList);
-
       if (!countryId) {
         alert('Das eingegebene Land ist nicht in der Tabelle "Country" vorhanden.');
         return;
@@ -184,17 +203,51 @@ export default function ProfileScreen() {
           />
           <Text style={[newStyle.titleText, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>{user.user_metadata.username}</Text>
           <Text style={[newStyle.bodyText, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>{user.email}</Text>
+
+          {/* Birthday */}
           <View style={newStyle.row}>
             <Icon name="birthday-cake" size={14} style={[newStyle.marginRightExtraSmall, { color: isDarkMode ? '#FFFDF3' : '#000000' }]} />
             <Text style={[newStyle.bodyText, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>
               {user.user_metadata.birthday ? user.user_metadata.birthday : 'No birthdate configured'}
             </Text>
           </View>
+
+          {/* Flag */}
           <View style={newStyle.row}>
             <Flag code="DE" size={16} style={newStyle.marginRightExtraSmall} />
             <Text style={[newStyle.bodyText, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>Deutschland</Text>
           </View>
         </View>
+
+        {/* User Stats Section */}
+        <View style={newStyle.userStatsContainer}>
+          {/* Row 1: Friends and Posts */}
+          <View style={newStyle.userStatsRow}>
+            <View style={newStyle.userStatColumn}>
+            <TouchableOpacity onPress={() => setTravelBuddiesModalVisible(true)} style={[{ justifyContent: 'center', alignItems: 'center' }]}>
+              <Text style={newStyle.userStatLabel}>Travel-Buddies</Text>
+              <Text style={newStyle.userStatValue}>{travelBuddies.length != null ? travelBuddies.length : 'N/A'}</Text>
+            </TouchableOpacity>
+            </View>
+            <View style={newStyle.userStatColumn}>
+              <Text style={newStyle.userStatLabel}>Posts</Text>
+              <Text style={newStyle.userStatValue}>{postCount != null ? postCount : 'N/A'}</Text>
+            </View>
+          </View>
+
+          {/* Row 2: Upvotes and Downvotes */}
+          <View style={newStyle.userStatsRow}>
+            <View style={newStyle.userStatColumn}>
+              <Text style={newStyle.userStatLabel}>Upvotes</Text>
+              <Text style={newStyle.userStatValue}>{upvoteCount != null ? upvoteCount : 'N/A'}</Text>
+            </View>
+            <View style={newStyle.userStatColumn}>
+              <Text style={newStyle.userStatLabel}>Downvotes</Text>
+              <Text style={newStyle.userStatValue}>{downvoteCount != null ? downvoteCount : 'N/A'}</Text>
+            </View>
+          </View>
+        </View>
+
         <View style={styles.infoSection}>
           <Text style={styles.header}>Bereits besuchte Länder:</Text>
           {visitedCountries.length === 0 ? (
@@ -231,6 +284,7 @@ export default function ProfileScreen() {
             </TouchableOpacity>
           )}
         </View>
+
         <View style={styles.infoSection}>
           <Text style={styles.header}>Wunschreiseziele:</Text>
           {wishListCountries.length === 0 ? (
@@ -264,16 +318,50 @@ export default function ProfileScreen() {
             </TouchableOpacity>
           )}
         </View>
+
         <View style={[styles.infoSection, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
           <CustomButton
-          title={"Zu den Einstellungen"}
-          onPress={() => navigation.navigate('Settings')}
+            title={"Zu den Einstellungen"}
+            onPress={() => navigation.navigate('Settings')}
           />
-          {/* <CustomButton
-          title={"Zum Dev Screen"}
-          onPress={() => navigation.navigate('Development')}
-          /> */}
         </View>
+
+        {/* Travel Buddies Modal */}
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={travelBuddiesModalVisible}
+          onRequestClose={() => setTravelBuddiesModalVisible(false)}
+        >
+          <TouchableWithoutFeedback onPress={() => setTravelBuddiesModalVisible(false)}>
+            <View style={newStyle.modalBackground}>
+              <TouchableWithoutFeedback>
+                <View style={newStyle.modalContent}>
+                  {/* Close Button (X) */}
+                  <TouchableOpacity style={newStyle.closeButtonX} onPress={() => setTravelBuddiesModalVisible(false)}>
+                    <Text style={newStyle.closeButtonX}>✖</Text>
+                  </TouchableOpacity>
+
+                  {/* Travel Buddies listed */}
+                  <Text style={newStyle.modalTitleText}>Travel Buddies</Text>
+                  {travelBuddies.length === 0 ? (
+                    <Text style={newStyle.bodyText}>You have no travel buddies yet.</Text>
+                  ) : (
+                    <FlatList
+                      data={travelBuddies}
+                      keyExtractor={(item) => item.user_id}
+                      renderItem={({ item }) => (
+                        <View>
+                          <Text style={newStyle.bodyText}>{item.username}</Text>
+                        </View>
+                      )}
+                    />
+                  )}
+                </View>
+              </TouchableWithoutFeedback>
+            </View>
+          </TouchableWithoutFeedback>
+        </Modal>
       </ScrollView>
     </TouchableWithoutFeedback>
   );

@@ -212,17 +212,17 @@ const newStyle = StyleSheet.create({
     // Specific Styles for User Stats
     userStatsContainer: {
         marginVertical: 20,
-        alignItems: 'center', // Center the rows
+        alignItems: 'center',
     },
     userStatsRow: {
         flexDirection: 'row',
-        justifyContent: 'space-between', // Space between columns
-        width: '100%', // Full width of the parent
-        marginBottom: 10, // Space between rows
+        justifyContent: 'space-between',
+        width: '100%',
+        marginBottom: 10,
     },
     userStatColumn: {
-        alignItems: 'center', // Center the text in each column
-        flex: 1, // Make columns share the space equally
+        alignItems: 'center',
+        flex: 1,
     },
     userStatLabel: {
         fontWeight: '600',
@@ -232,7 +232,6 @@ const newStyle = StyleSheet.create({
         fontSize: 16,
         color: '#666',
     },
-
 });
 
 export default newStyle;

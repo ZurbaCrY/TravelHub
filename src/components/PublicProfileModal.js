@@ -39,7 +39,19 @@ const UserProfileModal = ({
 
               {/* User Stats Section */}
               <View style={newStyle.userStatsContainer}>
-                {/* Row 1: Upvotes and Downvotes */}
+                {/* Row 1: Friends and Posts */}
+                <View style={newStyle.userStatsRow}>
+                  <View style={newStyle.userStatColumn}>
+                    <Text style={newStyle.userStatLabel}>Travel-Buddies</Text>
+                    <Text style={newStyle.userStatValue}>{user.friendCount != null ? user.friendCount : 'N/A'}</Text>
+                  </View>
+                  <View style={newStyle.userStatColumn}>
+                    <Text style={newStyle.userStatLabel}>Posts</Text>
+                    <Text style={newStyle.userStatValue}>{user.postCount != null ? user.postCount : 'N/A'}</Text>
+                  </View>
+                </View>
+
+                {/* Row 2: Upvotes and Downvotes */}
                 <View style={newStyle.userStatsRow}>
                   <View style={newStyle.userStatColumn}>
                     <Text style={newStyle.userStatLabel}>Upvotes</Text>
@@ -48,18 +60,6 @@ const UserProfileModal = ({
                   <View style={newStyle.userStatColumn}>
                     <Text style={newStyle.userStatLabel}>Downvotes</Text>
                     <Text style={newStyle.userStatValue}>{user.downvotes != null ? user.downvotes : 'N/A'}</Text>
-                  </View>
-                </View>
-
-                {/* Row 2: Friends and Posts */}
-                <View style={newStyle.userStatsRow}>
-                  <View style={newStyle.userStatColumn}>
-                    <Text style={newStyle.userStatLabel}>Friends</Text>
-                    <Text style={newStyle.userStatValue}>{user.friendCount != null ? user.friendCount : 'N/A'}</Text>
-                  </View>
-                  <View style={newStyle.userStatColumn}>
-                    <Text style={newStyle.userStatLabel}>Posts</Text>
-                    <Text style={newStyle.userStatValue}>{user.postCount != null ? user.postCount : 'N/A'}</Text>
                   </View>
                 </View>
               </View>
