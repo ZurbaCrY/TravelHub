@@ -24,13 +24,13 @@ const newStyle = StyleSheet.create({
         fontSize: 24,
         fontWeight: 'bold',
         color: '#333',
-        marginBottom: 16,
+        marginBottom: 8,
     },
     subtitleText: {
         fontSize: 18,
         fontWeight: '600',
         color: '#666',
-        marginBottom: 12,
+        marginBottom: 4,
     },
     bodyText: {
         fontSize: 16,
@@ -49,22 +49,36 @@ const newStyle = StyleSheet.create({
     },
 
     // Button Styles
+    buttonWrapper: {
+        marginVertical: 10,
+        width: '100%',
+        borderRadius: 10,
+        elevation: 2,  // Adds subtle shadow on Android
+        shadowColor: '#000',  // iOS shadow properties
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+    },
+    disabledButtonWrapper: {
+        elevation: 0,
+        shadowOpacity: 0,
+    },
     primaryButton: {
-        backgroundColor: '#1e90ff',
-        paddingVertical: 12,
-        paddingHorizontal: 24,
-        borderRadius: 8,
+        backgroundColor: '#3498DB',
+        borderRadius: 10,
+        paddingVertical: 15,
         alignItems: 'center',
         justifyContent: 'center',
-        marginVertical: 10,
+        width: '100%',
     },
     primaryButtonText: {
-        color: 'white',
-        fontSize: 16,
+        color: '#fff',
         fontWeight: 'bold',
+        fontSize: 18,
+        textAlign: 'center',
     },
     disabledButton: {
-        backgroundColor: '#a9a9a9',
+        backgroundColor: '#b0c4de',
     },
 
     smallButton: {

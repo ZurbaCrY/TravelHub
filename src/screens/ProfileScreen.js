@@ -18,7 +18,7 @@ import Button from '../components/Button';
 import { styles } from '../styles/styles';
 import { supabase } from '../services/supabase';
 import { getProfilePictureUrlByUserId } from '../backend/community';
-
+import CustomButton from '../components/CustomButton'
 import newStyle from '../styles/style';
 
 export default function ProfileScreen() {
@@ -342,16 +342,14 @@ export default function ProfileScreen() {
           )}
         </View>
         <View style={[styles.infoSection, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
-          <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
-            <Button mode="contained">
-              Zu den Einstellungen
-            </Button>
-          </TouchableOpacity>
-          {/* <TouchableOpacity onPress={() => navigation.navigate('Development')}>
-            <Button mode="contained">
-              Zum Dev Screen
-            </Button>
-          </TouchableOpacity> */}
+          <CustomButton
+          title={"Zu den Einstellungen"}
+          onPress={() => navigation.navigate('Settings')}
+          />
+          {/* <CustomButton
+          title={"Zum Dev Screen"}
+          onPress={() => navigation.navigate('Development')}
+          /> */}
         </View>
       </ScrollView>
     </TouchableWithoutFeedback>

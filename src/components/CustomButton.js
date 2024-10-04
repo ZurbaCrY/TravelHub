@@ -1,6 +1,6 @@
 import React from 'react';
 import { TouchableOpacity, Text, View, ActivityIndicator } from 'react-native';
-import { styles } from '../styles/styles';
+import newStyle from '../styles/style';
 
 const CustomButton = ({
   onPress,
@@ -12,12 +12,12 @@ const CustomButton = ({
   loadingColor = '#fff',
 }) => {
   return (
-    <View style={[styles.buttonWrapper, disabled && styles.disabledWrapper]}>
+    <View style={[newStyle.buttonWrapper, disabled && newStyle.disabledButtonWrapper]}>
       <TouchableOpacity
         style={[
-          styles.newPostButton,
+          newStyle.primaryButton,
           style,
-          disabled && styles.disabledButton
+          disabled && newStyle.disabledButton
         ]}
         onPress={onPress}
         activeOpacity={0.8}
@@ -26,7 +26,7 @@ const CustomButton = ({
         {isLoading ? (
           <ActivityIndicator color={loadingColor} />
         ) : (
-          <Text style={[styles.newPostButtonText, textStyle]}>{title}</Text>
+          <Text style={[newStyle.primaryButtonText, textStyle]}>{title}</Text>
         )}
       </TouchableOpacity>
     </View>

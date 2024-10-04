@@ -371,20 +371,20 @@ export const styles = StyleSheet.create({
     width: '100%',
     padding: 15,
   },
-  newPostButton: {
-    backgroundColor: '#3498DB',
-    borderRadius: 20,
-    padding: 15,
-    marginBottom: 10,
-    alignItems: 'center',
-    width: '100%',
-  },
-  newPostButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 16,
-    textAlign: 'center',
-  },
+  // newPostButton: {
+  //   backgroundColor: '#3498DB',
+  //   borderRadius: 20,
+  //   padding: 15,
+  //   marginBottom: 10,
+  //   alignItems: 'center',
+  //   width: '100%',
+  // },
+  // newPostButtonText: {
+  //   color: 'white',
+  //   fontWeight: 'bold',
+  //   fontSize: 16,
+  //   textAlign: 'center',
+  // },
   postHeader: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -711,5 +711,4 @@ export const styles = StyleSheet.create({
     fontSize: 18,
     textAlign: 'center',
   },
-
 });
