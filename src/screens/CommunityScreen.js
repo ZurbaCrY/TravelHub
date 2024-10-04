@@ -4,7 +4,12 @@ import { View, Text, StyleSheet, FlatList, TextInput, Image, TouchableOpacity, M
 import { useDarkMode } from '../context/DarkModeContext';
 import AuthService from '../services/auth';
 import { handleUpvote, handleDownvote, fetchPosts, createNewPost, handleFilePicker } from '../backend/community';
-import { styles } from '../styles/styles';
+import { styles } from '../styles/styles'; // Assuming styles are imported from a centralized styles file
+import CustomButton from '../components/CustomButton';
+import PublicProfileModal from '../components/PublicProfileModal';
+import friendService from '../services/friendService';
+import getUserStats from '../services/getUserStats';
+
 
 export default function CommunityScreen({ navigation }) {
   const user = AuthService.getUser();
@@ -17,6 +22,8 @@ export default function CommunityScreen({ navigation }) {
   const [newPostModalVisible, setNewPostModalVisible] = useState(false);
   const [userProfileModal, setUserProfileModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [friendListVisible, setFriendListVisible] = useState(false);
 
   useEffect(() => {
     loadPosts();
@@ -46,10 +53,31 @@ export default function CommunityScreen({ navigation }) {
     navigation.navigate('CommunityDetailScreen', { post });
   };
 
-  const handleUserPress = (user) => {
-    setSelectedUser(user);
+  const handleUserPress = async (item) => {
+    const stats = await getUserStats.getUserStats(item.user_id);
+    const selectedUserData = {
+      user_id: item.user_id,
+      username: item.users.username,
+      profilepicture_url: item.users.profilepicture_url,
+      friendCount: stats.friendCount,
+      upvotes: stats.upvotes,
+      downvotes: stats.downvotes,
+      postCount: stats.postCount
+    };
+    setSelectedUser(selectedUserData);
     setUserProfileModal(true);
-  }
+  };
+
+  const handleFriendRequestPress = async () => {
+    try {
+      setLoading(true);
+      await friendService.sendFriendRequest(selectedUser.user_id);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <View style={[styles.communityContainer, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
@@ -57,7 +85,7 @@ export default function CommunityScreen({ navigation }) {
         data={posts}
         renderItem={({ item }) => (
           <View style={styles.postCard}>
-            <TouchableOpacity onPress={() => handleUserPress(item.users)}>
+            <TouchableOpacity onPress={() => handleUserPress(item)}>
               <View style={styles.postHeader}>
                 <Image source={{ uri: item.users.profilepicture_url }} style={styles.profileImage} />
                 <Text style={styles.username}>{item.users.username}</Text>
@@ -85,7 +113,6 @@ export default function CommunityScreen({ navigation }) {
         refreshing={refreshing}
         onRefresh={loadPosts}
         contentContainerStyle={{ paddingBottom: 20 }}
-        // Hier wird die graue Linie hinzugefügt
         ItemSeparatorComponent={() => <View style={styles.separator} />}
       />
       <TouchableOpacity style={styles.newPostButton} onPress={() => setNewPostModalVisible(true)}>
@@ -130,31 +157,15 @@ export default function CommunityScreen({ navigation }) {
           </View>
         </TouchableWithoutFeedback>
       </Modal>
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={userProfileModal}
-        onRequestClose={() => setUserProfileModal(!userProfileModal)}
-      >
-        <TouchableWithoutFeedback onPress={() => setUserProfileModal(false)}>
-          <View style={styles.modalContainer}>
-            <TouchableWithoutFeedback>
-              {/* The content inside the modal should not trigger the dismissal */}
-              <View style={styles.modalView}>
-                {selectedUser && (
-                  <>
-                    <Text style={styles.modalTitle}>{selectedUser.username}</Text>
-                    <Image source={{ uri: selectedUser.profilepicture_url }} style={styles.profileImageScreen} />
-                  </>
-                )}
-                <TouchableOpacity style={styles.closeButton} onPress={() => setUserProfileModal(false)}>
-                  <Text style={styles.closeButtonText}>Close</Text>
-                </TouchableOpacity>
-              </View>
-            </TouchableWithoutFeedback>
-          </View>
-        </TouchableWithoutFeedback>
-      </Modal>
+      <PublicProfileModal
+        isVisible={userProfileModal}
+        onClose={() => setUserProfileModal(false)}
+        user={selectedUser}
+        onFriendRequestPress={handleFriendRequestPress}
+        isLoading={loading}
+        friendListVisible={friendListVisible}
+        setFriendListVisible={setFriendListVisible}
+      />
     </View>
   );
 }

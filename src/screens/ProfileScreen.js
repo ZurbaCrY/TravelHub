@@ -19,6 +19,8 @@ import { styles } from '../styles/styles';
 import { supabase } from '../services/supabase';
 import { getProfilePictureUrlByUserId } from '../backend/community';
 
+import newStyle from '../styles/style';
+
 export default function ProfileScreen() {
   const CURRENT_USER = AuthService.getUser();
   const CURRENT_USER_ID = CURRENT_USER.id;
@@ -251,23 +253,23 @@ export default function ProfileScreen() {
       setShowVisitedInput(false);
       setShowWishListInput(false);
     }}>
-      <ScrollView style={[styles.containerProfileScreen, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
-        <View style={[styles.profileSection, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
+      <ScrollView style={[newStyle.container, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
+        <View style={[newStyle.centeredContainer, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
           <Image
             source={{ uri: profilePictureUrl }}
-            style={styles.profileImageScreen}
+            style={newStyle.largeProfileImage}
           />
-          <Text style={[styles.name, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>{CURRENT_USER.user_metadata.username}</Text>
-          <Text style={[styles.details, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>{CURRENT_USER.email}</Text>
-          <View style={styles.row}>
-            <Icon name="birthday-cake" size={14} style={[styles.iconRightMargin, { color: isDarkMode ? '#FFFDF3' : '#000000' }]} />
-            <Text style={[styles.details, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>
+          <Text style={[newStyle.titleText, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>{CURRENT_USER.user_metadata.username}</Text>
+          <Text style={[newStyle.bodyText, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>{CURRENT_USER.email}</Text>
+          <View style={newStyle.row}>
+            <Icon name="birthday-cake" size={14} style={[newStyle.marginRightExtraSmall, { color: isDarkMode ? '#FFFDF3' : '#000000' }]} />
+            <Text style={[newStyle.bodyText, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>
               {CURRENT_USER.user_metadata.birthday ? CURRENT_USER.user_metadata.birthday : 'No birthdate configured'}
             </Text>
           </View>
-          <View style={styles.row}>
-            <Flag code="DE" size={16} style={styles.iconRightMargin} />
-            <Text style={[styles.details, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>Deutschland</Text>
+          <View style={newStyle.row}>
+            <Flag code="DE" size={16} style={newStyle.marginRightExtraSmall} />
+            <Text style={[newStyle.bodyText, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>Deutschland</Text>
           </View>
         </View>
         <View style={styles.infoSection}>
