@@ -670,4 +670,46 @@ export const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: 'black',
   },
+  
+  // General button wrapper
+  buttonWrapper: {
+    marginVertical: 10,
+    width: '100%',
+    borderRadius: 10,
+    elevation: 2,  // Adds subtle shadow on Android
+    shadowColor: '#000',  // iOS shadow properties
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  
+  // Disabled state wrapper for disabled buttons
+  disabledWrapper: {
+    elevation: 0,
+    shadowOpacity: 0,
+  },
+
+  // General button style
+  newPostButton: {
+    backgroundColor: '#3498DB',
+    borderRadius: 10,
+    paddingVertical: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+  },
+
+  // Disabled button style
+  disabledButton: {
+    backgroundColor: '#b0c4de',
+  },
+
+  // Button text style
+  newPostButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 18,
+    textAlign: 'center',
+  },
+
 });
