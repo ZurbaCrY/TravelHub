@@ -22,6 +22,7 @@ const newStyle = StyleSheet.create({
     row: {
         flexDirection: 'row',
         alignItems: 'center',
+        justifyContent: 'space-between',
     },
 
     // Text Styles
@@ -55,14 +56,17 @@ const newStyle = StyleSheet.create({
     },
     boldTextLeft: {
         fontWeight: 'bold',
-
+    },
+    boldText: {
+        fontWeight: 'bold',
     },
     centerAlignedText: {
         textAlign: 'center',
     },
     selectedUserItem: {
         backgroundColor: '#007BFF',
-      },
+    },
+
     // Button Styles
     buttonWrapper: {
         marginVertical: 10,
@@ -74,20 +78,27 @@ const newStyle = StyleSheet.create({
         shadowOpacity: 0.25,
         shadowRadius: 3.84,
     },
+    disabledButtonWrapper: {
+        elevation: 0,
+        shadowOpacity: 0,
+    },
     primaryButton: {
         backgroundColor: '#3498DB',
         borderRadius: 10,
         paddingVertical: 15,
-        marginBottom: 8,
         alignItems: 'center',
         justifyContent: 'center',
         width: '100%',
+        marginBottom: 8,
     },
     primaryButtonText: {
         color: '#fff',
         fontWeight: 'bold',
         fontSize: 18,
         textAlign: 'center',
+    },
+    disabledButton: {
+        backgroundColor: '#b0c4de',
     },
     smallButton: {
         backgroundColor: '#1e90ff',
@@ -152,6 +163,25 @@ const newStyle = StyleSheet.create({
         elevation: 5,
         alignItems: 'center',
     },
+    closeButtonX: {
+        position: 'absolute',
+        top: 5,
+        right: 5,
+        padding: 10,
+    },
+    closeModalButton: {
+        backgroundColor: '#f00',
+        padding: 10,
+        borderRadius: 8,
+        marginTop: 20,
+        alignSelf: 'stretch',
+        alignItems: 'center',
+    },
+    closeModalButtonText: {
+        color: 'white',
+        fontSize: 16,
+    },
+
     // Image Styles
     largeProfileImage: {
         width: 140,
@@ -178,6 +208,67 @@ const newStyle = StyleSheet.create({
         marginBottom: 16,
     },
 
+    // List Styles
+    listItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: 10,
+        borderBottomWidth: 1,
+        borderColor: '#ddd',
+    },
+    listItemText: {
+        fontSize: 16,
+        marginLeft: 10,
+    },
+
+    // Spacing Utilities
+    marginBottomSmall: {
+        marginBottom: 8,
+    },
+    marginBottomMedium: {
+        marginBottom: 16,
+    },
+    marginBottomLarge: {
+        marginBottom: 24,
+    },
+    paddingHorizontalSmall: {
+        paddingHorizontal: 8,
+    },
+    paddingHorizontalMedium: {
+        paddingHorizontal: 16,
+    },
+    marginRightExtraSmall: {
+        marginRight: 4,
+    },
+
+    // Specific Styles for User Stats
+    userStatsContainer: {
+        marginVertical: 20,
+        alignItems: 'center',
+    },
+    userStatsRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '100%',
+        marginBottom: 10,
+    },
+    userStatColumn: {
+        alignItems: 'center',
+        flex: 1,
+        borderTopWidth: 1,
+        borderTopColor: '#ddd',
+        paddingTop: 10,
+        marginTop: 10,
+    },
+    userStatLabel: {
+        fontWeight: '600',
+        color: '#333',
+    },
+    userStatValue: {
+        fontSize: 16,
+        color: '#666',
+    },
+
     // Post Styles
     postContainer: {
         backgroundColor: '#fff',
@@ -195,7 +286,7 @@ const newStyle = StyleSheet.create({
         fontSize: 18,
         fontWeight: 'bold',
         marginLeft: 10,
-      },
+    },
     postImage: {
         width: '100%',
         height: 300,
@@ -206,21 +297,7 @@ const newStyle = StyleSheet.create({
         fontSize: 16,
         color: '#333',
     },
-    paddingHorizontalSmall: {
-        paddingHorizontal: 8,
-    },
-    paddingHorizontalMedium: {
-        paddingHorizontal: 16,
-    },
-    marginRightExtraSmall: {
-        marginRight: 4,
-    },
 
-    // Specific Styles for User Stats
-    userStatsContainer: {
-        marginVertical: 20,
-        alignItems: 'center',
-    },
     // Reaction Styles
     voteRow: {
         flexDirection: 'row',
@@ -242,28 +319,20 @@ const newStyle = StyleSheet.create({
         color: '#333',
     },
     icon: {
-        width:  24,
+        width: 24,
         height: 24,
     },
     iconBig: {
         width: 48,
         height: 48,
     },
+
     // Comment Section Styles
     commentSection: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         width: '100%',
         marginBottom: 10,
-    },
-    userStatColumn: {
-        alignItems: 'center',
-        flex: 1,
-        alignItems: 'center',
-        borderTopWidth: 1,
-        borderTopColor: '#ddd',
-        paddingTop: 10,
-        marginTop: 10,
     },
     commentInput: {
         flex: 1,
@@ -326,20 +395,20 @@ const newStyle = StyleSheet.create({
         color: '#fff',
         fontWeight: 'bold',
         fontSize: 16,
-        color: '#666',
     },
-    //Profil
+
+    // Info Section Styles (for profile)
     infoSection: {
         backgroundColor: '#3EAAE9',
         marginHorizontal: 10,
         padding: 10,
         borderRadius: 10,
         marginTop: 10,
-      },
-      details: {
+    },
+    details: {
         fontSize: 16,
         marginVertical: 2,
-      },
+    },
 });
 
 export default newStyle;
