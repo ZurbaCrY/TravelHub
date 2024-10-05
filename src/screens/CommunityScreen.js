@@ -1,15 +1,14 @@
 import 'react-native-url-polyfill/auto';
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, TextInput, Image, TouchableOpacity, Modal, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, FlatList, TextInput, Image, TouchableOpacity, Modal, TouchableWithoutFeedback } from 'react-native';
 import { useDarkMode } from '../context/DarkModeContext';
 import AuthService from '../services/auth';
 import { handleUpvote, handleDownvote, fetchPosts, createNewPost, handleFilePicker } from '../backend/community';
-import { styles } from '../styles/styles'; // Assuming styles are imported from a centralized styles file
+import newStyle from '../styles/style'; // Verwende die korrekte CSS-Datei
 import CustomButton from '../components/CustomButton';
 import PublicProfileModal from '../components/PublicProfileModal';
 import friendService from '../services/friendService';
 import getUserStats from '../services/getUserStats';
-
 
 export default function CommunityScreen({ navigation }) {
   const user = AuthService.getUser();
@@ -80,32 +79,36 @@ export default function CommunityScreen({ navigation }) {
   };
 
   return (
-    <View style={[styles.communityContainer, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
+    <View style={[newStyle.container, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
       <FlatList
         data={posts}
         renderItem={({ item }) => (
-          <View style={styles.postCard}>
+          <View style={newStyle.postContainer}>
             <TouchableOpacity onPress={() => handleUserPress(item)}>
-              <View style={styles.postHeader}>
-                <Image source={{ uri: item.users.profilepicture_url }} style={styles.profileImage} />
-                <Text style={styles.username}>{item.users.username}</Text>
+              <View style={newStyle.postHeader}>
+                <Image source={{ uri: item.users.profilepicture_url }} style={newStyle.commentProfileImage} />
+                <Text style={newStyle.boldTextLeft}>{item.users.username}</Text>
               </View>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => handlePostPress(item)}>
               {item.image_url && (
-                <Image source={{ uri: item.image_url }} style={styles.postImage} />
+                <Image source={{ uri: item.image_url }} style={newStyle.postImage} />
               )}
-              <Text style={styles.postText}>{item.content}</Text>
+              <Text style={newStyle.postText}>{item.content}</Text>
             </TouchableOpacity>
-            <View style={styles.postFooter}>
-              <TouchableOpacity onPress={() => handleUpvote(item.id, loadPosts)}>
-                <Image source={require('../assets/images/thumbs-up.png')} style={styles.icon} />
-              </TouchableOpacity>
-              <Text style={styles.upvoteText}>{item.upvotes}</Text>
-              <TouchableOpacity onPress={() => handleDownvote(item.id, loadPosts)}>
-                <Image source={require('../assets/images/thumbs-down.png')} style={styles.icon} />
-              </TouchableOpacity>
-              <Text style={styles.downvoteText}>{item.downvotes}</Text>
+            <View style={newStyle.voteRow}>
+              <View style={newStyle.voteContainer}>
+                <TouchableOpacity onPress={() => handleUpvote(item.id, loadPosts)}>
+                  <Image source={require('../assets/images/thumbs-up.png')} style={newStyle.icon} />
+                </TouchableOpacity>
+                <Text style={newStyle.voteCount}>{item.upvotes}</Text>
+              </View>
+              <View style={newStyle.voteContainer}>
+                <TouchableOpacity onPress={() => handleDownvote(item.id, loadPosts)}>
+                  <Image source={require('../assets/images/thumbs-down.png')} style={newStyle.icon} />
+                </TouchableOpacity>
+                <Text style={newStyle.voteCount}>{item.downvotes}</Text>
+              </View>
             </View>
           </View>
         )}
@@ -113,10 +116,10 @@ export default function CommunityScreen({ navigation }) {
         refreshing={refreshing}
         onRefresh={loadPosts}
         contentContainerStyle={{ paddingBottom: 20 }}
-        ItemSeparatorComponent={() => <View style={styles.separator} />}
+        ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
       />
-      <TouchableOpacity style={styles.newPostButton} onPress={() => setNewPostModalVisible(true)}>
-        <Text style={styles.newPostButtonText}>New Post</Text>
+      <TouchableOpacity style={newStyle.primaryButton} onPress={() => setNewPostModalVisible(true)}>
+        <Text style={newStyle.primaryButtonText}>New Post</Text>
       </TouchableOpacity>
       <Modal
         animationType="slide"
@@ -125,12 +128,12 @@ export default function CommunityScreen({ navigation }) {
         onRequestClose={() => setNewPostModalVisible(false)}
       >
         <TouchableWithoutFeedback onPress={() => setNewPostModalVisible(false)}>
-          <View style={styles.modalContainer}>
+          <View style={newStyle.modalBackground}>
             <TouchableWithoutFeedback>
-              <View style={styles.modalView}>
-                <Text style={styles.modalText}>Create New Post</Text>
+              <View style={newStyle.modalContent}>
+                <Text style={newStyle.modalTitleText}>Create New Post</Text>
                 <TextInput
-                  style={styles.input}
+                  style={newStyle.inputField}
                   placeholder="What's on your mind?"
                   value={newPostContent}
                   onChangeText={(text) => setNewPostContent(text)}
@@ -141,15 +144,15 @@ export default function CommunityScreen({ navigation }) {
                     setImageUrl(image);
                   }}
                 >
-                  <Image source={require('../assets/images/picture.png')} style={styles.uploadIcon} />
+                  <Image source={require('../assets/images/picture.png')} style={newStyle.iconBig} />
                 </TouchableOpacity>
-                {imageUrl && <Image source={{ uri: imageUrl }} style={styles.previewImage} />}
-                <View style={styles.modalButtons}>
-                  <TouchableOpacity style={styles.cancelButton} onPress={() => setNewPostModalVisible(false)}>
-                    <Text style={styles.cancelButtonText}>Cancel</Text>
+                {imageUrl && <Image source={{ uri: imageUrl }} style={newStyle.postImage} />}
+                <View style={newStyle.row}>
+                  <TouchableOpacity style={newStyle.smallButton} onPress={() => setNewPostModalVisible(false)}>
+                    <Text style={newStyle.smallButtonText}>Cancel</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={styles.submitButton} onPress={handleCreateNewPost}>
-                    <Text style={styles.submitButtonText}>Post</Text>
+                  <TouchableOpacity style={newStyle.smallButton} onPress={handleCreateNewPost}>
+                    <Text style={newStyle.smallButtonText}>Post</Text>
                   </TouchableOpacity>
                 </View>
               </View>

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, RefreshControl, FlatList, TextInput } from 'react-native';
-import { handleDownvote, handleUpvote, fetchPosts, getUpvoters, getDownvoters, fetchComments, addComment } from '../backend/community'; // Stelle sicher, dass addComment importiert wird
+import { View, Text, Image, TouchableOpacity, RefreshControl, FlatList, TextInput } from 'react-native';
+import { handleDownvote, handleUpvote, fetchPosts, getUpvoters, getDownvoters, fetchComments, addComment } from '../backend/community'; 
 import AuthService from '../services/auth';
-import { styles } from '../styles/styles';
+import newStyle from '../styles/style'; // Verwende die neue CSS-Datei
 
 export default function CommunityDetailScreen({ route, navigation }) {
   const { post } = route.params;
@@ -30,7 +30,7 @@ export default function CommunityDetailScreen({ route, navigation }) {
 
     const fetchCommentsData = async () => {
       try {
-        const commentsData = await fetchComments(post.id); // Funktion zum Abrufen der Kommentare
+        const commentsData = await fetchComments(post.id); 
         setComments(commentsData);
       } catch (error) {
         console.error('Error fetching comments:', error);
@@ -67,9 +67,8 @@ export default function CommunityDetailScreen({ route, navigation }) {
   const handleSubmitComment = async () => {
     if (newComment.trim()) {
       try {
-        await addComment(post.id, user.id, newComment); // Funktion zum Hinzufügen eines Kommentars
+        await addComment(post.id, user.id, newComment);
         setNewComment('');
-        // Kommentar nach dem Hinzufügen erneut abrufen
         const updatedComments = await fetchComments(post.id);
         setComments(updatedComments);
       } catch (error) {
@@ -83,16 +82,16 @@ export default function CommunityDetailScreen({ route, navigation }) {
       data={voters}
       keyExtractor={(item, index) => index.toString()}
       renderItem={({ item }) => (
-        <View style={styles.voterItem}>
-          <Image source={{ uri: item.profilepicture_url }} style={styles.voterProfileImage} />
-          <Text style={styles.voterUsername}>{item.username}</Text>
+        <View style={newStyle.listItem}>
+          <Image source={{ uri: item.profilepicture_url }} style={newStyle.smallProfileImage} />
+          <Text style={newStyle.listItemText}>{item.username}</Text>
         </View>
       )}
     />
   );
 
   return (
-    <View style={styles.CommunityDetailContainer}>
+    <View style={newStyle.containerNoMarginTop}>
       <FlatList
         data={[postData]}
         keyExtractor={(item) => item.id.toString()}
@@ -101,55 +100,50 @@ export default function CommunityDetailScreen({ route, navigation }) {
         }
         renderItem={() => (
           <>
-            <View style={styles.postHeader}>
-              <Image source={{ uri: postData.users.profilepicture_url }} style={styles.profileImage} />
-              <Text style={styles.username}>{postData.users.username}</Text>
+            <View style={newStyle.row}>
+              <Image source={{ uri: postData.users.profilepicture_url }} style={newStyle.profileImage} />
+              <Text style={newStyle.boldTextLeft}>{postData.users.username}</Text>
             </View>
             {postData.image_url && (
-              <Image source={{ uri: postData.image_url }} style={styles.postImage} />
+              <Image source={{ uri: postData.image_url }} style={newStyle.postImage} />
             )}
-            <Text style={styles.postText}>{postData.content}</Text>
+            <Text style={newStyle.bodyText}>{postData.content}</Text>
 
             {/* Upvotes and Downvotes Section */}
-            <View style={styles.voteRow}>
-              {/* Upvotes Section */}
-              <View style={styles.voteContainer}>
+            <View style={newStyle.voteRow}>
+              <View style={newStyle.voteContainer}>
                 <TouchableOpacity onPress={() => handleUpvote(postData.id, user.id, loadPosts)}>
-                  <Image source={require('../assets/images/thumbs-up.png')} style={styles.icon} />
+                  <Image source={require('../assets/images/thumbs-up.png')} style={newStyle.icon} />
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => setShowUpvoters(!showUpvoters)}>
-                  <Text style={styles.voteCount}>{postData.upvotes} Upvotes</Text>
+                  <Text style={newStyle.voteCount}>{postData.upvotes} Upvotes</Text>
                 </TouchableOpacity>
               </View>
-              {/* Downvotes Section */}
-              <View style={styles.voteContainer}>
+              <View style={newStyle.voteContainer}>
                 <TouchableOpacity onPress={() => handleDownvote(postData.id, user.id, loadPosts)}>
-                  <Image source={require('../assets/images/thumbs-down.png')} style={styles.icon} />
+                  <Image source={require('../assets/images/thumbs-down.png')} style={newStyle.icon} />
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => setShowDownvoters(!showDownvoters)}>
-                  <Text style={styles.voteCount}>{postData.downvotes} Downvotes</Text>
+                  <Text style={newStyle.voteCount}>{postData.downvotes} Downvotes</Text>
                 </TouchableOpacity>
               </View>
             </View>
 
-            {/* Upvoters Dropdown */}
             {showUpvoters && (
-              <View style={styles.updropdown}>
+              <View style={newStyle.updropdown}>
                 {renderVotersList(upvoters)}
               </View>
             )}
 
-            {/* Downvoters Dropdown */}
             {showDownvoters && (
-              <View style={styles.downdropdown}>
+              <View style={newStyle.downdropdown}>
                 {renderVotersList(downvoters)}
               </View>
             )}
 
-            {/* Comments Section */}
-            <View style={styles.commentSection}>
+            <View style={newStyle.commentSection}>
               <TextInput
-                style={styles.commentInput}
+                style={newStyle.commentInput}
                 placeholder="Add a comment..."
                 value={newComment}
                 onChangeText={setNewComment}
@@ -162,10 +156,10 @@ export default function CommunityDetailScreen({ route, navigation }) {
               data={comments}
               keyExtractor={(item) => item.id.toString()}
               renderItem={({ item }) => (
-                <View style={styles.commentItem}>
-                  <Image source={{ uri: item.users.profilepicture_url }} style={styles.commentProfileImage} />
-                  <Text style={styles.commentUsername}>{item.users.username}:</Text>
-                  <Text style={styles.commentText}>{item.content}</Text>
+                <View style={newStyle.commentItem}>
+                  <Image source={{ uri: item.users.profilepicture_url }} style={newStyle.commentProfileImage} />
+                  <Text style={newStyle.commentUsername}>{item.users.username}:</Text>
+                  <Text style={newStyle.commentText}>{item.content}</Text>
                 </View>
               )}
             />
@@ -175,4 +169,3 @@ export default function CommunityDetailScreen({ route, navigation }) {
     </View>
   );
 }
-

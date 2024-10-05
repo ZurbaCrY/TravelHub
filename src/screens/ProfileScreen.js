@@ -272,15 +272,15 @@ export default function ProfileScreen() {
             <Text style={[newStyle.bodyText, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>Deutschland</Text>
           </View>
         </View>
-        <View style={styles.infoSection}>
-          <Text style={styles.header}>Bereits besuchte Länder:</Text>
+        <View style={newStyle.infoSection}>
+          <Text style={newStyle.header}>Bereits besuchte Länder:</Text>
           {visitedCountries.length === 0 ? (
-            <Text style={styles.details}>Keine besuchten Länder hinzugefügt</Text>
+            <Text style={newStyle.details}>Keine besuchten Länder hinzugefügt</Text>
           ) : (
             visitedCountries.map((country, index) => (
               <View key={index} style={styles.countryItem}>
                 <View style={styles.countryTextContainer}>
-                  <Text style={styles.details}>{country.name}</Text>
+                  <Text style={newStyle.details}>{country.name}</Text>
                   {country.verified && <Icon name="check-circle" size={16} color="green" style={styles.verifiedIcon} />}
                 </View>
                 <TouchableOpacity onPress={() => removeVisitedCountry(index)} style={styles.removeButton}>

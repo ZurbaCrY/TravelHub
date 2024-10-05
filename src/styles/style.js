@@ -6,6 +6,12 @@ const newStyle = StyleSheet.create({
         flex: 1,
         padding: 8,
         backgroundColor: '#f8f8f8',
+        marginTop: 35,
+    },
+    containerNoMarginTop: {
+        flex: 1,
+        padding: 8,
+        backgroundColor: '#f8f8f8',
     },
     centeredContainer: {
         flex: 1,
@@ -16,7 +22,6 @@ const newStyle = StyleSheet.create({
     row: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'space-between',
     },
 
     // Text Styles
@@ -41,13 +46,23 @@ const newStyle = StyleSheet.create({
         fontSize: 12,
         color: '#888',
     },
-    boldText: {
+    boldMiniText: {
+        fontSize: 10,
+        color: '#ffffff',
+        marginTop: 2,
+        marginRight: 8,
+        textAlign: 'right',
+    },
+    boldTextLeft: {
         fontWeight: 'bold',
+
     },
     centerAlignedText: {
         textAlign: 'center',
     },
-
+    selectedUserItem: {
+        backgroundColor: '#007BFF',
+      },
     // Button Styles
     buttonWrapper: {
         marginVertical: 10,
@@ -59,14 +74,11 @@ const newStyle = StyleSheet.create({
         shadowOpacity: 0.25,
         shadowRadius: 3.84,
     },
-    disabledButtonWrapper: {
-        elevation: 0,
-        shadowOpacity: 0,
-    },
     primaryButton: {
         backgroundColor: '#3498DB',
         borderRadius: 10,
         paddingVertical: 15,
+        marginBottom: 8,
         alignItems: 'center',
         justifyContent: 'center',
         width: '100%',
@@ -77,10 +89,6 @@ const newStyle = StyleSheet.create({
         fontSize: 18,
         textAlign: 'center',
     },
-    disabledButton: {
-        backgroundColor: '#b0c4de',
-    },
-
     smallButton: {
         backgroundColor: '#1e90ff',
         paddingVertical: 8,
@@ -89,6 +97,7 @@ const newStyle = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         marginVertical: 5,
+        marginRight: 20,
     },
     smallButtonText: {
         color: 'white',
@@ -131,25 +140,18 @@ const newStyle = StyleSheet.create({
         fontWeight: 'bold',
         marginBottom: 10,
     },
-    closeButtonX: {
-        position: 'absolute',
-        top: 5,
-        right: 5,
-        padding: 10,
-    },
-    closeModalButton: {
-        backgroundColor: '#f00',
-        padding: 10,
-        borderRadius: 8,
-        marginTop: 20,
-        alignSelf: 'stretch',
+    modalContentWidth: {
+        width: '100%',
+        backgroundColor: 'white',
+        borderRadius: 15,
+        padding: 20,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
         alignItems: 'center',
     },
-    closeModalButtonText: {
-        color: 'white',
-        fontSize: 16,
-    },
-
     // Image Styles
     largeProfileImage: {
         width: 140,
@@ -176,63 +178,147 @@ const newStyle = StyleSheet.create({
         marginBottom: 16,
     },
 
-    // List Styles
-    listItem: {
+    // Post Styles
+    postContainer: {
+        backgroundColor: '#fff',
+        padding: 15,
+        borderBottomWidth: 1,
+        borderBottomColor: '#ddd',
+        marginBottom: 10,
+    },
+    postHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 10,
+    },
+    header: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginLeft: 10,
+      },
+    postImage: {
+        width: '100%',
+        height: 300,
+        borderRadius: 10,
+        marginBottom: 10,
+    },
+    postText: {
+        fontSize: 16,
+        color: '#333',
+    },
+
+    // Reaction Styles
+    voteRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        alignItems: 'center',
+        marginTop: 10,
+        paddingVertical: 8,
+        borderTopWidth: 1,
+        borderTopColor: '#ddd',
+    },
+    voteContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    voteCount: {
+        marginLeft: 5,
+        fontSize: 16,
+        color: '#333',
+    },
+    icon: {
+        width: 24,
+        height: 24,
+    },
+
+    iconBig: {
+        width: 48,
+        height: 48,
+    },
+    // Comment Section Styles
+    commentSection: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderTopWidth: 1,
+        borderTopColor: '#ddd',
+        paddingTop: 10,
+        marginTop: 10,
+    },
+    commentInput: {
+        flex: 1,
+        borderWidth: 1,
+        borderColor: '#ddd',
+        borderRadius: 25,
+        paddingHorizontal: 10,
+        height: 40,
+        marginRight: 10,
+    },
+    commentItem: {
         flexDirection: 'row',
         alignItems: 'center',
         paddingVertical: 10,
         borderBottomWidth: 1,
-        borderColor: '#ddd',
+        borderBottomColor: '#ddd',
     },
-    listItemText: {
-        fontSize: 16,
+    commentText: {
+        fontSize: 14,
         marginLeft: 10,
-    },
-
-    // Spacing Utilities
-    marginBottomSmall: {
-        marginBottom: 8,
-    },
-    marginBottomMedium: {
-        marginBottom: 16,
-    },
-    marginBottomLarge: {
-        marginBottom: 24,
-    },
-    paddingHorizontalSmall: {
-        paddingHorizontal: 8,
-    },
-    paddingHorizontalMedium: {
-        paddingHorizontal: 16,
-    },
-    marginRightExtraSmall: {
-        marginRight: 4,
-    },
-
-    // Specific Styles for User Stats
-    userStatsContainer: {
-        marginVertical: 20,
-        alignItems: 'center', // Center the rows
-    },
-    userStatsRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between', // Space between columns
-        width: '100%', // Full width of the parent
-        marginBottom: 10, // Space between rows
-    },
-    userStatColumn: {
-        alignItems: 'center', // Center the text in each column
-        flex: 1, // Make columns share the space equally
-    },
-    userStatLabel: {
-        fontWeight: '600',
         color: '#333',
     },
-    userStatValue: {
-        fontSize: 16,
-        color: '#666',
+    commentUsername: {
+        fontWeight: 'bold',
+        fontSize: 14,
+    },
+    commentProfileImage: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        marginRight: 10,
     },
 
+    // Profile Modal Styles
+    profileModalContainer: {
+        alignItems: 'center',
+        backgroundColor: '#fff',
+        padding: 20,
+        borderRadius: 10,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
+        margin: 20,
+    },
+    profileModalText: {
+        fontSize: 16,
+        color: '#333',
+        marginVertical: 5,
+    },
+    profileModalButton: {
+        backgroundColor: '#3498DB',
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 8,
+        marginTop: 15,
+    },
+    profileModalButtonText: {
+        color: '#fff',
+        fontWeight: 'bold',
+        fontSize: 16,
+    },
+    //Profil
+    infoSection: {
+        backgroundColor: '#3EAAE9',
+        marginHorizontal: 10,
+        padding: 10,
+        borderRadius: 10,
+        marginTop: 10,
+      },
+      details: {
+        fontSize: 16,
+        marginVertical: 2,
+      },
 });
 
 export default newStyle;
