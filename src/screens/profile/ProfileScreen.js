@@ -13,14 +13,14 @@ import {
 } from 'react-native';
 import Flag from 'react-native-flags';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { useDarkMode } from '../context/DarkModeContext';
+import { useDarkMode } from '../../context/DarkModeContext';
 import { useNavigation } from '@react-navigation/native';
-import AuthService from '../services/auth';
-import Button from '../components/Button';
-import CustomButton from '../components/CustomButton';
-import { styles } from '../styles/styles';
-import newStyle from '../styles/style';
-import { getProfilePictureUrlByUserId } from '../services/getProfilePictureUrlByUserId';
+import AuthService from '../../services/auth';
+import Button from '../../components/Button';
+import CustomButton from '../../components/CustomButton';
+import { styles } from '../../styles/styles';
+import newStyle from '../../styles/style';
+import { getProfilePictureUrlByUserId } from '../../services/getProfilePictureUrlByUserId';
 import {
   fetchVisitedCountries,
   fetchWishListCountries,
@@ -29,10 +29,10 @@ import {
   removeVisitedCountry,
   addWishListCountry,
   removeWishListCountry,
-} from '../backend/Profile';
-import friendService from '../services/friendService';
-import getUsernamesByUserIds from '../services/getUsernamesByUserIds'
-import { getUserStats } from '../services/getUserStats';
+} from '../../backend/Profile';
+import friendService from '../../services/friendService';
+import getUsernamesByUserIds from '../../services/getUsernamesByUserIds'
+import { getUserStats } from '../../services/getUserStats';
 
 export default function ProfileScreen() {
   const { isDarkMode } = useDarkMode();

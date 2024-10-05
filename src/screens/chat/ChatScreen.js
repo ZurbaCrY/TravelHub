@@ -1,11 +1,11 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { View, StyleSheet, Modal, Text, TouchableOpacity } from 'react-native';
 import { GiftedChat, MessageText } from 'react-native-gifted-chat';
-import { useDarkMode } from '../context/DarkModeContext';
-import { supabase } from '../services/supabase';
-import AuthService from '../services/auth';
+import { useDarkMode } from '../../context/DarkModeContext.js';
+import { supabase } from '../../services/supabase.js';
+import AuthService from '../../services/auth.js';
 import PropTypes from 'prop-types';
-import { styles } from '../styles/styles.js'; // Relativer Pfad
+import { styles } from '../../styles/styles.js'; // Relativer Pfad
 
 export default function ChatScreen({ route, navigation }) {
   const CURRENT_USER = AuthService.getUser();

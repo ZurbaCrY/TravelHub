@@ -1,22 +1,22 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { StyleSheet, View, Modal, Text, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
 import * as Location from 'expo-location';
-import { customMapStyle } from '../styles/customMapStyle';
+import { customMapStyle } from '../../styles/customMapStyle';
 import { MaterialIcons } from '@expo/vector-icons';
-import CustomPlaceItem from '../components/CustomPlaceItem';
-import PlaceDetailScreen from '../components/PlaceDetailScreen';
-import AddPlaceModal from '../components/AddPlaceModal';
+import CustomPlaceItem from '../../components/CustomPlaceItem';
+import PlaceDetailScreen from '../../components/PlaceDetailScreen';
+import AddPlaceModal from '../../components/AddPlaceModal';
 import { Button } from 'react-native-paper'
-import { supabase } from '../services/supabase';
-import AuthService from '../services/auth'
-import { useDarkMode } from '../context/DarkModeContext';
-import { fetchData, updateVisitedCountry, updateOrCreateVisitedCountry } from '../backend/LoadEditMapData';
-import { updateFavourite, deleteFavourite, getMarkerForPlace, getDescriptionForPlace, getListImage, getNameForPlace, handleStarClick } from '../backend/LoadEditPlaceData';
-import { findNearestCity } from '../backend/MapLocationChangeFunctions';
-import MapSearchBar from '../components/MapSearchBar';
-import Map from '../components/Map';
-import SlideUpBar from '../components/SlideUpBar';
-import SlideUpList from '../components/SlideUpList';
+import { supabase } from '../../services/supabase';
+import AuthService from '../../services/auth'
+import { useDarkMode } from '../../context/DarkModeContext';
+import { fetchData, updateVisitedCountry, updateOrCreateVisitedCountry } from '../../backend/LoadEditMapData';
+import { updateFavourite, deleteFavourite, getMarkerForPlace, getDescriptionForPlace, getListImage, getNameForPlace, handleStarClick } from '../../backend/LoadEditPlaceData';
+import { findNearestCity } from '../../backend/MapLocationChangeFunctions';
+import MapSearchBar from '../../components/MapSearchBar';
+import Map from '../../components/Map';
+import SlideUpBar from '../../components/SlideUpBar';
+import SlideUpList from '../../components/SlideUpList';
 
 const { width } = Dimensions.get('window');
 

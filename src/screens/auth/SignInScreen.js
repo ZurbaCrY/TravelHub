@@ -6,12 +6,12 @@ import {
   Text,  
 } from "react-native";
 import { Input } from "react-native-elements"; 
-import { styles } from '../styles/styles';
-import Button from "../components/Button";
-import AuthService from "../services/auth";
-import AnimatedSwitch from "../components/AnimatedSwitch";
+import { styles } from '../../styles/styles';
+import Button from "../../components/Button";
+import AuthService from "../../services/auth";
+import AnimatedSwitch from "../../components/AnimatedSwitch";
 import PropTypes from 'prop-types';
-import { useDarkMode } from '../context/DarkModeContext';
+import { useDarkMode } from '../../context/DarkModeContext';
 
 const SignInScreen = ({ navigation, setUser = () => {}, setLoading = () => {} }) => {
   const [email, setEmail] = useState("");
@@ -36,7 +36,7 @@ const SignInScreen = ({ navigation, setUser = () => {}, setLoading = () => {} })
   };
 
   const authSwitchToSignUp = () => {
-    navigation.navigate("SignUpScreen");
+    navigation.navigate("SignUp");
   };
 
   return (

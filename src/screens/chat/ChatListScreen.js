@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { ActivityIndicator, View, Text, FlatList, TouchableOpacity, StyleSheet, Modal, TouchableWithoutFeedback, Alert } from 'react-native';
-import { useDarkMode } from '../context/DarkModeContext';
-import { supabase } from '../services/supabase';
-import AuthService from '../services/auth';
-import Button from '../components/Button';
-import { styles as st} from '../styles/styles.js'; // Relativer Pfad
+import { useDarkMode } from '../../context/DarkModeContext.js';
+import { supabase } from '../../services/supabase.js';
+import AuthService from '../../services/auth.js';
+import Button from '../../components/Button.js';
+import { styles as st} from '../../styles/styles.js'; // Relativer Pfad
 import PropTypes from 'prop-types';
 import { useFocusEffect } from '@react-navigation/native';
 
@@ -129,13 +129,13 @@ export default function ChatListScreen({ navigation }) {
 
     fetchChats();
     setModalVisible(false);
-    navigation.navigate('ChatScreen', { chatId: newChat.chat_id, chatName: selectedUser.username });
+    navigation.navigate('Chat', { chatId: newChat.chat_id, chatName: selectedUser.username });
   };
 
   const renderChatItem = ({ item }) => (
     <TouchableOpacity
       style={styles.chatItem}
-      onPress={() => navigation.navigate('ChatScreen', { chatId: item.chat_id, chatName: item.chatPartnerUsername })}
+      onPress={() => navigation.navigate('Chat', { chatId: item.chat_id, chatName: item.chatPartnerUsername })}
     >
       <Text style={[styles.chatName, { color: isDarkMode ? '#FFF' : '#000' }]}>{item.chatPartnerUsername}</Text>
       <Text style={[styles.lastMessage, { color: isDarkMode ? '#AAA' : '#555' }]}>{item.latestMessage.content}</Text>

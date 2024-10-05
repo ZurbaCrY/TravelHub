@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, RefreshControl, FlatList, TextInput } from 'react-native';
-import { handleDownvote, handleUpvote, fetchPosts, getUpvoters, getDownvoters, fetchComments, addComment } from '../backend/community'; // Stelle sicher, dass addComment importiert wird
-import AuthService from '../services/auth';
-import { styles } from '../styles/styles';
+import { handleDownvote, handleUpvote, fetchPosts, getUpvoters, getDownvoters, fetchComments, addComment } from '../../backend/community'; // Stelle sicher, dass addComment importiert wird
+import AuthService from '../../services/auth';
+import { styles } from '../../styles/styles';
 
 export default function CommunityDetailScreen({ route, navigation }) {
   const { post } = route.params;
@@ -115,7 +115,7 @@ export default function CommunityDetailScreen({ route, navigation }) {
               {/* Upvotes Section */}
               <View style={styles.voteContainer}>
                 <TouchableOpacity onPress={() => handleUpvote(postData.id, user.id, loadPosts)}>
-                  <Image source={require('../assets/images/thumbs-up.png')} style={styles.icon} />
+                  <Image source={require('../../assets/images/thumbs-up.png')} style={styles.icon} />
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => setShowUpvoters(!showUpvoters)}>
                   <Text style={styles.voteCount}>{postData.upvotes} Upvotes</Text>
@@ -124,7 +124,7 @@ export default function CommunityDetailScreen({ route, navigation }) {
               {/* Downvotes Section */}
               <View style={styles.voteContainer}>
                 <TouchableOpacity onPress={() => handleDownvote(postData.id, user.id, loadPosts)}>
-                  <Image source={require('../assets/images/thumbs-down.png')} style={styles.icon} />
+                  <Image source={require('../../assets/images/thumbs-down.png')} style={styles.icon} />
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => setShowDownvoters(!showDownvoters)}>
                   <Text style={styles.voteCount}>{postData.downvotes} Downvotes</Text>
@@ -155,7 +155,7 @@ export default function CommunityDetailScreen({ route, navigation }) {
                 onChangeText={setNewComment}
               />
               <TouchableOpacity onPress={handleSubmitComment}>
-                <Image source={require('../assets/images/message_send.png')} style={{ width: 50, height: 50 }} />
+                <Image source={require('../../assets/images/message_send.png')} style={{ width: 50, height: 50 }} />
               </TouchableOpacity>
             </View>
             <FlatList

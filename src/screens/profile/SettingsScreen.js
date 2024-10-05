@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, Modal, Alert } from 'react-native';
-import { useDarkMode } from '../context/DarkModeContext';
-import Button from '../components/Button';
-import AuthService from '../services/auth';
-import AnimatedSwitch from '../components/AnimatedSwitch';
+import { useDarkMode } from '../../context/DarkModeContext';
+import Button from '../../components/Button';
+import AuthService from '../../services/auth';
+import AnimatedSwitch from '../../components/AnimatedSwitch';
 import PropTypes from 'prop-types';
-import { handleFilePicker, handleNewProfilePicture } from '../backend/community';
+import { handleFilePicker, handleNewProfilePicture } from '../../backend/community';
 
 const SettingsScreen = ({ setUser, setLoading }) => {
   const { isDarkMode, toggleDarkMode } = useDarkMode();
@@ -40,7 +40,7 @@ const SettingsScreen = ({ setUser, setLoading }) => {
       <View style={styles.setting}>
         <Text style={[styles.settingLabel, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>Profilbild wechseln </Text>
         <TouchableOpacity onPress={handleImageChange}>
-          <Image source={require('../assets/images/picture.png')} style={styles.uploadIcon} />
+          <Image source={require('../../assets/images/picture.png')} style={styles.uploadIcon} />
         </TouchableOpacity>
       </View>
 

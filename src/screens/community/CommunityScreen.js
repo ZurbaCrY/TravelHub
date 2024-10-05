@@ -1,14 +1,14 @@
 import 'react-native-url-polyfill/auto';
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, TextInput, Image, TouchableOpacity, Modal, TouchableWithoutFeedback } from 'react-native';
-import { useDarkMode } from '../context/DarkModeContext';
-import AuthService from '../services/auth';
-import { handleUpvote, handleDownvote, fetchPosts, createNewPost, handleFilePicker } from '../backend/community';
-import { styles } from '../styles/styles'; // Assuming styles are imported from a centralized styles file
-import CustomButton from '../components/CustomButton';
-import PublicProfileModal from '../components/PublicProfileModal';
-import friendService from '../services/friendService';
-import {getUserStats} from '../services/getUserStats';
+import { useDarkMode } from '../../context/DarkModeContext';
+import AuthService from '../../services/auth';
+import { handleUpvote, handleDownvote, fetchPosts, createNewPost, handleFilePicker } from '../../backend/community';
+import { styles } from '../../styles/styles'; // Assuming styles are imported from a centralized styles file
+import CustomButton from '../../components/CustomButton';
+import PublicProfileModal from '../../components/PublicProfileModal';
+import friendService from '../../services/friendService';
+import {getUserStats} from '../../services/getUserStats';
 
 
 export default function CommunityScreen({ navigation }) {
@@ -50,7 +50,7 @@ export default function CommunityScreen({ navigation }) {
   };
 
   const handlePostPress = (post) => {
-    navigation.navigate('CommunityDetailScreen', { post });
+    navigation.navigate('CommunityDetail', { post });
   };
 
   const handleUserPress = async (item) => {
@@ -99,11 +99,11 @@ export default function CommunityScreen({ navigation }) {
             </TouchableOpacity>
             <View style={styles.postFooter}>
               <TouchableOpacity onPress={() => handleUpvote(item.id, loadPosts)}>
-                <Image source={require('../assets/images/thumbs-up.png')} style={styles.icon} />
+                <Image source={require('../../assets/images/thumbs-up.png')} style={styles.icon} />
               </TouchableOpacity>
               <Text style={styles.upvoteText}>{item.upvotes}</Text>
               <TouchableOpacity onPress={() => handleDownvote(item.id, loadPosts)}>
-                <Image source={require('../assets/images/thumbs-down.png')} style={styles.icon} />
+                <Image source={require('../../assets/images/thumbs-down.png')} style={styles.icon} />
               </TouchableOpacity>
               <Text style={styles.downvoteText}>{item.downvotes}</Text>
             </View>
@@ -141,7 +141,7 @@ export default function CommunityScreen({ navigation }) {
                     setImageUrl(image);
                   }}
                 >
-                  <Image source={require('../assets/images/picture.png')} style={styles.uploadIcon} />
+                  <Image source={require('../../assets/images/picture.png')} style={styles.uploadIcon} />
                 </TouchableOpacity>
                 {imageUrl && <Image source={{ uri: imageUrl }} style={styles.previewImage} />}
                 <View style={styles.modalButtons}>

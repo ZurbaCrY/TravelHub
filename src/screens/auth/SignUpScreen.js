@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { View, TouchableOpacity } from 'react-native';
 import { Input, Text } from 'react-native-elements';
-import { styles } from '../styles/styles';
-import Button from '../components/Button';
-import AuthService from '../services/auth';
+import { styles } from '../../styles/styles';
+import Button from '../../components/Button';
+import AuthService from '../../services/auth';
 import PropTypes from 'prop-types';
-import { useDarkMode } from '../context/DarkModeContext';
+import { useDarkMode } from '../../context/DarkModeContext';
 
 const SignUpScreen = ({ navigation, setUser, setLoading }) => {
   const [username, setUsername] = useState('');
@@ -32,7 +32,7 @@ const SignUpScreen = ({ navigation, setUser, setLoading }) => {
   };
 
   const authSwitchToSignIn = () => {
-    navigation.navigate("SignInScreen");
+    navigation.navigate("SignIn");
   };
 
   return (

@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, Text } from 'react-native';
-import Button from '../components/Button';
+import Button from '../../components/Button';
 import { useNavigation } from '@react-navigation/native';
-import { styles } from '../styles/styles';
-import { useDarkMode } from '../context/DarkModeContext';
+import { styles } from '../../styles/styles';
+import { useDarkMode } from '../../context/DarkModeContext';
 
 export default function StartingScreen() {
   const navigation = useNavigation();
@@ -13,10 +13,10 @@ export default function StartingScreen() {
       <Text style={styles.title}>TravelHub</Text>
       <Text style={styles.subtitle}>Welcome to our App!</Text>
       <View style={styles.buttonView}>
-        <Button mode='contained' onPress={() => navigation.navigate('SignInScreen')}>
+        <Button mode='contained' onPress={() => navigation.navigate('SignIn')}>
           Sign In
         </Button>
-        <Button mode='contained' onPress={() => navigation.navigate('SignUpScreen')}>
+        <Button mode='contained' onPress={() => navigation.navigate('SignUp')}>
           Sign Up
         </Button>
       </View>
