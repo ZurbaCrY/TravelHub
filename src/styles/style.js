@@ -220,7 +220,7 @@ const newStyle = StyleSheet.create({
     userStatsContainer: {
         marginVertical: 20,
         alignItems: 'center',
-
+    },
     // Reaction Styles
     voteRow: {
         flexDirection: 'row',
@@ -242,10 +242,9 @@ const newStyle = StyleSheet.create({
         color: '#333',
     },
     icon: {
-        width: 24,
+        width:  24,
         height: 24,
     },
-
     iconBig: {
         width: 48,
         height: 48,
@@ -328,7 +327,6 @@ const newStyle = StyleSheet.create({
         fontWeight: 'bold',
         fontSize: 16,
         color: '#666',
-    },
     },
     //Profil
     infoSection: {
