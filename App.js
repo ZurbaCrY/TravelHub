@@ -98,7 +98,7 @@ export default function App() {
         setLoadingStatus(true)
         await AuthService.loadUser();
         const currentUser = await AuthService.getUser();
-        console.log(currentUser);
+        // console.log(currentUser);
         setUser(currentUser);
       } catch (error) {
         console.error('Error loading user:', error);
@@ -110,7 +110,7 @@ export default function App() {
     const initFriends = async () => {
       try {
         setLoadingStatus(true)
-        await FriendService.setup();
+        await FriendService.initialize();
       } catch (error) {
         console.error('Error loading friends: ', error)
       } finally {
@@ -125,7 +125,7 @@ export default function App() {
   // User state prints
   useEffect(() => {
     if (__DEV__) {
-      console.log('User state:', user);
+      // console.log('User state:', user);
     }
   }, [user]);
 

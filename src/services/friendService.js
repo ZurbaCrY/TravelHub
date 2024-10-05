@@ -19,10 +19,10 @@ class FriendService {
       }
     }
     this.friends = [];
-    this.setup();
+    this.initialize();
   }
 
-  async setup() {
+  async initialize() {
     if (this.initialized) return;
     this.initialized = true;
     try {

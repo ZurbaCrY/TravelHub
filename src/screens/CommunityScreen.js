@@ -8,7 +8,7 @@ import newStyle from '../styles/style'; // Verwende die korrekte CSS-Datei
 import CustomButton from '../components/CustomButton';
 import PublicProfileModal from '../components/PublicProfileModal';
 import friendService from '../services/friendService';
-import getUserStats from '../services/getUserStats';
+import {getUserStats} from '../services/getUserStats';
 
 export default function CommunityScreen({ navigation }) {
   const user = AuthService.getUser();
@@ -53,14 +53,14 @@ export default function CommunityScreen({ navigation }) {
   };
 
   const handleUserPress = async (item) => {
-    const stats = await getUserStats.getUserStats(item.user_id);
+    const stats = await getUserStats(user_id = item.user_id);
     const selectedUserData = {
       user_id: item.user_id,
       username: item.users.username,
       profilepicture_url: item.users.profilepicture_url,
       friendCount: stats.friendCount,
-      upvotes: stats.upvotes,
-      downvotes: stats.downvotes,
+      upvotes: stats.upvoteCount,
+      downvotes: stats.downvoteCount,
       postCount: stats.postCount
     };
     setSelectedUser(selectedUserData);

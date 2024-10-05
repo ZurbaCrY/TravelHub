@@ -50,7 +50,7 @@ export const handleSearchAutocompleteAPI = (selectedCoordinates, setSelectedPlac
     }, continentsData);
     setSearchResult(nearestCity);
   } else {
-    console.log("ERROR: City not found");
+    console.error("ERROR: City not found");
   }
 };
 

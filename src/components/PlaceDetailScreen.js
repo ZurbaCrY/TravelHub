@@ -23,7 +23,7 @@ const PlaceDetailModal = ({ visible, place, onClose }) => {
             <Image
               source={{ uri: place.link }}
               style={styles.placeImage}
-              onError={() => console.log("Image failed to load")}
+              onError={() => console.error("Image failed to load")}
             />
           ) : (
             <View style={styles.placeholderImage} />

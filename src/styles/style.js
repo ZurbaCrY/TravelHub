@@ -206,6 +206,20 @@ const newStyle = StyleSheet.create({
         fontSize: 16,
         color: '#333',
     },
+    paddingHorizontalSmall: {
+        paddingHorizontal: 8,
+    },
+    paddingHorizontalMedium: {
+        paddingHorizontal: 16,
+    },
+    marginRightExtraSmall: {
+        marginRight: 4,
+    },
+
+    // Specific Styles for User Stats
+    userStatsContainer: {
+        marginVertical: 20,
+        alignItems: 'center',
 
     // Reaction Styles
     voteRow: {
@@ -239,6 +253,13 @@ const newStyle = StyleSheet.create({
     // Comment Section Styles
     commentSection: {
         flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '100%',
+        marginBottom: 10,
+    },
+    userStatColumn: {
+        alignItems: 'center',
+        flex: 1,
         alignItems: 'center',
         borderTopWidth: 1,
         borderTopColor: '#ddd',
@@ -306,6 +327,8 @@ const newStyle = StyleSheet.create({
         color: '#fff',
         fontWeight: 'bold',
         fontSize: 16,
+        color: '#666',
+    },
     },
     //Profil
     infoSection: {

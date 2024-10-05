@@ -4,8 +4,19 @@ import * as SecureStore from "expo-secure-store";
 class AuthService {
   constructor(supabase) {
     this.supabase = supabase;
+    this.initialized = false;
     this.user = null;
-    this.loadUser();
+    this.initialize();
+  }
+
+  async initialize() {
+    if (this.initialized) return;
+    this.initialized = true;
+    try {
+      await this.loadUser();
+    } catch (error) {
+      console.error("Error in AuthService setup: ", error)
+    }
   }
 
   /* If you need to use User Information use this:
@@ -18,6 +29,9 @@ class AuthService {
   For more information contact Tom-N-M
   */
   getUser() {
+    if (!this.initialized) {
+      this.initialize()
+    }
     return this.user;
   }
 
