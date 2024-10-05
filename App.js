@@ -7,6 +7,7 @@ import "react-native-url-polyfill/auto";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
+import FriendService from "./src/services/friendService";
 
 import {
   MapScreen,
@@ -19,9 +20,11 @@ import {
   LoadingScreen,
   ChatScreen,
   ChatListScreen,
+  CommunityDetailScreen,
 } from './src/screens'
 import { DarkModeProvider } from "./src/context/DarkModeContext";
-import AuthService from "./src/services/auth"
+import AuthService from "./src/services/auth";
+import DevelopmentScreen from "./src/development/dev";
 
 const Tab = createBottomTabNavigator();
 const RootStack = createStackNavigator();
@@ -92,9 +95,10 @@ export default function App() {
   useEffect(() => {
     const initUser = async () => {
       try {
+        setLoadingStatus(true)
         await AuthService.loadUser();
         const currentUser = await AuthService.getUser();
-        console.log(currentUser);
+        // console.log(currentUser);
         setUser(currentUser);
       } catch (error) {
         console.error('Error loading user:', error);
@@ -102,13 +106,26 @@ export default function App() {
         setLoadingStatus(false);
       }
     };
+
+    const initFriends = async () => {
+      try {
+        setLoadingStatus(true)
+        await FriendService.initialize();
+      } catch (error) {
+        console.error('Error loading friends: ', error)
+      } finally {
+        setLoadingStatus(false)
+      }
+    };
+
     initUser();
+    initFriends();
   }, []);
 
   // User state prints
   useEffect(() => {
     if (__DEV__) {
-      console.log('User state:', user);
+      // console.log('User state:', user);
     }
   }, [user]);
 
@@ -133,9 +150,16 @@ export default function App() {
             />
             <RootStack.Screen name="Settings">
               {props => <SettingsScreen {...props} setUser={setUser} setLoading={setLoadingStatus} />}
-
+            </RootStack.Screen>
+            <RootStack.Screen name="Development">
+              {props => <DevelopmentScreen {...props} setUser={setUser} setLoading={setLoadingStatus} />}
             </RootStack.Screen>
             <RootStack.Screen name="ChatListScreen" component={ChatListScreen} />
+            <RootStack.Screen
+              name="CommunityDetailScreen"
+              component={CommunityDetailScreen}
+              options={{ title: 'Post' }}
+            />
             <RootStack.Screen name="ChatScreen" component={ChatScreen} />
           </RootStack.Navigator>
           <StatusBar style="auto" />

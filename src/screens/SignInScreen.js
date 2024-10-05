@@ -3,16 +3,17 @@ import {
   Alert,
   View,
   TouchableOpacity,
+  Text,  
 } from "react-native";
-import { Input, Text } from "react-native-elements";
-import { styles } from '../style/styles';
+import { Input } from "react-native-elements"; 
+import { styles } from '../styles/styles';
 import Button from "../components/Button";
-import AuthService from "../services/auth"
+import AuthService from "../services/auth";
 import AnimatedSwitch from "../components/AnimatedSwitch";
 import PropTypes from 'prop-types';
 import { useDarkMode } from '../context/DarkModeContext';
 
-const SignInScreen = ({ navigation, setUser, setLoading }) => {
+const SignInScreen = ({ navigation, setUser = () => {}, setLoading = () => {} }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
@@ -43,7 +44,7 @@ const SignInScreen = ({ navigation, setUser, setLoading }) => {
       <Text style={styles.title}>Login</Text>
       <TouchableOpacity style={styles.authSwitchTouchable} onPress={authSwitchToSignUp}>
         <Text style={styles.switchText}>
-          Dont have an account? Sign Up instead
+          Don't have an account? Sign Up instead
         </Text>
       </TouchableOpacity>
       <View style={styles.inputView}>
@@ -54,7 +55,7 @@ const SignInScreen = ({ navigation, setUser, setLoading }) => {
           value={email}
           placeholder="email@address.com"
           autoCapitalize={"none"}
-          containerStyle={styles.input}
+          containerStyle={styles.inputLogin}
         />
         <Input
           label="Password"
@@ -64,7 +65,7 @@ const SignInScreen = ({ navigation, setUser, setLoading }) => {
           secureTextEntry={true}
           placeholder="Password"
           autoCapitalize={"none"}
-          containerStyle={styles.input}
+          containerStyle={styles.inputLogin}
         />
       </View>
       <View style={styles.rememberView}>
@@ -72,7 +73,6 @@ const SignInScreen = ({ navigation, setUser, setLoading }) => {
           <AnimatedSwitch
             value={remember}
             onValueChange={setRemember}
-            // trackColor={{ true: "green", false: "gray" }}
           />
           <Text style={styles.rememberText}>Remember Me</Text>
         </View>
@@ -87,12 +87,12 @@ const SignInScreen = ({ navigation, setUser, setLoading }) => {
       </View>
     </View>
   );
-}
+};
 
 SignInScreen.propTypes = {
   navigation: PropTypes.object.isRequired,
   setUser: PropTypes.func.isRequired,
-  setLoading: PropTypes.func.isRequired
+  setLoading: PropTypes.func.isRequired,
 };
 
 export default SignInScreen;
