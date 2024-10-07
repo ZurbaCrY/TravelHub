@@ -87,7 +87,7 @@ export default function CommunityScreen({ navigation }) {
             <TouchableOpacity onPress={() => handleUserPress(item)}>
               <View style={newStyle.postHeader}>
                 <Image source={{ uri: item.users.profilepicture_url }} style={newStyle.commentProfileImage} />
-                <Text style={newStyle.boldTextLeft}>{item.users.username}</Text>
+                <Text style={newStyle.boldText}>{item.users.username}</Text>
               </View>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => handlePostPress(item)}>
@@ -148,7 +148,7 @@ export default function CommunityScreen({ navigation }) {
                 </TouchableOpacity>
                 {imageUrl && <Image source={{ uri: imageUrl }} style={newStyle.postImage} />}
                 <View style={newStyle.row}>
-                  <TouchableOpacity style={newStyle.smallButton} onPress={() => setNewPostModalVisible(false)}>
+                  <TouchableOpacity style={newStyle.smallRedButton} onPress={() => setNewPostModalVisible(false)}>
                     <Text style={newStyle.smallButtonText}>Cancel</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={newStyle.smallButton} onPress={handleCreateNewPost}>

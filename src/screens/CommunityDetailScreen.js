@@ -100,9 +100,9 @@ export default function CommunityDetailScreen({ route, navigation }) {
         }
         renderItem={() => (
           <>
-            <View style={newStyle.row}>
-              <Image source={{ uri: postData.users.profilepicture_url }} style={newStyle.profileImage} />
-              <Text style={newStyle.boldTextLeft}>{postData.users.username}</Text>
+            <View style={newStyle.containerRow}>
+              <Image source={{ uri: postData.users.profilepicture_url }} style={newStyle.smallProfileImage} />
+              <Text style={newStyle.boldTextBig}>{postData.users.username}</Text>
             </View>
             {postData.image_url && (
               <Image source={{ uri: postData.image_url }} style={newStyle.postImage} />

@@ -19,6 +19,12 @@ const newStyle = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: '#f8f8f8',
     },
+    containerRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: 10,
+        backgroundColor: '#f8f8f8',
+      },
     row: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -71,11 +77,12 @@ const newStyle = StyleSheet.create({
         marginRight: 8,
         textAlign: 'right',
     },
-    boldTextLeft: {
-        fontWeight: 'bold',
-    },
     boldText: {
         fontWeight: 'bold',
+    },
+    boldTextBig: {
+        fontWeight: 'bold',
+        fontSize: 18,
     },
     centerAlignedText: {
         textAlign: 'center',
@@ -126,6 +133,16 @@ const newStyle = StyleSheet.create({
     },
     smallButton: {
         backgroundColor: '#1e90ff',
+        paddingVertical: 8,
+        paddingHorizontal: 16,
+        borderRadius: 6,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginVertical: 5,
+        marginRight: 20,
+    },
+    smallRedButton: {
+        backgroundColor: '#FF5430',
         paddingVertical: 8,
         paddingHorizontal: 16,
         borderRadius: 6,
@@ -329,8 +346,6 @@ const newStyle = StyleSheet.create({
         alignItems: 'center',
         marginTop: 10,
         paddingVertical: 8,
-        borderTopWidth: 1,
-        borderTopColor: '#ddd',
     },
     voteContainer: {
         flexDirection: 'row',
@@ -341,6 +356,7 @@ const newStyle = StyleSheet.create({
         marginLeft: 5,
         fontSize: 16,
         color: '#333',
+        fontWeight: 'bold',
     },
     icon: {
         width: 24,
@@ -384,8 +400,8 @@ const newStyle = StyleSheet.create({
         fontSize: 14,
     },
     commentProfileImage: {
-        width: 40,
-        height: 40,
+        width: 30,
+        height: 30,
         borderRadius: 20,
         marginRight: 10,
     },
