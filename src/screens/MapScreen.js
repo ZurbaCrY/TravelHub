@@ -41,7 +41,7 @@ export default function MapScreen() {
   const [showBottomLine, setShowBottomLine] = useState(false);
   const [selectedPlace, setSelectedPlace] = useState(null);
   const scrollViewRef = useRef(null);
-  const [showList, setShowList] = useState(false);
+  const [showList, setShowList] = useState(true);
   const [forceUpdate, setForceUpdate] = useState(false);
   const [showPlaceDetailModal, setShowPlaceDetailModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -188,7 +188,7 @@ export default function MapScreen() {
       />
 
       {/* Symbol mit einem Plus oben links um "Ort-hinzufügen" Modul zu öffnen*/}
-      <TouchableOpacity style={[styles.addButton, showList && styles.disabledContainer]} onPress={handleOpenModal} >
+      <TouchableOpacity style={styles.addButton} onPress={handleOpenModal} >
         <MaterialIcons name="add" size={24} color="black" />
       </TouchableOpacity>
 
@@ -210,17 +210,6 @@ export default function MapScreen() {
         styles={styles}
       />
 
-      {/* Slide-Up Bar unten */}
-      <SlideUpBar
-          scrollViewRef={scrollViewRef}
-          styles={styles}
-          showBottomLine={showBottomLine}
-          searchResult={searchResult}
-          selectedPlace={selectedPlace}
-          handleMarkerPress={handleMarkerPress}
-          scrollToTop={scrollToTop}
-      />
-
       {/* Modal für die aufgeklappte Liste bzw. Slide-Up Bar */}
       <SlideUpList
         showList={showList}
@@ -233,7 +222,6 @@ export default function MapScreen() {
         selectedPlace={selectedPlace}
         setForceUpdate={setForceUpdate}
         forceUpdate={forceUpdate}
-        styles={styles}
         CURRENT_USER_ID={CURRENT_USER_ID}
       />
 
