@@ -4,6 +4,7 @@ import { useDarkMode } from '../context/DarkModeContext';
 import { supabase } from '../services/supabase';
 import AuthService from '../services/auth';
 import Button from '../components/Button';
+
 import styles from '../styles/style'; // Relativer Pfad zu den neuen Styles
 import PropTypes from 'prop-types';
 import { useFocusEffect } from '@react-navigation/native';

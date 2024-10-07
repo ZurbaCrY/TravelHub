@@ -334,7 +334,6 @@ const newStyle = StyleSheet.create({
         fontSize: 16,
         color: '#666',
     },
-
     // Post Styles
     postContainer: {
         backgroundColor: '#fff',
