@@ -17,6 +17,7 @@ import MapSearchBar from '../../components/MapSearchBar';
 import Map from '../../components/Map';
 import SlideUpBar from '../../components/SlideUpBar';
 import SlideUpList from '../../components/SlideUpList';
+import { useAuth } from '../../context/AuthContext';
 
 const { width } = Dimensions.get('window');
 
@@ -48,7 +49,8 @@ export default function MapScreen() {
   const [selectedCoordinates, setSelectedCoordinates] = useState(null);
   const [continentsData, setContinentsData] = useState([]);
 
-  const CURRENT_USER = AuthService.getUser();
+  const { user } = useAuth();
+  const CURRENT_USER = user;
   const CURRENT_USER_ID = CURRENT_USER.id;
 
   /**

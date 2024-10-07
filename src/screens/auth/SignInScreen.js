@@ -12,22 +12,23 @@ import AuthService from "../../services/auth";
 import AnimatedSwitch from "../../components/AnimatedSwitch";
 import PropTypes from 'prop-types';
 import { useDarkMode } from '../../context/DarkModeContext';
+import { useLoading } from "../../context/LoadingContext";
 
-const SignInScreen = ({ navigation, setUser = () => {}, setLoading = () => {} }) => {
+const SignInScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
+  const { showLoading, hideLoading } = useLoading();
 
   const handleSignIn = async () => {
     try {
-      setLoading(true, "Signing in");
+      showLoading(true, "Signing in");
       const user = await AuthService.signIn(email, password, remember);
-      setUser(user);
     } catch (error) {
       Alert.alert("Sign-In Error", "Unable to sign in. Please check your credentials and try again.");
       console.error('Sign-in error:', error);
     } finally {
-      setLoading(false);
+      hideLoading();
     }
   };
 
@@ -87,12 +88,6 @@ const SignInScreen = ({ navigation, setUser = () => {}, setLoading = () => {} })
       </View>
     </View>
   );
-};
-
-SignInScreen.propTypes = {
-  navigation: PropTypes.object.isRequired,
-  setUser: PropTypes.func.isRequired,
-  setLoading: PropTypes.func.isRequired,
 };
 
 export default SignInScreen;

@@ -4,9 +4,11 @@ import { useDarkMode } from '../../context/DarkModeContext.js';
 import { supabase } from '../../services/supabase.js';
 import AuthService from '../../services/auth.js';
 import Button from '../../components/Button.js';
-import { styles as st} from '../../styles/styles.js'; // Relativer Pfad
+import { styles as st } from '../../styles/styles.js'; // Relativer Pfad
 import PropTypes from 'prop-types';
 import { useFocusEffect } from '@react-navigation/native';
+import { useLoading } from '../../context/LoadingContext.js'
+import { useAuth } from '../../context/AuthContext.js';
 
 const fetchFromSupabase = async (table, select, filters = []) => {
   let query = supabase.from(table).select(select);
@@ -23,7 +25,8 @@ const fetchFromSupabase = async (table, select, filters = []) => {
 };
 
 export default function ChatListScreen({ navigation }) {
-  const CURRENT_USER = AuthService.getUser();
+  const { user } = useAuth();
+  const CURRENT_USER = user;
   const CURRENT_USER_ID = CURRENT_USER.id;
   const { isDarkMode } = useDarkMode();
   const [chats, setChats] = useState([]);
@@ -31,18 +34,19 @@ export default function ChatListScreen({ navigation }) {
   const [existingChatUserIds, setExistingChatUserIds] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const { loading, showLoading, hideLoading } = useLoading();
 
   useFocusEffect(
     React.useCallback(() => {
       const fetchChatsAndUsers = async () => {
         try {
+          showLoading("Fetching Chats");
           await fetchChats();
           await fetchUsers();
         } catch (error) {
           console.error('Error fetching chats and users:', error);
         } finally {
-          setLoading(false);
+          hideLoading();
         }
       };
       fetchChatsAndUsers();
@@ -155,51 +159,45 @@ export default function ChatListScreen({ navigation }) {
     </TouchableOpacity>
   );
 
-  if (loading) {
-    return (
-      <View style={st.container}>
-        <ActivityIndicator size="large" color="#3EAAE9" />
-        <Text>Loading Chats...</Text>
-      </View>
-    );
-  } else {
-    return (
-      <View style={[styles.container, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
-        <Button mode="contained" onPress={() => {
-          setSelectedUser(null); 
-          fetchUsers();
-          setModalVisible(true);
-        }}>
-          Neuen Chat erstellen
-        </Button>
-        <FlatList
-          data={chats}
-          keyExtractor={(item) => item.chat_id}
-          renderItem={renderChatItem}
-        />
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={() => setModalVisible(!modalVisible)}
-        >
-          <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
-            <View style={styles.modalOverlay} />
-          </TouchableWithoutFeedback>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Wähle einen Benutzer für den Chat</Text>
-            {users.length > 0 ? (
-              users.map(renderUserItem)
-            ) : (
-              <Text style={styles.noUsersText}>Keine neuen Benutzer verfügbar</Text>
-            )}
-            <Button onPress={createNewChat} disabled={!selectedUser}>Chat starten</Button>
-          </View>
-        </Modal>
-      </View>
-    );
-  }
+  if (loading) return null;
+
+  return (
+    <View style={[styles.container, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
+      <Button mode="contained" onPress={() => {
+        setSelectedUser(null);
+        fetchUsers();
+        setModalVisible(true);
+      }}>
+        Neuen Chat erstellen
+      </Button>
+      <FlatList
+        data={chats}
+        keyExtractor={(item) => item.chat_id}
+        renderItem={renderChatItem}
+      />
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(!modalVisible)}
+      >
+        <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
+          <View style={styles.modalOverlay} />
+        </TouchableWithoutFeedback>
+        <View style={styles.modalContent}>
+          <Text style={styles.modalTitle}>Wähle einen Benutzer für den Chat</Text>
+          {users.length > 0 ? (
+            users.map(renderUserItem)
+          ) : (
+            <Text style={styles.noUsersText}>Keine neuen Benutzer verfügbar</Text>
+          )}
+          <Button onPress={createNewChat} disabled={!selectedUser}>Chat starten</Button>
+        </View>
+      </Modal>
+    </View>
+  );
 }
+
 
 ChatListScreen.propTypes = {
   navigation: PropTypes.shape({

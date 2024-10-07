@@ -4,7 +4,7 @@ import { SignInScreen, SignUpScreen, StartingScreen } from '../screens/auth/';
 
 const AuthStack = createStackNavigator();
 
-export default function AuthStackNavigator({ setUser, setLoadingStatus }) {
+export default function AuthStackNavigator() {
   return (
     <AuthStack.Navigator initialRouteName="Welcome">
       <AuthStack.Screen
@@ -13,10 +13,10 @@ export default function AuthStackNavigator({ setUser, setLoadingStatus }) {
         options={{ headerShown: false }}
       />
       <AuthStack.Screen name="SignIn" options={{ headerShown: false }}>
-        {props => <SignInScreen {...props} setUser={setUser} setLoading={setLoadingStatus} />}
+        {props => <SignInScreen />}
       </AuthStack.Screen>
       <AuthStack.Screen name="SignUp" options={{ headerShown: false }}>
-        {props => <SignUpScreen {...props} setUser={setUser} setLoading={setLoadingStatus} />}
+        {props => <SignUpScreen />}
       </AuthStack.Screen>
     </AuthStack.Navigator>
   );

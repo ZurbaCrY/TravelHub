@@ -9,10 +9,11 @@ import CustomButton from '../../components/CustomButton';
 import PublicProfileModal from '../../components/PublicProfileModal';
 import friendService from '../../services/friendService';
 import {getUserStats} from '../../services/getUserStats';
+import { useAuth } from '../../context/AuthContext';
 
 
 export default function CommunityScreen({ navigation }) {
-  const user = AuthService.getUser();
+  const {user } = useAuth();
   const user_username = user.user_metadata.username;
   const { isDarkMode } = useDarkMode();
   const [posts, setPosts] = useState([]);

@@ -6,9 +6,11 @@ import { supabase } from '../../services/supabase.js';
 import AuthService from '../../services/auth.js';
 import PropTypes from 'prop-types';
 import { styles } from '../../styles/styles.js'; // Relativer Pfad
+import { useAuth } from '../../context/AuthContext.js';
 
 export default function ChatScreen({ route, navigation }) {
-  const CURRENT_USER = AuthService.getUser();
+  const {user} = useAuth();
+  const CURRENT_USER = user;
   const CURRENT_USER_ID = CURRENT_USER.id;
   const { chatId, chatName } = route.params;
   const [messages, setMessages] = useState([]);

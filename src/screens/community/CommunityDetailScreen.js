@@ -3,10 +3,11 @@ import { View, Text, Image, StyleSheet, TouchableOpacity, RefreshControl, FlatLi
 import { handleDownvote, handleUpvote, fetchPosts, getUpvoters, getDownvoters, fetchComments, addComment } from '../../backend/community'; // Stelle sicher, dass addComment importiert wird
 import AuthService from '../../services/auth';
 import { styles } from '../../styles/styles';
+import { useAuth } from '../../context/AuthContext';
 
 export default function CommunityDetailScreen({ route, navigation }) {
   const { post } = route.params;
-  const user = AuthService.getUser();
+  const {user} = useAuth();
   const [refreshing, setRefreshing] = useState(false);
   const [postData, setPostData] = useState(post);
   const [upvoters, setUpvoters] = useState([]);

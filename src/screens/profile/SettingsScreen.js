@@ -6,23 +6,24 @@ import AuthService from '../../services/auth';
 import AnimatedSwitch from '../../components/AnimatedSwitch';
 import PropTypes from 'prop-types';
 import { handleFilePicker, handleNewProfilePicture } from '../../backend/community';
+import { useLoading } from '../../context/LoadingContext';
 
-const SettingsScreen = ({ setUser, setLoading }) => {
+const SettingsScreen = () => {
   const { isDarkMode, toggleDarkMode } = useDarkMode();
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [imageUrl, setImageUrl] = useState(null); 
   const [modalVisible, setModalVisible] = useState(false); 
+  const { showLoading, hideLoading } = useLoading();
 
   const handleSignOut = async () => {
     try {
-      setLoading(true, "Signing Out");
+      showLoading("Signing Out");
       const user = await AuthService.signOut();
-      setUser(user);
     } catch (error) {
       Alert.alert("Fehler", "Beim Abmelden ist ein Fehler aufgetreten.");
       console.error('Sign-out error:', error);
     } finally {
-      setLoading(false);
+      hideLoading();
     }
   };
 
@@ -99,11 +100,6 @@ const SettingsScreen = ({ setUser, setLoading }) => {
       </Modal>
     </View>
   );
-};
-
-SettingsScreen.propTypes = {
-  setUser: PropTypes.func.isRequired,
-  setLoading: PropTypes.func.isRequired,
 };
 
 const styles = StyleSheet.create({

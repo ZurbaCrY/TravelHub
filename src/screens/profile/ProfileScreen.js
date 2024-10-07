@@ -33,6 +33,8 @@ import {
 import friendService from '../../services/friendService';
 import getUsernamesByUserIds from '../../services/getUsernamesByUserIds'
 import { getUserStats } from '../../services/getUserStats';
+import { useAuth } from '../../context/AuthContext';
+import { useLoading } from '../../context/LoadingContext';
 
 export default function ProfileScreen() {
   const { isDarkMode } = useDarkMode();
@@ -43,43 +45,34 @@ export default function ProfileScreen() {
   const [showVisitedInput, setShowVisitedInput] = useState(false);
   const [showWishListInput, setShowWishListInput] = useState(false);
   const [profilePictureUrl, setProfilePictureUrl] = useState(null);
-  const [user, setUser] = useState({ id: null, user_metadata: {}, email: '' });
   const [travelBuddiesModalVisible, setTravelBuddiesModalVisible] = useState(false);
   const [travelBuddies, setTravelBuddies] = useState([]);
   const [postCount, setPostCount] = useState(0);
-  const [upvoteCount, setUpvoteCount] = useState(0); 
-  const [downvoteCount, setDownvoteCount] = useState(0); 
-
+  const [upvoteCount, setUpvoteCount] = useState(0);
+  const [downvoteCount, setDownvoteCount] = useState(0);
+  const { user } = useAuth();
+  const { showLoading, hideLoading } = useLoading();
 
   const navigation = useNavigation();
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const fetchedUser = await AuthService.getUser();
-        setUser(fetchedUser);
-      } catch (error) {
-        console.error("Error fetching User:", error);
-      }
-    };
-
-    fetchUser();
-  }, []);
 
   useEffect(() => {
     if (!user || !user.id) return; // Exit if user is not yet defined or has no id
 
     const fetchProfilePictureUrl = async () => {
       try {
+        showLoading("Fetching Profile Picture");
         const url = await getProfilePictureUrlByUserId(user.id);
         setProfilePictureUrl(url);
       } catch (error) {
         console.error("Error fetching Profile Picture URL:", error);
+      } finally {
+        hideLoading();
       }
     };
 
     const fetchProfileData = async () => {
       try {
+        showLoading("Fetching User Stats");
         const visitedCountriesData = await fetchVisitedCountries(user.id);
         setVisitedCountries(visitedCountriesData);
 
@@ -99,6 +92,8 @@ export default function ProfileScreen() {
         setDownvoteCount(stats.downvoteCount);
       } catch (error) {
         console.error('Error fetching profile data:', error);
+      } finally {
+        hideLoading();
       }
     };
 
@@ -224,10 +219,10 @@ export default function ProfileScreen() {
           {/* Row 1: Friends and Posts */}
           <View style={newStyle.userStatsRow}>
             <View style={newStyle.userStatColumn}>
-            <TouchableOpacity onPress={() => setTravelBuddiesModalVisible(true)} style={[{ justifyContent: 'center', alignItems: 'center' }]}>
-              <Text style={newStyle.userStatLabel}>Travel-Buddies</Text>
-              <Text style={newStyle.userStatValue}>{travelBuddies.length != null ? travelBuddies.length : 'N/A'}</Text>
-            </TouchableOpacity>
+              <TouchableOpacity onPress={() => setTravelBuddiesModalVisible(true)} style={[{ justifyContent: 'center', alignItems: 'center' }]}>
+                <Text style={newStyle.userStatLabel}>Travel-Buddies</Text>
+                <Text style={newStyle.userStatValue}>{travelBuddies.length != null ? travelBuddies.length : 'N/A'}</Text>
+              </TouchableOpacity>
             </View>
             <View style={newStyle.userStatColumn}>
               <Text style={newStyle.userStatLabel}>Posts</Text>
