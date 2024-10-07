@@ -215,7 +215,7 @@ export default function ChatScreen({ route, navigation }) {
         <View style={newStyle.modalBackground}>
           <View style={newStyle.modalContent}>
             <Text style={newStyle.modalTitleText}>Bearbeiten oder Löschen</Text>
-            <TouchableOpacity style={newStyle.primaryButton} onPress={deleteMessage}>
+            <TouchableOpacity style={newStyle.primaryRedButton} onPress={deleteMessage}>
               <Text style={newStyle.primaryButtonText}>Nachricht löschen</Text>
             </TouchableOpacity>
             <TouchableOpacity style={newStyle.primaryButton} onPress={() => openEditModal(selectedMessage)}>

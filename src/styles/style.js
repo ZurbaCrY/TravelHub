@@ -122,6 +122,15 @@ const newStyle = StyleSheet.create({
         width: '100%',
         marginBottom: 8,
     },
+    primaryRedButton: {
+        backgroundColor: '#FF5430',
+        borderRadius: 10,
+        paddingVertical: 15,
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '100%',
+        marginBottom: 8,
+    },
     primaryButtonText: {
         color: '#fff',
         fontWeight: 'bold',
