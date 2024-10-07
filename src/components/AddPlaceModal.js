@@ -11,6 +11,7 @@ import { haversineDistance, deg2rad } from '../services/MapMathematics';
 import { findNearestCity } from '../backend/MapLocationChangeFunctions';
 import { fetchData } from '../backend/LoadEditMapData'
 import { MaterialIcons } from '@expo/vector-icons';
+import Alert from './Alert';
 
 const AddPlaceModal = ({ visible, onClose, setContinentsData, userID, continentsData }) => {
   const [placeName, setPlaceName] = useState('');
@@ -21,6 +22,17 @@ const AddPlaceModal = ({ visible, onClose, setContinentsData, userID, continents
   const [showMap, setShowMap] = useState(false);
   let cityId;
 
+    const [alertVisible, setAlertVisible] = useState(false);
+    const [message, setMessage] = useState('');
+
+    const showAlert = () => {
+      setAlertVisible(true);
+    };
+
+    const hideAlert = () => {
+      setAlertVisible(false);
+    };
+
   const data = [
     { label: 'Sehenswürdigkeit', value: 'Sehenswürdigkeit' },
     { label: 'Restaurant', value: 'Restaurant' },
@@ -30,7 +42,8 @@ const AddPlaceModal = ({ visible, onClose, setContinentsData, userID, continents
 
   const handleAddPlace = () => {
     if (!placeName || !placeDescription || !placeType || !coordinates) {
-      alert('Bitte füllen Sie alle erforderlichen Felder aus.');
+      setMessage('Bitte füllen Sie alle erforderlichen Felder aus.');
+      showAlert();
       return;
     }
     addPlace(placeName,
@@ -76,9 +89,10 @@ const AddPlaceModal = ({ visible, onClose, setContinentsData, userID, continents
       }
       
       console.log('Place added');
-      alert("Attraktion hinzugefügt!");
+      setMessage("Attraktion hinzugefügt!");
+      showAlert();
       fetchData(setContinentsData, userID);
-      onClose();
+      //onClose();
     } catch (error) {
       console.error('Error adding place:', error.message);
     }
@@ -159,6 +173,11 @@ const AddPlaceModal = ({ visible, onClose, setContinentsData, userID, continents
           </TouchableOpacity>
         </View>
       </View>
+            <Alert
+              visible={alertVisible}
+              onClose={hideAlert}
+              message={message}
+            />
     </Modal>
   );
 };
