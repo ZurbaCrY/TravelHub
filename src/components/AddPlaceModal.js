@@ -5,9 +5,11 @@ import MapView, { Marker } from 'react-native-maps';
 import { customMapStyle } from '../styles/customMapStyle';
 import { supabase } from '../services/supabase';
 import PropTypes from 'prop-types';
-import { styles } from '../styles/styles.js'; // Relativer Pfad
+import { styles } from '../styles/styles.js';
 import { useDarkMode } from '../context/DarkModeContext';
 import { haversineDistance, deg2rad } from '../services/MapMathematics';
+import { findNearestCity } from '../backend/MapLocationChangeFunctions';
+import { MaterialIcons } from '@expo/vector-icons';
 
 const AddPlaceModal = ({ visible, onClose, continentsData }) => {
   const [placeName, setPlaceName] = useState('');
@@ -52,12 +54,12 @@ const AddPlaceModal = ({ visible, onClose, continentsData }) => {
     latitude,
     longitude) => {
     try {
-      cityId = findNearestCityId({
+      cityId = findNearestCity({
         latitude: latitude,
         longitude: longitude,
         latitudeDelta: 1,
         longitudeDelta: 1,
-      }, continentsData);
+      }, continentsData).cityId;
       const { data, error } = await supabase
         .from('Attraction')
         .insert([{
@@ -84,29 +86,6 @@ const AddPlaceModal = ({ visible, onClose, continentsData }) => {
     setShowMap(false);
   };
 
-  const findNearestCityId = (region, continentsData) => {
-    let nearestCityId = null;
-    let minDistance = Infinity;
-
-    continentsData.forEach(continent => {
-      continent.countries.forEach(country => {
-        country.cities.forEach(city => {
-          const distance = haversineDistance(region.latitude,
-            region.longitude,
-            city.coordinates[0].latitude,
-            city.coordinates[0].longitude);
-
-          if (distance < minDistance) {
-            minDistance = distance;
-            nearestCityId = city.cityId;
-          }
-        });
-      });
-    });
-
-    return nearestCityId;
-  };
-
   return (
     <Modal
       animationType="slide"
@@ -116,6 +95,9 @@ const AddPlaceModal = ({ visible, onClose, continentsData }) => {
     >
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
+              <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+                <MaterialIcons name="close" size={24} color="black" />
+              </TouchableOpacity>
           <Text style={styles.modalTitle}>Ort hinzufügen</Text>
           <TextInput
             style={styles.input}
@@ -172,9 +154,6 @@ const AddPlaceModal = ({ visible, onClose, continentsData }) => {
           {/* Additional conditions for other place types could go here */}
           <TouchableOpacity onPress={handleAddPlace} style={styles.addButton}>
             <Text style={styles.buttonText}>Ort hinzufügen</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-            <Text style={styles.buttonText}>Abbrechen</Text>
           </TouchableOpacity>
         </View>
       </View>
