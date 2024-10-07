@@ -32,6 +32,12 @@ const newStyle = StyleSheet.create({
         color: '#333',
         marginBottom: 8,
     },
+    titleTextBlue: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: "#3EAAE9",
+        marginBottom: 8,
+    },
     subtitleText: {
         fontSize: 18,
         fontWeight: '600',
@@ -63,6 +69,10 @@ const newStyle = StyleSheet.create({
     centerAlignedText: {
         textAlign: 'center',
     },
+    blueText: {
+        fontSize: 13,
+        color: "#3EAAE9",
+      },
     selectedUserItem: {
         backgroundColor: '#007BFF',
     },
@@ -82,6 +92,9 @@ const newStyle = StyleSheet.create({
         elevation: 0,
         shadowOpacity: 0,
     },
+    buttonView: {
+        width: "80%",
+      },
     primaryButton: {
         backgroundColor: '#3498DB',
         borderRadius: 10,
@@ -409,6 +422,37 @@ const newStyle = StyleSheet.create({
         fontSize: 16,
         marginVertical: 2,
     },
+    // View
+    inputView: {
+        width: "80%",
+        marginBottom: 20,
+        backgroundColor: '#f8f8f8'
+      },
+    rememberView: {
+        width: "80%",
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginBottom: 20,
+      },
+    inputLogin: {
+        marginBottom: 15,
+        backgroundLight: '#f8f8f8',
+        color: '#070A0F',
+        padding: 10,
+        marginVertical: 10,
+        borderRadius: 5,
+        fontSize: 16,
+      },
+    switch: {
+        flexDirection: "row",
+        alignItems: "center",
+      },
+      authSwitchTouchable: {
+        alignItems: "center",
+        marginBottom: 20,
+        backgroundColor: '#f8f8f8',
+      },
 });
 
 export default newStyle;
