@@ -51,7 +51,7 @@ export default function CommunityScreen({ navigation }) {
   const handleDeletePost = async (postId) => {
     try {
       await deletePost(postId);
-      loadPosts(); // Refresh posts after deletion
+      loadPosts(); 
     } catch (error) {
       console.error('Error deleting post: ', error);
     }
