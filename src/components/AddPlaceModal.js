@@ -9,9 +9,10 @@ import { styles } from '../styles/styles.js';
 import { useDarkMode } from '../context/DarkModeContext';
 import { haversineDistance, deg2rad } from '../services/MapMathematics';
 import { findNearestCity } from '../backend/MapLocationChangeFunctions';
+import { fetchData } from '../backend/LoadEditMapData'
 import { MaterialIcons } from '@expo/vector-icons';
 
-const AddPlaceModal = ({ visible, onClose, continentsData }) => {
+const AddPlaceModal = ({ visible, onClose, setContinentsData, userID, continentsData }) => {
   const [placeName, setPlaceName] = useState('');
   const [placeDescription, setPlaceDescription] = useState('');
   const [placeType, setPlaceType] = useState('');
@@ -76,6 +77,7 @@ const AddPlaceModal = ({ visible, onClose, continentsData }) => {
       
       console.log('Place added');
       alert("Attraktion hinzugefügt!");
+      fetchData(setContinentsData, userID);
       onClose();
     } catch (error) {
       console.error('Error adding place:', error.message);

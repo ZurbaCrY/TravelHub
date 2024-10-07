@@ -66,7 +66,7 @@ export default function MapScreen() {
   useEffect(() => {
       if (scrollViewRef.current && selectedPlace) {
         const index = searchResult.places.findIndex(place => place === selectedPlace);
-        const offsetX = index * 120; // Breite des Platzhalters plus Abstand
+        const offsetX = index * 120;
 
         scrollViewRef.current.scrollTo({ x: offsetX, y: 0, animated: true });
       }
@@ -248,7 +248,8 @@ export default function MapScreen() {
       <AddPlaceModal
         visible={showAddModal}
         onClose={() => setShowAddModal(false)}
-        onFetchData={fetchData}
+        setContinentsData={setContinentsData}
+        userID={CURRENT_USER_ID}
         continentsData={continentsData}
       />
 
