@@ -5,13 +5,18 @@ import { styles } from '../../styles/styles';
 import Button from '../../components/Button';
 import AuthService from '../../services/auth';
 import PropTypes from 'prop-types';
+import { useNavigation } from '@react-navigation/core';
 import { useDarkMode } from '../../context/DarkModeContext';
+import { useLoading } from '../../context/LoadingContext';
 
-const SignUpScreen = ({ navigation, setUser, setLoading }) => {
+const SignUpScreen = () => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const { showLoading, hideLoading } = useLoading();
+
+  const navigation = useNavigation();
 
   const handleSignUp = async () => {
     if (password !== confirmPassword) {
@@ -20,14 +25,13 @@ const SignUpScreen = ({ navigation, setUser, setLoading }) => {
     }
 
     try {
-      setLoading(true, "Signing Up");
+      showLoading("Signing Up...");
       const user = await AuthService.signUp(username, email, password, confirmPassword);
-      setUser(user);
     } catch (error) {
       Alert.alert("Sign-Up Error", "An error occurred during sign-up. Please try again.");
       console.error(error);
     } finally {
-      setLoading(false);
+      hideLoading();
     }
   };
 
@@ -93,9 +97,9 @@ const SignUpScreen = ({ navigation, setUser, setLoading }) => {
 }
 
 SignUpScreen.propTypes = {
-  navigation: PropTypes.object.isRequired,
-  setUser: PropTypes.func.isRequired,
-  setLoading: PropTypes.func.isRequired
+  navigation: PropTypes.shape({
+    navigate: PropTypes.func.isRequired,
+  }).isRequired,
 };
 
 export default SignUpScreen;

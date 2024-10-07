@@ -3,14 +3,15 @@ import {
   Alert,
   View,
   TouchableOpacity,
-  Text,  
+  Text,
 } from "react-native";
-import { Input } from "react-native-elements"; 
+import { Input } from "react-native-elements";
 import { styles } from '../../styles/styles';
 import Button from "../../components/Button";
 import AuthService from "../../services/auth";
 import AnimatedSwitch from "../../components/AnimatedSwitch";
 import PropTypes from 'prop-types';
+import { useNavigation, useNavigationBuilder } from "@react-navigation/core";
 import { useDarkMode } from '../../context/DarkModeContext';
 import { useLoading } from "../../context/LoadingContext";
 
@@ -19,6 +20,8 @@ const SignInScreen = ({ navigation }) => {
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
   const { showLoading, hideLoading } = useLoading();
+
+  navigation = useNavigation();
 
   const handleSignIn = async () => {
     try {
