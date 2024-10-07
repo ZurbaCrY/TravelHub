@@ -144,14 +144,14 @@ export default function CommunityScreen({ navigation }) {
                     setImageUrl(image);
                   }}
                 >
-                  <Image source={require('../assets/images/picture.png')} style={newStyle.iconBig} />
+                  <Image source={require('../assets/images/picture.png')} style={newStyle.iconBigCenter} />
                 </TouchableOpacity>
                 {imageUrl && <Image source={{ uri: imageUrl }} style={newStyle.postImage} />}
                 <View style={newStyle.row}>
-                  <TouchableOpacity style={newStyle.smallRedButton} onPress={() => setNewPostModalVisible(false)}>
+                  <TouchableOpacity style={newStyle.averageRedButton} onPress={() => setNewPostModalVisible(false)}>
                     <Text style={newStyle.smallButtonText}>Cancel</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={newStyle.smallButton} onPress={handleCreateNewPost}>
+                  <TouchableOpacity style={newStyle.averageBlueButton} onPress={handleCreateNewPost}>
                     <Text style={newStyle.smallButtonText}>Post</Text>
                   </TouchableOpacity>
                 </View>

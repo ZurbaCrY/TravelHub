@@ -151,6 +151,28 @@ const newStyle = StyleSheet.create({
         marginVertical: 5,
         marginRight: 20,
     },
+    averageBlueButton: {
+        backgroundColor: '#3498DB',
+        paddingVertical: 8,
+        paddingHorizontal: 16,
+        borderRadius: 6,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginVertical: 5,
+        marginRight: 20,
+        width: '48%',
+    },
+    averageRedButton: {
+        backgroundColor: '#FF5430',
+        paddingVertical: 8,
+        paddingHorizontal: 16,
+        borderRadius: 6,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginVertical: 5,
+        marginRight: 20,
+        width: '48%',
+    },
     smallButtonText: {
         color: 'white',
         fontSize: 14,
@@ -180,12 +202,6 @@ const newStyle = StyleSheet.create({
         backgroundColor: 'white',
         borderRadius: 15,
         padding: 20,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.25,
-        shadowRadius: 4,
-        elevation: 5,
-        alignItems: 'center',
     },
     modalTitleText: {
         fontSize: 20,
@@ -202,7 +218,7 @@ const newStyle = StyleSheet.create({
         shadowOpacity: 0.25,
         shadowRadius: 4,
         elevation: 5,
-        alignItems: 'center',
+        alignItems: 'left',
     },
     closeButtonX: {
         position: 'absolute',
@@ -365,6 +381,11 @@ const newStyle = StyleSheet.create({
     iconBig: {
         width: 48,
         height: 48,
+    },
+    iconBigCenter: {
+        width: 48,
+        height: 48,
+        alignItems: 'center',
     },
 
     // Comment Section Styles
