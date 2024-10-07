@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, RefreshControl, FlatList, TextInput } from 'react-native';
-import { handleDownvote, handleUpvote, fetchPosts, getUpvoters, getDownvoters, fetchComments, addComment } from '../backend/community'; // Stelle sicher, dass addComment importiert wird
+import { handleDownvote, handleUpvote, fetchPosts, getUpvoters, getDownvoters, fetchComments, addComment } from '../backend/community'; 
 import AuthService from '../services/auth';
 import { styles } from '../styles/styles';
 
