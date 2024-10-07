@@ -5,6 +5,7 @@ import Button from '../components/Button';
 import AuthService from '../services/auth';
 import AnimatedSwitch from '../components/AnimatedSwitch';
 import PropTypes from 'prop-types';
+import styles from '../styles/style';
 import { handleFilePicker, handleNewProfilePicture } from '../backend/community';
 
 const SettingsScreen = ({ setUser, setLoading }) => {
@@ -35,25 +36,25 @@ const SettingsScreen = ({ setUser, setLoading }) => {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
-      <Text style={[styles.header, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>Einstellungen</Text>
-      <View style={styles.setting}>
-        <Text style={[styles.settingLabel, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>Profilbild wechseln </Text>
+    <View style={[styles.containerNoMarginTop, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
+      <Text style={[styles.titleText, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>Einstellungen</Text>
+      <View style={styles.rowMarginBottom}>
+        <Text style={[styles.bodyTextBig, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>Profilbild wechseln </Text>
         <TouchableOpacity onPress={handleImageChange}>
-          <Image source={require('../assets/images/picture.png')} style={styles.uploadIcon} />
+          <Image source={require('../assets/images/picture.png')} style={styles.iconBig} />
         </TouchableOpacity>
       </View>
 
-      <View style={styles.setting}>
-        <Text style={[styles.settingLabel, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>Darkmode</Text>
+      <View style={styles.rowMarginBottom}>
+        <Text style={[styles.bodyTextBig, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>Darkmode</Text>
         <AnimatedSwitch
           onValueChange={toggleDarkMode}
           value={isDarkMode}
         />
       </View>
 
-      <View style={styles.setting}>
-        <Text style={[styles.settingLabel, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>Benachrichtigungen</Text>
+      <View style={styles.rowMarginBottom}>
+        <Text style={[styles.bodyTextBig, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>Benachrichtigungen</Text>
         <AnimatedSwitch
           onValueChange={() => setNotificationsEnabled(previousState => !previousState)}
           value={notificationsEnabled}
@@ -106,7 +107,7 @@ SettingsScreen.propTypes = {
   setLoading: PropTypes.func.isRequired,
 };
 
-const styles = StyleSheet.create({
+/* const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
@@ -150,6 +151,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 15,
   },
-});
+}); */
 
 export default SettingsScreen;

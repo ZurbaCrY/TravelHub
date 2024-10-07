@@ -24,6 +24,12 @@ const newStyle = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
     },
+    rowMarginBottom: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginBottom: 20,
+    },
 
     // Text Styles
     titleText: {
@@ -46,6 +52,11 @@ const newStyle = StyleSheet.create({
     },
     bodyText: {
         fontSize: 16,
+        color: '#333',
+        marginBottom: 2
+    },
+    bodyTextBig: {
+        fontSize: 18,
         color: '#333',
         marginBottom: 2
     },
