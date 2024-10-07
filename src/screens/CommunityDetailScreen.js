@@ -53,6 +53,8 @@ export default function CommunityDetailScreen({ route, navigation }) {
       if (updatedPost) {
         setPostData(updatedPost);
       }
+      const commentsData = await fetchComments(post.id); 
+      setComments(commentsData);
     } catch (error) {
       console.error('Error fetching posts: ', error);
     } finally {
