@@ -98,11 +98,11 @@ export default function CommunityScreen({ navigation }) {
               <Text style={styles.postText}>{item.content}</Text>
             </TouchableOpacity>
             <View style={styles.postFooter}>
-              <TouchableOpacity onPress={() => handleUpvote(item.id, loadPosts)}>
+            <TouchableOpacity onPress={() => handleUpvote(item.id, user.id, () => loadPosts())}>
                 <Image source={require('../assets/images/thumbs-up.png')} style={styles.icon} />
               </TouchableOpacity>
               <Text style={styles.upvoteText}>{item.upvotes}</Text>
-              <TouchableOpacity onPress={() => handleDownvote(item.id, loadPosts)}>
+              <TouchableOpacity onPress={() => handleDownvote(item.id, user.id, () => loadPosts())}>
                 <Image source={require('../assets/images/thumbs-down.png')} style={styles.icon} />
               </TouchableOpacity>
               <Text style={styles.downvoteText}>{item.downvotes}</Text>
