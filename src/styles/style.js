@@ -6,6 +6,12 @@ const newStyle = StyleSheet.create({
         flex: 1,
         padding: 8,
         backgroundColor: '#f8f8f8',
+        marginTop: 35,
+    },
+    containerNoMarginTop: {
+        flex: 1,
+        padding: 8,
+        backgroundColor: '#f8f8f8',
     },
     centeredContainer: {
         flex: 1,
@@ -13,10 +19,22 @@ const newStyle = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: '#f8f8f8',
     },
+    containerRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: 10,
+        backgroundColor: '#f8f8f8',
+      },
     row: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
+    },
+    rowMarginBottom: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginBottom: 20,
     },
 
     // Text Styles
@@ -24,6 +42,12 @@ const newStyle = StyleSheet.create({
         fontSize: 24,
         fontWeight: 'bold',
         color: '#333',
+        marginBottom: 8,
+    },
+    titleTextBlue: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: "#3EAAE9",
         marginBottom: 8,
     },
     subtitleText: {
@@ -37,15 +61,38 @@ const newStyle = StyleSheet.create({
         color: '#333',
         marginBottom: 2
     },
+    bodyTextBig: {
+        fontSize: 18,
+        color: '#333',
+        marginBottom: 2
+    },
     smallBodyText: {
         fontSize: 12,
         color: '#888',
     },
+    boldMiniText: {
+        fontSize: 10,
+        color: '#ffffff',
+        marginTop: 2,
+        marginRight: 8,
+        textAlign: 'right',
+    },
     boldText: {
         fontWeight: 'bold',
     },
+    boldTextBig: {
+        fontWeight: 'bold',
+        fontSize: 18,
+    },
     centerAlignedText: {
         textAlign: 'center',
+    },
+    blueText: {
+        fontSize: 13,
+        color: "#3EAAE9",
+      },
+    selectedUserItem: {
+        backgroundColor: '#007BFF',
     },
 
     // Button Styles
@@ -63,6 +110,9 @@ const newStyle = StyleSheet.create({
         elevation: 0,
         shadowOpacity: 0,
     },
+    buttonView: {
+        width: "80%",
+      },
     primaryButton: {
         backgroundColor: '#3498DB',
         borderRadius: 10,
@@ -70,6 +120,16 @@ const newStyle = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         width: '100%',
+        marginBottom: 8,
+    },
+    primaryRedButton: {
+        backgroundColor: '#FF5430',
+        borderRadius: 10,
+        paddingVertical: 15,
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '100%',
+        marginBottom: 8,
     },
     primaryButtonText: {
         color: '#fff',
@@ -80,7 +140,6 @@ const newStyle = StyleSheet.create({
     disabledButton: {
         backgroundColor: '#b0c4de',
     },
-
     smallButton: {
         backgroundColor: '#1e90ff',
         paddingVertical: 8,
@@ -89,6 +148,39 @@ const newStyle = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         marginVertical: 5,
+        marginRight: 20,
+    },
+    smallRedButton: {
+        backgroundColor: '#FF5430',
+        paddingVertical: 8,
+        paddingHorizontal: 16,
+        borderRadius: 6,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginVertical: 5,
+        marginRight: 20,
+    },
+    averageBlueButton: {
+        backgroundColor: '#3498DB',
+        paddingVertical: 8,
+        paddingHorizontal: 16,
+        borderRadius: 6,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginVertical: 5,
+        marginRight: 20,
+        width: '48%',
+    },
+    averageRedButton: {
+        backgroundColor: '#FF5430',
+        paddingVertical: 8,
+        paddingHorizontal: 16,
+        borderRadius: 6,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginVertical: 5,
+        marginRight: 20,
+        width: '48%',
     },
     smallButtonText: {
         color: 'white',
@@ -119,17 +211,23 @@ const newStyle = StyleSheet.create({
         backgroundColor: 'white',
         borderRadius: 15,
         padding: 20,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.25,
-        shadowRadius: 4,
-        elevation: 5,
-        alignItems: 'center',
     },
     modalTitleText: {
         fontSize: 20,
         fontWeight: 'bold',
         marginBottom: 10,
+    },
+    modalContentWidth: {
+        width: '100%',
+        backgroundColor: 'white',
+        borderRadius: 15,
+        padding: 20,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
+        alignItems: 'left',
     },
     closeButtonX: {
         position: 'absolute',
@@ -223,6 +321,10 @@ const newStyle = StyleSheet.create({
     userStatColumn: {
         alignItems: 'center',
         flex: 1,
+        borderTopWidth: 1,
+        borderTopColor: '#ddd',
+        paddingTop: 10,
+        marginTop: 10,
     },
     userStatLabel: {
         fontWeight: '600',
@@ -232,6 +334,181 @@ const newStyle = StyleSheet.create({
         fontSize: 16,
         color: '#666',
     },
+    // Post Styles
+    postContainer: {
+        backgroundColor: '#fff',
+        padding: 15,
+        borderBottomWidth: 1,
+        borderBottomColor: '#ddd',
+        marginBottom: 10,
+    },
+    postHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 10,
+    },
+    header: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginLeft: 10,
+    },
+    postImage: {
+        width: '100%',
+        height: 300,
+        borderRadius: 10,
+        marginBottom: 10,
+    },
+    postText: {
+        fontSize: 16,
+        color: '#333',
+    },
+
+    // Reaction Styles
+    voteRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        alignItems: 'center',
+        marginTop: 10,
+        paddingVertical: 8,
+    },
+    voteContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    voteCount: {
+        marginLeft: 5,
+        fontSize: 16,
+        color: '#333',
+        fontWeight: 'bold',
+    },
+    icon: {
+        width: 24,
+        height: 24,
+    },
+    iconBig: {
+        width: 48,
+        height: 48,
+    },
+    iconBigCenter: {
+        width: 48,
+        height: 48,
+        alignItems: 'center',
+    },
+
+    // Comment Section Styles
+    commentSection: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '100%',
+        marginBottom: 10,
+    },
+    commentInput: {
+        flex: 1,
+        borderWidth: 1,
+        borderColor: '#ddd',
+        borderRadius: 25,
+        paddingHorizontal: 10,
+        height: 40,
+        marginRight: 10,
+    },
+    commentItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: '#ddd',
+    },
+    commentText: {
+        fontSize: 14,
+        marginLeft: 10,
+        color: '#333',
+    },
+    commentUsername: {
+        fontWeight: 'bold',
+        fontSize: 14,
+    },
+    commentProfileImage: {
+        width: 30,
+        height: 30,
+        borderRadius: 20,
+        marginRight: 10,
+    },
+
+    // Profile Modal Styles
+    profileModalContainer: {
+        alignItems: 'center',
+        backgroundColor: '#fff',
+        padding: 20,
+        borderRadius: 10,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
+        margin: 20,
+    },
+    profileModalText: {
+        fontSize: 16,
+        color: '#333',
+        marginVertical: 5,
+    },
+    profileModalButton: {
+        backgroundColor: '#3498DB',
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 8,
+        marginTop: 15,
+    },
+    profileModalButtonText: {
+        color: '#fff',
+        fontWeight: 'bold',
+        fontSize: 16,
+    },
+
+    // Info Section Styles (for profile)
+    infoSection: {
+        backgroundColor: '#3EAAE9',
+        marginHorizontal: 10,
+        padding: 10,
+        borderRadius: 10,
+        marginTop: 10,
+    },
+    details: {
+        fontSize: 16,
+        marginVertical: 2,
+    },
+    // View
+    inputView: {
+        width: "80%",
+        marginBottom: 20,
+        backgroundColor: '#f8f8f8'
+      },
+    rememberView: {
+        width: "80%",
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginBottom: 20,
+      },
+    inputLogin: {
+        marginBottom: 15,
+        backgroundLight: '#f8f8f8',
+        color: '#070A0F',
+        padding: 10,
+        marginVertical: 10,
+        borderRadius: 5,
+        fontSize: 16,
+      },
+    switch: {
+        flexDirection: "row",
+        alignItems: "center",
+      },
+      authSwitchTouchable: {
+        alignItems: "center",
+        marginBottom: 20,
+        backgroundColor: '#f8f8f8',
+      },
 });
 
 export default newStyle;

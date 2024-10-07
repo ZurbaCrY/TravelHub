@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { ActivityIndicator, View, Text, FlatList, TouchableOpacity, StyleSheet, Modal, TouchableWithoutFeedback, Alert } from 'react-native';
+import { ActivityIndicator, View, Text, FlatList, TouchableOpacity, Modal, TouchableWithoutFeedback, Alert } from 'react-native';
 import { useDarkMode } from '../context/DarkModeContext';
 import { supabase } from '../services/supabase';
 import AuthService from '../services/auth';
 import Button from '../components/Button';
-import { styles as st} from '../styles/styles.js'; 
+
+import styles from '../styles/style'; // Relativer Pfad zu den neuen Styles
 import PropTypes from 'prop-types';
 import { useFocusEffect } from '@react-navigation/native';
 
@@ -134,11 +135,11 @@ export default function ChatListScreen({ navigation }) {
 
   const renderChatItem = ({ item }) => (
     <TouchableOpacity
-      style={styles.chatItem}
+      style={styles.postContainer}
       onPress={() => navigation.navigate('ChatScreen', { chatId: item.chat_id, chatName: item.chatPartnerUsername })}
     >
-      <Text style={[styles.chatName, { color: isDarkMode ? '#FFF' : '#000' }]}>{item.chatPartnerUsername}</Text>
-      <Text style={[styles.lastMessage, { color: isDarkMode ? '#AAA' : '#555' }]}>{item.latestMessage.content}</Text>
+      <Text style={[styles.titleText, { color: isDarkMode ? '#FFF' : '#000' }]}>{item.chatPartnerUsername}</Text>
+      <Text style={[styles.smallBodyText, { color: isDarkMode ? '#AAA' : '#555' }]}>{item.latestMessage.content}</Text>
     </TouchableOpacity>
   );
 
@@ -146,18 +147,18 @@ export default function ChatListScreen({ navigation }) {
     <TouchableOpacity
       key={user.user_id}
       style={[
-        styles.userItem,
+        styles.postContainer,
         selectedUser && selectedUser.user_id === user.user_id && styles.selectedUserItem
       ]}
       onPress={() => setSelectedUser(user)}
     >
-      <Text style={styles.userName}>{user.username}</Text>
+      <Text style={selectedUser && selectedUser.user_id === user.user_id ? styles.selectedText : styles.bodyText}>{user.username}</Text>
     </TouchableOpacity>
   );
 
   if (loading) {
     return (
-      <View style={st.container}>
+      <View style={styles.centeredContainer}>
         <ActivityIndicator size="large" color="#3EAAE9" />
         <Text>Loading Chats...</Text>
       </View>
@@ -174,7 +175,7 @@ export default function ChatListScreen({ navigation }) {
         </Button>
         <FlatList
           data={chats}
-          keyExtractor={(item) => item.chat_id}
+          keyExtractor={(item) => item.chat_id.toString()}
           renderItem={renderChatItem}
         />
         <Modal
@@ -184,14 +185,14 @@ export default function ChatListScreen({ navigation }) {
           onRequestClose={() => setModalVisible(!modalVisible)}
         >
           <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
-            <View style={styles.modalOverlay} />
+            <View style={styles.modalBackground} />
           </TouchableWithoutFeedback>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Wähle einen Benutzer für den Chat</Text>
+          <View style={styles.modalContentWidth}>
+            <Text style={styles.modalTitleText}>Wähle einen Benutzer für den Chat</Text>
             {users.length > 0 ? (
               users.map(renderUserItem)
             ) : (
-              <Text style={styles.noUsersText}>Keine neuen Benutzer verfügbar</Text>
+              <Text style={styles.bodyText}>Keine neuen Benutzer verfügbar</Text>
             )}
             <Button onPress={createNewChat} disabled={!selectedUser}>Chat starten</Button>
           </View>
@@ -206,59 +207,3 @@ ChatListScreen.propTypes = {
     navigate: PropTypes.func.isRequired,
   }).isRequired,
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    marginTop: 20,
-  },
-  chatItem: {
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-  },
-  chatName: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  lastMessage: {
-    fontSize: 14,
-    marginTop: 5,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalContent: {
-    backgroundColor: '#FFF',
-    padding: 20,
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  userItem: {
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-  },
-  selectedUserItem: {
-    backgroundColor: '#007BFF',
-  },
-  userName: {
-    fontSize: 16,
-  },
-  noUsersText: {
-    textAlign: 'center',
-    marginTop: 20,
-    fontSize: 16,
-    color: '#999',
-  },
-});

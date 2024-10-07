@@ -6,7 +6,7 @@ import {
   Text,  
 } from "react-native";
 import { Input } from "react-native-elements"; 
-import { styles } from '../styles/styles';
+import styles from '../styles/style';
 import Button from "../components/Button";
 import AuthService from "../services/auth";
 import AnimatedSwitch from "../components/AnimatedSwitch";
@@ -40,15 +40,16 @@ const SignInScreen = ({ navigation, setUser = () => {}, setLoading = () => {} })
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Login</Text>
-      <TouchableOpacity style={styles.authSwitchTouchable} onPress={authSwitchToSignUp}>
-        <Text style={styles.switchText}>
+    <View style={styles.centeredContainer}>
+      <Text style={styles.titleTextBlue}>Login</Text>
+      <TouchableOpacity onPress={authSwitchToSignUp}>
+        <Text style={styles.blueText}>
           Don't have an account? Sign Up instead
         </Text>
       </TouchableOpacity>
       <View style={styles.inputView}>
         <Input
+          style={styles.container}
           label="Email"
           leftIcon={{ type: "font-awesome", name: "envelope" }}
           onChangeText={setEmail}
@@ -58,6 +59,7 @@ const SignInScreen = ({ navigation, setUser = () => {}, setLoading = () => {} })
           containerStyle={styles.inputLogin}
         />
         <Input
+          style={styles.container}
           label="Password"
           leftIcon={{ type: "font-awesome", name: "lock" }}
           onChangeText={setPassword}
@@ -74,10 +76,10 @@ const SignInScreen = ({ navigation, setUser = () => {}, setLoading = () => {} })
             value={remember}
             onValueChange={setRemember}
           />
-          <Text style={styles.rememberText}>Remember Me</Text>
+          <Text style={styles.smallBodyText}>Remember Me</Text>
         </View>
         <TouchableOpacity onPress={handleForgetPasswordPress}>
-          <Text style={styles.forgetText}>Forgot password?</Text>
+          <Text style={styles.blueText}>Forgot password?</Text>
         </TouchableOpacity>
       </View>
       <View style={styles.buttonView}>
