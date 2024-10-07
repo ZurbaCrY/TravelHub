@@ -1,5 +1,6 @@
 import { supabase } from '../services/supabase';
 import { Continent, Country, City, Place } from './MapClasses'; // Passe den Pfad zu deinen Klassen an
+import { findNearestCity } from './MapLocationChangeFunctions';
 
 /**
 * Funktionen zum Favorisieren der Orte.
@@ -154,4 +155,47 @@ export const getNameForPlace = (place, selectedPlace) => {
   } else {
     return null;
   }
+};
+
+/**
+ * Funktion, die einen Ort zur DB hinzufügt.
+ */
+export const addPlaceToDB = async (placeData, continentsData) => {
+  try {
+    const cityId = findNearestCity({
+      latitude: placeData.latitude,
+      longitude: placeData.longitude,
+      latitudeDelta: 1,
+      longitudeDelta: 1,
+    }, continentsData).cityId;
+
+    const { data, error } = await supabase
+      .from('Attraction')
+      .insert([{
+        Attraction_Name: placeData.name,
+        City_ID: cityId,
+        Type_of_Attraction: placeData.type,
+        Description: placeData.description,
+        Latitude: placeData.latitude,
+        Longitude: placeData.longitude
+      }]);
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    return { success: true };
+  } catch (error) {
+    return { success: false, message: error.message };
+  }
+};
+
+/**
+ * Validiert, ob alle notwendigen Daten vorhanden sind, um einen Ort zur DB hinzuzufügen.
+ */
+export const validatePlaceData = (placeName, placeDescription, placeType, coordinates) => {
+  if (!placeName || !placeDescription || !placeType || !coordinates) {
+    return { valid: false, message: 'Bitte füllen Sie alle erforderlichen Felder aus.' };
+  }
+  return { valid: true };
 };

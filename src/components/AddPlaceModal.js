@@ -7,31 +7,19 @@ import { supabase } from '../services/supabase';
 import PropTypes from 'prop-types';
 import { styles } from '../styles/styles.js';
 import { useDarkMode } from '../context/DarkModeContext';
-import { haversineDistance, deg2rad } from '../services/MapMathematics';
-import { findNearestCity } from '../backend/MapLocationChangeFunctions';
 import { fetchData } from '../backend/LoadEditMapData'
 import { MaterialIcons } from '@expo/vector-icons';
 import Alert from './Alert';
+import { addPlaceToDB, validatePlaceData } from '../backend/LoadEditPlaceData';
 
 const AddPlaceModal = ({ visible, onClose, setContinentsData, userID, continentsData }) => {
-  const [placeName, setPlaceName] = useState('');
-  const [placeDescription, setPlaceDescription] = useState('');
-  const [placeType, setPlaceType] = useState('');
-  const [entranceFee, setEntranceFee] = useState('');
-  const [coordinates, setCoordinates] = useState(null);
-  const [showMap, setShowMap] = useState(false);
-  let cityId;
-
-    const [alertVisible, setAlertVisible] = useState(false);
-    const [message, setMessage] = useState('');
-
-    const showAlert = () => {
-      setAlertVisible(true);
-    };
-
-    const hideAlert = () => {
-      setAlertVisible(false);
-    };
+  const [place, setPlace] = useState({
+    name: '',
+    description: '',
+    type: '',
+    entranceFee: '',
+    coordinates: null,
+  });
 
   const data = [
     { label: 'Sehenswürdigkeit', value: 'Sehenswürdigkeit' },
@@ -40,61 +28,47 @@ const AddPlaceModal = ({ visible, onClose, setContinentsData, userID, continents
     { label: 'Aussichtspunkt', value: 'Aussichtspunkt' },
   ];
 
-  const handleAddPlace = () => {
-    if (!placeName || !placeDescription || !placeType || !coordinates) {
-      setMessage('Bitte füllen Sie alle erforderlichen Felder aus.');
-      showAlert();
-      return;
-    }
-    addPlace(placeName,
-      placeType,
-      placeDescription,
-      coordinates.latitude,
-      coordinates.longitude);
-    resetForm();
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [message, setMessage] = useState('');
+  const [showMap, setShowMap] = useState(false);
+
+  const showAlert = (message) => {
+    setMessage(message);
+    setAlertVisible(true);
   };
 
   const resetForm = () => {
-    setPlaceType('');
-    setCoordinates(null);
-    setPlaceDescription('');
-    setPlaceName('');
+    setPlace({
+      name: '',
+      description: '',
+      type: '',
+      entranceFee: '',
+      coordinates: null,
+    });
   };
 
-  const addPlace = async (
-    attractionName,
-    typeOfAttraction,
-    description,
-    latitude,
-    longitude) => {
-    try {
-      cityId = findNearestCity({
-        latitude: latitude,
-        longitude: longitude,
-        latitudeDelta: 1,
-        longitudeDelta: 1,
-      }, continentsData).cityId;
-      const { data, error } = await supabase
-        .from('Attraction')
-        .insert([{
-          Attraction_Name: attractionName,
-          City_ID: cityId,
-          Type_of_Attraction: typeOfAttraction,
-          Description: description,
-          Latitude: latitude,
-          Longitude: longitude
-        }]);
-      if (error) {
-        throw new Error(error.message);
-      }
-      
-      console.log('Place added');
-      setMessage("Attraktion hinzugefügt!");
-      showAlert();
+  const handleAddPlace = async () => {
+    const validation = validatePlaceData(place.name, place.description, place.type, place.coordinates);
+    if (!validation.valid) {
+      showAlert(validation.message);
+      return;
+    }
+
+    const placeData = {
+      name: place.name,
+      type: place.type,
+      description: place.description,
+      latitude: place.coordinates.latitude,
+      longitude: place.coordinates.longitude,
+    };
+
+    const result = await addPlaceToDB(placeData, continentsData);
+    if (result.success) {
+      showAlert("Attraktion hinzugefügt!");
       fetchData(setContinentsData, userID);
-      //onClose();
-    } catch (error) {
-      console.error('Error adding place:', error.message);
+      resetForm();
+    } else {
+      console.error('Error adding place:', result.message);
     }
   };
 
@@ -111,43 +85,44 @@ const AddPlaceModal = ({ visible, onClose, setContinentsData, userID, continents
     >
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
-              <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-                <MaterialIcons name="close" size={24} color="black" />
-              </TouchableOpacity>
+          <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+            <MaterialIcons name="close" size={24} color="black" />
+          </TouchableOpacity>
           <Text style={styles.modalTitle}>Ort hinzufügen</Text>
           <TextInput
             style={styles.input}
             placeholder="Name des Ortes"
-            onChangeText={setPlaceName}
-            value={placeName}
+            onChangeText={(text) => setPlace({ ...place, name: text })}
+            value={place.name}
           />
           <TextInput
             style={styles.input}
             placeholder="Beschreibung des Ortes"
-            onChangeText={setPlaceDescription}
-            value={placeDescription}
+            onChangeText={(text) => setPlace({ ...place, description: text })}
+            value={place.description}
           />
-          <TouchableOpacity onPress={() => setShowMap(true)} style={[styles.locationButton, coordinates ? styles.locationButtonSelected : null]}>
-            <Text style={styles.locationInput}>{coordinates ? 'Standort ausgewählt' : 'Standort wählen'}</Text>
+          <TouchableOpacity onPress={() => setShowMap(true)} style={[styles.locationButton, place.coordinates ? styles.locationButtonSelected : null]}>
+            <Text style={styles.locationInput}>{place.coordinates ? 'Standort ausgewählt' : 'Standort wählen'}</Text>
           </TouchableOpacity>
 
           {showMap && (
             <View style={styles.mapContainer}>
               <MapView
                 style={styles.map}
-                onPress={(event) => setCoordinates(event.nativeEvent.coordinate)}
+                onPress={(event) => setPlace({ ...place, coordinates: event.nativeEvent.coordinate })}
                 customMapStyle={customMapStyle}
                 rotateEnabled={false}
                 showsCompass={false}
                 showsUserLocation={true}
               >
-                {coordinates && <Marker coordinate={coordinates} />}
+                {place.coordinates && <Marker coordinate={place.coordinates} />}
               </MapView>
               <TouchableOpacity onPress={handleConfirmLocation} style={styles.confirmButton}>
                 <Text style={styles.buttonText}>OK</Text>
               </TouchableOpacity>
             </View>
           )}
+
           <View style={styles.dropdownContainer}>
             <Dropdown
               style={styles.dropdown}
@@ -155,38 +130,31 @@ const AddPlaceModal = ({ visible, onClose, setContinentsData, userID, continents
               labelField="label"
               valueField="value"
               placeholder="Typ des Ortes"
-              value={placeType}
-              onChange={item => setPlaceType(item.value)}
+              value={place.type}
+              onChange={item => setPlace({ ...place, type: item.value })}
             />
           </View>
-          {placeType === 'Sehenswürdigkeit' && (
+          {place.type === 'Sehenswürdigkeit' && (
             <TextInput
               style={styles.input}
               placeholder="Eintrittsgebühr"
-              onChangeText={setEntranceFee}
-              value={entranceFee}
+              onChangeText={(text) => setPlace({ ...place, entranceFee: text })}
+              value={place.entranceFee}
             />
           )}
-          {/* Additional conditions for other place types could go here */}
           <TouchableOpacity onPress={handleAddPlace} style={styles.addButton}>
             <Text style={styles.buttonText}>Ort hinzufügen</Text>
           </TouchableOpacity>
         </View>
       </View>
-            <Alert
-              visible={alertVisible}
-              onClose={hideAlert}
-              message={message}
-            />
+
+      <Alert
+        visible={alertVisible}
+        onClose={() => setAlertVisible(false)}
+        message={message}
+      />
     </Modal>
   );
 };
-
-AddPlaceModal.propTypes = {
-  visible: PropTypes.bool.isRequired,
-  onClose: PropTypes.func.isRequired,
-  continentsData: PropTypes.array.isRequired
-};
-
 
 export default AddPlaceModal;
