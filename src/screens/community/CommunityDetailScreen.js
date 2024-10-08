@@ -152,15 +152,15 @@ export default function CommunityDetailScreen({ route, navigation }) {
               {/* <TouchableOpacity onPress={() => handleUserPress(postData.users)}> */}
               <TouchableOpacity onPress={() => console.log("test")}>
                 <View style={newStyle.postHeader}>
-                  <Image source={{ uri: postData.users.profilepicture_url }} style={newStyle.smallProfileImage} />
-                  <Text style={newStyle.boldTextBig}>{postData.users.username}</Text>
+                  <Image source={{ uri: postData.users.profilepicture_url }} style={newStyle.mediumProfileImage} />
+                  <Text style={newStyle.boldText}>{postData.users.username}</Text>
                 </View>
               </TouchableOpacity>
 
               {/* Delete Button if the post belongs to the logged-in user */}
               {postData.users.username === user.user_metadata.username && (
-                <TouchableOpacity onPress={() => confirmDeletePost(postData.id)}>
-                  <Image source={require('../../assets/images/trash.png')} />
+                <TouchableOpacity style={newStyle.deleteButton} onPress={() => confirmDeletePost(postData.id)}>
+                  <Image source={require('../../assets/images/trash.png')} style={newStyle.icon} />
                 </TouchableOpacity>
               )}
             </View>

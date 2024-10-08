@@ -110,9 +110,15 @@ const newStyle = StyleSheet.create({
         elevation: 0,
         shadowOpacity: 0,
     },
+    deleteButton: {
+        position: 'absolute',
+        top: 10,
+        right: 10,
+        zIndex: 1,
+    },
     buttonView: {
         width: "80%",
-      },
+    },
     primaryButton: {
         backgroundColor: '#3498DB',
         borderRadius: 10,
@@ -253,6 +259,14 @@ const newStyle = StyleSheet.create({
         width: 140,
         height: 140,
         borderRadius: 70,
+        borderColor: '#3EAAE9',
+        borderWidth: 3,
+        marginBottom: 16,
+    },
+    mediumProfileImage: {
+        width: 40,
+        height: 40,
+        borderRadius: 30,
         borderColor: '#3EAAE9',
         borderWidth: 3,
         marginBottom: 16,
