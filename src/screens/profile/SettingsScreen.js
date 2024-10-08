@@ -7,6 +7,7 @@ import AnimatedSwitch from '../../components/AnimatedSwitch';
 import styles from '../../styles/style';
 import { handleFilePicker, handleNewProfilePicture } from '../../backend/community';
 import { useLoading } from '../../context/LoadingContext';
+import CustomButton from '../../components/CustomButton';
 
 const SettingsScreen = () => {
   const { isDarkMode, toggleDarkMode } = useDarkMode();
@@ -62,9 +63,10 @@ const SettingsScreen = () => {
       </View>
 
       <View>
-        <Button mode="contained" onPress={handleSignOut}>
-          Sign out
-        </Button>
+        <CustomButton 
+        title={"Sign Out"} 
+        onPress={handleSignOut}
+        />
       </View>
 
       {/* Modal für die Bildvorschau */}
