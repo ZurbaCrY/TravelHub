@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Image, TouchableOpacity, RefreshControl, FlatList, TextInput, Alert } from 'react-native';
-import { handleDownvote, handleUpvote, fetchPosts, getUpvoters, getDownvoters, fetchComments, addComment, deletePost } from '../../backend/community'; 
+import { handleDownvote, handleUpvote, fetchPosts, getUpvoters, getDownvoters, fetchComments, addComment, deletePost } from '../../backend/community';
 import newStyle from '../../styles/style'; // Verwende die neue CSS-Datei
 import { useAuth } from '../../context/AuthContext';
+import PublicProfileModal from '../../components/PublicProfileModal';
 
 export default function CommunityDetailScreen({ route, navigation }) {
   const { post } = route.params;
-  const {user} = useAuth();
+  const { user } = useAuth();
   const [refreshing, setRefreshing] = useState(false);
   const [postData, setPostData] = useState(post);
   const [upvoters, setUpvoters] = useState([]);
@@ -15,6 +16,7 @@ export default function CommunityDetailScreen({ route, navigation }) {
   const [showDownvoters, setShowDownvoters] = useState(false);
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
+  const [userProfileModal, setUserProfileModal] = useState(false);
 
   useEffect(() => {
     const fetchVoters = async () => {
@@ -53,7 +55,7 @@ export default function CommunityDetailScreen({ route, navigation }) {
       if (updatedPost) {
         setPostData(updatedPost);
       }
-      const commentsData = await fetchComments(post.id); 
+      const commentsData = await fetchComments(post.id);
       setComments(commentsData);
     } catch (error) {
       console.error('Error fetching posts: ', error);
@@ -113,6 +115,28 @@ export default function CommunityDetailScreen({ route, navigation }) {
     />
   );
 
+  const handleUserPress = async (item) => {
+    try {
+      setLoading(true);
+      const stats = await getUserStats(user_id = item.user_id);
+      const selectedUserData = {
+        user_id: item.user_id,
+        username: item.users.username,
+        profilepicture_url: item.users.profilepicture_url,
+        friendCount: stats.friendCount,
+        upvotes: stats.upvoteCount,
+        downvotes: stats.downvoteCount,
+        postCount: stats.postCount
+      };
+      setSelectedUser(selectedUserData);
+      setUserProfileModal(true);
+    } catch (error) {
+      console.error('Error fetching user stats:', error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <View style={newStyle.containerNoMarginTop}>
       <FlatList
@@ -124,13 +148,19 @@ export default function CommunityDetailScreen({ route, navigation }) {
         renderItem={() => (
           <>
             <View style={newStyle.containerRow}>
-              <Image source={{ uri: postData.users.profilepicture_url }} style={newStyle.smallProfileImage} />
-              <Text style={newStyle.boldTextBig}>{postData.users.username}</Text>
+              {/* Username and Profilepicture */}
+              {/* <TouchableOpacity onPress={() => handleUserPress(postData.users)}> */}
+              <TouchableOpacity onPress={() => console.log("test")}>
+                <View style={newStyle.postHeader}>
+                  <Image source={{ uri: postData.users.profilepicture_url }} style={newStyle.smallProfileImage} />
+                  <Text style={newStyle.boldTextBig}>{postData.users.username}</Text>
+                </View>
+              </TouchableOpacity>
 
               {/* Delete Button if the post belongs to the logged-in user */}
               {postData.users.username === user.user_metadata.username && (
-                <TouchableOpacity style={custom.deleteButton} onPress={() => confirmDeletePost(postData.id)}>
-                  <Image source={require('../../assets/images/trash.png')} style={styles.icon} />
+                <TouchableOpacity onPress={() => confirmDeletePost(postData.id)}>
+                  <Image source={require('../../assets/images/trash.png')} />
                 </TouchableOpacity>
               )}
             </View>
@@ -195,6 +225,15 @@ export default function CommunityDetailScreen({ route, navigation }) {
             />
           </>
         )}
+      />
+      <PublicProfileModal
+        isVisible={userProfileModal}
+        onClose={() => setUserProfileModal(false)}
+        user={selectedUser}
+        onFriendRequestPress={handleFriendRequestPress}
+        isLoading={loading}
+        friendListVisible={friendListVisible}
+        setFriendListVisible={setFriendListVisible}
       />
     </View>
   );

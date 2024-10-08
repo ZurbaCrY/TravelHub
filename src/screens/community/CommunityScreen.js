@@ -7,11 +7,11 @@ import newStyle from '../../styles/style'; // Verwende die korrekte CSS-Datei
 import CustomButton from '../../components/CustomButton';
 import PublicProfileModal from '../../components/PublicProfileModal';
 import friendService from '../../services/friendService';
-import {getUserStats} from '../../services/getUserStats';
+import { getUserStats } from '../../services/getUserStats';
 import { useAuth } from '../../context/AuthContext';
 
 export default function CommunityScreen({ navigation }) {
-  const {user } = useAuth();
+  const { user } = useAuth();
   const user_username = user.user_metadata.username;
   const { isDarkMode } = useDarkMode();
   const [posts, setPosts] = useState([]);
@@ -51,7 +51,7 @@ export default function CommunityScreen({ navigation }) {
   const handleDeletePost = async (postId) => {
     try {
       await deletePost(postId);
-      loadPosts(); 
+      loadPosts();
     } catch (error) {
       console.error('Error deleting post: ', error);
     }
@@ -127,7 +127,7 @@ export default function CommunityScreen({ navigation }) {
             </TouchableOpacity>
             <View style={newStyle.voteRow}>
               <View style={newStyle.voteContainer}>
-                  <TouchableOpacity onPress={() => handleUpvote(item.id, loadPosts)}>
+                <TouchableOpacity onPress={() => handleUpvote(item.id, loadPosts)}>
                   <Image source={require('../../assets/images/thumbs-up.png')} style={newStyle.icon} />
                 </TouchableOpacity>
                 <Text style={newStyle.voteCount}>{item.upvotes}</Text>
