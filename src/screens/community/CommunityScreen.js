@@ -107,15 +107,15 @@ export default function CommunityScreen({ navigation }) {
           <View style={newStyle.postContainer}>
             <TouchableOpacity onPress={() => handleUserPress(item)}>
               <View style={newStyle.postHeader}>
-                <Image source={{ uri: item.users.profilepicture_url }} style={newStyle.commentProfileImage} />
-                <Text style={newStyle.boldText}>{item.users.username}</Text>
+                <Image source={{ uri: item.users.profilepicture_url }} style={newStyle.smallProfileImage} />
+                <Text style={newStyle.boldTextBig}>{item.users.username}</Text>
               </View>
             </TouchableOpacity>
 
             {/* Delete Button in Top Right */}
             {item.users.username === user_username && (
-              <TouchableOpacity onPress={() => confirmDeletePost(item.id)}>
-                <Image source={require('../../assets/images/trash.png')} />
+              <TouchableOpacity onPress={() => confirmDeletePost(item.id)} style={newStyle.deleteButton}>
+                <Image source={require('../../assets/images/trash.png')} style={newStyle.icon}/>
               </TouchableOpacity>
             )}
 
