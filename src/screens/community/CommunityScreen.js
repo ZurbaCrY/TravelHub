@@ -157,13 +157,13 @@ export default function CommunityScreen({ navigation }) {
             </TouchableOpacity>
             <View style={newStyle.voteRow}>
               <View style={newStyle.voteContainer}>
-                <TouchableOpacity onPress={() => handleUpvote(item.id, loadPosts)}>
+                <TouchableOpacity onPress={() => handleUpvote(item.id, user.id, loadPosts)}>
                   <Image source={require('../../assets/images/thumbs-up.png')} style={newStyle.icon} />
                 </TouchableOpacity>
                 <Text style={newStyle.voteCount}>{item.upvotes}</Text>
               </View>
               <View style={newStyle.voteContainer}>
-                <TouchableOpacity onPress={() => handleDownvote(item.id, loadPosts)}>
+                <TouchableOpacity onPress={() => handleDownvote(item.id,user.id , loadPosts)}>
                   <Image source={require('../../assets/images/thumbs-down.png')} style={newStyle.icon} />
                 </TouchableOpacity>
                 <Text style={newStyle.voteCount}>{item.downvotes}</Text>
