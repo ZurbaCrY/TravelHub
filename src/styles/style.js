@@ -24,7 +24,7 @@ const newStyle = StyleSheet.create({
         alignItems: 'center',
         padding: 10,
         backgroundColor: '#f8f8f8',
-      },
+    },
     row: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -35,6 +35,11 @@ const newStyle = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         marginBottom: 20,
+    },
+    headerTitleContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
 
     // Text Styles
@@ -72,7 +77,7 @@ const newStyle = StyleSheet.create({
     },
     boldMiniText: {
         fontSize: 10,
-        color: '#ffffff',
+        color: '#f8f8f8',
         marginTop: 2,
         marginRight: 8,
         textAlign: 'right',
@@ -90,9 +95,10 @@ const newStyle = StyleSheet.create({
     blueText: {
         fontSize: 13,
         color: "#3EAAE9",
-      },
+    },
     selectedUserItem: {
         backgroundColor: '#007BFF',
+        borderRadius: 10,
     },
 
     // Button Styles
@@ -138,7 +144,7 @@ const newStyle = StyleSheet.create({
         marginBottom: 8,
     },
     primaryButtonText: {
-        color: '#fff',
+        color: '#f8f8f8',
         fontWeight: 'bold',
         fontSize: 18,
         textAlign: 'center',
@@ -264,14 +270,6 @@ const newStyle = StyleSheet.create({
         marginBottom: 16,
     },
     mediumProfileImage: {
-        width: 40,
-        height: 40,
-        borderRadius: 30,
-        borderColor: '#3EAAE9',
-        borderWidth: 3,
-        marginBottom: 16,
-    },
-    profileImage: {
         width: 100,
         height: 100,
         borderRadius: 50,
@@ -287,6 +285,15 @@ const newStyle = StyleSheet.create({
         borderWidth: 3,
         marginBottom: 16,
     },
+    extraSmallProfileImage: {
+        width: 40,
+        height: 40,
+        borderRadius: 30,
+        borderColor: '#3EAAE9',
+        borderWidth: 3,
+        marginBottom: 16,
+    },
+
 
     // List Styles
     listItem: {
@@ -320,6 +327,18 @@ const newStyle = StyleSheet.create({
     marginRightExtraSmall: {
         marginRight: 4,
     },
+    marginTopSmall: {
+        marginTop: 8,
+    },
+    marginTopMedium: {
+        marginTop: 16,
+    },
+    marginTopLarge: {
+        marginTop: 24,
+    },
+    marginLeftSmall: {
+        marginLeft: 8,
+    },
 
     // Specific Styles for User Stats
     userStatsContainer: {
@@ -350,7 +369,7 @@ const newStyle = StyleSheet.create({
     },
     // Post Styles
     postContainer: {
-        backgroundColor: '#fff',
+        backgroundColor: '#f8f8f8',
         padding: 15,
         borderBottomWidth: 1,
         borderBottomColor: '#ddd',
@@ -452,7 +471,7 @@ const newStyle = StyleSheet.create({
     // Profile Modal Styles
     profileModalContainer: {
         alignItems: 'center',
-        backgroundColor: '#fff',
+        backgroundColor: '#f8f8f8',
         padding: 20,
         borderRadius: 10,
         shadowColor: '#000',
@@ -475,7 +494,7 @@ const newStyle = StyleSheet.create({
         marginTop: 15,
     },
     profileModalButtonText: {
-        color: '#fff',
+        color: '#f8f8f8',
         fontWeight: 'bold',
         fontSize: 16,
     },
@@ -497,14 +516,14 @@ const newStyle = StyleSheet.create({
         width: "80%",
         marginBottom: 20,
         backgroundColor: '#f8f8f8'
-      },
+    },
     rememberView: {
         width: "80%",
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
         marginBottom: 20,
-      },
+    },
     inputLogin: {
         marginBottom: 15,
         backgroundLight: '#f8f8f8',
@@ -513,16 +532,16 @@ const newStyle = StyleSheet.create({
         marginVertical: 10,
         borderRadius: 5,
         fontSize: 16,
-      },
+    },
     switch: {
         flexDirection: "row",
         alignItems: "center",
-      },
-      authSwitchTouchable: {
+    },
+    authSwitchTouchable: {
         alignItems: "center",
         marginBottom: 20,
         backgroundColor: '#f8f8f8',
-      },
+    },
 });
 
 export default newStyle;

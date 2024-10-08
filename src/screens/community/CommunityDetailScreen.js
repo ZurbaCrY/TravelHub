@@ -4,6 +4,8 @@ import { handleDownvote, handleUpvote, fetchPosts, getUpvoters, getDownvoters, f
 import newStyle from '../../styles/style'; // Verwende die neue CSS-Datei
 import { useAuth } from '../../context/AuthContext';
 import PublicProfileModal from '../../components/PublicProfileModal';
+import { useLoading } from '../../context/LoadingContext';
+import { getUserStats } from '../../services/getUserStats';
 
 export default function CommunityDetailScreen({ route, navigation }) {
   const { post } = route.params;
@@ -17,6 +19,9 @@ export default function CommunityDetailScreen({ route, navigation }) {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
   const [userProfileModal, setUserProfileModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const { loading, showLoading, hideLoading } = useLoading();
+  const [friendListVisible, setFriendListVisible] = useState(false);
 
   useEffect(() => {
     const fetchVoters = async () => {
@@ -117,7 +122,7 @@ export default function CommunityDetailScreen({ route, navigation }) {
 
   const handleUserPress = async (item) => {
     try {
-      setLoading(true);
+      showLoading("Loading User Data");
       const stats = await getUserStats(user_id = item.user_id);
       const selectedUserData = {
         user_id: item.user_id,
@@ -133,7 +138,18 @@ export default function CommunityDetailScreen({ route, navigation }) {
     } catch (error) {
       console.error('Error fetching user stats:', error);
     } finally {
-      setLoading(false);
+      hideLoading();
+    }
+  }
+
+  const handleFriendRequestPress = async () => {
+    try {
+      showLoading("Sending Friend Request");
+      await friendService.sendFriendRequest(selectedUser.user_id);
+    } catch (error) {
+      console.error('Error sending friend request:', error);
+    } finally {
+      hideLoading();
     }
   }
 
@@ -149,10 +165,9 @@ export default function CommunityDetailScreen({ route, navigation }) {
           <>
             <View style={newStyle.containerRow}>
               {/* Username and Profilepicture */}
-              {/* <TouchableOpacity onPress={() => handleUserPress(postData.users)}> */}
-              <TouchableOpacity onPress={() => console.log("test")}>
+              <TouchableOpacity onPress={() => handleUserPress(postData)}>
                 <View style={newStyle.postHeader}>
-                  <Image source={{ uri: postData.users.profilepicture_url }} style={newStyle.mediumProfileImage} />
+                  <Image source={{ uri: postData.users.profilepicture_url }} style={newStyle.extraSmallProfileImage} />
                   <Text style={newStyle.boldText}>{postData.users.username}</Text>
                 </View>
               </TouchableOpacity>
@@ -201,6 +216,7 @@ export default function CommunityDetailScreen({ route, navigation }) {
               </View>
             )}
 
+            {/* Comments Section */}
             <View style={newStyle.commentSection}>
               <TextInput
                 style={newStyle.commentInput}
@@ -217,8 +233,12 @@ export default function CommunityDetailScreen({ route, navigation }) {
               keyExtractor={(item) => item.id.toString()}
               renderItem={({ item }) => (
                 <View style={newStyle.commentItem}>
-                  <Image source={{ uri: item.users.profilepicture_url }} style={newStyle.commentProfileImage} />
-                  <Text style={newStyle.commentUsername}>{item.users.username}:</Text>
+                  <TouchableOpacity onPress={() => handleUserPress(item)}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                      <Image source={{ uri: item.users.profilepicture_url }} style={newStyle.commentProfileImage} />
+                      <Text style={newStyle.commentUsername}>{item.users.username}:</Text>
+                    </View>
+                  </TouchableOpacity>
                   <Text style={newStyle.commentText}>{item.content}</Text>
                 </View>
               )}
@@ -226,7 +246,7 @@ export default function CommunityDetailScreen({ route, navigation }) {
           </>
         )}
       />
-      <PublicProfileModal
+      < PublicProfileModal
         isVisible={userProfileModal}
         onClose={() => setUserProfileModal(false)}
         user={selectedUser}
@@ -235,7 +255,7 @@ export default function CommunityDetailScreen({ route, navigation }) {
         friendListVisible={friendListVisible}
         setFriendListVisible={setFriendListVisible}
       />
-    </View>
+    </View >
   );
 }
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ActivityIndicator, View, Text, FlatList, TouchableOpacity,  Modal, TouchableWithoutFeedback, Alert } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, Modal, TouchableWithoutFeedback, Alert, Image } from 'react-native';
 import { useDarkMode } from '../../context/DarkModeContext';
 import { supabase } from '../../services/supabase';
 import AuthService from '../../services/auth';
@@ -9,6 +9,7 @@ import PropTypes from 'prop-types';
 import { useFocusEffect } from '@react-navigation/native';
 import { useLoading } from '../../context/LoadingContext.js'
 import { useAuth } from '../../context/AuthContext.js';
+import { getProfilePictureUrlByUserId } from '../../services/getProfilePictureUrlByUserId';
 
 const fetchFromSupabase = async (table, select, filters = []) => {
   let query = supabase.from(table).select(select);
@@ -77,16 +78,20 @@ export default function ChatListScreen({ navigation }) {
       const chatUsers = await getChatUsers(chat.chat_id);
       const chatPartner = chatUsers.find(user => user.user_id !== CURRENT_USER_ID);
       const chatPartnerUsername = await fetchUsername(chatPartner.user_id);
+      const chatPartnerProfilePicutreUrl = await getProfilePictureUrlByUserId(chatPartner.user_id);
       return {
         ...chat,
         latestMessage: chatMap.get(chat.chat_id),
-        chatPartnerUsername: chatPartnerUsername || 'Unknown User'
+        chatPartnerUsername: chatPartnerUsername || 'Unknown User',
+        chatPartnerId: chatPartner.user_id,
+        chatPartnerProfilePicutreUrl: chatPartnerProfilePicutreUrl || null,
       };
     }));
 
     chatList.sort((a, b) => new Date(b.latestMessage.created_at) - new Date(a.latestMessage.created_at));
     setChats(chatList);
   };
+
 
   const fetchUsers = async () => {
     const allUsers = await fetchFromSupabase('users', 'user_id, username', [['neq', 'user_id', CURRENT_USER_ID]]);
@@ -138,11 +143,16 @@ export default function ChatListScreen({ navigation }) {
 
   const renderChatItem = ({ item }) => (
     <TouchableOpacity
-      style={styles.postContainer}
-      onPress={() => navigation.navigate('Chat', { chatId: item.chat_id, chatName: item.chatPartnerUsername })}
+      style={[styles.postContainer, styles.containerRow]}
+      onPress={() => navigation.navigate('Chat', { chatId: item.chat_id, chatName: item.chatPartnerUsername, chatPartnerProfilePicutreUrl: item.chatPartnerProfilePicutreUrl })}
     >
-      <Text style={[styles.titleText, { color: isDarkMode ? '#FFF' : '#000' }]}>{item.chatPartnerUsername}</Text>
-      <Text style={[styles.smallBodyText, { color: isDarkMode ? '#AAA' : '#555' }]}>{item.latestMessage.content}</Text>
+      <View style={styles.marginTopMedium}>
+        <Image source={{ uri: item.chatPartnerProfilePicutreUrl }} style={styles.smallProfileImage} />
+      </View>
+      <View style={styles.containerNoMarginTop}>
+        <Text style={styles.titleText}>{item.chatPartnerUsername}</Text>
+        <Text style={styles.smallBodyText}>{item.latestMessage.content}</Text>
+      </View>
     </TouchableOpacity>
   );
 
@@ -162,7 +172,7 @@ export default function ChatListScreen({ navigation }) {
   if (loading) return null;
 
   return (
-    <View style={[styles.container, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
+    <View style={[styles.container, { backgroundColor: isDarkMode ? '#070A0F' : '#f8f8f8' }]}>
       <Button mode="contained" onPress={() => {
         setSelectedUser(null);
         fetchUsers();

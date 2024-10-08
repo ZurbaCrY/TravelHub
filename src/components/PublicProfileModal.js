@@ -34,7 +34,7 @@ const UserProfileModal = ({
               <Text style={newStyle.modalTitleText}>{user.username || 'N/A'}</Text>
               <Image
                 source={{ uri: user.profilepicture_url || 'https://via.placeholder.com/100' }}
-                style={newStyle.profileImage}
+                style={newStyle.mediumProfileImage}
               />
 
               {/* User Stats Section */}

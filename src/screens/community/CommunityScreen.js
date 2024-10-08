@@ -100,7 +100,7 @@ export default function CommunityScreen({ navigation }) {
   };
 
   return (
-    <View style={[newStyle.container, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
+    <View style={[newStyle.container, { backgroundColor: isDarkMode ? '#070A0F' : '#f8f8f8' }]}>
       <FlatList
         data={posts}
         renderItem={({ item }) => (

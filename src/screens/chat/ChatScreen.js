@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { View, Modal, Text, TouchableOpacity } from 'react-native';
+import { View, Modal, Text, TouchableOpacity, Image } from 'react-native';
 import { GiftedChat, MessageText } from 'react-native-gifted-chat';
 import { useDarkMode } from '../../context/DarkModeContext.js';
 import { supabase } from '../../services/supabase.js';
@@ -9,10 +9,10 @@ import newStyle from '../../styles/style'; // Neuer relativer Pfad zu den Styles
 import { useAuth } from '../../context/AuthContext.js';
 
 export default function ChatScreen({ route, navigation }) {
-  const {user} = useAuth();
+  const { user } = useAuth();
   const CURRENT_USER = user;
   const CURRENT_USER_ID = CURRENT_USER.id;
-  const { chatId, chatName } = route.params;
+  const { chatId, chatName, chatPartnerProfilePicutreUrl } = route.params;
   const [messages, setMessages] = useState([]);
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [isDeleteModalVisible, setDeleteModalVisible] = useState(false);
@@ -21,7 +21,25 @@ export default function ChatScreen({ route, navigation }) {
   const { isDarkMode } = useDarkMode();
 
   useEffect(() => {
-    navigation.setOptions({ title: chatName });
+    // navigation.setOptions({ title: chatName });
+    navigation.setOptions({
+      headerTitle: () => (
+        <TouchableOpacity onPress={() => console.log('Title clicked!')} style={newStyle.headerTitleContainer}>
+          <View style={newStyle.containerRow}>
+            <View style={newStyle.marginTopMedium}>
+              <Image source={{ uri: chatPartnerProfilePicutreUrl }} style={newStyle.extraSmallProfileImage} />
+            </View>
+            <View style={[newStyle.marginTopSmall, newStyle.marginLeftSmall]}>
+              <Text style={newStyle.titleText}>{chatName}</Text>
+            </View>
+          </View>
+        </TouchableOpacity>
+      ),
+      headerStyle: {
+        backgroundColor: isDarkMode ? '#070A0F' : '#f8f8f8',
+      }
+    });
+
 
     const fetchMessages = async () => {
       try {
@@ -194,7 +212,7 @@ export default function ChatScreen({ route, navigation }) {
   };
 
   return (
-    <View style={[newStyle.containerNoMarginTop, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
+    <View style={[newStyle.containerNoMarginTop, { backgroundColor: isDarkMode ? '#070A0F' : '#f8f8f8' }]}>
       <GiftedChat
         messages={messages}
         onSend={(messages) => onSend(messages)}
@@ -202,10 +220,10 @@ export default function ChatScreen({ route, navigation }) {
           _id: CURRENT_USER_ID,
         }}
         text={messageInput}
-        onInputTextChanged={(text) => setMessageInput(text)} 
-        textInputStyle={{ color: isDarkMode ? '#FFF' : '#000' }}
+        onInputTextChanged={(text) => setMessageInput(text)}
+        textInputStyle={{ color: isDarkMode ? '#f8f8f8' : '#000' }}
         onLongPress={handleLongPress}
-        renderMessageText={renderMessageText} 
+        renderMessageText={renderMessageText}
       />
 
       <Modal
