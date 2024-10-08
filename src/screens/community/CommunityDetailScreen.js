@@ -21,7 +21,6 @@ export default function CommunityDetailScreen({ route, navigation }) {
   const [userProfileModal, setUserProfileModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const { loading, showLoading, hideLoading } = useLoading();
-  const [friendListVisible, setFriendListVisible] = useState(false);
 
   useEffect(() => {
     const fetchVoters = async () => {
@@ -252,8 +251,6 @@ export default function CommunityDetailScreen({ route, navigation }) {
         user={selectedUser}
         onFriendRequestPress={handleFriendRequestPress}
         isLoading={loading}
-        friendListVisible={friendListVisible}
-        setFriendListVisible={setFriendListVisible}
       />
     </View >
   );

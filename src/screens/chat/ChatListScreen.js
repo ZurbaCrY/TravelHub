@@ -82,8 +82,8 @@ export default function ChatListScreen({ navigation }) {
       return {
         ...chat,
         latestMessage: chatMap.get(chat.chat_id),
+        chatPartnerId: chatPartner.user_id || null,
         chatPartnerUsername: chatPartnerUsername || 'Unknown User',
-        chatPartnerId: chatPartner.user_id,
         chatPartnerProfilePicutreUrl: chatPartnerProfilePicutreUrl || null,
       };
     }));
@@ -144,7 +144,14 @@ export default function ChatListScreen({ navigation }) {
   const renderChatItem = ({ item }) => (
     <TouchableOpacity
       style={[styles.postContainer, styles.containerRow]}
-      onPress={() => navigation.navigate('Chat', { chatId: item.chat_id, chatName: item.chatPartnerUsername, chatPartnerProfilePicutreUrl: item.chatPartnerProfilePicutreUrl })}
+      onPress={() => navigation.navigate('Chat',
+        {
+          chatId: item.chat_id,
+          chatName: item.chatPartnerUsername,
+          chatPartnerId: item.chatPartnerId,
+          chatPartnerProfilePicutreUrl: item.chatPartnerProfilePicutreUrl
+        }
+      )}
     >
       <View style={styles.marginTopMedium}>
         <Image source={{ uri: item.chatPartnerProfilePicutreUrl }} style={styles.smallProfileImage} />

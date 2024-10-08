@@ -23,7 +23,6 @@ export default function CommunityScreen({ navigation }) {
   const [userProfileModal, setUserProfileModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [friendListVisible, setFriendListVisible] = useState(false);
   const { showLoading, hideLoading } = useLoading();
 
   useEffect(() => {
@@ -204,8 +203,6 @@ export default function CommunityScreen({ navigation }) {
         user={selectedUser}
         onFriendRequestPress={handleFriendRequestPress}
         isLoading={loading}
-        friendListVisible={friendListVisible}
-        setFriendListVisible={setFriendListVisible}
       />
     </View>
   );

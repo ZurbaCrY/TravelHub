@@ -80,7 +80,7 @@ export default function ProfileScreen() {
         setWishListCountries(wishListCountriesData);
 
         // Fetch travel buddies
-        const travelBuddiesData = await friendService.getFriends();
+        const travelBuddiesData = friendService.getFriends();
         const travelBuddiesIds = travelBuddiesData.map(buddy => buddy.friend_id);
         const travelBuddiesNames = await getUsernamesByUserIds(travelBuddiesIds);
         setTravelBuddies(travelBuddiesNames);
