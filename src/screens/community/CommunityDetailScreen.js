@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Image, TouchableOpacity, RefreshControl, FlatList, TextInput, Modal, TouchableWithoutFeedback } from 'react-native';
 import { handleDownvote, handleUpvote, fetchPosts, getUpvoters, getDownvoters, fetchComments, addComment, deletePost } from '../../backend/community';
-import newStyle from '../../styles/style'; // Verwende die neue CSS-Datei
+import newStyle from '../../styles/style';
 import { useAuth } from '../../context/AuthContext';
 
 export default function CommunityDetailScreen({ route, navigation }) {
@@ -17,6 +17,10 @@ export default function CommunityDetailScreen({ route, navigation }) {
   const [newComment, setNewComment] = useState('');
   const [isModalVisible, setModalVisible] = useState(false);
   const [postToDelete, setPostToDelete] = useState(null);
+  const [isUpvoterModalVisible, setUpvoterModalVisible] = useState(false);
+  const [isDownvoterModalVisible, setDownvoterModalVisible] = useState(false);
+
+
 
   useEffect(() => {
     const fetchVoters = async () => {
@@ -104,12 +108,19 @@ export default function CommunityDetailScreen({ route, navigation }) {
       keyExtractor={(item, index) => index.toString()}
       renderItem={({ item }) => (
         <View style={newStyle.listItem}>
-          <Image source={{ uri: item.profilepicture_url }} style={newStyle.smallProfileImage} />
+          <Image source={{ uri: item.profilepicture_url }} style={newStyle.mediumProfileImage} />
           <Text style={newStyle.listItemText}>{item.username}</Text>
         </View>
       )}
     />
   );
+
+  const openUpvoterModal = () => setUpvoterModalVisible(true);
+  const closeUpvoterModal = () => setUpvoterModalVisible(false);
+
+  const openDownvoterModal = () => setDownvoterModalVisible(true);
+  const closeDownvoterModal = () => setDownvoterModalVisible(false);
+
 
   return (
     <View style={newStyle.containerNoMarginTop}>
@@ -137,6 +148,18 @@ export default function CommunityDetailScreen({ route, navigation }) {
                 {postData.Country.Countryname}
               </Text>
             )}
+            {postData.City && (
+              <Text style={newStyle.cityText}>
+                <Image source={require('../../assets/images/city.png')} style={{ width: 20, height: 20 }} />
+                {postData.City.Cityname}
+              </Text>
+            )}
+            {postData.Attraction && (
+              <Text style={newStyle.cityText}>
+                <Image source={require('../../assets/images/attractions/attraction.png')} style={{ width: 20, height: 20 }} />
+                {postData.Attraction.Attraction_Name}
+              </Text>
+            )}
             {postData.image_url && (
               <Image source={{ uri: postData.image_url }} style={newStyle.postImage} />
             )}
@@ -147,7 +170,7 @@ export default function CommunityDetailScreen({ route, navigation }) {
                 <TouchableOpacity onPress={() => handleUpvote(postData.id, user.id, loadPosts)}>
                   <Image source={require('../../assets/images/thumbs-up.png')} style={newStyle.icon} />
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => setShowUpvoters(!showUpvoters)}>
+                <TouchableOpacity onPress={openUpvoterModal}>
                   <Text style={newStyle.voteCount}>{postData.upvotes} Upvotes</Text>
                 </TouchableOpacity>
               </View>
@@ -155,7 +178,7 @@ export default function CommunityDetailScreen({ route, navigation }) {
                 <TouchableOpacity onPress={() => handleDownvote(postData.id, user.id, loadPosts)}>
                   <Image source={require('../../assets/images/thumbs-down.png')} style={newStyle.icon} />
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => setShowDownvoters(!showDownvoters)}>
+                <TouchableOpacity onPress={openDownvoterModal}>
                   <Text style={newStyle.voteCount}>{postData.downvotes} Downvotes</Text>
                 </TouchableOpacity>
               </View>
@@ -211,11 +234,60 @@ export default function CommunityDetailScreen({ route, navigation }) {
             <View style={newStyle.modalContent}>
               <Text style={newStyle.modalTitleText}>Confirm Delete</Text>
               <View style={newStyle.row}>
-                <TouchableOpacity style={newStyle.averageRedButton} onPress={() => setDeletePostModalVisible(false)}>
+                <TouchableOpacity style={newStyle.averageRedButton} onPress={() => setModalVisible(false)}>
                   <Text style={newStyle.smallButtonText}>Cancel</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={newStyle.averageBlueButton} onPress={handleDeletePost}>
                   <Text style={newStyle.smallButtonText}>Delete</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </TouchableWithoutFeedback>
+        </View>
+      </Modal>
+
+      {/* Modal für Upvoter */}
+      <Modal
+        transparent={true}
+        animationType="slide"
+        visible={isUpvoterModalVisible}
+        onRequestClose={closeUpvoterModal}
+      >
+        <View style={newStyle.modalBackground}>
+          <TouchableWithoutFeedback onPress={closeUpvoterModal}>
+            <View style={newStyle.modalContent}>
+              <Text style={newStyle.modalTitleText}>Upvoters</Text>
+              <View>
+                {renderVotersList(upvoters)}
+              </View>
+              <View style={newStyle.row}>
+                <TouchableOpacity style={[newStyle.averageRedButton, { width: '100%' }]} onPress={closeUpvoterModal}>
+                  <Text style={newStyle.smallButtonText}>Back</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </TouchableWithoutFeedback>
+        </View>
+      </Modal>
+
+
+      {/* Modal für Downvoter */}
+      <Modal
+        transparent={true}
+        animationType="slide"
+        visible={isDownvoterModalVisible}
+        onRequestClose={closeDownvoterModal}
+      >
+        <View style={newStyle.modalBackground}>
+          <TouchableWithoutFeedback onPress={closeDownvoterModal}>
+            <View style={newStyle.modalContent}>
+              <Text style={newStyle.modalTitleText}>Downvoters</Text>
+              <View>
+                {renderVotersList(downvoters)}
+              </View>
+              <View style={newStyle.row}>
+                <TouchableOpacity style={[newStyle.averageRedButton, { width: '100%' }]} onPress={closeUpvoterModal}>
+                  <Text style={newStyle.smallButtonText}>Back</Text>
                 </TouchableOpacity>
               </View>
             </View>
