@@ -97,7 +97,6 @@ export const deletePost = async (postId) => {
   }
 };
 
-
 export const addComment = async (postId, userId, content) => {
   try {
     const response = await supabase

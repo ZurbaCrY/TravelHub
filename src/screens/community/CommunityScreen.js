@@ -30,12 +30,12 @@ export default function CommunityScreen({ navigation }) {
   const [cities, setCities] = useState([]);
   const [attractions, setAttractions] = useState([]);
   const [selectedCountry, setSelectedCountry] = useState('');
-  const [selectedCity, setSelectedCity] = useState(''); // State für die ausgewählte Stadt hinzufügen
+  const [selectedCity, setSelectedCity] = useState(''); 
   const [selectedAttraction, setSelectedAttraction] = useState('');
 
   useEffect(() => {
     loadPosts();
-    loadCountries(); // Lade die Länder beim Start
+    loadCountries(); 
   }, []);
 
   const loadPosts = async () => {
