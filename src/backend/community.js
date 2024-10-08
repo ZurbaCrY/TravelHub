@@ -61,6 +61,26 @@ export const fetchCountries = async () => {
 
 export const deletePost = async (postId) => {
   try {
+    const { data: commentsData, error: commentsError } = await supabase
+      .from('comments')
+      .delete()
+      .eq('post_id', postId);
+
+    if (commentsError) {
+      throw new Error('Error deleting comments: ' + commentsError.message);
+    }
+
+    // Dann abhängige Datensätze in der post_votes-Tabelle löschen
+    const { data: votesData, error: votesError } = await supabase
+      .from('post_votes')
+      .delete()
+      .eq('post_id', postId);
+
+    if (votesError) {
+      throw new Error('Error deleting votes: ' + votesError.message);
+    }
+
+    // Danach den Post löschen
     const { data, error } = await supabase
       .from('posts')
       .delete()
@@ -76,6 +96,7 @@ export const deletePost = async (postId) => {
     throw error;
   }
 };
+
 
 export const addComment = async (postId, userId, content) => {
   try {
