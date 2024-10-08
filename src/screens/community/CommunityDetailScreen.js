@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, TouchableOpacity, RefreshControl, FlatList, TextInput, Alert } from 'react-native';
-import { handleDownvote, handleUpvote, fetchPosts, getUpvoters, getDownvoters, fetchComments, addComment, deletePost } from '../../backend/community'; 
+import { View, Text, Image, TouchableOpacity, RefreshControl, FlatList, TextInput, Modal, TouchableWithoutFeedback } from 'react-native';
+import { handleDownvote, handleUpvote, fetchPosts, getUpvoters, getDownvoters, fetchComments, addComment, deletePost } from '../../backend/community';
 import newStyle from '../../styles/style'; // Verwende die neue CSS-Datei
 import { useAuth } from '../../context/AuthContext';
 
 export default function CommunityDetailScreen({ route, navigation }) {
   const { post } = route.params;
-  const {user} = useAuth();
+  const { user } = useAuth();
   const [refreshing, setRefreshing] = useState(false);
   const [postData, setPostData] = useState(post);
   const [upvoters, setUpvoters] = useState([]);
@@ -15,6 +15,8 @@ export default function CommunityDetailScreen({ route, navigation }) {
   const [showDownvoters, setShowDownvoters] = useState(false);
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [postToDelete, setPostToDelete] = useState(null);
 
   useEffect(() => {
     const fetchVoters = async () => {
@@ -53,7 +55,7 @@ export default function CommunityDetailScreen({ route, navigation }) {
       if (updatedPost) {
         setPostData(updatedPost);
       }
-      const commentsData = await fetchComments(post.id); 
+      const commentsData = await fetchComments(post.id);
       setComments(commentsData);
     } catch (error) {
       console.error('Error fetching posts: ', error);
@@ -79,25 +81,21 @@ export default function CommunityDetailScreen({ route, navigation }) {
     }
   };
 
-  const handleDeletePost = async (postId) => {
+  const handleDeletePost = async () => {
     try {
-      await deletePost(postId);
+      await deletePost(postToDelete);
       navigation.goBack(); // Navigate back to community feed after deletion
     } catch (error) {
       console.error('Error deleting post:', error);
+    } finally {
+      setModalVisible(false);
+      setPostToDelete(null);
     }
   };
 
-  const confirmDeletePost = (postId) => {
-    Alert.alert(
-      'Delete Post',
-      'Are you sure you want to delete this post?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Delete', onPress: () => handleDeletePost(postId), style: 'destructive' }
-      ],
-      { cancelable: true }
-    );
+  const openDeleteModal = (postId) => {
+    setPostToDelete(postId);
+    setModalVisible(true);
   };
 
   const renderVotersList = (voters) => (
@@ -125,11 +123,10 @@ export default function CommunityDetailScreen({ route, navigation }) {
           <>
             <View style={newStyle.containerRow}>
               <Image source={{ uri: postData.users.profilepicture_url }} style={newStyle.mediumProfileImage} />
-              <Text style={newStyle.boldText}>{postData.users.username}</Text>
-
+              <Text style={newStyle.boldTextBig}>{postData.users.username}</Text>
               {/* Delete Button if the post belongs to the logged-in user */}
               {postData.users.username === user.user_metadata.username && (
-                <TouchableOpacity style={newStyle.deleteButton} onPress={() => confirmDeletePost(postData.id)}>
+                <TouchableOpacity style={newStyle.deleteButton} onPress={() => openDeleteModal(postData.id)}>
                   <Image source={require('../../assets/images/trash.png')} style={newStyle.icon} />
                 </TouchableOpacity>
               )}
@@ -196,7 +193,30 @@ export default function CommunityDetailScreen({ route, navigation }) {
           </>
         )}
       />
+
+      {/* Modal for Delete Confirmation */}
+      <Modal
+        transparent={true}
+        animationType="slide"
+        visible={isModalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={newStyle.modalBackground}>
+          <TouchableWithoutFeedback>
+            <View style={newStyle.modalContent}>
+              <Text style={newStyle.modalTitleText}>Confirm Delete</Text>
+              <View style={newStyle.row}>
+                <TouchableOpacity style={newStyle.averageRedButton} onPress={() => setDeletePostModalVisible(false)}>
+                  <Text style={newStyle.smallButtonText}>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={newStyle.averageBlueButton} onPress={handleDeletePost}>
+                  <Text style={newStyle.smallButtonText}>Delete</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </TouchableWithoutFeedback>
+        </View>
+      </Modal>
     </View>
   );
 }
-
