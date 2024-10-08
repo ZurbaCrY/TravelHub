@@ -224,7 +224,7 @@ export default function CommunityScreen({ navigation }) {
                 {/* Country Picker */}
                 <Picker selectedValue={selectedCountry} onValueChange={(itemValue) => {
                   setSelectedCountry(itemValue);
-                  loadCities(itemValue); // Städte laden, wenn das Land ausgewählt wird
+                  loadCities(itemValue); 
                   setSelectedCity(''); // Zurücksetzen der ausgewählten Stadt
                 }}>
                   <Picker.Item label="Select a country" value="" />
@@ -259,7 +259,6 @@ export default function CommunityScreen({ navigation }) {
                     ))}
                   </Picker>
                 )}
-
                 <View style={newStyle.row}>
                   <TouchableOpacity style={newStyle.averageRedButton} onPress={() => setNewPostModalVisible(false)}>
                     <Text style={newStyle.smallButtonText}>Cancel</Text>
