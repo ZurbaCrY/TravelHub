@@ -1,11 +1,11 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { View, StyleSheet, Modal, Text, TouchableOpacity } from 'react-native';
+import { View, Modal, Text, TouchableOpacity } from 'react-native';
 import { GiftedChat, MessageText } from 'react-native-gifted-chat';
 import { useDarkMode } from '../../context/DarkModeContext.js';
 import { supabase } from '../../services/supabase.js';
 import AuthService from '../../services/auth.js';
 import PropTypes from 'prop-types';
-import { styles } from '../../styles/styles.js'; // Relativer Pfad
+import newStyle from '../../styles/style'; // Neuer relativer Pfad zu den Styles
 import { useAuth } from '../../context/AuthContext.js';
 
 export default function ChatScreen({ route, navigation }) {
@@ -25,7 +25,6 @@ export default function ChatScreen({ route, navigation }) {
 
     const fetchMessages = async () => {
       try {
-        console.log(`Fetching messages for chatId: ${chatId}`);
         const { data, error } = await supabase
           .from('messages')
           .select('id, content, created_at, chat_id, user_id, edited')
@@ -41,11 +40,6 @@ export default function ChatScreen({ route, navigation }) {
       } catch (error) {
         console.error('Error fetching messages:', error);
       }
-      const error = console.error; 
-        console.error = (...args) => {           
-          if (/defaultProps/.test(args[0])) return;           
-            error(...args);
-        }
     };
 
     fetchMessages();
@@ -193,14 +187,14 @@ export default function ChatScreen({ route, navigation }) {
       <View>
         <MessageText {...props} />
         {currentMessage.edited && (
-          <Text style={styles.editedText}>Bearbeitet</Text>
+          <Text style={newStyle.boldMiniText}>Bearbeitet</Text>
         )}
       </View>
     );
   };
 
   return (
-    <View style={[styles.chatContainer, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
+    <View style={[newStyle.containerNoMarginTop, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
       <GiftedChat
         messages={messages}
         onSend={(messages) => onSend(messages)}
@@ -220,17 +214,17 @@ export default function ChatScreen({ route, navigation }) {
         animationType="slide"
         onRequestClose={() => setDeleteModalVisible(false)}
       >
-        <View style={styles.modalOverlayChatScreen}>
-          <View style={styles.modalContentChatScreen}>
-            <Text style={styles.modalTitleChatScreen}>Bearbeiten oder Löschen</Text>
-            <TouchableOpacity style={styles.modalButtonChatScreen} onPress={deleteMessage}>
-              <Text style={styles.modalButtonTextChatScreen}>Nachricht löschen</Text>
+        <View style={newStyle.modalBackground}>
+          <View style={newStyle.modalContent}>
+            <Text style={newStyle.modalTitleText}>Bearbeiten oder Löschen</Text>
+            <TouchableOpacity style={newStyle.primaryRedButton} onPress={deleteMessage}>
+              <Text style={newStyle.primaryButtonText}>Nachricht löschen</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.modalButtonChatScreen} onPress={() => openEditModal(selectedMessage)}>
-              <Text style={styles.modalButtonTextChatScreen}>Text bearbeiten</Text>
+            <TouchableOpacity style={newStyle.primaryButton} onPress={() => openEditModal(selectedMessage)}>
+              <Text style={newStyle.primaryButtonText}>Text bearbeiten</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.modalButtonChatScreen} onPress={() => setDeleteModalVisible(false)}>
-              <Text style={styles.modalButtonTextChatScreen}>Abbrechen</Text>
+            <TouchableOpacity style={newStyle.primaryButton} onPress={() => setDeleteModalVisible(false)}>
+              <Text style={newStyle.primaryButtonText}>Abbrechen</Text>
             </TouchableOpacity>
           </View>
         </View>

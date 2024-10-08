@@ -19,10 +19,6 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 20,
   },
-  inputView: {
-    width: "80%",
-    marginBottom: 20,
-  },
   rememberView: {
     width: "80%",
     flexDirection: "row",

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, TouchableOpacity } from 'react-native';
 import { Input, Text } from 'react-native-elements';
-import { styles } from '../../styles/styles';
+import styles from '../../styles/style';
 import Button from '../../components/Button';
 import AuthService from '../../services/auth';
 import PropTypes from 'prop-types';
@@ -40,10 +40,10 @@ const SignUpScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Sign Up</Text>
+    <View style={styles.centeredContainer}>
+      <Text style={styles.titleTextBlue}>Sign Up</Text>
       <TouchableOpacity style={styles.authSwitchTouchable} onPress={authSwitchToSignIn}>
-        <Text style={styles.switchText}>
+        <Text style={styles.blueText}>
           Already have an account? Sign In instead
         </Text>
       </TouchableOpacity>
