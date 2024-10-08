@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { View, Text } from 'react-native';
+import { ActivityIndicator, View, Text } from 'react-native';
 import BottomSheet from '@gorhom/bottom-sheet';
 import CustomPlaceItem from './CustomPlaceItem';
 import { slideUpListStyles } from '../styles/slideUpListStyles';
@@ -52,7 +52,8 @@ const SlideUpList = ({
           ))
         ) : (
           <View style={slideUpListStyles.hiddenList}>
-            <Text style={{ color: '#888' }}>Keine Ergebnisse</Text>
+            <ActivityIndicator size="large" color="#3EAAE9" />
+            <Text>Loading Results...</Text>
           </View>
         )}
       </View>
