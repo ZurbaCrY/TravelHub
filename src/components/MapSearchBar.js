@@ -3,7 +3,7 @@ import { View, TextInput, Button, StyleSheet } from 'react-native';
 import { handleSearchLocalAutocomplete } from '../backend/MapSearchBarFunctions'; // Importiere die Funktion für lokale Suche
 import { findMiddleCoordinate } from '../services/MapMathematics';
 
-const MapSearchBar = ({ styles, mapRef, scrollToStart, setSelectedPlace, setSearchResult, continentsData }) => {
+const MapSearchBar = ({ styles, mapRef, scrollToStart, setSelectedPlace, setSearchResult, continentsData, setRegion }) => {
   const [query, setQuery] = useState('');
   const [bestMatch, setBestMatch] = useState(null);
 
@@ -20,11 +20,20 @@ const MapSearchBar = ({ styles, mapRef, scrollToStart, setSelectedPlace, setSear
         mapRef.animateToRegion({
           latitude: middleCoordinate.latitude,
           longitude: middleCoordinate.longitude,
-          latitudeDelta: 0.0922,
-          longitudeDelta: 0.0421,
+          latitudeDelta: 0.01,
+          longitudeDelta: 0.01,
         }, 1000);
+
+        const newRegion = {
+          latitude: middleCoordinate.latitude,
+          longitude: middleCoordinate.longitude,
+          latitudeDelta: 0.01,
+          longitudeDelta: 0.01,
+        };
+        //setRegion(newRegion);
+        mapRef.animateToRegion(newRegion, 1000);
+
         setSelectedPlace(null);
-        setSearchResult(bestMatch);
         setQuery(bestMatch.name);
       }
     }

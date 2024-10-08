@@ -193,6 +193,7 @@ export default function MapScreen() {
         setSelectedPlace={setSelectedPlace}
         setSearchResult={setSearchResult}
         continentsData={continentsData}
+        setRegion={setRegion}
       />
 
       {/* Symbol mit einem Plus oben links um "Ort-hinzufügen" Modul zu öffnen*/}
