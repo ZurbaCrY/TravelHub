@@ -211,7 +211,7 @@ export default function CommunityDetailScreen({ route, navigation }) {
             <View style={newStyle.modalContent}>
               <Text style={newStyle.modalTitleText}>Confirm Delete</Text>
               <View style={newStyle.row}>
-                <TouchableOpacity style={newStyle.averageRedButton} onPress={() => setDeletePostModalVisible(false)}>
+                <TouchableOpacity style={newStyle.averageRedButton} onPress={() => setModalVisible(false)}>
                   <Text style={newStyle.smallButtonText}>Cancel</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={newStyle.averageBlueButton} onPress={handleDeletePost}>

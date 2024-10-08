@@ -27,13 +27,13 @@ export default function CommunityScreen({ navigation }) {
   const [loading, setLoading] = useState(false);
   const [friendListVisible, setFriendListVisible] = useState(false);
   const [countries, setCountries] = useState([]);
-  const [cities, setCities] = useState([]); // New state for cities
+  const [cities, setCities] = useState([]); // State für Städte hinzufügen
   const [selectedCountry, setSelectedCountry] = useState('');
-  const [selectedCity, setSelectedCity] = useState(''); // New state for selected city
+  const [selectedCity, setSelectedCity] = useState(''); // State für die ausgewählte Stadt hinzufügen
 
   useEffect(() => {
     loadPosts();
-    loadCountries(); // Load countries on mount
+    loadCountries(); // Lade die Länder beim Start
   }, []);
 
   const loadPosts = async () => {
@@ -57,23 +57,22 @@ export default function CommunityScreen({ navigation }) {
     }
   };
 
-  // Function to fetch cities when a country is selected
+  // Funktion zum Abrufen der Städte basierend auf dem ausgewählten Land
   const loadCities = async (countryId) => {
     try {
       const citiesData = await fetchCitiesByCountry(countryId);
       setCities(citiesData);
-      setSelectedCity(''); // Reset selected city when country changes
     } catch (error) {
       console.error('Error fetching cities: ', error);
     }
   };
 
   const handleCreateNewPost = async () => {
-    await createNewPost(newPostContent, user_username, imageUrl, selectedCountry, selectedCity); // Include selectedCity
+    await createNewPost(newPostContent, user_username, imageUrl, selectedCountry, selectedCity); 
     setNewPostContent('');
     setImageUrl(null);
     setSelectedCountry('');
-    setSelectedCity(''); // Reset city
+    setSelectedCity(''); // Stadt zurücksetzen
     setNewPostModalVisible(false);
     loadPosts();
   };
@@ -147,6 +146,12 @@ export default function CommunityScreen({ navigation }) {
                   {item.Country.Countryname}
                 </Text>
               )}
+              {item.City && (
+                <Text style={newStyle.cityText}>
+                  <Image source={require('../../assets/images/city.png')} style={{ width: 20, height: 20 }} />
+                  {item.City.Cityname}
+                </Text>
+              )}
               {item.image_url && <Image source={{ uri: item.image_url }} style={newStyle.postImage} />}
               <Text style={newStyle.postText}>{item.content}</Text>
             </TouchableOpacity>
@@ -194,25 +199,29 @@ export default function CommunityScreen({ navigation }) {
                   <Image source={require('../../assets/images/picture.png')} style={newStyle.iconBigCenter} />
                 </TouchableOpacity>
                 {imageUrl && <Image source={{ uri: imageUrl }} style={newStyle.postImage} />}
+                
                 {/* Country Picker */}
                 <Picker selectedValue={selectedCountry} onValueChange={(itemValue) => {
                   setSelectedCountry(itemValue);
-                  loadCities(itemValue); // Fetch cities when country changes
+                  loadCities(itemValue); // Städte laden, wenn das Land ausgewählt wird
+                  setSelectedCity(''); // Zurücksetzen der ausgewählten Stadt
                 }}>
                   <Picker.Item label="Select a country" value="" />
                   {countries.map((country) => (
                     <Picker.Item key={country.id} label={country.name} value={country.id} />
                   ))}
                 </Picker>
-                {/* City Picker - only show if a country is selected */}
+
+                {/* City Picker, nur sichtbar, wenn ein Land ausgewählt wurde */}
                 {selectedCountry ? (
                   <Picker selectedValue={selectedCity} onValueChange={(itemValue) => setSelectedCity(itemValue)}>
                     <Picker.Item label="Select a city" value="" />
                     {cities.map((city) => (
-                      <Picker.Item key={city.id} label={city.name} value={city.id} />
+                      <Picker.Item key={city.City_ID} label={city.Cityname} value={city.City_ID} />
                     ))}
                   </Picker>
                 ) : null}
+
                 <View style={newStyle.row}>
                   <TouchableOpacity style={newStyle.averageRedButton} onPress={() => setNewPostModalVisible(false)}>
                     <Text style={newStyle.smallButtonText}>Cancel</Text>
@@ -227,13 +236,35 @@ export default function CommunityScreen({ navigation }) {
         </TouchableWithoutFeedback>
       </Modal>
 
-      {/* User Profile Modal */}
+      {/* Delete Post Modal */}
+      <Modal animationType="slide" transparent={true} visible={deletePostModalVisible} onRequestClose={() => setDeletePostModalVisible(false)}>
+        <TouchableWithoutFeedback onPress={() => setDeletePostModalVisible(false)}>
+          <View style={newStyle.modalBackground}>
+            <TouchableWithoutFeedback>
+              <View style={newStyle.modalContent}>
+                <Text style={newStyle.modalTitleText}>Confirm Delete</Text>
+                <View style={newStyle.row}>
+                  <TouchableOpacity style={newStyle.averageRedButton} onPress={() => setDeletePostModalVisible(false)}>
+                    <Text style={newStyle.smallButtonText}>Cancel</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={newStyle.averageBlueButton} onPress={handleDeletePost}>
+                    <Text style={newStyle.smallButtonText}>Delete</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
+
       <PublicProfileModal
-        user={selectedUser}
-        visible={userProfileModal}
+        isVisible={userProfileModal}
         onClose={() => setUserProfileModal(false)}
-        onSendFriendRequest={handleFriendRequestPress}
-        loading={loading}
+        user={selectedUser}
+        onFriendRequestPress={handleFriendRequestPress}
+        isLoading={loading}
+        friendListVisible={friendListVisible}
+        setFriendListVisible={setFriendListVisible}
       />
     </View>
   );

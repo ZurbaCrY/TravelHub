@@ -10,7 +10,6 @@ export const fetchCitiesByCountry = async (countryId) => {
       .from('City') 
       .select('City_ID, Cityname')
       .eq('Country_ID', countryId); 
-    console.log(data)
     if (error) {
       throw error;
     }
@@ -268,6 +267,10 @@ export const fetchPosts = async () => {
         Country (
           Country_ID,
           Countryname
+        ),
+        City (
+          City_ID,
+          Cityname
         )
       `)
       .order('timestamp', { ascending: false });
@@ -288,7 +291,7 @@ export const fetchPosts = async () => {
 
 
 
-export const createNewPost = async (newPostContent, user_username, imageUrl, countryId) => {  // countryId als Parameter hinzufügen
+export const createNewPost = async (newPostContent, user_username, imageUrl, countryId, cityId) => {  // countryId als Parameter hinzufügen
   try {
     let uploadedImageUrl = null;
     const CURRENT_USER = AuthService.getUser();
@@ -331,7 +334,8 @@ export const createNewPost = async (newPostContent, user_username, imageUrl, cou
       upvotes: 0,
       downvotes: 0,
       user_id: CURRENT_USER_ID,
-      country_id: countryId // Übergabe der country_id
+      country_id: countryId ? countryId : null,
+      city_id: cityId ? cityId : null 
     }]);
 
     if (postError) {
