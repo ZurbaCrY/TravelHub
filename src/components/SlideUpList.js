@@ -20,7 +20,7 @@ const SlideUpList = ({
   const bottomSheetRef = useRef(null);
 
   // Snap points define the open heights of the bottom sheet
-  const snapPoints = ['5%', '50%', '90%'];
+  const snapPoints = ['5%', '25%', '37%', '50%', '90%'];
 
   return (
     <BottomSheet
@@ -34,7 +34,7 @@ const SlideUpList = ({
       }}
     >
       {/* Handle indicator (the small stripe for drag handle) */}
-      <View style={slideUpListStyles.handleIndicator} />
+      <View />
 
       {/* Content for the Bottom Sheet */}
       <View style={slideUpListStyles.sheetContent}>

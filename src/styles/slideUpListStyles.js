@@ -3,22 +3,7 @@ import { StyleSheet } from "react-native";
 export const slideUpListStyles = StyleSheet.create({
   sheetContent: {
     backgroundColor: 'white', // Hintergrund der Liste
-    borderTopLeftRadius: 20, // Abgerundete Ecken
-    borderTopRightRadius: 20,
     padding: 20,
-    shadowColor: '#000', // Schatten
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 5,
-  },
-  handleIndicator: {
-    width: 40,
-    height: 5,
-    backgroundColor: '#ccc',
-    borderRadius: 3,
-    alignSelf: 'center',
-    marginTop: 10,
   },
   placeItem: {
     padding: 10,
