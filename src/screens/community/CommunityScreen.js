@@ -6,9 +6,10 @@ import { handleUpvote, handleDownvote, fetchPosts, createNewPost, handleFilePick
 import newStyle from '../../styles/style'; // Verwende die korrekte CSS-Datei
 import CustomButton from '../../components/CustomButton';
 import PublicProfileModal from '../../components/PublicProfileModal';
-import friendService from '../../services/friendService';
+import FriendService from '../../services/friendService';
 import { getUserStats } from '../../services/getUserStats';
 import { useAuth } from '../../context/AuthContext';
+import { useLoading } from '../../context/LoadingContext';
 
 export default function CommunityScreen({ navigation }) {
   const { user } = useAuth();
@@ -23,6 +24,7 @@ export default function CommunityScreen({ navigation }) {
   const [selectedUser, setSelectedUser] = useState(null);
   const [loading, setLoading] = useState(false);
   const [friendListVisible, setFriendListVisible] = useState(false);
+  const { showLoading, hideLoading } = useLoading();
 
   useEffect(() => {
     loadPosts();
@@ -74,24 +76,31 @@ export default function CommunityScreen({ navigation }) {
   };
 
   const handleUserPress = async (item) => {
-    const stats = await getUserStats(user_id = item.user_id);
-    const selectedUserData = {
-      user_id: item.user_id,
-      username: item.users.username,
-      profilepicture_url: item.users.profilepicture_url,
-      friendCount: stats.friendCount,
-      upvotes: stats.upvoteCount,
-      downvotes: stats.downvoteCount,
-      postCount: stats.postCount
-    };
-    setSelectedUser(selectedUserData);
-    setUserProfileModal(true);
+    try {
+      showLoading("Loading User Stats");
+      const stats = await getUserStats(user_id = item.user_id);
+      const selectedUserData = {
+        user_id: item.user_id,
+        username: item.users.username,
+        profilepicture_url: item.users.profilepicture_url,
+        friendCount: stats.friendCount,
+        upvotes: stats.upvoteCount,
+        downvotes: stats.downvoteCount,
+        postCount: stats.postCount
+      };
+      setSelectedUser(selectedUserData);
+      setUserProfileModal(true);
+    } catch (error) {
+      console.error('Error fetching user stats:', error);
+    } finally {
+      hideLoading();
+    }
   };
 
   const handleFriendRequestPress = async () => {
     try {
       setLoading(true);
-      await friendService.sendFriendRequest(selectedUser.user_id);
+      await FriendService.sendFriendRequest(selectedUser.user_id);
     } catch (error) {
       console.error(error);
     } finally {
