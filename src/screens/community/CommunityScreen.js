@@ -1,8 +1,7 @@
 import 'react-native-url-polyfill/auto';
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, TextInput, Image, TouchableOpacity, Modal, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TextInput, Image, TouchableOpacity, Modal, TouchableWithoutFeedback, Alert } from 'react-native';
 import { useDarkMode } from '../../context/DarkModeContext';
-import AuthService from '../../services/auth';
 import { handleUpvote, handleDownvote, fetchPosts, createNewPost, handleFilePicker } from '../../backend/community';
 import { styles } from '../../styles/styles'; // Assuming styles are imported from a centralized styles file
 import CustomButton from '../../components/CustomButton';
@@ -50,6 +49,27 @@ export default function CommunityScreen({ navigation }) {
     loadPosts();
   };
 
+  const handleDeletePost = async (postId) => {
+    try {
+      await deletePost(postId);
+      loadPosts(); 
+    } catch (error) {
+      console.error('Error deleting post: ', error);
+    }
+  };
+
+  const confirmDeletePost = (postId) => {
+    Alert.alert(
+      'Delete Post',
+      'Are you sure you want to delete this post?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Delete', onPress: () => handleDeletePost(postId), style: 'destructive' }
+      ],
+      { cancelable: true }
+    );
+  };
+
   const handlePostPress = (post) => {
     navigation.navigate('CommunityDetail', { post });
   };
@@ -92,6 +112,14 @@ export default function CommunityScreen({ navigation }) {
                 <Text style={styles.username}>{item.users.username}</Text>
               </View>
             </TouchableOpacity>
+
+            {/* Delete Button in Top Right */}
+            {item.users.username === user_username && (
+              <TouchableOpacity style={custom.deleteButton} onPress={() => confirmDeletePost(item.id)}>
+                <Image source={require('../../assets/images/trash.png')} style={styles.icon} />
+              </TouchableOpacity>
+            )}
+
             <TouchableOpacity onPress={() => handlePostPress(item)}>
               {item.image_url && (
                 <Image source={{ uri: item.image_url }} style={styles.postImage} />
@@ -99,11 +127,11 @@ export default function CommunityScreen({ navigation }) {
               <Text style={styles.postText}>{item.content}</Text>
             </TouchableOpacity>
             <View style={styles.postFooter}>
-              <TouchableOpacity onPress={() => handleUpvote(item.id, loadPosts)}>
+              <TouchableOpacity onPress={() => handleUpvote(item.id, user.id, () => loadPosts())}>
                 <Image source={require('../../assets/images/thumbs-up.png')} style={styles.icon} />
               </TouchableOpacity>
               <Text style={styles.upvoteText}>{item.upvotes}</Text>
-              <TouchableOpacity onPress={() => handleDownvote(item.id, loadPosts)}>
+              <TouchableOpacity onPress={() => handleDownvote(item.id, user.id, () => loadPosts())}>
                 <Image source={require('../../assets/images/thumbs-down.png')} style={styles.icon} />
               </TouchableOpacity>
               <Text style={styles.downvoteText}>{item.downvotes}</Text>
@@ -170,3 +198,13 @@ export default function CommunityScreen({ navigation }) {
     </View>
   );
 }
+
+// Styles for the delete button at the top right
+const custom = StyleSheet.create({
+  deleteButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    zIndex: 1,
+  },
+});

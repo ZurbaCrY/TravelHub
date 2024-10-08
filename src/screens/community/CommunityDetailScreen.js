@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, RefreshControl, FlatList, TextInput } from 'react-native';
-import { handleDownvote, handleUpvote, fetchPosts, getUpvoters, getDownvoters, fetchComments, addComment } from '../../backend/community'; // Stelle sicher, dass addComment importiert wird
-import AuthService from '../../services/auth';
+import { View, Text, Image, StyleSheet, TouchableOpacity, RefreshControl, FlatList, TextInput, Alert } from 'react-native';
+import { handleDownvote, handleUpvote, fetchPosts, getUpvoters, getDownvoters, fetchComments, addComment, deletePost } from '../../backend/community'; // Stelle sicher, dass addComment importiert wird
 import { styles } from '../../styles/styles';
-import { useAuth } from '../../context/AuthContext';
 
 export default function CommunityDetailScreen({ route, navigation }) {
   const { post } = route.params;
@@ -31,7 +29,7 @@ export default function CommunityDetailScreen({ route, navigation }) {
 
     const fetchCommentsData = async () => {
       try {
-        const commentsData = await fetchComments(post.id); // Funktion zum Abrufen der Kommentare
+        const commentsData = await fetchComments(post.id);
         setComments(commentsData);
       } catch (error) {
         console.error('Error fetching comments:', error);
@@ -54,6 +52,8 @@ export default function CommunityDetailScreen({ route, navigation }) {
       if (updatedPost) {
         setPostData(updatedPost);
       }
+      const commentsData = await fetchComments(post.id); 
+      setComments(commentsData);
     } catch (error) {
       console.error('Error fetching posts: ', error);
     } finally {
@@ -68,15 +68,35 @@ export default function CommunityDetailScreen({ route, navigation }) {
   const handleSubmitComment = async () => {
     if (newComment.trim()) {
       try {
-        await addComment(post.id, user.id, newComment); // Funktion zum Hinzufügen eines Kommentars
+        await addComment(post.id, user.id, newComment); 
         setNewComment('');
-        // Kommentar nach dem Hinzufügen erneut abrufen
         const updatedComments = await fetchComments(post.id);
         setComments(updatedComments);
       } catch (error) {
         console.error('Error adding comment:', error);
       }
     }
+  };
+
+  const handleDeletePost = async (postId) => {
+    try {
+      await deletePost(postId);
+      navigation.goBack(); // Navigate back to community feed after deletion
+    } catch (error) {
+      console.error('Error deleting post:', error);
+    }
+  };
+
+  const confirmDeletePost = (postId) => {
+    Alert.alert(
+      'Delete Post',
+      'Are you sure you want to delete this post?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Delete', onPress: () => handleDeletePost(postId), style: 'destructive' }
+      ],
+      { cancelable: true }
+    );
   };
 
   const renderVotersList = (voters) => (
@@ -105,6 +125,13 @@ export default function CommunityDetailScreen({ route, navigation }) {
             <View style={styles.postHeader}>
               <Image source={{ uri: postData.users.profilepicture_url }} style={styles.profileImage} />
               <Text style={styles.username}>{postData.users.username}</Text>
+
+              {/* Delete Button if the post belongs to the logged-in user */}
+              {postData.users.username === user.user_metadata.username && (
+                <TouchableOpacity style={custom.deleteButton} onPress={() => confirmDeletePost(postData.id)}>
+                  <Image source={require('../../assets/images/trash.png')} style={styles.icon} />
+                </TouchableOpacity>
+              )}
             </View>
             {postData.image_url && (
               <Image source={{ uri: postData.image_url }} style={styles.postImage} />
@@ -177,3 +204,12 @@ export default function CommunityDetailScreen({ route, navigation }) {
   );
 }
 
+// Styles for the delete button at the top right
+const custom = StyleSheet.create({
+  deleteButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    zIndex: 1,
+  },
+});

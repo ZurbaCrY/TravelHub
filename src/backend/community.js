@@ -4,6 +4,24 @@ import { supabase } from '../services/supabase';
 import AuthService from '../services/auth'
 import { SUPABASE_URL } from '@env';
 
+export const deletePost = async (postId) => {
+  try {
+    const { data, error } = await supabase
+      .from('posts')
+      .delete()
+      .eq('id', postId);
+
+    if (error) {
+      throw new Error('Error deleting post: ' + error.message);
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error deleting post: ', error.message);
+    throw error;
+  }
+};
+
 export const addComment = async (postId, userId, content) => {
   try {
     const response = await supabase
