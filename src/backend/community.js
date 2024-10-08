@@ -4,6 +4,27 @@ import { supabase } from '../services/supabase';
 import AuthService from '../services/auth'
 import { SUPABASE_URL } from '@env';
 
+export const fetchCountries = async () => {
+  try {
+    const { data, error } = await supabase
+      .from('Country')
+      .select('Country_ID, Countryname');
+
+    if (error) {
+      throw new Error('Error fetching countries: ' + error.message);
+    }
+
+    return data.map(country => ({
+      id: country.Country_ID,  
+      name: country.Countryname 
+    }));
+  } catch (error) {
+    console.error('Error fetching countries: ', error.message);
+    return []; // Gibt ein leeres Array zurück, falls ein Fehler auftritt
+  }
+};
+
+
 export const deletePost = async (postId) => {
   try {
     const { data, error } = await supabase
@@ -210,110 +231,6 @@ export const handleUpvote = async (postId, userId, fetchPosts) => {
   }
 };
 
-export const handleDownvote = async (postId, userId, fetchPosts) => {
-  try {
-    // Überprüfe, ob der Benutzer bereits für diesen Beitrag abgestimmt hat
-    const { data: existingVote, error: voteError } = await supabase
-      .from('post_votes')
-      .select('*')
-      .eq('post_id', postId)
-      .eq('user_id', userId)
-      .single();
-
-    if (voteError && voteError.code !== 'PGRST116') {
-      console.error('Error checking user vote:', voteError.message);
-      return;
-    }
-
-    // Wenn der Benutzer bereits upgevotet hat, entferne die Upvote und erhöhe die Downvote-Zahl
-    if (existingVote && existingVote.vote_type === 1) {
-      console.log("User has upvoted. Removing upvote and downvoting.");
-      await supabase
-        .from('post_votes')
-        .delete()
-        .eq('id', existingVote.id);
-
-      // Verringere die Upvotes im Post
-      const { data: postData, error: fetchError } = await supabase
-        .from('posts')
-        .select('upvotes')
-        .eq('id', postId)
-        .single();
-
-      if (fetchError) {
-        console.error('Error fetching post for upvote decrement:', fetchError.message);
-        return;
-      }
-
-      const updatedUpvotes = postData.upvotes - 1;
-
-      await supabase
-        .from('posts')
-        .update({ upvotes: updatedUpvotes })
-        .eq('id', postId);
-    }
-
-    // Wenn der Benutzer bereits downgevotet hat, entferne die Downvote
-    if (existingVote && existingVote.vote_type === -1) {
-      console.log("User has already downvoted. Removing downvote.");
-      await supabase
-        .from('post_votes')
-        .delete()
-        .eq('id', existingVote.id);
-
-      // Verringere die Downvotes im Post
-      const { data: postData, error: fetchError } = await supabase
-        .from('posts')
-        .select('downvotes')
-        .eq('id', postId)
-        .single();
-
-      if (fetchError) {
-        console.error('Error fetching post for downvote decrement:', fetchError.message);
-        return;
-      }
-
-      const updatedDownvotes = postData.downvotes - 1;
-
-      await supabase
-        .from('posts')
-        .update({ downvotes: updatedDownvotes })
-        .eq('id', postId);
-      return; // Keine weitere Verarbeitung, da der Benutzer seine Stimme entfernt hat
-    }
-
-    // Füge die Downvote hinzu
-    await supabase.from('post_votes').insert({
-      user_id: userId,
-      post_id: postId,
-      vote_type: -1
-    });
-
-    // Update die Downvote-Zahl im Beitrag
-    const { data: postDataAfterDownvote, error: fetchErrorAfterDownvote } = await supabase
-      .from('posts')
-      .select('downvotes')
-      .eq('id', postId)
-      .single();
-
-    if (fetchErrorAfterDownvote) {
-      console.error('Error fetching post for downvote:', fetchErrorAfterDownvote.message);
-      return;
-    }
-
-    const updatedDownvotes = postDataAfterDownvote.downvotes + 1;
-
-    await supabase
-      .from('posts')
-      .update({ downvotes: updatedDownvotes })
-      .eq('id', postId);
-
-    fetchPosts(); // Aktualisiere die Beiträge
-  } catch (error) {
-    console.error('Error downvoting post:', error.message);
-  }
-};
-
 export const fetchPosts = async () => {
   try {
     const { data, error } = await supabase
@@ -329,6 +246,10 @@ export const fetchPosts = async () => {
         users (
           username, 
           profilepicture_url
+        ),
+        Country (
+          Country_ID,
+          Countryname
         )
       `)
       .order('timestamp', { ascending: false });
@@ -336,6 +257,7 @@ export const fetchPosts = async () => {
     if (error) {
       throw error;
     }
+
     return data;
   } catch (error) {
     console.error('Error fetching posts:', error.message);
@@ -343,12 +265,16 @@ export const fetchPosts = async () => {
   }
 };
 
-export const createNewPost = async (newPostContent, user_username, imageUrl) => {
+
+
+
+
+
+export const createNewPost = async (newPostContent, user_username, imageUrl, countryId) => {  // countryId als Parameter hinzufügen
   try {
     let uploadedImageUrl = null;
     const CURRENT_USER = AuthService.getUser();
     const CURRENT_USER_ID = CURRENT_USER.id;
-
 
     if (imageUrl) {
       // Lade das Bild hoch
@@ -386,7 +312,8 @@ export const createNewPost = async (newPostContent, user_username, imageUrl) => 
       image_url: uploadedImageUrl,
       upvotes: 0,
       downvotes: 0,
-      user_id: CURRENT_USER_ID
+      user_id: CURRENT_USER_ID,
+      country_id: countryId // Übergabe der country_id
     }]);
 
     if (postError) {
@@ -396,6 +323,7 @@ export const createNewPost = async (newPostContent, user_username, imageUrl) => 
     console.error('Error creating post:', error.message);
   }
 };
+
 
 export const handleFilePicker = async () => {
   try {

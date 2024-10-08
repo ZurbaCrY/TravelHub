@@ -131,11 +131,16 @@ export default function CommunityDetailScreen({ route, navigation }) {
                 </TouchableOpacity>
               )}
             </View>
+            {postData.Country && (
+              <Text style={newStyle.countryText}>
+                <Image source={require('../../assets/images/globus.png')} style={{ width: 20, height: 20 }} />
+                {postData.Country.Countryname}
+              </Text>
+            )}
             {postData.image_url && (
               <Image source={{ uri: postData.image_url }} style={newStyle.postImage} />
             )}
             <Text style={newStyle.bodyText}>{postData.content}</Text>
-
             {/* Upvotes and Downvotes Section */}
             <View style={newStyle.voteRow}>
               <View style={newStyle.voteContainer}>
