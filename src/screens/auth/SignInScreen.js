@@ -7,13 +7,13 @@ import {
 } from "react-native";
 import { Input } from "react-native-elements";
 import styles from '../../styles/style';
-import Button from "../../components/Button";
 import AuthService from "../../services/auth";
 import AnimatedSwitch from "../../components/AnimatedSwitch";
 import PropTypes from 'prop-types';
 import { useNavigation, useNavigationBuilder } from "@react-navigation/core";
 import { useDarkMode } from '../../context/DarkModeContext';
 import { useLoading } from "../../context/LoadingContext";
+import CustomButton from "../../components/CustomButton";
 
 const SignInScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
@@ -87,9 +87,10 @@ const SignInScreen = ({ navigation }) => {
         </TouchableOpacity>
       </View>
       <View style={styles.buttonView}>
-        <Button mode='contained' onPress={handleSignIn}>
-          Sign In
-        </Button>
+        <CustomButton
+          onPress={handleSignIn}
+          title={"Sign In"}
+        />
       </View>
     </View>
   );

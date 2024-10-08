@@ -2,12 +2,11 @@ import React, { useState } from 'react';
 import { View, TouchableOpacity } from 'react-native';
 import { Input, Text } from 'react-native-elements';
 import styles from '../../styles/style';
-import Button from '../../components/Button';
 import AuthService from '../../services/auth';
-import PropTypes from 'prop-types';
 import { useNavigation } from '@react-navigation/core';
 import { useDarkMode } from '../../context/DarkModeContext';
 import { useLoading } from '../../context/LoadingContext';
+import CustomButton from '../../components/CustomButton';
 
 const SignUpScreen = () => {
   const [username, setUsername] = useState('');
@@ -88,18 +87,13 @@ const SignUpScreen = () => {
         />
       </View>
       <View style={styles.buttonView}>
-        <Button mode='contained' onPress={handleSignUp}>
-          Sign Up
-        </Button>
+        <CustomButton
+          onPress={handleSignUp}
+          title={"Sign Up"}
+        />
       </View>
     </View>
   );
 }
-
-SignUpScreen.propTypes = {
-  navigation: PropTypes.shape({
-    navigate: PropTypes.func.isRequired,
-  }).isRequired,
-};
 
 export default SignUpScreen;
