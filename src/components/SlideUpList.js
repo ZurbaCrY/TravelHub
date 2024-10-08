@@ -39,10 +39,14 @@ const SlideUpList = ({
       {/* Handle indicator (the small stripe for drag handle) */}
       <View />
 
-      {/* Content for the Bottom Sheet */}
-      <View style={slideUpListStyles.sheetContent}>
-        {searchResult && searchResult.places.length > 0 ? (
-          searchResult.places.map((place) => (
+    {/* Content for the Bottom Sheet */}
+    <View style={slideUpListStyles.sheetContent}>
+      {searchResult && searchResult.places.length > 0 ? (
+        // Zuerst den selectedPlace filtern und an den Anfang setzen
+        searchResult.places
+          .filter((place) => place === selectedPlace) // Filtert den selectedPlace
+          .concat(searchResult.places.filter((place) => place !== selectedPlace)) // Fügt die restlichen Plätze hinzu
+          .map((place) => (
             <CustomPlaceItem
               key={`${place.name}-${forceUpdate}`}
               place={place}
@@ -53,13 +57,13 @@ const SlideUpList = ({
               selected={selectedPlace === place}
             />
           ))
-        ) : (
-          <View style={slideUpListStyles.hiddenList}>
-            <ActivityIndicator size="large" color="#3EAAE9" />
-            <Text>Loading Results...</Text>
-          </View>
-        )}
-      </View>
+      ) : (
+        <View style={slideUpListStyles.hiddenList}>
+          <ActivityIndicator size="large" color="#3EAAE9" />
+          <Text>Loading Results...</Text>
+        </View>
+      )}
+    </View>
     </BottomSheet>
   );
 };
