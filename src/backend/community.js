@@ -4,12 +4,30 @@ import { supabase } from '../services/supabase';
 import AuthService from '../services/auth'
 import { SUPABASE_URL } from '@env';
 
+
+export const fetchAttractionsByCity = async (cityId) => {
+  try {
+    const { data, error } = await supabase
+      .from('Attraction') 
+      .select('Attraction_ID, Attraction_Name, Type_of_Attraction') 
+      .eq('City_ID', cityId); 
+    console.log(data)
+    if (error) {
+      throw error;
+    }
+    return data; 
+  } catch (error) {
+    console.error('Error fetching attractions:', error.message);
+    return []; 
+  }
+};
+
 export const fetchCitiesByCountry = async (countryId) => {
   try {
     const { data, error } = await supabase
       .from('City') 
       .select('City_ID, Cityname')
-      .eq('Country_ID', countryId); 
+      .eq('Country_ID', countryId);
     if (error) {
       throw error;
     }
@@ -374,6 +392,11 @@ export const fetchPosts = async () => {
         City (
           City_ID,
           Cityname
+        ),
+        Attraction (
+          Attraction_ID,
+          Attraction_Name,
+          Type_of_Attraction
         )
       `)
       .order('timestamp', { ascending: false });
@@ -389,7 +412,7 @@ export const fetchPosts = async () => {
   }
 };
 
-export const createNewPost = async (newPostContent, user_username, imageUrl, countryId, cityId) => {  
+export const createNewPost = async (newPostContent, user_username, imageUrl, countryId, cityId, attractionId) => {  
    try {
     let uploadedImageUrl = null;
     const CURRENT_USER = AuthService.getUser();
@@ -433,7 +456,8 @@ export const createNewPost = async (newPostContent, user_username, imageUrl, cou
       downvotes: 0,
       user_id: CURRENT_USER_ID,
       country_id: countryId ? countryId : null,
-      city_id: cityId ? cityId : null 
+      city_id: cityId ? cityId : null,
+      attraction_id: attractionId ? attractionId : null
     }]);
 
     if (postError) {

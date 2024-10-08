@@ -143,6 +143,12 @@ export default function CommunityDetailScreen({ route, navigation }) {
                   {postData.City.Cityname}
                 </Text>
               )}
+            {postData.Attraction && (
+                <Text style={newStyle.cityText}>
+                  <Image source={require('../../assets/images/city.png')} style={{ width: 20, height: 20 }} />
+                  {postData.Attraction.Attraction_Name}
+                </Text>
+              )}
             {postData.image_url && (
               <Image source={{ uri: postData.image_url }} style={newStyle.postImage} />
             )}

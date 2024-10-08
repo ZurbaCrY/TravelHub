@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, TextInput, Image, TouchableOpacity, Modal, TouchableWithoutFeedback } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { useDarkMode } from '../../context/DarkModeContext';
-import { handleUpvote, handleDownvote, fetchPosts, createNewPost, handleFilePicker, deletePost, fetchCountries, fetchCitiesByCountry } from '../../backend/community';
+import { handleUpvote, handleDownvote, fetchPosts, createNewPost, handleFilePicker, deletePost, fetchCountries, fetchCitiesByCountry, fetchAttractionsByCity } from '../../backend/community';
 import newStyle from '../../styles/style';
 import CustomButton from '../../components/CustomButton';
 import PublicProfileModal from '../../components/PublicProfileModal';
@@ -27,9 +27,11 @@ export default function CommunityScreen({ navigation }) {
   const [loading, setLoading] = useState(false);
   const [friendListVisible, setFriendListVisible] = useState(false);
   const [countries, setCountries] = useState([]);
-  const [cities, setCities] = useState([]); // State für Städte hinzufügen
+  const [cities, setCities] = useState([]);
+  const [attractions, setAttractions] = useState([]);
   const [selectedCountry, setSelectedCountry] = useState('');
   const [selectedCity, setSelectedCity] = useState(''); // State für die ausgewählte Stadt hinzufügen
+  const [selectedAttraction, setSelectedAttraction] = useState('');
 
   useEffect(() => {
     loadPosts();
@@ -62,17 +64,30 @@ export default function CommunityScreen({ navigation }) {
     try {
       const citiesData = await fetchCitiesByCountry(countryId);
       setCities(citiesData);
+      setAttractions([]);
+      setSelectedCity('');
     } catch (error) {
       console.error('Error fetching cities: ', error);
     }
   };
 
+  // Funktion zum Abrufen der Attraktionen basierend auf der ausgewählten Stadt
+  const loadAttractions = async (cityId) => {
+    try {
+      const attractionsData = await fetchAttractionsByCity(cityId);
+      setAttractions(attractionsData);
+    } catch (error) {
+      console.error('Error fetching attractions: ', error);
+    }
+  };
+
   const handleCreateNewPost = async () => {
-    await createNewPost(newPostContent, user_username, imageUrl, selectedCountry, selectedCity); 
+    await createNewPost(newPostContent, user_username, imageUrl, selectedCountry, selectedCity, selectedAttraction);
     setNewPostContent('');
     setImageUrl(null);
     setSelectedCountry('');
-    setSelectedCity(''); // Stadt zurücksetzen
+    setSelectedCity('');
+    setSelectedAttraction('');
     setNewPostModalVisible(false);
     loadPosts();
   };
@@ -152,6 +167,12 @@ export default function CommunityScreen({ navigation }) {
                   {item.City.Cityname}
                 </Text>
               )}
+              {item.Attraction && (
+                <Text style={newStyle.cityText}>
+                  <Image source={require('../../assets/images/city.png')} style={{ width: 20, height: 20 }} />
+                  {item.Attraction.Attraction_Name}
+                </Text>
+              )}
               {item.image_url && <Image source={{ uri: item.image_url }} style={newStyle.postImage} />}
               <Text style={newStyle.postText}>{item.content}</Text>
             </TouchableOpacity>
@@ -163,7 +184,7 @@ export default function CommunityScreen({ navigation }) {
                 <Text style={newStyle.voteCount}>{item.upvotes}</Text>
               </View>
               <View style={newStyle.voteContainer}>
-                <TouchableOpacity onPress={() => handleDownvote(item.id,user.id , loadPosts)}>
+                <TouchableOpacity onPress={() => handleDownvote(item.id, user.id, loadPosts)}>
                   <Image source={require('../../assets/images/thumbs-down.png')} style={newStyle.icon} />
                 </TouchableOpacity>
                 <Text style={newStyle.voteCount}>{item.downvotes}</Text>
@@ -199,7 +220,7 @@ export default function CommunityScreen({ navigation }) {
                   <Image source={require('../../assets/images/picture.png')} style={newStyle.iconBigCenter} />
                 </TouchableOpacity>
                 {imageUrl && <Image source={{ uri: imageUrl }} style={newStyle.postImage} />}
-                
+
                 {/* Country Picker */}
                 <Picker selectedValue={selectedCountry} onValueChange={(itemValue) => {
                   setSelectedCountry(itemValue);
@@ -214,13 +235,30 @@ export default function CommunityScreen({ navigation }) {
 
                 {/* City Picker, nur sichtbar, wenn ein Land ausgewählt wurde */}
                 {selectedCountry ? (
-                  <Picker selectedValue={selectedCity} onValueChange={(itemValue) => setSelectedCity(itemValue)}>
+                  <Picker selectedValue={selectedCity} onValueChange={(itemValue) => {
+                    setSelectedCity(itemValue);
+                    loadAttractions(itemValue); // Lade die Attraktionen für die ausgewählte Stadt
+                  }}>
                     <Picker.Item label="Select a city" value="" />
                     {cities.map((city) => (
                       <Picker.Item key={city.City_ID} label={city.Cityname} value={city.City_ID} />
                     ))}
                   </Picker>
                 ) : null}
+
+                {/* Attraction Dropdown, nur wenn ein Land und eine Stadt ausgewählt sind */}
+                {selectedCountry && selectedCity && (
+                  <Picker
+                    selectedValue={selectedAttraction}
+                    onValueChange={setSelectedAttraction}
+                    style={newStyle.picker}
+                  >
+                    <Picker.Item label="Select Attraction" value="" />
+                    {attractions.map((attraction) => (
+                      <Picker.Item key={attraction.Attraction_ID} label={attraction.Attraction_Name} value={attraction.Attraction_ID} />
+                    ))}
+                  </Picker>
+                )}
 
                 <View style={newStyle.row}>
                   <TouchableOpacity style={newStyle.averageRedButton} onPress={() => setNewPostModalVisible(false)}>
