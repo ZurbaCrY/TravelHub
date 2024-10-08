@@ -46,6 +46,7 @@ export default function MapScreen() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedCoordinates, setSelectedCoordinates] = useState(null);
   const [continentsData, setContinentsData] = useState([]);
+  const [hasZoomedToUserLocation, setHasZoomedToUserLocation] = useState(false); // New state to track if zoomed already
 
   const CURRENT_USER = AuthService.getUser();
   const CURRENT_USER_ID = CURRENT_USER.id;
@@ -76,26 +77,34 @@ export default function MapScreen() {
   }, [selectedPlace]);
 
   useEffect(() => {
-      (async () => {
-        let { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== 'granted') {
-          setErrorMsg('Permission to access location was denied');
-          return;
-        }
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        console.log('Permission to access location was denied');
+        return;
+      }
 
-        let currentLocation = await Location.getCurrentPositionAsync({});
-        setLocation(currentLocation);
+      let currentLocation = await Location.getCurrentPositionAsync({});
+      setLocation(currentLocation);
 
-        if (currentLocation) {
-          setRegion({
-            latitude: currentLocation.coords.latitude,
-            longitude: currentLocation.coords.longitude,
-            latitudeDelta: 0.0922,
-            longitudeDelta: 0.0421,
-          });
+      if (currentLocation) {
+        const newRegion = {
+          latitude: currentLocation.coords.latitude,
+          longitude: currentLocation.coords.longitude,
+          latitudeDelta: 0.0922,
+          longitudeDelta: 0.0421,
+        };
+
+        setRegion(newRegion);
+
+        // Check if mapRef is available, and if we haven't zoomed already
+        if (mapRef && !hasZoomedToUserLocation) {
+          mapRef.animateToRegion(newRegion, 1000);  // Zoom to the user's current location
+          setHasZoomedToUserLocation(true);  // Set flag to true so it won't zoom again
         }
-      })();
-  }, []);
+      }
+    })();
+  }, [mapRef]);  // Dependencies: runs when mapRef is set
 
 
   /**
