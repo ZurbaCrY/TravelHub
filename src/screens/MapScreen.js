@@ -35,7 +35,7 @@ export default function MapScreen() {
   const [showMarkers, setShowMarkers] = useState(false);
   const [searchResult, setSearchResult] = useState(null);
   const [searchLocation, setSearchLocation] = useState(null);
-  const [region, setRegion] = useState(null); // Zustand für die aktuelle Kartenregion
+  const [region, setRegion] = useState(null);
   const [mapRef, setMapRef] = useState(null);
   const [showBottomLine, setShowBottomLine] = useState(false);
   const [selectedPlace, setSelectedPlace] = useState(null);
@@ -46,7 +46,7 @@ export default function MapScreen() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedCoordinates, setSelectedCoordinates] = useState(null);
   const [continentsData, setContinentsData] = useState([]);
-  const [hasZoomedToUserLocation, setHasZoomedToUserLocation] = useState(false); // New state to track if zoomed already
+  const [hasZoomedToUserLocation, setHasZoomedToUserLocation] = useState(false);
 
   const CURRENT_USER = AuthService.getUser();
   const CURRENT_USER_ID = CURRENT_USER.id;
@@ -197,9 +197,11 @@ export default function MapScreen() {
       />
 
       {/* Symbol mit einem Plus oben links um "Ort-hinzufügen" Modul zu öffnen*/}
-      <TouchableOpacity style={commonStyles.addButton} onPress={handleOpenModal} >
-        <MaterialIcons name="add" size={24} color="black" />
-      </TouchableOpacity>
+      {showList && (
+          <TouchableOpacity style={commonStyles.addButton} onPress={handleOpenModal}>
+            <MaterialIcons name="add" size={24} color="black" />
+          </TouchableOpacity>
+      )}
 
       {/* Sobald Standort verfügbar -> Laden der MAP */}
       <Map

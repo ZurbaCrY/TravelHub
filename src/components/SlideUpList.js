@@ -29,8 +29,11 @@ const SlideUpList = ({
       snapPoints={snapPoints}
       enablePanDownToClose={false} // Verhindert das Schließen durch nach unten wischen
       onChange={(index) => {
-        // Nur schließen, wenn die BottomSheet auf -1 ist
-        if (index === -1) setShowList(false);
+        if (snapPoints[index] === '90%') {
+          setShowList(false);
+        } else {
+          setShowList(true);
+        }
       }}
     >
       {/* Handle indicator (the small stripe for drag handle) */}
