@@ -265,11 +265,6 @@ export const fetchPosts = async () => {
   }
 };
 
-
-
-
-
-
 export const createNewPost = async (newPostContent, user_username, imageUrl, countryId) => {  // countryId als Parameter hinzufügen
   try {
     let uploadedImageUrl = null;
@@ -305,7 +300,6 @@ export const createNewPost = async (newPostContent, user_username, imageUrl, cou
       uploadedImageUrl = `${SUPABASE_URL}/storage/v1/object/public/Images/images/${fileName}`;
     }
 
-    // Erstelle den Post nach dem Hochladen des Bildes
     const { error: postError } = await supabase.from('posts').insert([{
       content: newPostContent,
       author: user_username,
@@ -313,8 +307,9 @@ export const createNewPost = async (newPostContent, user_username, imageUrl, cou
       upvotes: 0,
       downvotes: 0,
       user_id: CURRENT_USER_ID,
-      country_id: countryId // Übergabe der country_id
+      country_id: countryId ? countryId : null 
     }]);
+
 
     if (postError) {
       throw new Error('Error creating post: ' + postError.message);
