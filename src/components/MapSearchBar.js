@@ -23,6 +23,7 @@ const MapSearchBar = ({ styles, mapRef, scrollToStart, setSelectedPlace, setSear
           latitudeDelta: 0.0922,
           longitudeDelta: 0.0421,
         }, 1000);
+        setSelectedPlace(null);
         setSearchResult(bestMatch);
         setQuery(bestMatch.name);
       }
