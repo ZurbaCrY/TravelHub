@@ -169,7 +169,7 @@ export default function CommunityScreen({ navigation }) {
               )}
               {item.Attraction && (
                 <Text style={newStyle.cityText}>
-                  <Image source={require('../../assets/images/city.png')} style={{ width: 20, height: 20 }} />
+                  <Image source={require('../../assets/images/attractions/attraction.png')} style={{ width: 20, height: 20 }} />
                   {item.Attraction.Attraction_Name}
                 </Text>
               )}
