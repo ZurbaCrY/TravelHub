@@ -20,7 +20,7 @@ const SlideUpList = ({
   const bottomSheetRef = useRef(null);
 
   // Snap points define the open heights of the bottom sheet
-  const snapPoints = ['5%', '25%', '37%', '50%', '90%'];
+  const snapPoints = ['7%', '25%', '37%', '50%', '90%'];
 
   return (
     <BottomSheet

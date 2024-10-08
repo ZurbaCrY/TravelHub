@@ -87,7 +87,7 @@ export default function MapScreen() {
       let currentLocation = await Location.getCurrentPositionAsync({});
       setLocation(currentLocation);
 
-      if (currentLocation) {
+      if (currentLocation && !hasZoomedToUserLocation) {
         const newRegion = {
           latitude: currentLocation.coords.latitude,
           longitude: currentLocation.coords.longitude,
@@ -98,7 +98,7 @@ export default function MapScreen() {
         setRegion(newRegion);
 
         // Check if mapRef is available, and if we haven't zoomed already
-        if (mapRef && !hasZoomedToUserLocation) {
+        if (mapRef) {
           mapRef.animateToRegion(newRegion, 1000);  // Zoom to the user's current location
           setHasZoomedToUserLocation(true);  // Set flag to true so it won't zoom again
         }
