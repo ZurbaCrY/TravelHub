@@ -4,6 +4,24 @@ import { supabase } from '../services/supabase';
 import AuthService from '../services/auth'
 import { SUPABASE_URL } from '@env';
 
+export const fetchCitiesByCountry = async (countryId) => {
+  try {
+    const { data, error } = await supabase
+      .from('City') 
+      .select('City_ID, Cityname')
+      .eq('Country_ID', countryId); 
+    console.log(data)
+    if (error) {
+      throw error;
+    }
+    return data;
+  } catch (error) {
+    console.error('Error fetching cities:', error.message);
+    return [];
+  }
+};
+
+
 export const fetchCountries = async () => {
   try {
     const { data, error } = await supabase

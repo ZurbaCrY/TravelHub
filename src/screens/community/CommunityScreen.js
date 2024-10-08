@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, TextInput, Image, TouchableOpacity, Modal, TouchableWithoutFeedback } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { useDarkMode } from '../../context/DarkModeContext';
-import { handleUpvote, handleDownvote, fetchPosts, createNewPost, handleFilePicker, deletePost, fetchCountries } from '../../backend/community';
+import { handleUpvote, handleDownvote, fetchPosts, createNewPost, handleFilePicker, deletePost, fetchCountries, fetchCitiesByCountry } from '../../backend/community';
 import newStyle from '../../styles/style';
 import CustomButton from '../../components/CustomButton';
 import PublicProfileModal from '../../components/PublicProfileModal';
@@ -27,11 +27,13 @@ export default function CommunityScreen({ navigation }) {
   const [loading, setLoading] = useState(false);
   const [friendListVisible, setFriendListVisible] = useState(false);
   const [countries, setCountries] = useState([]);
+  const [cities, setCities] = useState([]); // New state for cities
   const [selectedCountry, setSelectedCountry] = useState('');
+  const [selectedCity, setSelectedCity] = useState(''); // New state for selected city
 
   useEffect(() => {
     loadPosts();
-    loadCountries(); // Lade die Länder beim Start
+    loadCountries(); // Load countries on mount
   }, []);
 
   const loadPosts = async () => {
@@ -55,11 +57,23 @@ export default function CommunityScreen({ navigation }) {
     }
   };
 
+  // Function to fetch cities when a country is selected
+  const loadCities = async (countryId) => {
+    try {
+      const citiesData = await fetchCitiesByCountry(countryId);
+      setCities(citiesData);
+      setSelectedCity(''); // Reset selected city when country changes
+    } catch (error) {
+      console.error('Error fetching cities: ', error);
+    }
+  };
+
   const handleCreateNewPost = async () => {
-    await createNewPost(newPostContent, user_username, imageUrl, selectedCountry);
+    await createNewPost(newPostContent, user_username, imageUrl, selectedCountry, selectedCity); // Include selectedCity
     setNewPostContent('');
     setImageUrl(null);
     setSelectedCountry('');
+    setSelectedCity(''); // Reset city
     setNewPostModalVisible(false);
     loadPosts();
   };
@@ -127,12 +141,12 @@ export default function CommunityScreen({ navigation }) {
               </TouchableOpacity>
             )}
             <TouchableOpacity onPress={() => handlePostPress(item)}>
-                {item.Country && (
-                  <Text style={newStyle.countryText}>
-                    <Image source={require('../../assets/images/globus.png')} style={{width: 20, height: 20}} />
-                    {item.Country.Countryname}
-                  </Text>
-                )}
+              {item.Country && (
+                <Text style={newStyle.countryText}>
+                  <Image source={require('../../assets/images/globus.png')} style={{ width: 20, height: 20 }} />
+                  {item.Country.Countryname}
+                </Text>
+              )}
               {item.image_url && <Image source={{ uri: item.image_url }} style={newStyle.postImage} />}
               <Text style={newStyle.postText}>{item.content}</Text>
             </TouchableOpacity>
@@ -181,12 +195,24 @@ export default function CommunityScreen({ navigation }) {
                 </TouchableOpacity>
                 {imageUrl && <Image source={{ uri: imageUrl }} style={newStyle.postImage} />}
                 {/* Country Picker */}
-                <Picker selectedValue={selectedCountry} onValueChange={(itemValue) => setSelectedCountry(itemValue)}>
+                <Picker selectedValue={selectedCountry} onValueChange={(itemValue) => {
+                  setSelectedCountry(itemValue);
+                  loadCities(itemValue); // Fetch cities when country changes
+                }}>
                   <Picker.Item label="Select a country" value="" />
                   {countries.map((country) => (
                     <Picker.Item key={country.id} label={country.name} value={country.id} />
                   ))}
                 </Picker>
+                {/* City Picker - only show if a country is selected */}
+                {selectedCountry ? (
+                  <Picker selectedValue={selectedCity} onValueChange={(itemValue) => setSelectedCity(itemValue)}>
+                    <Picker.Item label="Select a city" value="" />
+                    {cities.map((city) => (
+                      <Picker.Item key={city.id} label={city.name} value={city.id} />
+                    ))}
+                  </Picker>
+                ) : null}
                 <View style={newStyle.row}>
                   <TouchableOpacity style={newStyle.averageRedButton} onPress={() => setNewPostModalVisible(false)}>
                     <Text style={newStyle.smallButtonText}>Cancel</Text>
@@ -201,35 +227,13 @@ export default function CommunityScreen({ navigation }) {
         </TouchableWithoutFeedback>
       </Modal>
 
-      {/* Delete Post Modal */}
-      <Modal animationType="slide" transparent={true} visible={deletePostModalVisible} onRequestClose={() => setDeletePostModalVisible(false)}>
-        <TouchableWithoutFeedback onPress={() => setDeletePostModalVisible(false)}>
-          <View style={newStyle.modalBackground}>
-            <TouchableWithoutFeedback>
-              <View style={newStyle.modalContent}>
-                <Text style={newStyle.modalTitleText}>Confirm Delete</Text>
-                <View style={newStyle.row}>
-                  <TouchableOpacity style={newStyle.averageRedButton} onPress={() => setDeletePostModalVisible(false)}>
-                    <Text style={newStyle.smallButtonText}>Cancel</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={newStyle.averageBlueButton} onPress={handleDeletePost}>
-                    <Text style={newStyle.smallButtonText}>Delete</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </TouchableWithoutFeedback>
-          </View>
-        </TouchableWithoutFeedback>
-      </Modal>
-
+      {/* User Profile Modal */}
       <PublicProfileModal
-        isVisible={userProfileModal}
-        onClose={() => setUserProfileModal(false)}
         user={selectedUser}
-        onFriendRequestPress={handleFriendRequestPress}
-        isLoading={loading}
-        friendListVisible={friendListVisible}
-        setFriendListVisible={setFriendListVisible}
+        visible={userProfileModal}
+        onClose={() => setUserProfileModal(false)}
+        onSendFriendRequest={handleFriendRequestPress}
+        loading={loading}
       />
     </View>
   );
