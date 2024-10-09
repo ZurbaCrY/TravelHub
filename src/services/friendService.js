@@ -88,8 +88,9 @@ class FriendService {
   }
 
   async respondToFriendRequest(requestId, action) {
-    if (!["accept", "decline"].includes(action)) {
-      throw new Error("Invalid action. Must be 'accept' or 'decline'.");
+    console.log("Responding to friend request: ", requestId, action);
+    if (action !== "accept" && action !== "decline") {
+      console.error("Invalid action: ", action);
     }
 
     const request = this.findRequestById(requestId, "received");
@@ -143,7 +144,8 @@ class FriendService {
     const { error } = await this.supabase
       .from("friends")
       .delete()
-      .or(`(user_id.eq.${this.user.id}, friend_id.eq.${friend_id}), (user_id.eq.${friend_id}, friend_id.eq.${this.user.id})`);
+      .or(`user_id.eq.${this.user.id},friend_id.eq.${friend_id}`)
+      .or(`user_id.eq.${friend_id},friend_id.eq.${this.user.id}`);
     if (error) throw error;
     this.friends = this.friends.filter(f => f.friend_id !== friend_id);
   }
@@ -156,8 +158,9 @@ class FriendService {
     const { data: existingFriendship, error } = await this.supabase
       .from("friends")
       .select("*")
-      .or(`(user_id.eq.${this.user.id} and friend_id.eq.${friend_id}), (user_id.eq.${friend_id} and friend_id.eq.${this.user.id})`);
-    if (error) {
+      .or(`user_id.eq.${this.user.id},friend_id.eq.${friend_id}`)
+      .or(`user_id.eq.${friend_id},friend_id.eq.${this.user.id}`);
+      if (error) {
       throw new Error("Error checking for existing friendships: " + error.message);
     }
 
@@ -213,7 +216,7 @@ class FriendService {
     const receivedRequest = this.friendRequests.received.pending.find(req => req.sender_id === friend_id);
     return {
       isFriend,
-      request: sentRequest ? { type: 'sent', request: sentRequest } : receivedRequest ? { type: 'received', request: receivedRequest } : null
+      request: sentRequest ? { ...sentRequest, type: 'sent' } : receivedRequest ? { ...receivedRequest, type: 'received' } : null
     };
   }
 }

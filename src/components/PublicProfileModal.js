@@ -33,7 +33,52 @@ const UserProfileModal = ({
     fetchFriendshipState();
   }, [user]);
 
+  const handleFriendRequestSend = async () => {
+    try {
+      await FriendService.sendFriendRequest(user.user_id);
+      setFriendshipState({ request: { type: 'sent' } });
+    } catch (error) {
+      console.error('Failed to send friend request:', error);
+    }
+  };
 
+  const handleFriendRequestAccept = async () => {
+    try {
+      console.log(friendshipState.request)
+      await FriendService.respondToFriendRequest(requestId = friendshipState.request.friend_request_id, action = 'accept');
+      setFriendshipState({ isFriend: true });
+    } catch (error) {
+      console.error('Failed to accept friend request:', error);
+    }
+  };
+
+  const handleFriendRequestDecline = async () => {
+    try {
+      await FriendService.respondToFriendRequest(requestId = friendshipState.request.friend_request_id, action = 'decline');
+      setFriendshipState({ request: null });
+    } catch (error) {
+      console.error('Failed to decline friend request:', error);
+    }
+  };
+
+  const handleFriendRequestRevoke = async () => {
+    try {
+      await FriendService.respondToFriendRequest(requestId = friendshipState.request.friend_request_id, action = 'decline');
+      setFriendshipState({ request: null });
+    } catch (error) {
+      console.error('Failed to revoke friend request:', error);
+    }
+  };
+
+  const handleFriendRemove = async () => {
+    try {
+      console.log('Removing friend:', user.user_id);
+      await FriendService.removeFriend(user.user_id);
+      setFriendshipState({ isFriend: false });
+    } catch (error) {
+      console.error('Failed to remove friend:', error);
+    }
+  };
 
   if (!user) return null;
 
@@ -125,16 +170,54 @@ const UserProfileModal = ({
                 </Modal>
               )}
 
-              {/* Friend Button */}
+              {friendshipState && !friendshipState.isFriend && !friendshipState.request && (
+                <CustomButton
+                  onPress={handleFriendRequestSend}
+                  title="Send Friend Request"
+                  isLoading={isLoading}
+                  disabled={isLoading}
+                />
+              )}
 
+              {friendshipState && !friendshipState.isFriend && friendshipState.request && friendshipState.request.type === 'received' && (
+                <View style={newStyle.containerRow}>
+                  <CustomButton
+                    wrapperStyle={{ width: '45%', marginRight: 10 }}
+                    style={{ backgroundColor: 'green' }}
+                    onPress={handleFriendRequestAccept}
+                    title="Accept Friend Request"
+                    isLoading={isLoading}
+                    disabled={isLoading}
+                  />
+                  <CustomButton
+                    wrapperStyle={{ width: '45%', marginLeft: 'auto', marginRight: 0 }}
+                    style={{ backgroundColor: 'red' }}
+                    onPress={handleFriendRequestDecline}
+                    title="Decline Friend Request"
+                    isLoading={isLoading}
+                    disabled={isLoading}
+                  />
+                </View>
+              )}
 
-              {/* Friend Request Button */}
-              <CustomButton
-                onPress={onFriendRequestPress}
-                title="Send Friend Request"
-                isLoading={isLoading}
-                disabled={isLoading}
-              />
+              {friendshipState && !friendshipState.isFriend && friendshipState.request && friendshipState.request.type === 'sent' && (
+                <CustomButton
+                  onPress={handleFriendRequestRevoke}
+                  title="Revoke Friend Request"
+                  isLoading={isLoading}
+                  disabled={isLoading}
+                />
+              )}
+
+              {friendshipState && friendshipState.isFriend && (
+                <CustomButton
+                  onPress={handleFriendRemove}
+                  style={{ backgroundColor: 'red' }}
+                  title="Remove Friend"
+                  isLoading={isLoading}
+                  disabled={isLoading}
+                />
+              )}
             </View>
           </TouchableWithoutFeedback>
         </View>
