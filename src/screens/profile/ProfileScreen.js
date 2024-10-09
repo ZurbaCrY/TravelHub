@@ -217,30 +217,42 @@ export default function ProfileScreen() {
         {/* User Stats Section */}
         <View style={newStyle.userStatsContainer}>
           {/* Row 1: Friends and Posts */}
-          <View style={newStyle.userStatsRow}>
-            <View style={newStyle.userStatColumn}>
-              <TouchableOpacity onPress={() => setTravelBuddiesModalVisible(true)} style={[{ justifyContent: 'center', alignItems: 'center' }]}>
-                <Text style={newStyle.userStatLabel}>Travel-Buddies</Text>
-                <Text style={newStyle.userStatValue}>{travelBuddies.length != null ? travelBuddies.length : 'N/A'}</Text>
-              </TouchableOpacity>
-            </View>
-            <View style={newStyle.userStatColumn}>
-              <Text style={newStyle.userStatLabel}>Posts</Text>
-              <Text style={newStyle.userStatValue}>{postCount != null ? postCount : 'N/A'}</Text>
-            </View>
-          </View>
+          <View style={[newStyle.userStatsContainer, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
+  {/* Row 1: Friends and Posts */}
+  <View style={newStyle.userStatsRow}>
+    <View style={newStyle.userStatColumn}>
+      <TouchableOpacity onPress={() => setTravelBuddiesModalVisible(true)} style={{ justifyContent: 'center', alignItems: 'center' }}>
+        <Text style={[newStyle.userStatLabel, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>Travel-Buddies</Text>
+        <Text style={[newStyle.userStatValue, { color: isDarkMode ? '#CCCCCC' : '#555555' }]}>
+          {travelBuddies.length != null ? travelBuddies.length : 'N/A'}
+        </Text>
+      </TouchableOpacity>
+    </View>
+    <View style={newStyle.userStatColumn}>
+      <Text style={[newStyle.userStatLabel, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>Posts</Text>
+      <Text style={[newStyle.userStatValue, { color: isDarkMode ? '#CCCCCC' : '#555555' }]}>
+        {postCount != null ? postCount : 'N/A'}
+      </Text>
+    </View>
+  </View>
+</View>
 
           {/* Row 2: Upvotes and Downvotes */}
           <View style={newStyle.userStatsRow}>
-            <View style={newStyle.userStatColumn}>
-              <Text style={newStyle.userStatLabel}>Upvotes</Text>
-              <Text style={newStyle.userStatValue}>{upvoteCount != null ? upvoteCount : 'N/A'}</Text>
-            </View>
-            <View style={newStyle.userStatColumn}>
-              <Text style={newStyle.userStatLabel}>Downvotes</Text>
-              <Text style={newStyle.userStatValue}>{downvoteCount != null ? downvoteCount : 'N/A'}</Text>
-            </View>
-          </View>
+  <View style={newStyle.userStatColumn}>
+    <Text style={[newStyle.userStatLabel, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>Upvotes</Text>
+    <Text style={[newStyle.userStatValue, { color: isDarkMode ? '#CCCCCC' : '#555555' }]}>
+      {upvoteCount != null ? upvoteCount : 'N/A'}
+    </Text>
+  </View>
+  <View style={newStyle.userStatColumn}>
+    <Text style={[newStyle.userStatLabel, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>Downvotes</Text>
+    <Text style={[newStyle.userStatValue, { color: isDarkMode ? '#CCCCCC' : '#555555' }]}>
+      {downvoteCount != null ? downvoteCount : 'N/A'}
+    </Text>
+  </View>
+</View>
+
         </View>
         <View style={newStyle.infoSection}>
           <Text style={newStyle.header}>Bereits besuchte Länder:</Text>
