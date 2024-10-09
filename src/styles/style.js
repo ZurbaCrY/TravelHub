@@ -222,6 +222,44 @@ const newStyle = StyleSheet.create({
         lineHeight: 60,
         paddingBottom: 5,
     },
+    friendRequestButtonWrapper: {
+        position: 'absolute',
+        right: 0,
+        top: 0,
+        padding: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    friendRequestButton: {
+        position: 'absolute',
+        top: 0,
+        right: 0,
+        backgroundColor: '#3498DB',
+        width: 50,
+        height: 50,
+        marginBottom: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: 25,
+        // Change Border radius to that when trying to make it fit on the right side of the screen
+        // borderTopLeftRadius: 25,
+        // borderBottomLeftRadius: 25,
+    },
+    notificationCircle: {
+        position: 'absolute',
+        top: 0,
+        right: 0,
+        width: 20,
+        height: 20,
+        borderRadius: 10,
+        backgroundColor: 'red',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    notificationText: {
+        color: 'white',
+        fontSize: 12,
+    },
 
     // Input Styles
     inputField: {
@@ -281,6 +319,22 @@ const newStyle = StyleSheet.create({
     closeModalButtonText: {
         color: 'white',
         fontSize: 16,
+    },
+    friendRequestModal: {
+        position: 'absolute',
+        right: -20,
+        top: -20,
+        width: '85%',
+        height: '100%',
+        backgroundColor: '#f8f8f8',
+        padding: 20,
+        borderTopLeftRadius: 25,
+        borderBottomLeftRadius: 25,
+        // shadowColor: '#000',
+        // shadowOffset: { width: 0, height: 2 },
+        // shadowOpacity: 0.25,
+        // shadowRadius: 4,
+        // elevation: 5,
     },
 
     // Image Styles

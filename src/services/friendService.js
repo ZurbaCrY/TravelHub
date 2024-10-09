@@ -88,7 +88,6 @@ class FriendService {
   }
 
   async respondToFriendRequest(requestId, action) {
-    console.log("Responding to friend request: ", requestId, action);
     if (action !== "accept" && action !== "decline") {
       console.error("Invalid action: ", action);
     }

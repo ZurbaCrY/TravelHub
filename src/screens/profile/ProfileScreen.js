@@ -11,6 +11,7 @@ import {
   Modal,
   FlatList
 } from 'react-native';
+import ExtendedModal from "react-native-modal";
 import Flag from 'react-native-flags';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useDarkMode } from '../../context/DarkModeContext';
@@ -29,12 +30,14 @@ import {
   addWishListCountry,
   removeWishListCountry,
 } from '../../backend/Profile';
-import friendService from '../../services/friendService';
+import FriendService from '../../services/friendService';
 import getUsernamesByUserIds from '../../services/getUsernamesByUserIds'
 import { getUserStats } from '../../services/getUserStats';
 import { useAuth } from '../../context/AuthContext';
 import { useLoading } from '../../context/LoadingContext';
 import PublicProfileModal from '../../components/PublicProfileModal';
+import { FontAwesome5 } from '@expo/vector-icons';
+import { SlideInLeft } from 'react-native-reanimated';
 
 export default function ProfileScreen() {
   const { isDarkMode } = useDarkMode();
@@ -54,6 +57,8 @@ export default function ProfileScreen() {
   const { showLoading, hideLoading } = useLoading();
   const [userProfileModal, setUserProfileModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [requestModalVisible, setRequestModalVisible] = useState(false);
+  const [friendRequests, setFriendRequests] = useState([]);
 
   const navigation = useNavigation();
 
@@ -82,7 +87,7 @@ export default function ProfileScreen() {
         setWishListCountries(wishListCountriesData);
 
         // Fetch travel buddies
-        const travelBuddiesData = await friendService.getFriends();
+        const travelBuddiesData = await FriendService.getFriends();
         const travelBuddiesIds = travelBuddiesData.map(buddy => buddy.friend_id);
         const travelBuddiesNames = await getUsernamesByUserIds(travelBuddiesIds);
         setTravelBuddies(travelBuddiesNames);
@@ -99,8 +104,28 @@ export default function ProfileScreen() {
       }
     };
 
+    const fetchRequests = async () => {
+      try {
+        const requests = await FriendService.getIncomingRequests(pending = true, accepted = false, declined = false);
+        const senderIds = requests.map(request => request.sender_id);
+        const senderUsernames = await getUsernamesByUserIds(senderIds);
+        const requestsWithUsernames = requests.map((request, index) => ({
+          friend_request_id: request.friend_request_id,
+          sender_id: request.sender_id,
+          sender_username: senderUsernames[index].username
+        }));
+        setFriendRequests(requestsWithUsernames);
+      } catch (error) {
+        console.error('Error fetching friend requests:', error);
+      } finally {
+        hideLoading();
+      }
+    };
+
+
     fetchProfilePictureUrl();
     fetchProfileData();
+    fetchRequests();
   }, [user]);
 
   const handleAddVisitedCountry = async () => {
@@ -211,7 +236,7 @@ export default function ProfileScreen() {
   const handleFriendRequestPress = async () => {
     try {
       showLoading("Sending Friend Request");
-      await friendService.sendFriendRequest(selectedUser.user_id);
+      await FriendService.sendFriendRequest(selectedUser.user_id);
     } catch (error) {
       console.error('Error sending friend request:', error);
     } finally {
@@ -219,8 +244,19 @@ export default function ProfileScreen() {
     }
   }
 
+  const handleRequestButtonPress = async () => {
+    try {
+      showLoading("Navigating to Friend Requests");
+      setRequestModalVisible(true);
+    } catch (error) {
+      console.error('Error navigating to friend requests:', error);
+    } finally {
+      hideLoading();
+    }
+  }
+
   return (
-    <View style={[newStyle.container, { backgroundColor: isDarkMode ? '#070A0F' : '#f8f8f8' }]}>
+    <View style={[newStyle.centeredContainer, { backgroundColor: isDarkMode ? '#070A0F' : '#f8f8f8' }]}>
       <TouchableWithoutFeedback onPress={() => {
         // Close the keyboard when the user taps outside of the input fields
         Keyboard.dismiss();
@@ -229,6 +265,19 @@ export default function ProfileScreen() {
       }}>
         <ScrollView style={[newStyle.container, { backgroundColor: isDarkMode ? '#070A0F' : '#f8f8f8' }]}>
           <View style={[newStyle.centeredContainer, { backgroundColor: isDarkMode ? '#070A0F' : '#f8f8f8' }]}>
+
+            {/* Friend Requests */}
+            <View style={newStyle.friendRequestButtonWrapper}>
+              <TouchableOpacity style={newStyle.friendRequestButton} onPress={handleRequestButtonPress}>
+                {friendRequests.length > 0 && (
+                  <View style={newStyle.notificationCircle}>
+                    <Text style={newStyle.notificationText}>{friendRequests.length}</Text>
+                  </View>
+                )}
+                <FontAwesome5 name="user-plus" size={20} color={isDarkMode ? '#FFFDF3' : '#000000'} />
+              </TouchableOpacity>
+            </View>
+
             <Image
               source={{ uri: profilePictureUrl }}
               style={newStyle.largeProfileImage}
@@ -408,6 +457,40 @@ export default function ProfileScreen() {
         }}
         onFriendRequestPress={handleFriendRequestPress}
       />
+      <ExtendedModal
+        isVisible={requestModalVisible}
+        onBackdropPress={() => setRequestModalVisible(false)}
+        onBackButtonPress={() => setRequestModalVisible(false)}
+        animationIn="slideInRight"
+        animationOut="slideOutRight"
+        backdropOpacity={0.5}
+        style={newStyle.friendRequestModal}
+      >
+        <View style={newStyle.container}>
+          <Text style={newStyle.titleText}>Friend Requests</Text>
+          {friendRequests.length === 0 ? (
+            <Text style={newStyle.bodyText}>You have no friend requests.</Text>
+          ) : (
+            <FlatList
+              data={friendRequests}
+              keyExtractor={(item) => item.friend_request_id}
+              renderItem={({ item }) => (
+                <View style={newStyle.containerRow}>
+                  <TouchableOpacity>
+                    <Text style={newStyle.bodyText}>{item.sender_username}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity>
+
+                  </TouchableOpacity>
+                  <TouchableOpacity>
+                    
+                  </TouchableOpacity>
+                </View>
+              )}
+            />
+          )}
+        </View>
+      </ExtendedModal>
     </View>
   );
 }
