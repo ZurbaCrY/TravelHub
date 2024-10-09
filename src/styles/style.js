@@ -313,7 +313,7 @@ const newStyle = StyleSheet.create({
         height: 40,
         borderRadius: 30,
         borderColor: '#3EAAE9',
-        borderWidth: 3,
+        borderWidth: 2,
         marginBottom: 16,
     },
 
