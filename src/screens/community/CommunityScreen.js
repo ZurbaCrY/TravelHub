@@ -7,9 +7,10 @@ import { handleUpvote, handleDownvote, fetchPosts, createNewPost, handleFilePick
 import newStyle from '../../styles/style';
 import CustomButton from '../../components/CustomButton';
 import PublicProfileModal from '../../components/PublicProfileModal';
-import friendService from '../../services/friendService';
+import FriendService from '../../services/friendService';
 import { getUserStats } from '../../services/getUserStats';
 import { useAuth } from '../../context/AuthContext';
+import { useLoading } from '../../context/LoadingContext';
 
 export default function CommunityScreen({ navigation }) {
   const { user } = useAuth();
@@ -25,7 +26,7 @@ export default function CommunityScreen({ navigation }) {
   const [selectedUser, setSelectedUser] = useState(null);
   const [selectedPostId, setSelectedPostId] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [friendListVisible, setFriendListVisible] = useState(false);
+  const { showLoading, hideLoading } = useLoading();
   const [countries, setCountries] = useState([]);
   const [selectedCountry, setSelectedCountry] = useState('');
 
@@ -66,6 +67,8 @@ export default function CommunityScreen({ navigation }) {
 
   const handleDeletePost = async () => {
     try {
+      await deletePost(postId);
+      loadPosts();
       await deletePost(selectedPostId);
       setDeletePostModalVisible(false);
       loadPosts();
@@ -84,24 +87,31 @@ export default function CommunityScreen({ navigation }) {
   };
 
   const handleUserPress = async (item) => {
-    const stats = await getUserStats(item.user_id);
-    const selectedUserData = {
-      user_id: item.user_id,
-      username: item.users.username,
-      profilepicture_url: item.users.profilepicture_url,
-      friendCount: stats.friendCount,
-      upvotes: stats.upvoteCount,
-      downvotes: stats.downvoteCount,
-      postCount: stats.postCount
-    };
-    setSelectedUser(selectedUserData);
-    setUserProfileModal(true);
+    try {
+      showLoading("Loading User Stats");
+      const stats = await getUserStats(item.user_id);
+      const selectedUserData = {
+        user_id: item.user_id,
+        username: item.users.username,
+        profilepicture_url: item.users.profilepicture_url,
+        friendCount: stats.friendCount,
+        upvotes: stats.upvoteCount,
+        downvotes: stats.downvoteCount,
+        postCount: stats.postCount
+      };
+      setSelectedUser(selectedUserData);
+      setUserProfileModal(true);
+    } catch (error) {
+      console.error('Error fetching user stats:', error);
+    } finally {
+      hideLoading();
+    }
   };
 
   const handleFriendRequestPress = async () => {
     try {
       setLoading(true);
-      await friendService.sendFriendRequest(selectedUser.user_id);
+      await FriendService.sendFriendRequest(selectedUser.user_id);
     } catch (error) {
       console.error(error);
     } finally {
@@ -110,14 +120,14 @@ export default function CommunityScreen({ navigation }) {
   };
 
   return (
-    <View style={[newStyle.container, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
+    <View style={[newStyle.container, { backgroundColor: isDarkMode ? '#070A0F' : '#f8f8f8' }]}>
       <FlatList
         data={posts}
         renderItem={({ item }) => (
           <View style={newStyle.postContainer}>
             <TouchableOpacity onPress={() => handleUserPress(item)}>
               <View style={newStyle.postHeader}>
-                <Image source={{ uri: item.users.profilepicture_url }} style={newStyle.mediumProfileImage} />
+                <Image source={{ uri: item.users.profilepicture_url }} style={newStyle.extraSmallProfileImage} />
                 <Text style={newStyle.boldTextBig}>{item.users.username}</Text>
               </View>
             </TouchableOpacity>
@@ -228,8 +238,6 @@ export default function CommunityScreen({ navigation }) {
         user={selectedUser}
         onFriendRequestPress={handleFriendRequestPress}
         isLoading={loading}
-        friendListVisible={friendListVisible}
-        setFriendListVisible={setFriendListVisible}
       />
     </View>
   );

@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, TouchableOpacity, RefreshControl, FlatList, TextInput, Modal, TouchableWithoutFeedback } from 'react-native';
-import { handleDownvote, handleUpvote, fetchPosts, getUpvoters, getDownvoters, fetchComments, addComment, deletePost } from '../../backend/community';
+import { View, Text, Image, TouchableOpacity, RefreshControl, FlatList, TextInput, Alert, Modal, TouchableWithoutFeedback } from 'react-native';
+import { handleDownvote, handleUpvote, fetchPosts, getUpvoters, getDownvoters, fetchComments, addComment, deletePost } from '../../backend/community'; 
 import newStyle from '../../styles/style'; // Verwende die neue CSS-Datei
 import { useAuth } from '../../context/AuthContext';
+import PublicProfileModal from '../../components/PublicProfileModal';
+import { useLoading } from '../../context/LoadingContext';
+import { getUserStats } from '../../services/getUserStats';
 
 export default function CommunityDetailScreen({ route, navigation }) {
   const { post } = route.params;
@@ -15,6 +18,9 @@ export default function CommunityDetailScreen({ route, navigation }) {
   const [showDownvoters, setShowDownvoters] = useState(false);
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
+  const [userProfileModal, setUserProfileModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const { loading, showLoading, hideLoading } = useLoading();
   const [isModalVisible, setModalVisible] = useState(false);
   const [postToDelete, setPostToDelete] = useState(null);
 
@@ -111,6 +117,39 @@ export default function CommunityDetailScreen({ route, navigation }) {
     />
   );
 
+  const handleUserPress = async (item) => {
+    try {
+      showLoading("Loading User Data");
+      const stats = await getUserStats(user_id = item.user_id);
+      const selectedUserData = {
+        user_id: item.user_id,
+        username: item.users.username,
+        profilepicture_url: item.users.profilepicture_url,
+        friendCount: stats.friendCount,
+        upvotes: stats.upvoteCount,
+        downvotes: stats.downvoteCount,
+        postCount: stats.postCount
+      };
+      setSelectedUser(selectedUserData);
+      setUserProfileModal(true);
+    } catch (error) {
+      console.error('Error fetching user stats:', error);
+    } finally {
+      hideLoading();
+    }
+  }
+
+  const handleFriendRequestPress = async () => {
+    try {
+      showLoading("Sending Friend Request");
+      await friendService.sendFriendRequest(selectedUser.user_id);
+    } catch (error) {
+      console.error('Error sending friend request:', error);
+    } finally {
+      hideLoading();
+    }
+  }
+
   return (
     <View style={newStyle.containerNoMarginTop}>
       <FlatList
@@ -122,8 +161,13 @@ export default function CommunityDetailScreen({ route, navigation }) {
         renderItem={() => (
           <>
             <View style={newStyle.containerRow}>
-              <Image source={{ uri: postData.users.profilepicture_url }} style={newStyle.mediumProfileImage} />
-              <Text style={newStyle.boldTextBig}>{postData.users.username}</Text>
+              {/* Username and Profilepicture */}
+              <TouchableOpacity onPress={() => handleUserPress(postData)}>
+                <View style={newStyle.postHeader}>
+                  <Image source={{ uri: postData.users.profilepicture_url }} style={newStyle.extraSmallProfileImage} />
+                  <Text style={newStyle.boldTextBig}>{postData.users.username}</Text>
+                </View>
+              </TouchableOpacity>
               {/* Delete Button if the post belongs to the logged-in user */}
               {postData.users.username === user.user_metadata.username && (
                 <TouchableOpacity style={newStyle.deleteButton} onPress={() => openDeleteModal(postData.id)}>
@@ -173,6 +217,7 @@ export default function CommunityDetailScreen({ route, navigation }) {
               </View>
             )}
 
+            {/* Comments Section */}
             <View style={newStyle.commentSection}>
               <TextInput
                 style={newStyle.commentInput}
@@ -189,8 +234,12 @@ export default function CommunityDetailScreen({ route, navigation }) {
               keyExtractor={(item) => item.id.toString()}
               renderItem={({ item }) => (
                 <View style={newStyle.commentItem}>
-                  <Image source={{ uri: item.users.profilepicture_url }} style={newStyle.commentProfileImage} />
-                  <Text style={newStyle.commentUsername}>{item.users.username}:</Text>
+                  <TouchableOpacity onPress={() => handleUserPress(item)}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                      <Image source={{ uri: item.users.profilepicture_url }} style={newStyle.commentProfileImage} />
+                      <Text style={newStyle.commentUsername}>{item.users.username}:</Text>
+                    </View>
+                  </TouchableOpacity>
                   <Text style={newStyle.commentText}>{item.content}</Text>
                 </View>
               )}
@@ -222,6 +271,13 @@ export default function CommunityDetailScreen({ route, navigation }) {
           </TouchableWithoutFeedback>
         </View>
       </Modal>
-    </View>
+      < PublicProfileModal
+        isVisible={userProfileModal}
+        onClose={() => setUserProfileModal(false)}
+        user={selectedUser}
+        onFriendRequestPress={handleFriendRequestPress}
+        isLoading={loading}
+      />
+    </View >
   );
 }
