@@ -66,7 +66,7 @@ const fetchVoteCount = async (user_id) => {
 
     return [upvoteCount, downvoteCount];
   } catch (error) {
-    console.log("Error fetching Vote Counts:", error);
+    console.error("Error fetching Vote Counts:", error);
     return [0, 0]; // Return zero counts on error
   }
 }

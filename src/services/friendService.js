@@ -17,9 +17,8 @@ class FriendService {
         accepted: [],
         declined: [],
       }
-    }
+    };
     this.friends = [];
-    this.initialize();
   }
 
   async initialize() {
@@ -27,22 +26,21 @@ class FriendService {
     this.initialized = true;
     try {
       await this.loadUser();
-      await this.fetchFriends();
-      await this.fetchFriendRequests();
+      await Promise.all([this.fetchFriends(), this.fetchFriendRequests()]);
     } catch (error) {
-      console.error("Error in FriendService setup: ", error)
+      console.error("Error in FriendService setup: ", error);
     }
   }
 
   async loadUser() {
     await AuthService.loadUser();
     this.user = AuthService.getUser();
-  }
-
-  async fetchFriends() {
     if (!this.user || !this.user.id) {
       throw new Error("User not loaded");
     }
+  }
+
+  async fetchFriends() {
     const { data, error } = await this.supabase
       .from("friends")
       .select("friend_id")
@@ -54,9 +52,6 @@ class FriendService {
   }
 
   async fetchFriendRequests() {
-    if (!this.user || !this.user.id) {
-      throw new Error("User not loaded");
-    }
     const { data, error } = await this.supabase
       .from("friend_requests")
       .select("*")
@@ -66,13 +61,9 @@ class FriendService {
       throw new Error("Error fetching friend requests: " + error.message);
     }
 
-    // Separate requests into sent and received
     data.forEach(req => {
-      if (req.receiver_id === this.user.id) {
-        this.friendRequests.received[req.status].push(req);
-      } else if (req.sender_id === this.user.id) {
-        this.friendRequests.sent[req.status].push(req);
-      }
+      const type = req.receiver_id === this.user.id ? 'received' : 'sent';
+      this.friendRequests[type][req.status].push(req);
     });
   }
 
@@ -81,10 +72,10 @@ class FriendService {
       throw new Error("You can't send a friend request to yourself");
     }
 
-    this.checkFriendshipLocal(receiver_id);
-    this.checkExistingRequest(receiver_id);
+    if (this.checkFriendshipLocal(receiver_id) || this.checkExistingRequest(receiver_id)) {
+      return;
+    }
 
-    // Insert the friend request if none exists
     const { data, error } = await this.supabase
       .from("friend_requests")
       .insert({ sender_id: this.user.id, receiver_id })
@@ -92,7 +83,7 @@ class FriendService {
     if (error) {
       throw new Error("Error sending friend request: " + error.message);
     }
-    this.friendRequests.sent.pending.push(data[0])
+    this.friendRequests.sent.pending.push(data[0]);
     return data;
   }
 
@@ -100,24 +91,20 @@ class FriendService {
     if (!["accept", "decline"].includes(action)) {
       throw new Error("Invalid action. Must be 'accept' or 'decline'.");
     }
-    // Find the request in local state (pending, accepted, or declined)
-    const request = this.friendRequests.received.pending.find(req => req.friend_request_id === requestId) ||
-      this.friendRequests.received.accepted.find(req => req.friend_request_id === requestId) ||
-      this.friendRequests.received.declined.find(req => req.friend_request_id === requestId);
+
+    const request = this.findRequestById(requestId, "received");
     if (!request) {
       throw new Error("Friend request not found.");
     }
-    if ((action === "accept" && request.status === "accepted") ||
-      (action === "decline" && request.status === "declined")) {
+    if (request.status === action) {
       throw new Error(`This friend request has already been ${request.status}.`);
     }
 
-    // Check if the user is already a friend
-    this.checkFriendshipLocal(request.sender_id);
+    if (action === "accept" && this.checkFriendshipLocal(request.sender_id)) {
+      throw new Error("You are already friends with this user");
+    }
 
-    // Update the status
-    const status =
-      action === "accept" ? "accepted" : "declined";
+    const status = action === "accept" ? "accepted" : "declined";
     const { data, error } = await this.supabase
       .from("friend_requests")
       .update({ status })
@@ -138,7 +125,6 @@ class FriendService {
       throw new Error("You are already friends with this user");
     }
 
-    // Insert the friendship if none exists
     const { data, error } = await this.supabase
       .from("friends")
       .insert([
@@ -149,31 +135,28 @@ class FriendService {
     if (error) throw error;
 
     const friendEntry = data.find(entry => entry.user_id === this.user.id);
-    this.friends.push(friendEntry)
+    this.friends.push(friendEntry);
     return friendEntry;
   }
 
   async removeFriend(friend_id) {
-    // Check if friend exists
     const { error } = await this.supabase
       .from("friends")
       .delete()
       .or(`(user_id.eq.${this.user.id}, friend_id.eq.${friend_id}), (user_id.eq.${friend_id}, friend_id.eq.${this.user.id})`);
     if (error) throw error;
-    this.data.friends = this.data.friends.filter(f => f !== friend_id); // Remove friend from list
+    this.friends = this.friends.filter(f => f.friend_id !== friend_id);
   }
 
   async checkFriendship(friend_id) {
-    // Check if the friendship already exists in local state
     if (this.checkFriendshipLocal(friend_id)) {
-      throw new Error("You are already friends with this user");
+      return true;
     }
 
     const { data: existingFriendship, error } = await this.supabase
       .from("friends")
       .select("*")
-      .or(`user_id.eq.${this.user.id}, friend_id.eq.${friend_id}), (user_id.eq.${friend_id}, friend_id.eq.${this.user.id}`);
-
+      .or(`(user_id.eq.${this.user.id} and friend_id.eq.${friend_id}), (user_id.eq.${friend_id} and friend_id.eq.${this.user.id})`);
     if (error) {
       throw new Error("Error checking for existing friendships: " + error.message);
     }
@@ -182,23 +165,17 @@ class FriendService {
   }
 
   checkExistingRequest(receiver_id) {
-    const existingRequest = this.friendRequests.sent.pending.find(
+    return this.friendRequests.sent.pending.find(
       req => req.receiver_id === receiver_id || req.sender_id === receiver_id
-    );
-    if (existingRequest) {
-      throw new Error("Friend request already sent.");
-    }
-
-    const receivedRequest = this.friendRequests.received.pending.find(
+    ) || this.friendRequests.received.pending.find(
       req => req.sender_id === receiver_id
     );
-    if (receivedRequest) {
-      throw new Error("You have already received a friend request from this user.");
-    }
   }
 
+
   checkFriendshipLocal(friend_id) {
-    return this.friends.some(friend => friend.friend_id === friend_id);
+    const result = this.friends.some(friend => friend.friend_id === friend_id);
+    return result;
   }
 
   updateRequestStatus(requestId, type, newStatus) {
@@ -206,30 +183,38 @@ class FriendService {
     if (request) {
       this.friendRequests[type][newStatus].push(request);
       this.friendRequests[type].pending = this.friendRequests[type].pending.filter(req => req.friend_request_id !== requestId);
+    } else {
+      console.error(`Request not found for requestId: ${requestId}`);
     }
   }
 
+  findRequestById(requestId, type) {
+    const request = this.friendRequests[type].pending.find(req => req.friend_request_id === requestId) ||
+      this.friendRequests[type].accepted.find(req => req.friend_request_id === requestId) ||
+      this.friendRequests[type].declined.find(req => req.friend_request_id === requestId);
+    return request;
+  }
+
   getFriends() {
-    return this.friends
+    return this.friends;
   }
 
   getIncomingRequests(pending = true, accepted = true, declined = true) {
     const requests = [];
-
-    if (pending) {
-      requests.push(...this.friendRequests.received.pending);
-    }
-
-    if (accepted) {
-      requests.push(...this.friendRequests.received.accepted);
-    }
-
-    if (declined) {
-      requests.push(...this.friendRequests.received.declined);
-    }
-
+    if (pending) requests.push(...this.friendRequests.received.pending);
+    if (accepted) requests.push(...this.friendRequests.received.accepted);
+    if (declined) requests.push(...this.friendRequests.received.declined);
     return requests;
   }
-}
 
+  getFriendshipStatus(friend_id) {
+    const isFriend = this.checkFriendshipLocal(friend_id);
+    const sentRequest = this.friendRequests.sent.pending.find(req => req.receiver_id === friend_id);
+    const receivedRequest = this.friendRequests.received.pending.find(req => req.sender_id === friend_id);
+    return {
+      isFriend,
+      request: sentRequest ? { type: 'sent', request: sentRequest } : receivedRequest ? { type: 'received', request: receivedRequest } : null
+    };
+  }
+}
 export default new FriendService(supabase);
