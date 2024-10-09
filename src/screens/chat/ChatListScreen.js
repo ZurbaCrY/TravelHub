@@ -136,9 +136,11 @@ export default function ChatListScreen({ navigation }) {
     const initialMessage = { chat_id: newChat.chat_id, content: `Hallo ${selectedUser.username}`, user_id: CURRENT_USER_ID, created_at: new Date().toISOString(), edited: false };
     await supabase.from('messages').insert([initialMessage]);
 
+    const chatPartnerProfilePicutreUrl = await getProfilePictureUrlByUserId(selectedUser.user_id);
+    
     fetchChats();
     setModalVisible(false);
-    navigation.navigate('Chat', { chatId: newChat.chat_id, chatName: selectedUser.username });
+    navigation.navigate('Chat', { chatId: newChat.chat_id, chatName: selectedUser.username, chatPartnerId: selectedUser.user_id, chatPartnerProfilePicutreUrl: chatPartnerProfilePicutreUrl });
   };
 
   const renderChatItem = ({ item }) => (
@@ -180,18 +182,21 @@ export default function ChatListScreen({ navigation }) {
 
   return (
     <View style={[styles.container, { backgroundColor: isDarkMode ? '#070A0F' : '#f8f8f8' }]}>
-      <Button mode="contained" onPress={() => {
-        setSelectedUser(null);
-        fetchUsers();
-        setModalVisible(true);
-      }}>
-        Neuen Chat erstellen
-      </Button>
       <FlatList
         data={chats}
         keyExtractor={(item) => item.chat_id.toString()}
         renderItem={renderChatItem}
       />
+      <TouchableOpacity
+        style={styles.newChatButton}
+        onPress={() => {
+          setSelectedUser(null);
+          fetchUsers();
+          setModalVisible(true);
+        }}
+      >
+        <Text style={styles.newChatButtonText}>+</Text>
+      </TouchableOpacity>
       <Modal
         animationType="slide"
         transparent={true}

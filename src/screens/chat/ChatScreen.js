@@ -26,8 +26,7 @@ export default function ChatScreen({ route, navigation }) {
   const { showLoading, hideLoading } = useLoading();
   const [selectedUser, setSelectedUser] = useState(null);
   const [loading, setLoading] = useState(false);
-
-
+  
   useEffect(() => {
     navigation.setOptions({
       headerTitle: () => (

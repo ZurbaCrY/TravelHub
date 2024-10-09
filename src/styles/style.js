@@ -199,6 +199,29 @@ const newStyle = StyleSheet.create({
         fontSize: 14,
         fontWeight: 'bold',
     },
+    newChatButton: {
+        backgroundColor: '#3498DB',
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        justifyContent: 'center',
+        alignItems: 'center',
+        position: 'absolute',
+        bottom: 20,
+        right: 20,
+        elevation: 5,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+    },
+    newChatButtonText: {
+        color: '#f8f8f8',
+        fontSize: 30,
+        fontWeight: 'bold',
+        lineHeight: 60,
+        paddingBottom: 5,
+    },
 
     // Input Styles
     inputField: {
