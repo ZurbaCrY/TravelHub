@@ -138,36 +138,48 @@ export default function ChatListScreen({ navigation }) {
 
   const renderChatItem = ({ item }) => (
     <TouchableOpacity
-      style={styles.postContainer}
+      style={[
+        styles.postContainer,
+        { backgroundColor: isDarkMode ? '#333' : '#FFF' } // Hintergrundfarbe für Darkmode
+      ]}
       onPress={() => navigation.navigate('Chat', { chatId: item.chat_id, chatName: item.chatPartnerUsername })}
     >
       <Text style={[styles.titleText, { color: isDarkMode ? '#FFF' : '#000' }]}>{item.chatPartnerUsername}</Text>
       <Text style={[styles.smallBodyText, { color: isDarkMode ? '#AAA' : '#555' }]}>{item.latestMessage.content}</Text>
     </TouchableOpacity>
   );
-
+  
   const renderUserItem = (user) => (
     <TouchableOpacity
       key={user.user_id}
       style={[
         styles.postContainer,
+        { backgroundColor: isDarkMode ? '#333' : '#FFF' }, // Hintergrundfarbe für Darkmode
         selectedUser && selectedUser.user_id === user.user_id && styles.selectedUserItem
       ]}
       onPress={() => setSelectedUser(user)}
     >
-      <Text style={selectedUser && selectedUser.user_id === user.user_id ? styles.selectedText : styles.bodyText}>{user.username}</Text>
+      <Text style={[
+        selectedUser && selectedUser.user_id === user.user_id ? styles.selectedText : styles.bodyText,
+        { color: isDarkMode ? '#FFFDF3' : '#000' } // Textfarbe für Darkmode
+      ]}>
+        {user.username}
+      </Text>
     </TouchableOpacity>
   );
-
+  
   if (loading) return null;
-
+  
   return (
     <View style={[styles.container, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
-      <Button mode="contained" onPress={() => {
-        setSelectedUser(null);
-        fetchUsers();
-        setModalVisible(true);
-      }}>
+      <Button
+        mode="contained"
+        onPress={() => {
+          setSelectedUser(null);
+          fetchUsers();
+          setModalVisible(true);
+        }}
+      >
         Neuen Chat erstellen
       </Button>
       <FlatList
@@ -182,14 +194,14 @@ export default function ChatListScreen({ navigation }) {
         onRequestClose={() => setModalVisible(!modalVisible)}
       >
         <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
-          <View style={styles.modalBackground} />
+          <View style={[styles.modalBackground, { backgroundColor: isDarkMode ? 'rgba(0, 0, 0, 0.8)' : 'rgba(255, 255, 255, 0.8)' }]} />
         </TouchableWithoutFeedback>
-        <View style={styles.modalContentWidth}>
-          <Text style={styles.modalTitleText}>Wähle einen Benutzer für den Chat</Text>
+        <View style={[styles.modalContentWidth, { backgroundColor: isDarkMode ? '#1C1C1C' : '#FFF' }]}>
+          <Text style={[styles.modalTitleText, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>Wähle einen Benutzer für den Chat</Text>
           {users.length > 0 ? (
             users.map(renderUserItem)
           ) : (
-            <Text style={styles.bodyText}>Keine neuen Benutzer verfügbar</Text>
+            <Text style={[styles.bodyText, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>Keine neuen Benutzer verfügbar</Text>
           )}
           <Button onPress={createNewChat} disabled={!selectedUser}>Chat starten</Button>
         </View>
@@ -197,10 +209,3 @@ export default function ChatListScreen({ navigation }) {
     </View>
   );
 }
-
-
-ChatListScreen.propTypes = {
-  navigation: PropTypes.shape({
-    navigate: PropTypes.func.isRequired,
-  }).isRequired,
-};

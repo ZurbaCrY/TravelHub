@@ -205,34 +205,36 @@ export default function ChatScreen({ route, navigation }) {
         onInputTextChanged={(text) => setMessageInput(text)} 
         textInputStyle={{ color: isDarkMode ? '#FFF' : '#000' }}
         onLongPress={handleLongPress}
-        renderMessageText={renderMessageText} 
+        renderMessageText={renderMessageText}
       />
-
+  
       <Modal
         transparent={true}
         visible={isDeleteModalVisible}
         animationType="slide"
         onRequestClose={() => setDeleteModalVisible(false)}
       >
-        <View style={newStyle.modalBackground}>
-          <View style={newStyle.modalContent}>
-            <Text style={newStyle.modalTitleText}>Bearbeiten oder Löschen</Text>
-            <TouchableOpacity style={newStyle.primaryRedButton} onPress={deleteMessage}>
-              <Text style={newStyle.primaryButtonText}>Nachricht löschen</Text>
+        <View style={[newStyle.modalBackground, { backgroundColor: isDarkMode ? 'rgba(0, 0, 0, 0.8)' : 'rgba(255, 255, 255, 0.8)' }]}>
+          <View style={[newStyle.modalContent, { backgroundColor: isDarkMode ? '#1C1C1C' : '#FFF' }]}>
+            <Text style={[newStyle.modalTitleText, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>Bearbeiten oder Löschen</Text>
+            
+            <TouchableOpacity style={[newStyle.primaryRedButton, { backgroundColor: isDarkMode ? '#8B0000' : '#FF6347' }]} onPress={deleteMessage}>
+              <Text style={[newStyle.primaryButtonText, { color: isDarkMode ? '#FFF' : '#FFF' }]}>Nachricht löschen</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={newStyle.primaryButton} onPress={() => openEditModal(selectedMessage)}>
-              <Text style={newStyle.primaryButtonText}>Text bearbeiten</Text>
+  
+            <TouchableOpacity style={[newStyle.primaryButton, { backgroundColor: isDarkMode ? '#1E90FF' : '#007BFF' }]} onPress={() => openEditModal(selectedMessage)}>
+              <Text style={[newStyle.primaryButtonText, { color: isDarkMode ? '#FFF' : '#FFF' }]}>Text bearbeiten</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={newStyle.primaryButton} onPress={() => setDeleteModalVisible(false)}>
-              <Text style={newStyle.primaryButtonText}>Abbrechen</Text>
+  
+            <TouchableOpacity style={[newStyle.primaryButton, { backgroundColor: isDarkMode ? '#333' : '#DDD' }]} onPress={() => setDeleteModalVisible(false)}>
+              <Text style={[newStyle.primaryButtonText, { color: isDarkMode ? '#FFF' : '#000' }]}>Abbrechen</Text>
             </TouchableOpacity>
           </View>
         </View>
       </Modal>
     </View>
   );
-}
-
+}  
 ChatScreen.propTypes = {
   route: PropTypes.shape({
     params: PropTypes.shape({
