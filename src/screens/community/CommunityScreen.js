@@ -101,103 +101,125 @@ export default function CommunityScreen({ navigation }) {
 
   return (
     <View style={[newStyle.container, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
-      <FlatList
-        data={posts}
-        renderItem={({ item }) => (
-          <View style={newStyle.postContainer}>
-            <TouchableOpacity onPress={() => handleUserPress(item)}>
-              <View style={newStyle.postHeader}>
-                <Image source={{ uri: item.users.profilepicture_url }} style={newStyle.smallProfileImage} />
-                <Text style={newStyle.boldTextBig}>{item.users.username}</Text>
-              </View>
-            </TouchableOpacity>
+  {/* FlatList to render all posts */}
+  <FlatList
+    data={posts}
+    renderItem={({ item }) => (
+      <View style={[newStyle.postContainer, { backgroundColor: isDarkMode ? '#333' : '#FFF' }]}>
+        <TouchableOpacity onPress={() => handleUserPress(item)}>
+          {/* Post header with user profile picture and username */}
+          <View style={newStyle.postHeader}>
+            <Image source={{ uri: item.users.profilepicture_url }} style={newStyle.smallProfileImage} />
+            <Text style={[newStyle.boldTextBig, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>{item.users.username}</Text>
+          </View>
+        </TouchableOpacity>
 
-            {/* Delete Button in Top Right */}
-            {item.users.username === user_username && (
-              <TouchableOpacity onPress={() => confirmDeletePost(item.id)} style={newStyle.deleteButton}>
-                <Image source={require('../../assets/images/trash.png')} style={newStyle.icon}/>
+        {/* Conditional delete button for posts owned by the user */}
+        {item.users.username === user_username && (
+          <TouchableOpacity onPress={() => confirmDeletePost(item.id)} style={newStyle.deleteButton}>
+            {/* Trash icon with dynamic color */}
+            <Image source={require('../../assets/images/trash.png')} style={[newStyle.icon, { tintColor: isDarkMode ? '#FFFDF3' : '#000' }]} />
+          </TouchableOpacity>
+        )}
+
+        <TouchableOpacity onPress={() => handlePostPress(item)}>
+          {/* Conditional post image display */}
+          {item.image_url && (
+            <Image source={{ uri: item.image_url }} style={[newStyle.postImage, { borderColor: isDarkMode ? '#555' : '#CCC' }]} />
+          )}
+          {/* Post content text */}
+          <Text style={[newStyle.postText, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>{item.content}</Text>
+        </TouchableOpacity>
+        
+        {/* Vote section for upvotes and downvotes */}
+        <View style={newStyle.voteRow}>
+          {/* Upvote button and count */}
+          <View style={newStyle.voteContainer}>
+            <TouchableOpacity onPress={() => handleUpvote(item.id, loadPosts)}>
+              <Image source={require('../../assets/images/thumbs-up.png')} style={[newStyle.icon]} />
+            </TouchableOpacity>
+            <Text style={[newStyle.voteCount, { color: isDarkMode ? '#CCCCCC' : '#555555' }]}>{item.upvotes}</Text>
+          </View>
+
+          {/* Downvote button and count */}
+          <View style={newStyle.voteContainer}>
+            <TouchableOpacity onPress={() => handleDownvote(item.id, loadPosts)}>
+              <Image source={require('../../assets/images/thumbs-down.png')} style={[newStyle.icon]} />
+            </TouchableOpacity>
+            <Text style={[newStyle.voteCount, { color: isDarkMode ? '#CCCCCC' : '#555555' }]}>{item.downvotes}</Text>
+          </View>
+        </View>
+      </View>
+    )}
+    keyExtractor={(item) => item.id.toString()}
+    refreshing={refreshing}
+    onRefresh={loadPosts}
+    contentContainerStyle={{ paddingBottom: 20 }}
+    ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
+  />
+
+  {/* Button to create a new post */}
+  <TouchableOpacity style={[newStyle.primaryButton, { backgroundColor: isDarkMode ? '#1E90FF' : '#007BFF' }]} onPress={() => setNewPostModalVisible(true)}>
+    <Text style={[newStyle.primaryButtonText, { color: isDarkMode ? '#FFF' : '#FFF' }]}>New Post</Text>
+  </TouchableOpacity>
+
+  {/* Modal for creating a new post */}
+  <Modal
+    animationType="slide"
+    transparent={true}
+    visible={newPostModalVisible}
+    onRequestClose={() => setNewPostModalVisible(false)}
+  >
+    <TouchableWithoutFeedback onPress={() => setNewPostModalVisible(false)}>
+      <View style={[newStyle.modalBackground, { backgroundColor: isDarkMode ? 'rgba(0, 0, 0, 0.8)' : 'rgba(255, 255, 255, 0.8)' }]}>
+        <TouchableWithoutFeedback>
+          <View style={[newStyle.modalContent, { backgroundColor: isDarkMode ? '#1C1C1C' : '#FFF' }]}>
+            <Text style={[newStyle.modalTitleText, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>Create New Post</Text>
+
+            {/* Text input for new post content */}
+            <TextInput
+              style={[newStyle.inputField, { backgroundColor: isDarkMode ? '#333' : '#F5F5F5', color: isDarkMode ? '#FFFDF3' : '#000', borderColor: isDarkMode ? '#555' : '#CCC' }]}
+              placeholder="What's on your mind?"
+              placeholderTextColor={isDarkMode ? '#777' : '#ccc'}
+              value={newPostContent}
+              onChangeText={(text) => setNewPostContent(text)}
+            />
+
+            {/* Image picker for new post */}
+            <TouchableOpacity onPress={async () => {
+              const image = await handleFilePicker();
+              setImageUrl(image);
+            }}>
+              <Image source={require('../../assets/images/picture.png')} style={[newStyle.iconBigCenter, { tintColor: isDarkMode ? '#FFFDF3' : '#000' }]} />
+            </TouchableOpacity>
+            {imageUrl && <Image source={{ uri: imageUrl }} style={newStyle.postImage} />}
+
+            {/* Buttons for canceling and posting new content */}
+            <View style={newStyle.row}>
+              <TouchableOpacity style={[newStyle.averageRedButton, { backgroundColor: isDarkMode ? '#8B0000' : '#FF6347' }]} onPress={() => setNewPostModalVisible(false)}>
+                <Text style={[newStyle.smallButtonText, { color: isDarkMode ? '#FFFDF3' : '#FFF' }]}>Cancel</Text>
               </TouchableOpacity>
-            )}
-
-            <TouchableOpacity onPress={() => handlePostPress(item)}>
-              {item.image_url && (
-                <Image source={{ uri: item.image_url }} style={newStyle.postImage} />
-              )}
-              <Text style={newStyle.postText}>{item.content}</Text>
-            </TouchableOpacity>
-            <View style={newStyle.voteRow}>
-              <View style={newStyle.voteContainer}>
-                  <TouchableOpacity onPress={() => handleUpvote(item.id, loadPosts)}>
-                  <Image source={require('../../assets/images/thumbs-up.png')} style={newStyle.icon} />
-                </TouchableOpacity>
-                <Text style={newStyle.voteCount}>{item.upvotes}</Text>
-              </View>
-              <View style={newStyle.voteContainer}>
-                <TouchableOpacity onPress={() => handleDownvote(item.id, loadPosts)}>
-                  <Image source={require('../../assets/images/thumbs-down.png')} style={newStyle.icon} />
-                </TouchableOpacity>
-                <Text style={newStyle.voteCount}>{item.downvotes}</Text>
-              </View>
+              <TouchableOpacity style={[newStyle.averageBlueButton, { backgroundColor: isDarkMode ? '#1E90FF' : '#007BFF' }]} onPress={handleCreateNewPost}>
+                <Text style={[newStyle.smallButtonText, { color: isDarkMode ? '#FFFDF3' : '#FFF' }]}>Post</Text>
+              </TouchableOpacity>
             </View>
           </View>
-        )}
-        keyExtractor={(item) => item.id.toString()}
-        refreshing={refreshing}
-        onRefresh={loadPosts}
-        contentContainerStyle={{ paddingBottom: 20 }}
-        ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
-      />
-      <TouchableOpacity style={newStyle.primaryButton} onPress={() => setNewPostModalVisible(true)}>
-        <Text style={newStyle.primaryButtonText}>New Post</Text>
-      </TouchableOpacity>
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={newPostModalVisible}
-        onRequestClose={() => setNewPostModalVisible(false)}
-      >
-        <TouchableWithoutFeedback onPress={() => setNewPostModalVisible(false)}>
-          <View style={newStyle.modalBackground}>
-            <TouchableWithoutFeedback>
-              <View style={newStyle.modalContent}>
-                <Text style={newStyle.modalTitleText}>Create New Post</Text>
-                <TextInput
-                  style={newStyle.inputField}
-                  placeholder="What's on your mind?"
-                  value={newPostContent}
-                  onChangeText={(text) => setNewPostContent(text)}
-                />
-                <TouchableOpacity
-                  onPress={async () => {
-                    const image = await handleFilePicker();
-                    setImageUrl(image);
-                  }}
-                >
-                  <Image source={require('../../assets/images/picture.png')} style={newStyle.iconBigCenter} />
-                </TouchableOpacity>
-                {imageUrl && <Image source={{ uri: imageUrl }} style={newStyle.postImage} />}
-                <View style={newStyle.row}>
-                  <TouchableOpacity style={newStyle.averageRedButton} onPress={() => setNewPostModalVisible(false)}>
-                    <Text style={newStyle.smallButtonText}>Cancel</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={newStyle.averageBlueButton} onPress={handleCreateNewPost}>
-                    <Text style={newStyle.smallButtonText}>Post</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </TouchableWithoutFeedback>
-          </View>
         </TouchableWithoutFeedback>
-      </Modal>
-      <PublicProfileModal
-        isVisible={userProfileModal}
-        onClose={() => setUserProfileModal(false)}
-        user={selectedUser}
-        onFriendRequestPress={handleFriendRequestPress}
-        isLoading={loading}
-        friendListVisible={friendListVisible}
-        setFriendListVisible={setFriendListVisible}
-      />
-    </View>
+      </View>
+    </TouchableWithoutFeedback>
+  </Modal>
+
+  {/* Modal for public profile with dynamic friend request functionality */}
+  <PublicProfileModal
+    isVisible={userProfileModal}
+    onClose={() => setUserProfileModal(false)}
+    user={selectedUser}
+    onFriendRequestPress={handleFriendRequestPress}
+    isLoading={loading}
+    friendListVisible={friendListVisible}
+    setFriendListVisible={setFriendListVisible}
+  />
+</View>
+
   );
 }
