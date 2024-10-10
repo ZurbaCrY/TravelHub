@@ -325,11 +325,10 @@ export default function ProfileScreen() {
           )}
         </View>
 
-        <View style={[styles.infoSection, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
-          <CustomButton
-            title={"Zu den Einstellungen"}
-            onPress={() => navigation.navigate('Settings')}
-          />
+        <View style={[newStyle.containersmallMarginTop, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
+        <TouchableOpacity style={[newStyle.primaryButton, { backgroundColor: isDarkMode ? '#1E90FF' : '#007BFF' }]} onPress={() => navigation.navigate('Settings')}>
+         <Text style={[newStyle.primaryButtonText, { color: isDarkMode ? '#FFF' : '#FFF' }]}>Zu den Einstellungen</Text>
+        </TouchableOpacity>
         </View>
 
         {/* Travel Buddies Modal */}

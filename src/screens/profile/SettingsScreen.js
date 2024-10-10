@@ -5,6 +5,7 @@ import Button from '../../components/Button';
 import AuthService from '../../services/auth';
 import AnimatedSwitch from '../../components/AnimatedSwitch';
 import styles from '../../styles/style';
+import newStyle from '../../styles/style';
 import { handleFilePicker, handleNewProfilePicture } from '../../backend/community';
 import { useLoading } from '../../context/LoadingContext';
 import CustomButton from '../../components/CustomButton';
@@ -63,10 +64,9 @@ const SettingsScreen = () => {
       </View>
 
       <View>
-        <CustomButton 
-        title={"Sign Out"} 
-        onPress={handleSignOut}
-        />
+        <TouchableOpacity style={[newStyle.primaryButton, { backgroundColor: isDarkMode ? '#1E90FF' : '#007BFF' }]} onPress={handleSignOut}>
+         <Text style={[newStyle.primaryButtonText, { color: isDarkMode ? '#FFF' : '#FFF' }]}>Sign Out</Text>
+        </TouchableOpacity>
       </View>
 
       {/* Modal für die Bildvorschau */}

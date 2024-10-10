@@ -8,6 +8,12 @@ const newStyle = StyleSheet.create({
         backgroundColor: '#f8f8f8',
         marginTop: 35,
     },
+    containersmallMarginTop: {
+        flex: 1,
+        padding: 8,
+        backgroundColor: '#f8f8f8',
+        marginTop: 15,
+    },
     containerNoMarginTop: {
         flex: 1,
         padding: 8,
