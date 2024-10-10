@@ -68,7 +68,7 @@ export default function CommunityDetailScreen({ route, navigation }) {
       const commentsData = await fetchComments(post.id);
       setComments(commentsData);
     } catch (error) {
-      console.error('Error fetching posts: ', error);
+      console.error('Error loading posts: ', error);
     } finally {
       setRefreshing(false);
     }

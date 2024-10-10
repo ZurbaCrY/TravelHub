@@ -31,6 +31,7 @@ import {
   removeWishListCountry,
 } from '../../backend/Profile';
 import FriendService from '../../services/friendService';
+import UserDataHandler from '../../services/userDataHandler';
 import getUsernamesByUserIds from '../../services/getUsernamesByUserIds'
 import { getUserStats } from '../../services/getUserStats';
 import { useAuth } from '../../context/AuthContext';
@@ -58,6 +59,7 @@ export default function ProfileScreen() {
   const [selectedUser, setSelectedUser] = useState(null);
   const [requestModalVisible, setRequestModalVisible] = useState(false);
   const [friendRequests, setFriendRequests] = useState([]);
+  const [userData, setUserData] = useState(null);
 
   const navigation = useNavigation();
 
@@ -76,7 +78,7 @@ export default function ProfileScreen() {
       }
     };
 
-    const fetchProfileData = async () => {
+    const fetchUserStats = async () => {
       try {
         showLoading("Fetching User Stats");
         const visitedCountriesData = await fetchVisitedCountries(user.id);
@@ -121,10 +123,24 @@ export default function ProfileScreen() {
       }
     };
 
+    const fetchUserData = async () => {
+      try {
+        showLoading("Fetching User Data");
+        const userData = await UserDataHandler.getUserData(user.id);
+        setUserData(userData);
+        console.log("User Data: ", userData);
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      } finally {
+        hideLoading();
+      }
+    };
+
 
     fetchProfilePictureUrl();
-    fetchProfileData();
+    fetchUserStats();
     fetchRequests();
+    fetchUserData();
   }, [user]);
 
   const handleAddVisitedCountry = async () => {
@@ -517,6 +533,9 @@ export default function ProfileScreen() {
               )}
             />
           )}
+          {/* <View style={newStyle.marginBottomLarge}/> 
+          <Text style={newStyle.titleText}>Suggested Users</Text>
+          <Text style={newStyle.bodyText}>This feature will be added in the future.</Text> */}
         </View>
       </ExtendedModal>
 

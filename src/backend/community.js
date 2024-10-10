@@ -422,7 +422,7 @@ export const fetchPosts = async () => {
       .order('timestamp', { ascending: false });
 
     if (error) {
-      throw error;
+      throw new Error('Error fetching posts: ' + error.message);
     }
 
     return data;

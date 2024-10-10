@@ -30,9 +30,7 @@ class AuthService {
   For more information contact Tom-N-M
   */
   async getUser() {
-    if (!this.initialized) {
-      await this.initialize()
-    }
+    await this.initialize()
     return this.user;
   }
 
