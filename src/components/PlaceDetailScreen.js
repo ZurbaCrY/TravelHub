@@ -3,12 +3,15 @@ import { View, Text, Animated, TouchableOpacity, Image, StyleSheet, TextInput, S
 import PropTypes from 'prop-types';
 import { FontAwesome } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
+import Alert from './Alert';
 
 const PlaceDetailScreen = ({ visible, place, onClose }) => {
   const translateX = useRef(new Animated.Value(-1000)).current;
   const [rating, setRating] = useState(0);
   const [review, setReview] = useState('');
   const [reviews, setReviews] = useState([]);
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [message, setMessage] = useState('');
 
   useEffect(() => {
     if (visible) {
@@ -23,6 +26,11 @@ const PlaceDetailScreen = ({ visible, place, onClose }) => {
   if (!visible || !place) {
     return null;
   }
+
+  const showAlert = (message) => {
+      setMessage(message);
+      setAlertVisible(true);
+  };
 
   const handleRatingPress = (value) => {
     setRating(value);
@@ -40,7 +48,7 @@ const PlaceDetailScreen = ({ visible, place, onClose }) => {
       setReview('');
       setRating(0);
     } else {
-      alert('Bitte geben Sie eine Bewertung und einen Text ein.');
+      showAlert('Bitte geben Sie eine Bewertung und einen Text ein.');
     }
   };
 
@@ -149,6 +157,12 @@ const PlaceDetailScreen = ({ visible, place, onClose }) => {
           )}
         </View>
       </ScrollView>
+
+        <Alert
+          visible={alertVisible}
+          onClose={() => setAlertVisible(false)}
+          message={message}
+        />
     </Animated.View>
   );
 };
