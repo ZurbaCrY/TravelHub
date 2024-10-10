@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, Animated, TouchableOpacity, Image, StyleSheet, TextInput, FlatList } from 'react-native';
+import { View, Text, Animated, TouchableOpacity, Image, StyleSheet, TextInput, ScrollView } from 'react-native';
 import PropTypes from 'prop-types';
 import { FontAwesome } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -8,6 +8,7 @@ const PlaceDetailScreen = ({ visible, place, onClose }) => {
   const translateX = useRef(new Animated.Value(-1000)).current;
   const [rating, setRating] = useState(0);
   const [review, setReview] = useState('');
+  const [reviews, setReviews] = useState([]);
 
   useEffect(() => {
     if (visible) {
@@ -27,10 +28,48 @@ const PlaceDetailScreen = ({ visible, place, onClose }) => {
     setRating(value);
   };
 
+  const handleSubmitReview = () => {
+    if (rating > 0 && review.trim() !== '') {
+      const newReview = {
+        id: Math.random().toString(36).substr(2, 9),
+        rating,
+        text: review,
+        date: new Date().toLocaleDateString(),
+      };
+      setReviews([...reviews, newReview]);
+      setReview('');
+      setRating(0);
+    } else {
+      alert('Bitte geben Sie eine Bewertung und einen Text ein.');
+    }
+  };
+
+  const renderReviewItem = (item) => {
+    if (!item || !item.rating) return null; // Sicherheitsüberprüfung
+    return (
+      <View style={styles.reviewItem} key={item.id}>
+        <View style={styles.reviewHeader}>
+          <View style={styles.reviewStars}>
+            {[1, 2, 3, 4, 5].map((star) => (
+              <FontAwesome
+                key={star}
+                name={star <= item.rating ? 'star' : 'star-o'}
+                size={18}
+                color="#FFD700"
+              />
+            ))}
+          </View>
+          <Text style={styles.reviewDate}>{item.date}</Text>
+        </View>
+        <Text style={styles.reviewText}>{item.text}</Text>
+      </View>
+    );
+  };
+
   return (
     <Animated.View style={[styles.container, { transform: [{ translateX }] }]}>
-      <View style={styles.content}>
-
+      <ScrollView contentContainerStyle={styles.content}>
+        {/* Schließen-Button */}
         <TouchableOpacity onPress={onClose} style={styles.closeButton}>
           <MaterialIcons name="close" size={24} color="black" />
         </TouchableOpacity>
@@ -95,12 +134,21 @@ const PlaceDetailScreen = ({ visible, place, onClose }) => {
             onChangeText={setReview}
             multiline
           />
-          <TouchableOpacity style={styles.submitButton} onPress={() => alert('Bewertung gesendet')}>
+          <TouchableOpacity style={styles.submitButton} onPress={handleSubmitReview}>
             <Text style={styles.submitButtonText}>Senden</Text>
           </TouchableOpacity>
         </View>
 
-      </View>
+        {/* Vorhandene Bewertungen */}
+        <View style={styles.reviewsContainer}>
+          <Text style={styles.reviewsTitle}>Vorhandene Bewertungen:</Text>
+          {reviews.length === 0 ? (
+            <Text style={styles.noReviews}>Keine Bewertungen vorhanden.</Text>
+          ) : (
+            reviews.map(renderReviewItem)
+          )}
+        </View>
+      </ScrollView>
     </Animated.View>
   );
 };
@@ -133,9 +181,7 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 20,
-    flex: 1,
-    justifyContent: 'flex-start',
-    marginTop: 20,
+    flexGrow: 1,
   },
   placeName: {
     fontSize: 28,
@@ -211,6 +257,34 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
   },
+  reviewsContainer: {
+    marginTop: 20,
+  },
+  reviewsTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  reviewItem: {
+    marginBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+    paddingBottom: 10,
+  },
+  reviewHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  reviewStars: {
+    flexDirection: 'row',
+  },
+  reviewDate: {
+    color: '#777',
+  },
+  reviewText: {
+    fontSize: 16,
+  },
   closeButton: {
     padding: 10,
     position: 'absolute',
@@ -219,10 +293,6 @@ const styles = StyleSheet.create({
     zIndex: 1,
     backgroundColor: 'lightgrey',
     borderRadius: 5,
-  },
-  closeButtonText: {
-    color: '#fff',
-    fontSize: 16,
   },
 });
 
