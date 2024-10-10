@@ -25,9 +25,11 @@ export const AuthProvider = ({ children }) => {
     };
     initUser();
 
-    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session?.user) {
-        setUser(session.user);
+    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
+      await AuthService.initialize();
+      const user = await AuthService.getUser();
+      if (user && user.id) {
+        setUser(user);
       } else {
         setUser(null);
       }
@@ -35,7 +37,7 @@ export const AuthProvider = ({ children }) => {
 
     // Cleanup subscription on unmount
     return () => {
-      authListener?.subscription?.unsubscribe(); 
+      authListener?.subscription?.unsubscribe();
     };
   }, []);
 

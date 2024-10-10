@@ -34,7 +34,7 @@ class FriendService {
 
   async loadUser() {
     await AuthService.loadUser();
-    this.user = AuthService.getUser();
+    this.user = await AuthService.getUser();
     if (!this.user || !this.user.id) {
       throw new Error("User not loaded");
     }

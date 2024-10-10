@@ -274,7 +274,7 @@ export default function ProfileScreen() {
                     <Text style={newStyle.notificationText}>{friendRequests.length}</Text>
                   </View>
                 )}
-                <FontAwesome5 name="user-plus" size={20} color={isDarkMode ? '#FFFDF3' : '#000000'} />
+                <FontAwesome5 name="user-plus" size={20} color={isDarkMode ? '#070A0F' : '#f8f8f8'} />
               </TouchableOpacity>
             </View>
 
@@ -476,14 +476,14 @@ export default function ProfileScreen() {
               keyExtractor={(item) => item.friend_request_id}
               renderItem={({ item }) => (
                 <View style={newStyle.containerRow}>
-                  <TouchableOpacity>
+                  <TouchableOpacity style={newStyle.containerNoMarginTop}>
                     <Text style={newStyle.bodyText}>{item.sender_username}</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity>
-
+                  <TouchableOpacity style={newStyle.containerNoMarginTop}>
+                    <Text style={newStyle.bodyText}>Accept</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity>
-                    
+                  <TouchableOpacity style={newStyle.containerNoMarginTop}>
+                    <Text style={newStyle.bodyText}>Decline</Text>
                   </TouchableOpacity>
                 </View>
               )}
