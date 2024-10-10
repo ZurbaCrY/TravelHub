@@ -1,17 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, Animated, TouchableOpacity, Image, StyleSheet, TextInput, FlatList } from 'react-native';
 import PropTypes from 'prop-types';
-import { FontAwesome } from '@expo/vector-icons'; // Für die Sternebewertung
+import { FontAwesome } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
 
 const PlaceDetailScreen = ({ visible, place, onClose }) => {
-  const translateX = useRef(new Animated.Value(-1000)).current; // Start außerhalb des Bildschirms
-  const [rating, setRating] = useState(0); // Sternebewertung
-  const [review, setReview] = useState(''); // Bewertungstext
+  const translateX = useRef(new Animated.Value(-1000)).current;
+  const [rating, setRating] = useState(0);
+  const [review, setReview] = useState('');
 
   useEffect(() => {
     if (visible) {
-      // Animation starten, wenn sichtbar
       Animated.timing(translateX, {
         toValue: 0,
         duration: 300,
