@@ -37,7 +37,6 @@ import { useAuth } from '../../context/AuthContext';
 import { useLoading } from '../../context/LoadingContext';
 import PublicProfileModal from '../../components/PublicProfileModal';
 import { FontAwesome5 } from '@expo/vector-icons';
-import { SlideInLeft } from 'react-native-reanimated';
 
 export default function ProfileScreen() {
   const { isDarkMode } = useDarkMode();
@@ -255,6 +254,18 @@ export default function ProfileScreen() {
     }
   }
 
+  const respondToFriendRequest = async (requestId, action) => {
+    try {
+      showLoading("Responding to Friend Request");
+      await FriendService.respondToFriendRequest(requestId, action);
+      setFriendRequests(friendRequests.filter(request => request.friend_request_id !== requestId));
+    } catch (error) {
+      console.error('Error responding to friend request:', error);
+    } finally {
+      hideLoading();
+    }
+  }
+
   return (
     <View style={[newStyle.centeredContainer, { backgroundColor: isDarkMode ? '#070A0F' : '#f8f8f8' }]}>
       <TouchableWithoutFeedback onPress={() => {
@@ -266,18 +277,35 @@ export default function ProfileScreen() {
         <ScrollView style={[newStyle.container, { backgroundColor: isDarkMode ? '#070A0F' : '#f8f8f8' }]}>
           <View style={[newStyle.centeredContainer, { backgroundColor: isDarkMode ? '#070A0F' : '#f8f8f8' }]}>
 
-            {/* Friend Requests */}
-            <View style={newStyle.friendRequestButtonWrapper}>
-              <TouchableOpacity style={newStyle.friendRequestButton} onPress={handleRequestButtonPress}>
-                {friendRequests.length > 0 && (
-                  <View style={newStyle.notificationCircle}>
-                    <Text style={newStyle.notificationText}>{friendRequests.length}</Text>
-                  </View>
-                )}
-                <FontAwesome5 name="user-plus" size={20} color={isDarkMode ? '#070A0F' : '#f8f8f8'} />
-              </TouchableOpacity>
+            <View style={newStyle.roundButtonContainer}>
+              {/* Settings Button */}
+              <View style={newStyle.roundButtonWrapper}>
+                <TouchableOpacity style={newStyle.roundButton} onPress={() => navigation.navigate('Settings')}>
+                  <FontAwesome5 name="cog" size={20} color={isDarkMode ? '#070A0F' : '#f8f8f8'} />
+                </TouchableOpacity>
+              </View>
+
+              {/* Edit Profile Button */}
+              <View style={newStyle.roundButtonWrapper}>
+                <TouchableOpacity style={newStyle.roundButton} onPress={() => navigation.navigate('EditProfile')}>
+                  <FontAwesome5 name="edit" size={20} color={isDarkMode ? '#070A0F' : '#f8f8f8'} />
+                </TouchableOpacity>
+              </View>
+
+              {/* Friend Request Button */}
+              <View style={newStyle.roundButtonWrapper}>
+                <TouchableOpacity style={newStyle.roundButton} onPress={handleRequestButtonPress}>
+                  {friendRequests.length > 0 && (
+                    <View style={newStyle.notificationCircle}>
+                      <Text style={newStyle.notificationText}>{friendRequests.length}</Text>
+                    </View>
+                  )}
+                  <FontAwesome5 name="user-plus" size={20} color={isDarkMode ? '#070A0F' : '#f8f8f8'} />
+                </TouchableOpacity>
+              </View>
             </View>
 
+            {/* Profile Picture, Username, Email, Birthday, Country */}
             <Image
               source={{ uri: profilePictureUrl }}
               style={newStyle.largeProfileImage}
@@ -300,7 +328,7 @@ export default function ProfileScreen() {
             </View>
           </View>
 
-          {/* User Stats Section */}
+          {/* User Stats */}
           <View style={newStyle.userStatsContainer}>
             {/* Row 1: Friends and Posts */}
             <View style={newStyle.userStatsRow}>
@@ -328,6 +356,8 @@ export default function ProfileScreen() {
               </View>
             </View>
           </View>
+
+          {/* Visited and Wish List Countries */}
           <View style={newStyle.infoSection}>
             <Text style={newStyle.header}>Bereits besuchte Länder:</Text>
             {visitedCountries.length === 0 ? (
@@ -399,12 +429,8 @@ export default function ProfileScreen() {
             )}
           </View>
 
-          <View style={[styles.infoSection, { backgroundColor: isDarkMode ? '#070A0F' : '#f8f8f8' }]}>
-            <CustomButton
-              title={"Zu den Einstellungen"}
-              onPress={() => navigation.navigate('Settings')}
-            />
-          </View>
+          {/* Placeholder for the bottom of the screen */}
+          <View style={[styles.infoSection, { backgroundColor: isDarkMode ? '#070A0F' : '#f8f8f8' }]} />
 
           {/* Travel Buddies Modal */}
           <Modal
@@ -444,19 +470,10 @@ export default function ProfileScreen() {
               </View>
             </TouchableWithoutFeedback>
           </Modal>
-
         </ScrollView>
       </TouchableWithoutFeedback>
-      {/* User Profile Modal */}
-      <PublicProfileModal
-        user={selectedUser}
-        visible={userProfileModal}
-        onClose={() => {
-          setUserProfileModal(false);
-          setSelectedUser(null);
-        }}
-        onFriendRequestPress={handleFriendRequestPress}
-      />
+
+      {/* Friend Requests */}
       <ExtendedModal
         isVisible={requestModalVisible}
         onBackdropPress={() => setRequestModalVisible(false)}
@@ -476,21 +493,43 @@ export default function ProfileScreen() {
               keyExtractor={(item) => item.friend_request_id}
               renderItem={({ item }) => (
                 <View style={newStyle.containerRow}>
-                  <TouchableOpacity style={newStyle.containerNoMarginTop}>
+                  <TouchableOpacity
+                    style={newStyle.containerNoMarginTop}
+                    onPress={() => handleUserPress(item = { user_id: item.sender_id, username: item.sender_username })}
+                  >
                     <Text style={newStyle.bodyText}>{item.sender_username}</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={newStyle.containerNoMarginTop}>
-                    <Text style={newStyle.bodyText}>Accept</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={newStyle.containerNoMarginTop}>
-                    <Text style={newStyle.bodyText}>Decline</Text>
-                  </TouchableOpacity>
+                  <View style={newStyle.row}>
+                    <TouchableOpacity
+                      style={newStyle.containerNoMarginTop}
+                      onPress={() => respondToFriendRequest(item.friend_request_id, "accept")}
+                    >
+                      <Text style={newStyle.bodyText}>Accept</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={newStyle.containerNoMarginTop}
+                      onPress={() => respondToFriendRequest(item.friend_request_id, "decline")}
+                    >
+                      <Text style={newStyle.bodyText}>Decline</Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
               )}
             />
           )}
         </View>
       </ExtendedModal>
+
+      {/* User Profile Modal */}
+      <PublicProfileModal
+        user={selectedUser}
+        visible={userProfileModal}
+        onClose={() => {
+          setUserProfileModal(false);
+          setSelectedUser(null);
+        }}
+        onFriendRequestPress={handleFriendRequestPress}
+      />
     </View>
   );
 }

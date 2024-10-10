@@ -81,7 +81,7 @@ class AuthService {
     this.rememberMe = rememberMe;
     if (this.rememberMe) {
       await this.saveUser(data.user);
-    } else if (this.rememberMe) {
+    } else if (!this.rememberMe) {
       await this.removeUser();
     }
     this.user = data.user;
@@ -137,6 +137,7 @@ class AuthService {
         },
       ]);
       // Only local Save, user needs to login again on next app open
+      this.removeUser();
       this.user = data.user;
       return data.user;
     } else {

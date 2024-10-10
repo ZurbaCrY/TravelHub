@@ -222,15 +222,25 @@ const newStyle = StyleSheet.create({
         lineHeight: 60,
         paddingBottom: 5,
     },
-    friendRequestButtonWrapper: {
+    roundButtonContainer: {
         position: 'absolute',
         right: 0,
         top: 0,
-        padding: 10,
+        flexDirection: 'column', 
         alignItems: 'center',
-        justifyContent: 'center',
+        justifyContent: 'space-between',
     },
-    friendRequestButton: {
+    roundButtonWrapper: {
+        // position: 'absolute',
+        // right: 0,
+        // top: 0,
+        // padding: 10,
+        alignItems: 'center',
+        width: '100%',
+        marginBottom: 54,
+        // justifyContent: 'center',
+    },
+    roundButton: {
         position: 'absolute',
         top: 0,
         right: 0,
@@ -412,6 +422,9 @@ const newStyle = StyleSheet.create({
     },
     marginTopLarge: {
         marginTop: 24,
+    },
+    marginTopHuge: {
+        marginTop: 54,
     },
     marginLeftSmall: {
         marginLeft: 8,
