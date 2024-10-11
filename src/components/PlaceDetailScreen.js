@@ -125,15 +125,6 @@ useEffect(() => {
 
             {/* Relevante Infos als Liste */}
             <View style={styles.infoList}>
-              {place.type === 'Sehenswürdigkeit' && (
-                <Text style={styles.infoItem}>Eintrittsgebühr: {place.entranceFee} Euro</Text>
-              )}
-              {place.type === 'Restaurant' && (
-                <Text style={styles.infoItem}>Preisniveau: {place.priceLevel}</Text>
-              )}
-              {place.type === 'Einkaufsladen' && (
-                <Text style={styles.infoItem}>Geöffnet: {place.isOpen ? 'Ja' : 'Nein'}</Text>
-              )}
             </View>
 
             {/* Beschreibung */}
@@ -325,7 +316,7 @@ const styles = StyleSheet.create({
   closeButton: {
     padding: 10,
     position: 'absolute',
-    top: 10,
+    top: 0,
     right: 10,
     zIndex: 1,
     backgroundColor: 'lightgrey',
