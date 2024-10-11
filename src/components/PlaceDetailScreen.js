@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, Animated, TouchableOpacity, Image, StyleSheet, TextInput, ScrollView } from 'react-native';
+import { View, Text, Animated, TouchableOpacity, Image, StyleSheet, TextInput, ScrollView, FlatList } from 'react-native';
 import PropTypes from 'prop-types';
 import { FontAwesome } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
 import Alert from './Alert';
+import { loadRatings, saveRatingToDB } from '../backend/LoadEditPlaceData';
 
 const PlaceDetailScreen = ({ visible, place, onClose }) => {
   const translateX = useRef(new Animated.Value(-1000)).current;
@@ -13,15 +14,24 @@ const PlaceDetailScreen = ({ visible, place, onClose }) => {
   const [alertVisible, setAlertVisible] = useState(false);
   const [message, setMessage] = useState('');
 
-  useEffect(() => {
-    if (visible) {
-      Animated.timing(translateX, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: true,
-      }).start();
-    }
-  }, [visible]);
+useEffect(() => {
+  if (visible && place) {
+    // Animation starten
+    Animated.timing(translateX, {
+      toValue: 0,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+
+    // Bewertungen aus der DB laden
+    const fetchRatings = async () => {
+      const ratings = await loadRatings(place.placeId); // place.placeId ist die Attraction_Id
+      setReviews(ratings);  // Setze die Bewertungen im Zustand
+    };
+
+    fetchRatings();
+  }
+}, [visible, place]);
 
   if (!visible || !place) {
     return null;
@@ -36,26 +46,38 @@ const PlaceDetailScreen = ({ visible, place, onClose }) => {
     setRating(value);
   };
 
-  const handleSubmitReview = () => {
-    if (rating > 0 && review.trim() !== '') {
-      const newReview = {
-        id: Math.random().toString(36).substr(2, 9),
-        rating,
-        text: review,
-        date: new Date().toLocaleDateString(),
-      };
-      setReviews([...reviews, newReview]);
-      setReview('');
-      setRating(0);
-    } else {
-      showAlert('Bitte geben Sie eine Bewertung und einen Text ein.');
-    }
-  };
+ const handleSubmitReview = async () => {
+   if (rating > 0 && review.trim() !== '') {
+     // Neue Bewertung lokal erstellen
+     const newReview = {
+       id: Math.random().toString(36).substr(2, 9),  // Temporäre ID für die lokale Anzeige
+       rating,
+       text: review,
+       date: new Date().toLocaleDateString(),
+     };
+
+     // Bewertung in die DB speichern
+     const result = await saveRatingToDB(place.placeId, rating, review);
+
+     if (result.success) {
+       // Wenn die Bewertung erfolgreich gespeichert wurde, zur lokalen Anzeige hinzufügen
+       setReviews([...reviews, newReview]);
+       setReview('');  // Eingabefeld leeren
+       setRating(0);   // Bewertung zurücksetzen
+     } else {
+       showAlert('Fehler beim Speichern der Bewertung: ');
+     }
+   } else {
+     showAlert('Bitte geben Sie eine Bewertung und einen Text ein.');
+   }
+ };
+
 
   const renderReviewItem = (item) => {
-    if (!item || !item.rating) return null; // Sicherheitsüberprüfung
+    if (!item || item.rating === undefined) return null; // Sicherheitsüberprüfung
+
     return (
-      <View style={styles.reviewItem} key={item.id}>
+      <View style={styles.reviewItem} key={item.rating_id}>
         <View style={styles.reviewHeader}>
           <View style={styles.reviewStars}>
             {[1, 2, 3, 4, 5].map((star) => (
@@ -67,12 +89,16 @@ const PlaceDetailScreen = ({ visible, place, onClose }) => {
               />
             ))}
           </View>
-          <Text style={styles.reviewDate}>{item.date}</Text>
+          <Text style={styles.reviewDate}>
+            {new Date(item.created_at).toLocaleDateString()}
+          </Text>
         </View>
         <Text style={styles.reviewText}>{item.text}</Text>
       </View>
     );
   };
+
+
 
   return (
     <Animated.View style={[styles.container, { transform: [{ translateX }] }]}>
@@ -107,9 +133,6 @@ const PlaceDetailScreen = ({ visible, place, onClose }) => {
           {place.type === 'Einkaufsladen' && (
             <Text style={styles.infoItem}>Geöffnet: {place.isOpen ? 'Ja' : 'Nein'}</Text>
           )}
-          {place.type === 'Aussichtspunkt' && (
-            <Text style={styles.infoItem}>Aussichtspunkttyp: {place.viewpointType}</Text>
-          )}
         </View>
 
         {/* Beschreibung */}
@@ -134,7 +157,6 @@ const PlaceDetailScreen = ({ visible, place, onClose }) => {
 
         {/* Bereich zum Bewertungen schreiben */}
         <View style={styles.reviewContainer}>
-          <Text style={styles.reviewTitle}>Bewertung schreiben:</Text>
           <TextInput
             style={styles.reviewInput}
             placeholder="Ihre Bewertung hier eingeben..."
@@ -149,11 +171,14 @@ const PlaceDetailScreen = ({ visible, place, onClose }) => {
 
         {/* Vorhandene Bewertungen */}
         <View style={styles.reviewsContainer}>
-          <Text style={styles.reviewsTitle}>Vorhandene Bewertungen:</Text>
           {reviews.length === 0 ? (
             <Text style={styles.noReviews}>Keine Bewertungen vorhanden.</Text>
           ) : (
-            reviews.map(renderReviewItem)
+        <FlatList
+          data={reviews}
+          renderItem={({ item }) => renderReviewItem(item)}
+          keyExtractor={(item) => item.rating_id ? item.rating_id.toString() : Math.random().toString()}
+        />
           )}
         </View>
       </ScrollView>

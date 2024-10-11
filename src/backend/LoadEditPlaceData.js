@@ -199,3 +199,45 @@ export const validatePlaceData = (placeName, placeDescription, placeType, coordi
   }
   return { valid: true };
 };
+
+
+
+export const loadRatings = async (attractionId) => {
+  try {
+    const { data, error } = await supabase
+      .from('Rating')
+      .select('rating, text, created_at')
+      .eq('Attraction_Id', attractionId);
+
+    if (error) {
+      console.error('Fehler beim Laden der Bewertungen:', error.message);
+      return [];
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Fehler beim Abrufen der Bewertungen:', error.message);
+    return [];
+  }
+};
+
+export const saveRatingToDB = async (attractionId, rating, reviewText) => {
+  try {
+    const { data, error } = await supabase
+      .from('Rating')
+      .insert([{
+        Attraction_Id: attractionId,
+        rating: rating,
+        text: reviewText,
+      }]);
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    return { success: true, data };
+  } catch (error) {
+    console.error('Fehler beim Speichern der Bewertung:', error.message);
+    return { success: false, message: error.message };
+  }
+};
