@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Alert } from 'react-native';
+import { Modal, TouchableWithoutFeedback } from 'react-native';
 import { View, Text, TextInput, Image } from 'react-native';
-import userDataHandler from '../../services/userDataHandler';
+import UserDataHandler from '../../services/userDataHandler';
 import { useLoading } from '../../context/LoadingContext';
 import styles from '../../styles/style';
 import { FontAwesome5 } from '@expo/vector-icons';
@@ -9,26 +9,23 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useDarkMode } from '../../context/DarkModeContext';
 import CustomButton from '../../components/CustomButton';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import moment from 'moment-timezone';
+import { handleFilePicker, handleNewProfilePicture } from '../../backend/community';
 
 const EditProfile = ({ navigation }) => {
   const { isDarkMode } = useDarkMode();
   const { showLoading, hideLoading } = useLoading();
-  const sourceMoment = moment.unix(1636765200);
-  const sourceDate = sourceMoment.local().toDate();
-  const [date, setDate] = useState(sourceDate);
+  const [date, setDate] = useState(new Date());
   const [showDatepicker, setShowDatepicker] = useState(false);
+  const [imageUrl, setImageUrl] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
   const today = new Date();
-
-  const [userData, setUserData] = useState({
-
-  });
+  const [userData, setUserData] = useState({});
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
         showLoading("Fetching user data");
-        const data = await userDataHandler.getUserData();
+        const data = await UserDataHandler.getUserData();
         // data.birthdate = new Date(data.birthdate); // Ensure birthdate is a Date object
         setUserData({ ...userData, ...data })
         console.log("User data fetched:", data);
@@ -47,10 +44,29 @@ const EditProfile = ({ navigation }) => {
     setUserData({ ...userData, [field]: value });
   };
 
+  const handleImageChange = async () => {
+    const image = await handleFilePicker();
+    if (image) {
+      setImageUrl(image);
+      setModalVisible(true);
+    }
+  };
+
+  const onDateChange = (event, selectedDate) => {
+    setShowDatepicker(false);
+    if (event.type === 'dismissed') {
+      return;
+    } else if (event.type === 'neutralButtonPressed') {
+      setDate(new Date(0));
+    } else if (event.type === 'set') {
+      setDate(selectedDate);
+    }
+  };
+
   const handleSave = async () => {
     try {
       showLoading("Saving user data");
-      await userDataHandler.updateUserData(userData);
+      await UserDataHandler.updateUserData(userData);
     }
     catch (error) {
       console.error('Error saving user data:', error);
@@ -59,64 +75,21 @@ const EditProfile = ({ navigation }) => {
     finally {
       hideLoading();
       alert('User data saved successfully');
-      navigation.goBack();
+      // navigation.goBack();
     }
   };
-
-  const handleImageChange = async () => {
-    Alert.alert(
-      'Feature Not Implemented',
-      'Please contact Support!',
-      [{ text: 'OK' }]
-    );
-    // try {
-    //   showLoading("Changing profile picture");
-    //   const image = await userDataHandler.handleFilePicker();
-    //   if (image) {
-    //     const imageUrl = await userDataHandler.handleNewProfilePicture(image);
-    //     setUserData({ ...userData, profilepicture_url: imageUrl });
-    //   }
-    // } catch (error) {
-    //   console.error('Error changing profile picture:', error);
-    //   alert('This feature is not implemented yet. Please contact Support!');
-    // } finally {
-    //   hideLoading();
-    // }
-  };
-
-  const onDateChange = (event, selectedDate) => {
-    setShowDatepicker(false);
-    if (event.type === 'dismissed') {
-      Alert.alert(
-        'picker was dismissed',
-        undefined,
-        [
-          {
-            text: 'great',
-          },
-        ],
-        { cancelable: true },
-      );
-      return;
-    }
-    
-    if (event.type === 'neutralButtonPressed') {
-      setDate(new Date(0));
-    } else {
-      setDate(selectedDate);
-    }
-  };
-
 
   return (
     <View style={[styles.containerNoMarginTop, styles.paddingHorizontalMedium]}>
 
       <View style={styles.profileImageContainer}>
         <View style={styles.profileImageWrapper}>
-          <Image
-            source={{ uri: userData.profilepicture_url }}
-            style={styles.largeProfileImage}
-          />
+          <TouchableWithoutFeedback onPress={() => handleImageChange()}>
+            <Image
+              source={{ uri: userData.profilepicture_url }}
+              style={styles.largeProfileImage}
+            />
+          </TouchableWithoutFeedback>
           <View style={styles.roundButtonContainerBottomRight}>
             <TouchableOpacity style={styles.roundButton} onPress={() => handleImageChange()}>
               <FontAwesome5 name="edit" size={20} color={isDarkMode ? '#070A0F' : '#f8f8f8'} />
@@ -166,21 +139,22 @@ const EditProfile = ({ navigation }) => {
       />
 
       <Text style={styles.bodyText}>Birthday</Text>
-      <TouchableOpacity 
-      onPress={() => setShowDatepicker(true)} 
-      style={styles.inputField}
+      <TouchableOpacity
+        onPress={() => setShowDatepicker(true)}
+        style={styles.inputField}
       >
-        <Text>{date.toDateString()}</Text>
+        <Text style={styles.bodyText}>{userData.birthdate ? userData.birthdate : ''}</Text>
       </TouchableOpacity>
       {showDatepicker && (
         <DateTimePicker
-        value={date}
-        mode='date'
-        display='spinner'
-        onChange={onDateChange}
-        minimumDate={new Date(0)}
-        maximumDate={today}
-      />
+          value={date}
+          mode='date'
+          display='spinner'
+          onChange={onDateChange}
+          minimumDate={new Date(0)}
+          maximumDate={today}
+          style={styles.datePicker}
+        />
       )}
 
       <Text style={styles.bodyText}>Country</Text>
@@ -190,6 +164,46 @@ const EditProfile = ({ navigation }) => {
         onChangeText={(text) => handleInputChange('country.home_country', text)}
       />
       <CustomButton title={"Save"} onPress={handleSave} />
+
+
+      {/* Modal für die Bildvorschau */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(!modalVisible);
+        }}
+      >
+        <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
+          <View style={styles.modalBackground}>
+            <TouchableWithoutFeedback>
+              <View style={styles.modalContent}>
+                <Text style={styles.modalTitleText}>Profilbild ändern</Text>
+
+                {imageUrl && (
+                  <Image source={{ uri: imageUrl }} style={styles.postImage} />
+                )}
+                <View style={styles.row}>
+
+                  <TouchableOpacity style={styles.averageRedButton} onPress={() => setModalVisible(false)}>
+                    <Text style={styles.smallButtonText}>Schließen</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.averageBlueButton}
+                    onPress={async () => {
+                      const success = await handleNewProfilePicture(imageUrl);
+                      setModalVisible(false);
+                    }}
+                  >
+                    <Text style={styles.smallButtonText}>Posten</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
     </View>
   );
 };

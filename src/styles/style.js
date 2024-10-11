@@ -234,7 +234,7 @@ const newStyle = StyleSheet.create({
         position: 'absolute',
         right: 0,
         top: 0,
-        flexDirection: 'column', 
+        flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'space-between',
     },
@@ -242,7 +242,7 @@ const newStyle = StyleSheet.create({
         position: 'absolute',
         right: 0,
         bottom: 0,
-        flexDirection: 'column', 
+        flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'space-between',
     },
@@ -308,6 +308,7 @@ const newStyle = StyleSheet.create({
         fontSize: 16,
         marginBottom: 10,
         backgroundColor: 'white',
+        height: 48
     },
 
     // Modal Styles
@@ -498,6 +499,7 @@ const newStyle = StyleSheet.create({
         fontSize: 16,
         color: '#666',
     },
+
     // Post Styles
     postContainer: {
         backgroundColor: '#f8f8f8',
@@ -671,6 +673,16 @@ const newStyle = StyleSheet.create({
     authSwitchTouchable: {
         alignItems: "center",
         marginBottom: 20,
+        backgroundColor: '#f8f8f8',
+    },
+
+    // Date Picker Style
+    datePicker: {
+        width: '100%',
+        padding: 10,
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 5,
         backgroundColor: '#f8f8f8',
     },
 });
