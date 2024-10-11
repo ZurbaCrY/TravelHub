@@ -311,7 +311,7 @@ export default function ProfileScreen() {
                 <TouchableOpacity style={newStyle.roundButtonAbsolute} onPress={handleRequestButtonPress}>
                   {friendRequests.length > 0 && (
                     <View style={newStyle.notificationCircle}>
-                      <Text style={newStyle.notificationText}>{friendRequests.length}</Text>
+                      <Text style={newStyle.notificationText}>{friendRequests.length < 10 ? friendRequests.length : '9+'}</Text>
                     </View>
                   )}
                   <FontAwesome5 name="user-plus" size={20} color={isDarkMode ? '#070A0F' : '#f8f8f8'} />
