@@ -220,26 +220,26 @@ export default function ProfileScreen() {
   }
 
   return (
-    <View style={[newStyle.container, { backgroundColor: isDarkMode ? '#070A0F' : '#f8f8f8' }]}>
+    <View style={[newStyle.container, { backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]}>
       <TouchableWithoutFeedback onPress={() => {
         // Close the keyboard when the user taps outside of the input fields
         Keyboard.dismiss();
         setShowVisitedInput(false);
         setShowWishListInput(false);
       }}>
-        <ScrollView style={[newStyle.container, { backgroundColor: isDarkMode ? '#070A0F' : '#f8f8f8' }]}>
-          <View style={[newStyle.centeredContainer, { backgroundColor: isDarkMode ? '#070A0F' : '#f8f8f8' }]}>
+        <ScrollView style={[newStyle.container, { backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]}>
+          <View style={[newStyle.centeredContainer, { backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]}>
             <Image
               source={{ uri: profilePictureUrl }}
               style={newStyle.largeProfileImage}
             />
-            <Text style={[newStyle.titleText, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>{user.user_metadata.username}</Text>
-            <Text style={[newStyle.bodyText, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>{user.email}</Text>
+            <Text style={[newStyle.titleText, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>{user.user_metadata.username}</Text>
+            <Text style={[newStyle.bodyText, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>{user.email}</Text>
 
             {/* Birthday */}
             <View style={newStyle.row}>
               <Icon name="birthday-cake" size={14} style={[newStyle.marginRightExtraSmall, { color: isDarkMode ? '#FFFDF3' : '#000000' }]} />
-              <Text style={[newStyle.bodyText, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>
+              <Text style={[newStyle.bodyText, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>
                 {user.user_metadata.birthday ? user.user_metadata.birthday : 'No birthdate configured'}
               </Text>
             </View>
@@ -247,7 +247,7 @@ export default function ProfileScreen() {
             {/* Flag */}
             <View style={newStyle.row}>
               <Flag code="DE" size={16} style={newStyle.marginRightExtraSmall} />
-              <Text style={[newStyle.bodyText, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>Deutschland</Text>
+              <Text style={[newStyle.bodyText, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>Deutschland</Text>
             </View>
           </View>
 
@@ -257,25 +257,25 @@ export default function ProfileScreen() {
             <View style={newStyle.userStatsRow}>
               <View style={newStyle.userStatColumn}>
                 <TouchableOpacity onPress={() => setTravelBuddiesModalVisible(true)} style={[{ justifyContent: 'center', alignItems: 'center' }]}>
-                  <Text style={[newStyle.userStatLabel, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>Travel-Buddies</Text>
-                  <Text style={[newStyle.userStatValue, { color: isDarkMode ? '#CCCCCC' : '#555555' }]}>{travelBuddies.length != null ? travelBuddies.length : 'N/A'}</Text>
+                  <Text style={[newStyle.userStatLabel, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>Travel-Buddies</Text>
+                  <Text style={[newStyle.userStatValue, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>{travelBuddies.length != null ? travelBuddies.length : 'N/A'}</Text>
                 </TouchableOpacity>
               </View>
               <View style={newStyle.userStatColumn}>
-                <Text style={newStyle.userStatLabel}>Posts</Text>
-                <Text style={newStyle.userStatValue}>{postCount != null ? postCount : 'N/A'}</Text>
+                <Text style={[newStyle.userStatLabel, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>Posts</Text>
+                <Text style={[newStyle.userStatValue, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>{postCount != null ? postCount : 'N/A'}</Text>
               </View>
             </View>
 
             {/* Row 2: Upvotes and Downvotes */}
             <View style={newStyle.userStatsRow}>
               <View style={newStyle.userStatColumn}>
-                <Text style={[newStyle.userStatLabel, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>Upvotes</Text>
-                <Text style={[newStyle.userStatValue, { color: isDarkMode ? '#CCCCCC' : '#555555' }]}>{upvoteCount != null ? upvoteCount : 'N/A'}</Text>
+                <Text style={[newStyle.userStatLabel, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>Upvotes</Text>
+                <Text style={[newStyle.userStatValue, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>{upvoteCount != null ? upvoteCount : 'N/A'}</Text>
               </View>
               <View style={newStyle.userStatColumn}>
-                <Text style={[newStyle.userStatLabel, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>Downvotes</Text>
-                <Text style={[newStyle.userStatValue, { color: isDarkMode ? '#CCCCCC' : '#555555' }]}>{downvoteCount != null ? downvoteCount : 'N/A'}</Text>
+                <Text style={[newStyle.userStatLabel, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>Downvotes</Text>
+                <Text style={[newStyle.userStatValue, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>{downvoteCount != null ? downvoteCount : 'N/A'}</Text>
               </View>
             </View>
           </View>
@@ -291,7 +291,7 @@ export default function ProfileScreen() {
                     {country.verified && <Icon name="check-circle" size={16} color="green" style={styles.verifiedIcon} />}
                   </View>
                   <TouchableOpacity onPress={() => handleRemoveVisitedCountry(index)} style={styles.removeButton}>
-                    <Icon name="trash" size={20} color="#FFFDF3" />
+                    <Icon name="trash" size={20} color="#f8f8f8" />
                   </TouchableOpacity>
                 </View>
               ))
@@ -303,14 +303,14 @@ export default function ProfileScreen() {
                   onChangeText={setNewVisited}
                   value={newVisited}
                   placeholder="Neues Ziel hinzufügen"
-                  placeholderTextColor="#cccccc"
+                  placeholderTextColor="#f8f8f8"
                 />
-                <Button onPress={handleAddVisitedCountry} color="#58CFEC">Hinzufügen</Button>
+                <Button onPress={handleAddVisitedCountry} color="#f8f8f8">Hinzufügen</Button>
               </>
             )}
             {!showVisitedInput && (
               <TouchableOpacity onPress={() => setShowVisitedInput(true)} style={styles.addButton}>
-                <Icon name="plus" size={20} color="#FFFDF3" />
+                <Icon name="plus" size={20} color="#f8f8f8" />
                 <Text style={styles.addButtonText}> Besuchtes Land hinzufügen</Text>
               </TouchableOpacity>
             )}
@@ -325,7 +325,7 @@ export default function ProfileScreen() {
                 <View key={index} style={styles.countryItem}>
                   <Text style={styles.details}>{country}</Text>
                   <TouchableOpacity onPress={() => handleRemoveWishListCountry(index)} style={styles.removeButton}>
-                    <Icon name="trash" size={20} color="#FFFDF3" />
+                    <Icon name="trash" size={20} color="#f8f8f8" />
                   </TouchableOpacity>
                 </View>
               ))
@@ -337,20 +337,20 @@ export default function ProfileScreen() {
                   onChangeText={setNewWishList}
                   value={newWishList}
                   placeholder="Neues Wunschland hinzufügen"
-                  placeholderTextColor="#cccccc"
+                  placeholderTextColor="#f8f8f8"
                 />
-                <Button onPress={handleAddWishListCountry} color="#58CFEC">Hinzufügen</Button>
+                <Button onPress={handleAddWishListCountry} color="#f8f8f8">Hinzufügen</Button>
               </>
             )}
             {!showWishListInput && (
               <TouchableOpacity onPress={() => setShowWishListInput(true)} style={styles.addButton}>
-                <Icon name="plus" size={20} color="#FFFDF3" />
+                <Icon name="plus" size={20} color="#f8f8f8" />
                 <Text style={styles.addButtonText}> Wunschland hinzufügen</Text>
               </TouchableOpacity>
             )}
           </View>
 
-          <View style={[styles.infoSection, { backgroundColor: isDarkMode ? '#070A0F' : '#f8f8f8' }]}>
+          <View style={[styles.infoSection, { backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]}>
             <CustomButton
               title={"Zu den Einstellungen"}
               onPress={() => navigation.navigate('Settings')}
