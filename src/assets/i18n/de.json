@@ -1,0 +1,25 @@
+{
+  "LANGUAGE": "Deutsch",
+  "SCREENS": {
+    "SETTINGS": {
+      "TITLE": "Einstellungen",
+      "CHANGE_PROFILE_PICTURE": "Profilbild ändern",
+      "DARKMODE": "Darkmode",
+      "NOTIFICATIONS": "Benachrichtigungen",
+      "LANGUAGE": "Sprache",
+      "LOGOUT": "Abmelden",
+      "LOGOUT_CONFIRMATION": "Möchtest du dich wirklich abmelden?",
+      "CANCEL": "Abbrechen"
+    },
+    "PROFILE": {
+      "TITLE": "Profil"
+    },
+    "EDIT_PROFILE": {
+      "TITLE": "Profil bearbeiten"
+    },
+    "COMMUNITY": {
+      "TITLE": "Community"
+    }
+  },
+  "COMPONENTS": {}
+}

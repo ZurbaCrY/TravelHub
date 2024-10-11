@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
 import RootStackNavigator from './src/navigation/RootStack';
@@ -9,6 +9,8 @@ import { DarkModeProvider } from './src/context/DarkModeContext';
 import { LoadingProvider, useLoading } from './src/context/LoadingContext';
 import { AuthProvider, useAuth } from './src/context/AuthContext';
 
+
+import { useTranslation } from 'react-i18next';
 
 
 export default function App() {
@@ -29,10 +31,13 @@ function AppContent() {
   const { user } = useAuth();
   const { showLoading, hideLoading } = useLoading();
 
+  const { t  } = useTranslation();
+  const [ language, setLanguage ] = useState('en');
+
   useEffect(() => {
     const initFriends = async () => {
       try {
-        showLoading('Loading Friends...');
+        showLoading("Loading Friends...");
         await FriendService.initialize();
       } catch (error) {
         console.error('Error loading friends:', error);
@@ -43,7 +48,7 @@ function AppContent() {
 
     // const loadLanguage = async () => {
     //   try {
-    //     showLoading('Loading Language...');
+    //     showLoading("Loading Language...");
     //     const savedLanguage = await AsyncStorage.getItem('language');
     //     if (savedLanguage) {
     //       i18n.changeLanguage(savedLanguage);

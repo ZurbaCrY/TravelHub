@@ -1,0 +1,26 @@
+{
+  "LANGUAGE": "English",
+  "SCREENS": {
+    "SETTINGS": {
+      "TITLE": "Settings",
+      "CHANGE_PROFILE_PICTURE": "Change Profile Picture",
+      "DARKMODE": "Darkmode",
+      "NOTIFICATIONS": "Notifications",
+      "LANGUAGE": "Language",
+      "LOGOUT": "Logout",
+      "LOGOUT_CONFIRMATION": "Do you really want to logout?",
+      "CANCEL": "Cancel"
+    },
+    "PROFILE": {
+      "TITLE": "Profile"
+    },
+    "EDIT_PROFILE": {
+      "TITLE": "Edit Profile"
+    },
+    "COMMUNITY": {
+      "TITLE": "Community"
+    }
+  },
+  "COMPONENTS": {
+  }
+}

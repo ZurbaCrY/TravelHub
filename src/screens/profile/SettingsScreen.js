@@ -10,6 +10,8 @@ import CustomButton from '../../components/CustomButton';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Picker } from '@react-native-picker/picker';
 
+import i18n from '../../assets/i18n/i18n';
+import { useTranslation } from 'react-i18next';
 
 const SettingsScreen = ({ navigation }) => {
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
@@ -17,6 +19,9 @@ const SettingsScreen = ({ navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const { showLoading, hideLoading } = useLoading();
   const { isDarkMode, toggleDarkMode } = useDarkMode();
+
+  const { t } = useTranslation();
+  const [language, setLanguage] = useState('en');
 
   const languages = [
     { label: "English", value: "en" },
@@ -30,10 +35,11 @@ const SettingsScreen = ({ navigation }) => {
   useEffect(() => {
     const fetchLanguage = async () => {
       try {
-        showLoading("Fetching Language");
+        showLoading(t('SCREENS.SETTINGS.FETCHING_LANGUAGE'));
         const language = await AsyncStorage.getItem('language');
         if (language) {
           setSelectedLanguage(String(language));
+          i18n.changeLanguage(language);
         }
       } catch (error) {
         console.error('Error fetching language:', error);
@@ -42,17 +48,17 @@ const SettingsScreen = ({ navigation }) => {
       };
     };
 
-    navigation.setOptions({ title: 'settings', headerStyle: { backgroundColor: '#f8f8f8' } });
+    navigation.setOptions({ title: t('SCREENS.SETTINGS.TITLE'), headerStyle: { backgroundColor: '#f8f8f8' } });
     fetchLanguage();
   }, []);
 
 
   const handleSignOut = async () => {
     try {
-      showLoading("Signing Out");
+      showLoading(t('SCREENS.SETTINGS.SIGNING_OUT'));
       const user = await AuthService.signOut();
     } catch (error) {
-      Alert.alert("Fehler", "Beim Abmelden ist ein Fehler aufgetreten.");
+      Alert.alert(t('SCREENS.SETTINGS.ERROR'), t('SCREENS.SETTINGS.SIGN_OUT_ERROR'));
       console.error('Sign-out error:', error);
     } finally {
       hideLoading();
@@ -69,12 +75,14 @@ const SettingsScreen = ({ navigation }) => {
 
   const languageSwitch = async (pressedLanguage) => {
     try {
-      showLoading("Changing Language");
+      showLoading(t('SCREENS.SETTINGS.CHANGING_LANGUAGE'));
       await AsyncStorage.setItem('language', pressedLanguage);
       setSelectedLanguage(pressedLanguage);
-      Alert.alert("Sprache geändert", `Die Sprache wurde erfolgreich geändert.`);
+      i18n.changeLanguage(pressedLanguage);
+      Alert.alert(t('SCREENS.SETTINGS.LANGUAGE_CHANGED'), t('SCREENS.SETTINGS.LANGUAGE_CHANGED_SUCCESS'));
+      navigation.setOptions({ title: t('SCREENS.SETTINGS.TITLE'), headerStyle: { backgroundColor: '#f8f8f8' } });
     } catch (error) {
-      Alert.alert("Fehler", "Beim Ändern der Sprache ist ein Fehler aufgetreten.");
+      Alert.alert(t('SCREENS.SETTINGS.ERROR'), t('SCREENS.SETTINGS.LANGUAGE_CHANGE_ERROR'));
       console.error('Language change error:', error);
     } finally {
       hideLoading();
@@ -84,16 +92,15 @@ const SettingsScreen = ({ navigation }) => {
 
   return (
     <View style={[styles.containerNoMarginTop, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
-      <Text style={[styles.titleText, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>settings</Text>
       <View style={styles.rowMarginBottom}>
-        <Text style={[styles.bodyTextBig, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>Profilbild wechseln </Text>
+        <Text style={[styles.bodyTextBig, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>{t('SCREENS.SETTINGS.CHANGE_PROFILE_PICTURE')} </Text>
         <TouchableOpacity onPress={handleImageChange}>
           <Image source={require('../../assets/images/picture.png')} style={styles.iconBig} />
         </TouchableOpacity>
       </View>
 
       <View style={styles.rowMarginBottom}>
-        <Text style={[styles.bodyTextBig, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>Darkmode</Text>
+        <Text style={[styles.bodyTextBig, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>{t('SCREENS.SETTINGS.DARKMODE')}</Text>
         <AnimatedSwitch
           onValueChange={toggleDarkMode}
           value={isDarkMode}
@@ -101,7 +108,7 @@ const SettingsScreen = ({ navigation }) => {
       </View>
 
       <View style={styles.rowMarginBottom}>
-        <Text style={[styles.bodyTextBig, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>Benachrichtigungen</Text>
+        <Text style={[styles.bodyTextBig, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>{t('SCREENS.SETTINGS.NOTIFICATIONS')}</Text>
         <AnimatedSwitch
           onValueChange={() => setNotificationsEnabled(previousState => !previousState)}
           value={notificationsEnabled}
@@ -109,7 +116,7 @@ const SettingsScreen = ({ navigation }) => {
       </View>
 
       <View style={styles.rowMarginBottom}>
-        <Text style={[styles.bodyTextBig, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>Sprache</Text>
+        <Text style={[styles.bodyTextBig, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>{t('SCREENS.SETTINGS.LANGUAGE')}</Text>
         <Picker
           selectedValue={selectedLanguage}
           style={{ height: 50, width: 150, color: isDarkMode ? '#FFFDF3' : '#000' }}
@@ -123,7 +130,7 @@ const SettingsScreen = ({ navigation }) => {
 
       <View>
         <CustomButton
-          title={"Sign Out"}
+          title={t('SCREENS.SETTINGS.LOGOUT')}
           onPress={handleSignOut}
         />
       </View>
@@ -141,7 +148,7 @@ const SettingsScreen = ({ navigation }) => {
           <View style={styles.modalBackground}>
             <TouchableWithoutFeedback>
               <View style={styles.modalContent}>
-                <Text style={styles.modalTitleText}>Profilbild ändern</Text>
+                <Text style={styles.modalTitleText}>{t('SCREENS.SETTINGS.CHANGE_PROFILE_PICTURE')}</Text>
 
                 {imageUrl && (
                   <Image source={{ uri: imageUrl }} style={styles.postImage} />
@@ -149,7 +156,7 @@ const SettingsScreen = ({ navigation }) => {
                 <View style={styles.row}>
 
                   <TouchableOpacity style={styles.averageRedButton} onPress={() => setModalVisible(false)}>
-                    <Text style={styles.smallButtonText}>Schließen</Text>
+                    <Text style={styles.smallButtonText}>{t('SCREENS.SETTINGS.CANCEL')}</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={styles.averageBlueButton}
@@ -158,7 +165,7 @@ const SettingsScreen = ({ navigation }) => {
                       setModalVisible(false);
                     }}
                   >
-                    <Text style={styles.smallButtonText}>Posten</Text>
+                    <Text style={styles.smallButtonText}>{t('SCREENS.SETTINGS.POST')}</Text>
                   </TouchableOpacity>
                 </View>
               </View>
