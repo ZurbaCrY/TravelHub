@@ -54,6 +54,7 @@ useEffect(() => {
        rating,
        text: review,
        date: new Date().toLocaleDateString(),
+       created_at: new Date(),
      };
 
      // Bewertung in die DB speichern
@@ -73,115 +74,112 @@ useEffect(() => {
  };
 
 
-  const renderReviewItem = (item) => {
-    if (!item || item.rating === undefined) return null; // Sicherheitsüberprüfung
-
-    return (
-      <View style={styles.reviewItem} key={item.rating_id}>
-        <View style={styles.reviewHeader}>
-          <View style={styles.reviewStars}>
-            {[1, 2, 3, 4, 5].map((star) => (
-              <FontAwesome
-                key={star}
-                name={star <= item.rating ? 'star' : 'star-o'}
-                size={18}
-                color="#FFD700"
-              />
-            ))}
-          </View>
-          <Text style={styles.reviewDate}>
-            {new Date(item.created_at).toLocaleDateString()}
-          </Text>
-        </View>
-        <Text style={styles.reviewText}>{item.text}</Text>
-      </View>
-    );
-  };
-
-
+   const renderReviewItem = (item) => {
+     if (!item || item.rating === undefined) return null; // Sicherheitsüberprüfung
+     return (
+       <View style={styles.reviewItem}>
+         <View style={styles.reviewHeader}>
+           <View style={styles.reviewStars}>
+             {[1, 2, 3, 4, 5].map((star) => (
+               <FontAwesome
+                 key={star}
+                 name={star <= item.rating ? 'star' : 'star-o'}
+                 size={18}
+                 color="#FFD700"
+               />
+             ))}
+           </View>
+           <Text style={styles.reviewDate}>
+             {new Date(item.created_at).toLocaleDateString()}
+           </Text>
+         </View>
+         <Text style={styles.reviewText}>{item.text}</Text>
+       </View>
+     );
+   };
 
   return (
     <Animated.View style={[styles.container, { transform: [{ translateX }] }]}>
-      <ScrollView contentContainerStyle={styles.content}>
-        {/* Schließen-Button */}
-        <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-          <MaterialIcons name="close" size={24} color="black" />
-        </TouchableOpacity>
+      <FlatList
+        contentContainerStyle={styles.content}
+        ListHeaderComponent={
+          <>
+            {/* Schließen-Button */}
+            <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+              <MaterialIcons name="close" size={24} color="black" />
+            </TouchableOpacity>
 
-        {/* Name des Ortes */}
-        <Text style={styles.placeName}>{place.name}</Text>
+            {/* Name des Ortes */}
+            <Text style={styles.placeName}>{place.name}</Text>
 
-        {/* Bild des Ortes */}
-        {place.link ? (
-          <Image
-            source={{ uri: place.link }}
-            style={styles.placeImage}
-            onError={() => console.error("Image failed to load")}
-          />
-        ) : (
-          <View style={styles.placeholderImage} />
-        )}
+            {/* Bild des Ortes */}
+            {place.link ? (
+              <Image
+                source={{ uri: place.link }}
+                style={styles.placeImage}
+                onError={() => console.error("Image failed to load")}
+              />
+            ) : (
+              <View style={styles.placeholderImage} />
+            )}
 
-        {/* Relevante Infos als Liste */}
-        <View style={styles.infoList}>
-          {place.type === 'Sehenswürdigkeit' && (
-            <Text style={styles.infoItem}>Eintrittsgebühr: {place.entranceFee} Euro</Text>
-          )}
-          {place.type === 'Restaurant' && (
-            <Text style={styles.infoItem}>Preisniveau: {place.priceLevel}</Text>
-          )}
-          {place.type === 'Einkaufsladen' && (
-            <Text style={styles.infoItem}>Geöffnet: {place.isOpen ? 'Ja' : 'Nein'}</Text>
-          )}
-        </View>
+            {/* Relevante Infos als Liste */}
+            <View style={styles.infoList}>
+              {place.type === 'Sehenswürdigkeit' && (
+                <Text style={styles.infoItem}>Eintrittsgebühr: {place.entranceFee} Euro</Text>
+              )}
+              {place.type === 'Restaurant' && (
+                <Text style={styles.infoItem}>Preisniveau: {place.priceLevel}</Text>
+              )}
+              {place.type === 'Einkaufsladen' && (
+                <Text style={styles.infoItem}>Geöffnet: {place.isOpen ? 'Ja' : 'Nein'}</Text>
+              )}
+            </View>
 
-        {/* Beschreibung */}
-        <Text style={styles.placeDescription}>{place.description}</Text>
+            {/* Beschreibung */}
+            <Text style={styles.placeDescription}>{place.description}</Text>
 
-        {/* Sternebewertung */}
-        <View style={styles.ratingContainer}>
-          <Text style={styles.ratingTitle}>Bewertung:</Text>
-          <View style={styles.stars}>
-            {[1, 2, 3, 4, 5].map((star) => (
-              <TouchableOpacity key={star} onPress={() => handleRatingPress(star)}>
-                <FontAwesome
-                  name={star <= rating ? 'star' : 'star-o'}
-                  size={32}
-                  color="#FFD700"
-                  style={styles.star}
-                />
+            {/* Sternebewertung */}
+            <View style={styles.ratingContainer}>
+              <Text style={styles.ratingTitle}>Bewertung:</Text>
+              <View style={styles.stars}>
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <TouchableOpacity key={star} onPress={() => handleRatingPress(star)}>
+                    <FontAwesome
+                      name={star <= rating ? 'star' : 'star-o'}
+                      size={32}
+                      color="#FFD700"
+                      style={styles.star}
+                    />
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+
+            {/* Bereich zum Bewertungen schreiben */}
+            <View style={styles.reviewContainer}>
+              <TextInput
+                style={styles.reviewInput}
+                placeholder="Ihre Bewertung hier eingeben..."
+                value={review}
+                onChangeText={setReview}
+                multiline
+              />
+              <TouchableOpacity style={styles.submitButton} onPress={handleSubmitReview}>
+                <Text style={styles.submitButtonText}>Senden</Text>
               </TouchableOpacity>
-            ))}
-          </View>
-        </View>
-
-        {/* Bereich zum Bewertungen schreiben */}
-        <View style={styles.reviewContainer}>
-          <TextInput
-            style={styles.reviewInput}
-            placeholder="Ihre Bewertung hier eingeben..."
-            value={review}
-            onChangeText={setReview}
-            multiline
-          />
-          <TouchableOpacity style={styles.submitButton} onPress={handleSubmitReview}>
-            <Text style={styles.submitButtonText}>Senden</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Vorhandene Bewertungen */}
-        <View style={styles.reviewsContainer}>
-          {reviews.length === 0 ? (
+            </View>
+          </>
+        }
+        data={reviews}
+        renderItem={({ item }) => renderReviewItem(item)}
+        keyExtractor={(item) => item.rating_id ? item.rating_id.toString() : Math.random().toString()}
+        ListFooterComponent={
+          reviews.length === 0 ? (
             <Text style={styles.noReviews}>Keine Bewertungen vorhanden.</Text>
-          ) : (
-        <FlatList
-          data={reviews}
-          renderItem={({ item }) => renderReviewItem(item)}
-          keyExtractor={(item) => item.rating_id ? item.rating_id.toString() : Math.random().toString()}
-        />
-          )}
-        </View>
-      </ScrollView>
+          ) : null
+        }
+      />
 
         <Alert
           visible={alertVisible}
