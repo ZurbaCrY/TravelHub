@@ -1,27 +1,50 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { View, Modal, Text, TouchableOpacity } from 'react-native';
+import { View, Modal, Text, TouchableOpacity, Image } from 'react-native';
 import { GiftedChat, MessageText } from 'react-native-gifted-chat';
 import { useDarkMode } from '../../context/DarkModeContext.js';
 import { supabase } from '../../services/supabase.js';
-import AuthService from '../../services/auth.js';
 import PropTypes from 'prop-types';
 import newStyle from '../../styles/style'; // Neuer relativer Pfad zu den Styles
 import { useAuth } from '../../context/AuthContext.js';
+import PublicProfileModal from '../../components/PublicProfileModal.js';
+import { useLoading } from '../../context/LoadingContext.js';
+import { getUserStats } from '../../services/getUserStats.js';
+import FriendService from '../../services/friendService.js';
 
 export default function ChatScreen({ route, navigation }) {
-  const {user} = useAuth();
+  const { user } = useAuth();
   const CURRENT_USER = user;
   const CURRENT_USER_ID = CURRENT_USER.id;
-  const { chatId, chatName } = route.params;
+  const { chatId, chatName, chatPartnerId, chatPartnerProfilePicutreUrl } = route.params;
   const [messages, setMessages] = useState([]);
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [isDeleteModalVisible, setDeleteModalVisible] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [messageInput, setMessageInput] = useState('');
   const { isDarkMode } = useDarkMode();
-
+  const [userProfileModalVisible, setUserProfileModalVisible] = useState(false);
+  const { showLoading, hideLoading } = useLoading();
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [loading, setLoading] = useState(false);
+  
   useEffect(() => {
-    navigation.setOptions({ title: chatName });
+    navigation.setOptions({
+      headerTitle: () => (
+        <TouchableOpacity onPress={() => handleUserPress()} style={newStyle.headerTitleContainer}>
+          <View style={newStyle.containerRow}>
+            <View style={newStyle.marginTopMedium}>
+              <Image source={{ uri: chatPartnerProfilePicutreUrl }} style={newStyle.extraSmallProfileImage} />
+            </View>
+            <View style={[newStyle.marginTopSmall, newStyle.marginLeftSmall]}>
+              <Text style={newStyle.titleText}>{chatName}</Text>
+            </View>
+          </View>
+        </TouchableOpacity>
+      ),
+      headerStyle: {
+        backgroundColor: isDarkMode ? '#070A0F' : '#f8f8f8',
+      }
+    });
 
     const fetchMessages = async () => {
       try {
@@ -64,6 +87,28 @@ export default function ChatScreen({ route, navigation }) {
       supabase.removeChannel(messageSubscription);
     };
   }, [chatId, chatName, navigation]);
+
+  const handleUserPress = async () => {
+    try {
+      showLoading("Loading User Stats");
+      const stats = await getUserStats(user_id = chatPartnerId);
+      const selectedUserData = {
+        user_id: chatPartnerId,
+        username: chatName,
+        profilepicture_url: chatPartnerProfilePicutreUrl,
+        friendCount: stats.friendCount,
+        upvotes: stats.upvoteCount,
+        downvotes: stats.downvoteCount,
+        postCount: stats.postCount
+      };
+      setSelectedUser(selectedUserData);
+      setUserProfileModalVisible(true);
+    } catch (error) {
+      console.error('Error fetching user stats:', error);
+    } finally {
+      hideLoading();
+    }
+  };
 
   const formatMessages = (data) => {
     return data.map(message => ({
@@ -193,8 +238,19 @@ export default function ChatScreen({ route, navigation }) {
     );
   };
 
+  const handleFriendRequestPress = async () => {
+    try {
+      showLoading();
+      await FriendService.sendFriendRequest(selectedUser.user_id);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      hideLoading();
+    }
+  };
+
   return (
-    <View style={[newStyle.containerNoMarginTop, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
+    <View style={[newStyle.containerNoMarginTop, { backgroundColor: isDarkMode ? '#070A0F' : '#f8f8f8' }]}>
       <GiftedChat
         messages={messages}
         onSend={(messages) => onSend(messages)}
@@ -202,8 +258,8 @@ export default function ChatScreen({ route, navigation }) {
           _id: CURRENT_USER_ID,
         }}
         text={messageInput}
-        onInputTextChanged={(text) => setMessageInput(text)} 
-        textInputStyle={{ color: isDarkMode ? '#FFF' : '#000' }}
+        onInputTextChanged={(text) => setMessageInput(text)}
+        textInputStyle={{ color: isDarkMode ? '#f8f8f8' : '#000' }}
         onLongPress={handleLongPress}
         renderMessageText={renderMessageText}
       />
@@ -232,6 +288,13 @@ export default function ChatScreen({ route, navigation }) {
           </View>
         </View>
       </Modal>
+      <PublicProfileModal
+        isVisible={userProfileModalVisible}
+        onClose={() => setUserProfileModalVisible(false)}
+        user={selectedUser}
+        onFriendRequestPress={handleFriendRequestPress}
+        isLoading={loading}
+      />
     </View>
   );
 }  

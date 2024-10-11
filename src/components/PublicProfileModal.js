@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, Image, Modal, TouchableOpacity, TouchableWithoutFeedback, FlatList } from 'react-native';
 import CustomButton from './CustomButton'; // Ensure CustomButton is imported correctly
 import newStyle from '../styles/style'; // Updated to use the new styles variable name
+import FriendService from '../services/friendService';
 import { useDarkMode } from '../context/DarkModeContext'; // Import DarkMode context
 
 const UserProfileModal = ({
@@ -13,6 +14,28 @@ const UserProfileModal = ({
   friendListVisible,
   setFriendListVisible
 }) => {
+
+  const [friendshipState, setFriendshipState] = useState(null);
+
+  useEffect(() => {
+    const fetchFriendshipState = async () => {
+      if (user && user.user_id) {
+        try {
+          const friendshipState = await FriendService.getFriendshipStatus(user.user_id);
+          // Assuming you have a state to store the friendship state
+          setFriendshipState(friendshipState);
+          console.log('Friendship state:', friendshipState);
+        } catch (error) {
+          console.error('Failed to fetch friendship state:', error);
+        }
+      }
+    };
+
+    fetchFriendshipState();
+  }, [user]);
+
+
+
   const { isDarkMode } = useDarkMode(); // Access Dark Mode state
 
   if (!user) return null;
@@ -37,7 +60,7 @@ const UserProfileModal = ({
               <Text style={[newStyle.modalTitleText, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>{user.username || 'N/A'}</Text>
               <Image
                 source={{ uri: user.profilepicture_url || 'https://via.placeholder.com/100' }}
-                style={newStyle.profileImage}
+                style={newStyle.mediumProfileImage}
               />
 
               {/* User Stats Section */}
@@ -104,6 +127,9 @@ const UserProfileModal = ({
                   </TouchableWithoutFeedback>
                 </Modal>
               )}
+
+              {/* Friend Button */}
+
 
               {/* Friend Request Button */}
               <CustomButton

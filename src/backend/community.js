@@ -4,8 +4,83 @@ import { supabase } from '../services/supabase';
 import AuthService from '../services/auth'
 import { SUPABASE_URL } from '@env';
 
+
+export const fetchAttractionsByCity = async (cityId) => {
+  try {
+    const { data, error } = await supabase
+      .from('Attraction') 
+      .select('Attraction_ID, Attraction_Name, Type_of_Attraction') 
+      .eq('City_ID', cityId); 
+    console.log(data)
+    if (error) {
+      throw error;
+    }
+    return data; 
+  } catch (error) {
+    console.error('Error fetching attractions:', error.message);
+    return []; 
+  }
+};
+
+export const fetchCitiesByCountry = async (countryId) => {
+  try {
+    const { data, error } = await supabase
+      .from('City') 
+      .select('City_ID, Cityname')
+      .eq('Country_ID', countryId);
+    if (error) {
+      throw error;
+    }
+    return data;
+  } catch (error) {
+    console.error('Error fetching cities:', error.message);
+    return [];
+  }
+};
+
+export const fetchCountries = async () => {
+  try {
+    const { data, error } = await supabase
+      .from('Country')
+      .select('Country_ID, Countryname');
+
+    if (error) {
+      throw new Error('Error fetching countries: ' + error.message);
+    }
+
+    return data.map(country => ({
+      id: country.Country_ID,  
+      name: country.Countryname 
+    }));
+  } catch (error) {
+    console.error('Error fetching countries: ', error.message);
+    return []; // Gibt ein leeres Array zurück, falls ein Fehler auftritt
+  }
+};
+
+
 export const deletePost = async (postId) => {
   try {
+    const { data: commentsData, error: commentsError } = await supabase
+      .from('comments')
+      .delete()
+      .eq('post_id', postId);
+
+    if (commentsError) {
+      throw new Error('Error deleting comments: ' + commentsError.message);
+    }
+
+    // Dann abhängige Datensätze in der post_votes-Tabelle löschen
+    const { data: votesData, error: votesError } = await supabase
+      .from('post_votes')
+      .delete()
+      .eq('post_id', postId);
+
+    if (votesError) {
+      throw new Error('Error deleting votes: ' + votesError.message);
+    }
+
+    // Danach den Post löschen
     const { data, error } = await supabase
       .from('posts')
       .delete()
@@ -329,6 +404,19 @@ export const fetchPosts = async () => {
         users (
           username, 
           profilepicture_url
+        ),
+        Country (
+          Country_ID,
+          Countryname
+        ),
+        City (
+          City_ID,
+          Cityname
+        ),
+        Attraction (
+          Attraction_ID,
+          Attraction_Name,
+          Type_of_Attraction
         )
       `)
       .order('timestamp', { ascending: false });
@@ -336,6 +424,7 @@ export const fetchPosts = async () => {
     if (error) {
       throw error;
     }
+
     return data;
   } catch (error) {
     console.error('Error fetching posts:', error.message);
@@ -343,12 +432,11 @@ export const fetchPosts = async () => {
   }
 };
 
-export const createNewPost = async (newPostContent, user_username, imageUrl) => {
-  try {
+export const createNewPost = async (newPostContent, user_username, imageUrl, countryId, cityId, attractionId) => {  
+   try {
     let uploadedImageUrl = null;
     const CURRENT_USER = AuthService.getUser();
     const CURRENT_USER_ID = CURRENT_USER.id;
-
 
     if (imageUrl) {
       // Lade das Bild hoch
@@ -379,15 +467,18 @@ export const createNewPost = async (newPostContent, user_username, imageUrl) => 
       uploadedImageUrl = `${SUPABASE_URL}/storage/v1/object/public/Images/images/${fileName}`;
     }
 
-    // Erstelle den Post nach dem Hochladen des Bildes
     const { error: postError } = await supabase.from('posts').insert([{
       content: newPostContent,
       author: user_username,
       image_url: uploadedImageUrl,
       upvotes: 0,
       downvotes: 0,
-      user_id: CURRENT_USER_ID
+      user_id: CURRENT_USER_ID,
+      country_id: countryId ? countryId : null,
+      city_id: cityId ? cityId : null,
+      attraction_id: attractionId ? attractionId : null
     }]);
+
 
     if (postError) {
       throw new Error('Error creating post: ' + postError.message);

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, Modal, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, Modal, Alert, TouchableWithoutFeedback } from 'react-native';
 import { useDarkMode } from '../../context/DarkModeContext';
 import Button from '../../components/Button';
 import AuthService from '../../services/auth';
@@ -13,8 +13,8 @@ import CustomButton from '../../components/CustomButton';
 const SettingsScreen = () => {
   const { isDarkMode, toggleDarkMode } = useDarkMode();
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
-  const [imageUrl, setImageUrl] = useState(null); 
-  const [modalVisible, setModalVisible] = useState(false); 
+  const [imageUrl, setImageUrl] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
   const { showLoading, hideLoading } = useLoading();
 
   const handleSignOut = async () => {
@@ -64,7 +64,7 @@ const SettingsScreen = () => {
       </View>
 
       <View>
-        <TouchableOpacity style={[newStyle.primaryButton, { backgroundColor: isDarkMode ? '#1E90FF' : '#007BFF' }]} onPress={handleSignOut}>
+      <TouchableOpacity style={[newStyle.primaryButton, { backgroundColor: isDarkMode ? '#1E90FF' : '#007BFF' }]} onPress={handleSignOut}>
          <Text style={[newStyle.primaryButtonText, { color: isDarkMode ? '#FFF' : '#FFF' }]}>Sign Out</Text>
         </TouchableOpacity>
       </View>
@@ -78,28 +78,36 @@ const SettingsScreen = () => {
           setModalVisible(!modalVisible);
         }}
       >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalView}>
-            {imageUrl && (
-              <Image source={{ uri: imageUrl }} style={styles.previewImage} />
-            )}
-            <Button mode="contained" onPress={() => setModalVisible(false)}>
-              Schließen
-            </Button>
-            <TouchableOpacity
-              style={styles.submitButton}
-              onPress={async () => {
-                const success = await handleNewProfilePicture(imageUrl);
-                setModalVisible(false);
-              }}
-            >
-              <Button mode="contained">
-                Posten
-              </Button>
-            </TouchableOpacity>
+        <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
+          <View style={styles.modalBackground}>
+            <TouchableWithoutFeedback>
+              <View style={styles.modalContent}>
+                <Text style={styles.modalTitleText}>Profilbild ändern</Text>
+
+                {imageUrl && (
+                  <Image source={{ uri: imageUrl }} style={styles.postImage} />
+                )}
+                <View style={styles.row}>
+                
+                  <TouchableOpacity style={styles.averageRedButton} onPress={() => setModalVisible(false)}>
+                    <Text style={styles.smallButtonText}>Schließen</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                  style={styles.averageBlueButton}
+                  onPress={async () => {
+                    const success = await handleNewProfilePicture(imageUrl);
+                    setModalVisible(false);
+                  }}
+                >
+                  <Text style={styles.smallButtonText}>Posten</Text>
+                </TouchableOpacity>
+                </View>
+              </View>
+            </TouchableWithoutFeedback>
           </View>
-        </View>
+        </TouchableWithoutFeedback>
       </Modal>
+
     </View>
   );
 };

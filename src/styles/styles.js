@@ -58,6 +58,8 @@ export const styles = StyleSheet.create({
     color: "#3EAAE9",
   },
 
+
+
   // Profile styles
   containerProfileScreen: {
     flex: 1,
@@ -707,4 +709,6 @@ export const styles = StyleSheet.create({
     fontSize: 18,
     textAlign: 'center',
   },
+
+  
 });
