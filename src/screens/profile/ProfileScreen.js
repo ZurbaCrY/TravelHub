@@ -454,7 +454,7 @@ export default function ProfileScreen() {
                   placeholderTextColor="#cccccc"
                 />
                 <Button onPress={handleAddVisitedCountry} color="#58CFEC">
-                  {t('SCREENS.PROFILE.ADD')}
+                  {t('ADD')}
                 </Button>
               </>
             )}
@@ -496,7 +496,7 @@ export default function ProfileScreen() {
                   placeholderTextColor="#cccccc"
                 />
                 <Button onPress={handleAddWishListCountry} color="#58CFEC">
-                  {t('SCREENS.PROFILE.ADD')}
+                  {t('ADD')}
                 </Button>
               </>
             )}
@@ -536,7 +536,7 @@ export default function ProfileScreen() {
 
                       <TouchableOpacity style={newStyle.averageRedButton} onPress={() => setModalVisible(false)}>
                         <Text style={newStyle.smallButtonText}>
-                          {t('SCREENS.PROFILE.CLOSE')}
+                          {t('CLOSE')}
                         </Text>
                       </TouchableOpacity>
                       <TouchableOpacity
@@ -547,7 +547,7 @@ export default function ProfileScreen() {
                         }}
                       >
                         <Text style={newStyle.smallButtonText}>
-                          {t('SCREENS.PROFILE.POST')}
+                          {t('POST')}
                         </Text>
                       </TouchableOpacity>
                     </View>
@@ -612,9 +612,13 @@ export default function ProfileScreen() {
         style={newStyle.friendRequestModal}
       >
         <View style={newStyle.container}>
-          <Text style={newStyle.titleText}>{t('SCREENS.PROFILE.FRIEND_REQUEST')}</Text>
+          <Text style={newStyle.titleText}>
+            {t('FRIENDS.REQUESTS.FRIEND_REQUESTS')}
+          </Text>
           {friendRequests.length === 0 ? (
-            <Text style={newStyle.bodyText}>{t('SCREENS.PROFILE.NO_FRIEND_REQUEST')}</Text>
+            <Text style={newStyle.bodyText}>
+              {t('FRIENDS.REQUESTS.NO_FRIEND_REQUESTS')}
+            </Text>
           ) : (
             <FlatList
               data={friendRequests}

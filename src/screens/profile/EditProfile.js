@@ -113,7 +113,9 @@ const EditProfile = ({ navigation }) => {
 
           <View style={styles.row}>
             <View style={styles.container45Percent}>
-              <Text style={styles.bodyText}>First Name</Text>
+              <Text style={styles.bodyText}>
+                {t('SCREENS.PROFILE.FIRST_NAME')}
+              </Text>
               <TextInput
                 style={styles.inputField}
                 value={userData.first_name}
@@ -121,7 +123,9 @@ const EditProfile = ({ navigation }) => {
               />
             </View>
             <View style={styles.container45Percent}>
-              <Text style={styles.bodyText}>Last Name</Text>
+              <Text style={styles.bodyText}>
+                {t('SCREENS.PROFILE.LAST_NAME')}
+              </Text>
               <TextInput
                 style={styles.inputField}
                 value={userData.last_name}
@@ -130,21 +134,27 @@ const EditProfile = ({ navigation }) => {
             </View>
           </View>
 
-          <Text style={styles.bodyText}>Username</Text>
+          <Text style={styles.bodyText}>
+            {t('SCREENS.PROFILE.USERNAME')}
+          </Text>
           <TextInput
             style={styles.inputField}
             value={userData.username}
             onChangeText={(text) => handleInputChange('username', text)}
           />
 
-          <Text style={styles.bodyText}>Bio</Text>
+          <Text style={styles.bodyText}>
+            {t('SCREENS.PROFILE.BIO')}
+          </Text>
           <TextInput
             style={styles.inputField}
             value={userData.bio}
             onChangeText={(text) => handleInputChange('bio', text)}
           />
 
-          <Text style={styles.bodyText}>Email</Text>
+          <Text style={styles.bodyText}>
+            {t('SCREENS.PROFILE.EMAIL')}
+          </Text>
           <TextInput
             style={styles.inputField}
             value={userData.email}
@@ -153,7 +163,9 @@ const EditProfile = ({ navigation }) => {
             onChangeText={(text) => Alert.alert('Error', 'There is a Problem with this feature. \nPlease Contact Support')}
           />
 
-          <Text style={styles.bodyText}>Birthday</Text>
+          <Text style={styles.bodyText}>
+            {t('SCREENS.PROFILE.BIRTHDATE')}
+          </Text>
           <TouchableOpacity
             onPress={() => setShowDatepicker(true)}
             style={styles.inputField}
@@ -174,7 +186,9 @@ const EditProfile = ({ navigation }) => {
             />
           )}
 
-          <Text style={styles.bodyText}>Country</Text>
+          <Text style={styles.bodyText}>
+            {t('SCREENS.PROFILE.COUNTRY')}
+          </Text>
           <TextInput
             style={styles.inputField}
             value={country}
@@ -196,7 +210,9 @@ const EditProfile = ({ navigation }) => {
               <View style={styles.modalBackground}>
                 <TouchableWithoutFeedback>
                   <View style={styles.modalContent}>
-                    <Text style={styles.modalTitleText}>Profilbild ändern</Text>
+                    <Text style={styles.modalTitleText}>
+                      {t('SCREENS.SETTINGS.CHANGE_PROFILE_PICTURE')}
+                    </Text>
 
                     {imageUrl && (
                       <Image source={{ uri: imageUrl }} style={styles.postImage} />
@@ -204,7 +220,9 @@ const EditProfile = ({ navigation }) => {
                     <View style={styles.row}>
 
                       <TouchableOpacity style={styles.averageRedButton} onPress={() => setModalVisible(false)}>
-                        <Text style={styles.smallButtonText}>Schließen</Text>
+                        <Text style={styles.smallButtonText}>
+                          {t('CLOSE')}
+                        </Text>
                       </TouchableOpacity>
                       <TouchableOpacity
                         style={styles.averageBlueButton}
@@ -213,7 +231,9 @@ const EditProfile = ({ navigation }) => {
                           setModalVisible(false);
                         }}
                       >
-                        <Text style={styles.smallButtonText}>Posten</Text>
+                        <Text style={styles.smallButtonText}>
+                          {t('POST')}
+                        </Text>
                       </TouchableOpacity>
                     </View>
                   </View>

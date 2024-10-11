@@ -18,12 +18,22 @@
     },
     "PROFILE": {
       "TITLE": "Profile",
+      "FIRST_NAME": "First Name",
+      "NO_FIRST_NAME": "No first name configured",
+      "LAST_NAME": "Last Name",
+      "NO_LAST_NAME": "No last name configured",
+      "USERNAME": "Username",
+      "NO_USERNAME": "No username configured",
+      "BIO": "Bio",
+      "NO_BIO": "No bio configured",
+      "EMAIL": "Email",
+      "NO_EMAIL": "No email configured",
+      "BIRTHDATE": "Birthdate",
+      "NO_BIRTHDATE": "No birthdate configured",
+      "COUNTRY": "Country",
+      "NO_COUNTRY": "No home country configured",
       "TRAVEL_BUDDIES": "Travel Buddies",
       "NO_TRAVEL_BUDDIES": "You have no travel buddies yet.",
-      "NO_EMAIL": "No email configured",
-      "NO_BIRTHDATE": "No birthdate configured",
-      "NO_COUNTRY": "No home country configured",
-      "NO_BIO": "No bio configured",
       "POSTS": "Posts",
       "UPVOTES": "Upvotes",
       "DOWNVOTES": "Downvotes",
@@ -33,15 +43,7 @@
       "WISHLIST_COUNTRIES": "Wishlist Countries: ",
       "NO_WISHLIST_COUNTRIES": "No wishlist countries added yet",
       "ADD_WISHLIST_COUNTRY": "Add wishlist country",
-      "ADD": "Add",
       "CHANGE_PROFILE_PICTURE": "Change Profile Picture",
-      "CLOSE": "Close",
-      "POST": "Post",
-      "FRIEND_REQUEST": "Friend Request",
-      "NO_FRIEND_REQUEST": "You have no friend requests."
-    },
-    "EDIT_PROFILE": {
-      "TITLE": "Edit Profile"
     },
     "COMMUNITY": {
       "TITLE": "Community"
@@ -69,5 +71,38 @@
     "CHATS": "Loading chats...",
     "CHANGING_LANGUAGE": "Changing language...",
     "FETCHING_LANGUAGE": "Fetching language..."
-  }
+  },
+  "FRIENDS": {
+    "FRIEND": "Friends",
+    "FRIENDS": "Friends",
+    "NO_FRIENDS": "You have no friends yet.",
+    "REQUESTS": {
+      "FRIEND_REQUEST": "Friend Request",
+      "FRIEND_REQUESTS": "Friend Requests",
+      "NO_FRIEND_REQUEST": "You have no friend request.",
+      "NO_FRIEND_REQUESTS": "You have no friend requests.",
+      "SENT": "Friend request sent.",
+      "NO_SENT": "You have no friend request sent.",
+      "RECEIVED": "Friend request received.",
+      "NO_RECEIVED": "You have no friend request received.",
+      "ACCEPT_SUCCESS": "Friend request accepted.",
+      "ACCEPT_ERROR": "Error accepting friend request.",
+      "DECLINE_SUCCESS": "Friend request declined.",
+      "DECLINE_ERROR": "Error declining friend request.",
+      "REVOKE_SUCCESS": "Friend request revoked.",
+      "REVOKE_ERROR": "Error revoking friend request.",
+      "SEND_SUCCESS": "Friend request sent.",
+      "SEND_ERROR": "Error sending friend request."
+    }
+  },
+  "CANCEL": "Cancel",
+  "POST": "Post",
+  "SUCCESS": "Success",
+  "ERROR": "Error",
+  "ADD": "Add",
+  "CLOSE": "Close",
+  "ACCEPT": "Accept",
+  "DECLINE": "Decline",
+  "REVOKE": "Revoke",
+  "SEND": "Send"
 }
