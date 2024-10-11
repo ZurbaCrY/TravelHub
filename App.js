@@ -9,6 +9,8 @@ import { DarkModeProvider } from './src/context/DarkModeContext';
 import { LoadingProvider, useLoading } from './src/context/LoadingContext';
 import { AuthProvider, useAuth } from './src/context/AuthContext';
 
+
+
 export default function App() {
   return (
     <LoadingProvider>
@@ -27,7 +29,6 @@ function AppContent() {
   const { user } = useAuth();
   const { showLoading, hideLoading } = useLoading();
 
-  // Initialize friends
   useEffect(() => {
     const initFriends = async () => {
       try {
@@ -39,6 +40,23 @@ function AppContent() {
         hideLoading();
       }
     };
+
+    // const loadLanguage = async () => {
+    //   try {
+    //     showLoading('Loading Language...');
+    //     const savedLanguage = await AsyncStorage.getItem('language');
+    //     if (savedLanguage) {
+    //       i18n.changeLanguage(savedLanguage);
+    //     } else {
+    //       const locale = Localization.getLocales();
+    //       i18n.changeLanguage(locale);
+    //     }
+    //   } catch (error) {
+    //     console.error('Error loading language:', error);
+    //   } finally {
+    //     hideLoading();
+    //   }
+    // }
 
     initFriends();
   }, []);
