@@ -10,6 +10,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useLoading } from '../../context/LoadingContext.js'
 import { useAuth } from '../../context/AuthContext.js';
 import { getProfilePictureUrlByUserId } from '../../services/getProfilePictureUrlByUserId';
+import { useTranslation } from 'react-i18next';
 
 const fetchFromSupabase = async (table, select, filters = []) => {
   let query = supabase.from(table).select(select);
@@ -26,6 +27,7 @@ const fetchFromSupabase = async (table, select, filters = []) => {
 };
 
 export default function ChatListScreen({ navigation }) {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const CURRENT_USER = user;
   const CURRENT_USER_ID = CURRENT_USER.id;
@@ -41,7 +43,7 @@ export default function ChatListScreen({ navigation }) {
     React.useCallback(() => {
       const fetchChatsAndUsers = async () => {
         try {
-          showLoading("Fetching Chats");
+          showLoading(t('LOADING_MESSAGE.CHATS'));
           await fetchChats();
           await fetchUsers();
         } catch (error) {

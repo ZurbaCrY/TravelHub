@@ -8,8 +8,8 @@ import FriendService from './src/services/friendService';
 import { DarkModeProvider } from './src/context/DarkModeContext';
 import { LoadingProvider, useLoading } from './src/context/LoadingContext';
 import { AuthProvider, useAuth } from './src/context/AuthContext';
-
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import i18n from './src/assets/i18n/i18n';
 import { useTranslation } from 'react-i18next';
 
 
@@ -31,13 +31,13 @@ function AppContent() {
   const { user } = useAuth();
   const { showLoading, hideLoading } = useLoading();
 
-  const { t  } = useTranslation();
-  const [ language, setLanguage ] = useState('en');
+  const { t } = useTranslation();
+  const [language, setLanguage] = useState('en');
 
   useEffect(() => {
     const initFriends = async () => {
       try {
-        showLoading("Loading Friends...");
+        showLoading(t('LOADING_MESSAGE.FRIENDS'));
         await FriendService.initialize();
       } catch (error) {
         console.error('Error loading friends:', error);
@@ -46,24 +46,25 @@ function AppContent() {
       }
     };
 
-    // const loadLanguage = async () => {
-    //   try {
-    //     showLoading("Loading Language...");
-    //     const savedLanguage = await AsyncStorage.getItem('language');
-    //     if (savedLanguage) {
-    //       i18n.changeLanguage(savedLanguage);
-    //     } else {
-    //       const locale = Localization.getLocales();
-    //       i18n.changeLanguage(locale);
-    //     }
-    //   } catch (error) {
-    //     console.error('Error loading language:', error);
-    //   } finally {
-    //     hideLoading();
-    //   }
-    // }
+    const loadLanguage = async () => {
+      try {
+        showLoading(t('LOADING_MESSAGE.LANGUAGE'));
+        const savedLanguage = await AsyncStorage.getItem('language');
+        if (savedLanguage) {
+          i18n.changeLanguage(savedLanguage);
+        } else {
+          const locale = Localization.getLocales();
+          i18n.changeLanguage(locale);
+        }
+      } catch (error) {
+        console.error('Error loading language:', error);
+      } finally {
+        hideLoading();
+      }
+    }
 
     initFriends();
+    loadLanguage();
   }, []);
 
   return user ? (

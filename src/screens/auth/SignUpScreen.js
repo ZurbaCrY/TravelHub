@@ -7,6 +7,7 @@ import { useNavigation } from '@react-navigation/core';
 import { useDarkMode } from '../../context/DarkModeContext';
 import { useLoading } from '../../context/LoadingContext';
 import CustomButton from '../../components/CustomButton';
+import { useTranslation } from 'react-i18next';
 
 const SignUpScreen = () => {
   const [username, setUsername] = useState('');
@@ -14,6 +15,7 @@ const SignUpScreen = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const { showLoading, hideLoading } = useLoading();
+  const { t } = useTranslation();
 
   const navigation = useNavigation();
 
@@ -24,7 +26,7 @@ const SignUpScreen = () => {
     }
 
     try {
-      showLoading("Signing Up...");
+      showLoading(t('LOADING_MESSAGE.SIGN_UP'));
       const user = await AuthService.signUp(username, email, password, confirmPassword);
     } catch (error) {
       Alert.alert("Sign-Up Error", "An error occurred during sign-up. Please try again.");

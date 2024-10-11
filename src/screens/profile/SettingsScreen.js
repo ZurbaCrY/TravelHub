@@ -35,7 +35,7 @@ const SettingsScreen = ({ navigation }) => {
   useEffect(() => {
     const fetchLanguage = async () => {
       try {
-        showLoading(t('SCREENS.SETTINGS.FETCHING_LANGUAGE'));
+        showLoading(t('LOADING_MESSAGE.FETCHING_LANGUAGE'));
         const language = await AsyncStorage.getItem('language');
         if (language) {
           setSelectedLanguage(String(language));
@@ -75,11 +75,11 @@ const SettingsScreen = ({ navigation }) => {
 
   const languageSwitch = async (pressedLanguage) => {
     try {
-      showLoading(t('SCREENS.SETTINGS.CHANGING_LANGUAGE'));
+      showLoading(t('LOADING_MESSAGE.CHANGING_LANGUAGE'));
       await AsyncStorage.setItem('language', pressedLanguage);
       setSelectedLanguage(pressedLanguage);
       i18n.changeLanguage(pressedLanguage);
-      Alert.alert(t('SCREENS.SETTINGS.LANGUAGE_CHANGED'), t('SCREENS.SETTINGS.LANGUAGE_CHANGED_SUCCESS'));
+      Alert.alert(t('SCREENS.SETTINGS.SUCCESS'), t('SCREENS.SETTINGS.LANGUAGE_CHANGE_SUCCESS'));
       navigation.setOptions({ title: t('SCREENS.SETTINGS.TITLE'), headerStyle: { backgroundColor: '#f8f8f8' } });
     } catch (error) {
       Alert.alert(t('SCREENS.SETTINGS.ERROR'), t('SCREENS.SETTINGS.LANGUAGE_CHANGE_ERROR'));
@@ -88,7 +88,6 @@ const SettingsScreen = ({ navigation }) => {
       hideLoading();
     }
   }
-
 
   return (
     <View style={[styles.containerNoMarginTop, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>

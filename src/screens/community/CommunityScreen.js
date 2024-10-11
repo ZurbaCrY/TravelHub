@@ -11,8 +11,10 @@ import FriendService from '../../services/friendService';
 import { getUserStats } from '../../services/getUserStats';
 import { useAuth } from '../../context/AuthContext';
 import { useLoading } from '../../context/LoadingContext';
+import { useTranslation } from 'react-i18next';
 
 export default function CommunityScreen({ navigation }) {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const user_username = user.user_metadata.username;
   const { isDarkMode } = useDarkMode();
@@ -116,7 +118,7 @@ export default function CommunityScreen({ navigation }) {
 
   const handleUserPress = async (item) => {
     try {
-      showLoading("Loading User Stats");
+      showLoading(t('LOADING_MESSAGE.USER_STATS'));
       const stats = await getUserStats(item.user_id);
       const selectedUserData = {
         user_id: item.user_id,

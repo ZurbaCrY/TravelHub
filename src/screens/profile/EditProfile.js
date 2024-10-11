@@ -10,8 +10,10 @@ import { useDarkMode } from '../../context/DarkModeContext';
 import CustomButton from '../../components/CustomButton';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { handleFilePicker, handleNewProfilePicture } from '../../backend/community';
+import { useTranslation } from 'react-i18next';
 
 const EditProfile = ({ navigation }) => {
+  const { t } = useTranslation();
   const { isDarkMode } = useDarkMode();
   const { showLoading, hideLoading } = useLoading();
   const [date, setDate] = useState(new Date());
@@ -25,7 +27,7 @@ const EditProfile = ({ navigation }) => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        showLoading("Fetching user data");
+        showLoading(t('LOADING_MESSAGE.USER'));
         const data = await UserDataHandler.getUserData();
         // data.birthdate = new Date(data.birthdate); // Ensure birthdate is a Date object
         setUserData({ ...userData, ...data });
@@ -68,7 +70,7 @@ const EditProfile = ({ navigation }) => {
 
   const handleSave = async () => {
     try {
-      showLoading("Saving user data");
+      showLoading(t('LOADING_MESSAGE.SAVE_DATA'));
       userData.birthdate = date.toISOString().split('T')[0];
       userData.country = { home_country: country };
       await UserDataHandler.updateUserData(userData);

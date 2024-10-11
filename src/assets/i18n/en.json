@@ -9,10 +9,36 @@
       "LANGUAGE": "Language",
       "LOGOUT": "Logout",
       "LOGOUT_CONFIRMATION": "Do you really want to logout?",
-      "CANCEL": "Cancel"
+      "CANCEL": "Cancel",
+      "POST": "Post",
+      "SUCCESS": "Success",
+      "ERROR": "Error",
+      "LANGUAGE_CHANGE_SUCCESS": "Language changed successfully",
+      "LANGUAGE_CHANGE_ERROR": "Error changing language"
     },
     "PROFILE": {
-      "TITLE": "Profile"
+      "TITLE": "Profile",
+      "TRAVEL_BUDDIES": "Travel Buddies",
+      "NO_TRAVEL_BUDDIES": "You have no travel buddies yet.",
+      "NO_EMAIL": "No email configured",
+      "NO_BIRTHDATE": "No birthdate configured",
+      "NO_COUNTRY": "No home country configured",
+      "NO_BIO": "No bio configured",
+      "POSTS": "Posts",
+      "UPVOTES": "Upvotes",
+      "DOWNVOTES": "Downvotes",
+      "VISITED_COUNTRIES": "Visited Countries: ",
+      "NO_VISITED_COUNTRIES": "No visited countries added yet",
+      "ADD_VISITED_COUNTRY": "Add visited country",
+      "WISHLIST_COUNTRIES": "Wishlist Countries: ",
+      "NO_WISHLIST_COUNTRIES": "No wishlist countries added yet",
+      "ADD_WISHLIST_COUNTRY": "Add wishlist country",
+      "ADD": "Add",
+      "CHANGE_PROFILE_PICTURE": "Change Profile Picture",
+      "CLOSE": "Close",
+      "POST": "Post",
+      "FRIEND_REQUEST": "Friend Request",
+      "NO_FRIEND_REQUEST": "You have no friend requests."
     },
     "EDIT_PROFILE": {
       "TITLE": "Edit Profile"
@@ -21,6 +47,27 @@
       "TITLE": "Community"
     }
   },
-  "COMPONENTS": {
+  "COMPONENTS": {},
+  "LOADING_MESSAGE": {
+    "LANGUAGE": "Loading language...",
+    "SIGN_IN": "Signing in...",
+    "SIGN_UP": "Signing up...",
+    "LOG_OUT": "Logging out...",
+    "USER": "Loading user...",
+    "USER_STATS": "Loading user stats...",
+    "USER_DATA": "Loading user data...",
+    "SAVE_DATA": "Saving data...",
+    "FRIENDS": "Loading friends...",
+    "FRIEND_REQUESTS": "Loading friend requests...",
+    "FRIEND_REQUEST": "Loading friend request...",
+    "FRIEND_REQUEST_SEND": "Sending friend request...",
+    "FRIEND_REQUEST_ACCEPT": "Accepting friend request...",
+    "FRIEND_REQUEST_DECLINE": "Declining friend request...",
+    "FRIEND_REQUEST_REVOKE": "Revoking friend request...",
+    "PROFILE_PICTURE": "Loading profile picture...",
+    "PROFILE": "Loading profile...",
+    "CHATS": "Loading chats...",
+    "CHANGING_LANGUAGE": "Changing language...",
+    "FETCHING_LANGUAGE": "Fetching language..."
   }
 }

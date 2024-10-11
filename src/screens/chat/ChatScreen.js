@@ -10,8 +10,10 @@ import PublicProfileModal from '../../components/PublicProfileModal.js';
 import { useLoading } from '../../context/LoadingContext.js';
 import { getUserStats } from '../../services/getUserStats.js';
 import FriendService from '../../services/friendService.js';
+import { useTranslation } from 'react-i18next';
 
 export default function ChatScreen({ route, navigation }) {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const CURRENT_USER = user;
   const CURRENT_USER_ID = CURRENT_USER.id;
@@ -90,7 +92,7 @@ export default function ChatScreen({ route, navigation }) {
 
   const handleUserPress = async () => {
     try {
-      showLoading("Loading User Stats");
+      showLoading(t('LOADING.GETTING_USER_STATS'));
       const stats = await getUserStats(user_id = chatPartnerId);
       const selectedUserData = {
         user_id: chatPartnerId,
@@ -240,7 +242,7 @@ export default function ChatScreen({ route, navigation }) {
 
   const handleFriendRequestPress = async () => {
     try {
-      showLoading();
+      showLoading(t('LOADING.SENDING_FRIEND_REQUEST'));
       await FriendService.sendFriendRequest(selectedUser.user_id);
     } catch (error) {
       console.error(error);

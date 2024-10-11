@@ -6,8 +6,10 @@ import { useAuth } from '../../context/AuthContext';
 import PublicProfileModal from '../../components/PublicProfileModal';
 import { useLoading } from '../../context/LoadingContext';
 import { getUserStats } from '../../services/getUserStats';
+import { useTranslation } from 'react-i18next';
 
 export default function CommunityDetailScreen({ route, navigation }) {
+  const { t } = useTranslation();
   const { post } = route.params;
   const { user } = useAuth();
   const [refreshing, setRefreshing] = useState(false);
@@ -123,7 +125,7 @@ export default function CommunityDetailScreen({ route, navigation }) {
 
   const handleUserPress = async (item) => {
     try {
-      showLoading("Loading User Data");
+      showLoading(t('LOADING_MESSAGE.USER'));
       const stats = await getUserStats(user_id = item.user_id);
       const selectedUserData = {
         user_id: item.user_id,
@@ -145,7 +147,7 @@ export default function CommunityDetailScreen({ route, navigation }) {
 
   const handleFriendRequestPress = async () => {
     try {
-      showLoading("Sending Friend Request");
+      showLoading(t('LOADING_MESSAGE.FRIEND_REQUEST'));
       await friendService.sendFriendRequest(selectedUser.user_id);
     } catch (error) {
       console.error('Error sending friend request:', error);
