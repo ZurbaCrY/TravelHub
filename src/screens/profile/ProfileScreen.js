@@ -73,8 +73,6 @@ export default function ProfileScreen() {
         setProfilePictureUrl(url);
       } catch (error) {
         console.error("Error fetching Profile Picture URL:", error);
-      } finally {
-        hideLoading();
       }
     };
 
@@ -100,8 +98,6 @@ export default function ProfileScreen() {
         setDownvoteCount(stats.downvoteCount);
       } catch (error) {
         console.error('Error fetching profile data:', error);
-      } finally {
-        hideLoading();
       }
     };
 
@@ -118,8 +114,6 @@ export default function ProfileScreen() {
         setFriendRequests(requestsWithUsernames);
       } catch (error) {
         console.error('Error fetching friend requests:', error);
-      } finally {
-        hideLoading();
       }
     };
 
@@ -128,19 +122,23 @@ export default function ProfileScreen() {
         showLoading("Fetching User Data");
         const userData = await UserDataHandler.getUserData(user.id);
         setUserData(userData);
-        console.log("User Data: ", userData);
       } catch (error) {
         console.error('Error fetching user data:', error);
-      } finally {
-        hideLoading();
       }
     };
 
 
-    fetchProfilePictureUrl();
-    fetchUserStats();
-    fetchRequests();
-    fetchUserData();
+    try {
+      showLoading("Loading Profile");
+      fetchProfilePictureUrl();
+      fetchUserStats();
+      fetchRequests();
+      fetchUserData();
+    } catch (error) {
+      console.error('Error fetching profile data:', error);
+    } finally {
+      hideLoading();
+    }
   }, [user]);
 
   const handleAddVisitedCountry = async () => {
@@ -293,24 +291,24 @@ export default function ProfileScreen() {
         <ScrollView style={[newStyle.container, { backgroundColor: isDarkMode ? '#070A0F' : '#f8f8f8' }]}>
           <View style={[newStyle.centeredContainer, { backgroundColor: isDarkMode ? '#070A0F' : '#f8f8f8' }]}>
 
-            <View style={newStyle.roundButtonContainer}>
+            <View style={newStyle.roundButtonContainerTopRight}>
               {/* Settings Button */}
               <View style={newStyle.roundButtonWrapper}>
-                <TouchableOpacity style={newStyle.roundButton} onPress={() => navigation.navigate('Settings')}>
+                <TouchableOpacity style={newStyle.roundButtonAbsolute} onPress={() => navigation.navigate('Settings')}>
                   <FontAwesome5 name="cog" size={20} color={isDarkMode ? '#070A0F' : '#f8f8f8'} />
                 </TouchableOpacity>
               </View>
 
               {/* Edit Profile Button */}
               <View style={newStyle.roundButtonWrapper}>
-                <TouchableOpacity style={newStyle.roundButton} onPress={() => navigation.navigate('EditProfile')}>
+                <TouchableOpacity style={newStyle.roundButtonAbsolute} onPress={() => navigation.navigate('EditProfile')}>
                   <FontAwesome5 name="edit" size={20} color={isDarkMode ? '#070A0F' : '#f8f8f8'} />
                 </TouchableOpacity>
               </View>
 
               {/* Friend Request Button */}
               <View style={newStyle.roundButtonWrapper}>
-                <TouchableOpacity style={newStyle.roundButton} onPress={handleRequestButtonPress}>
+                <TouchableOpacity style={newStyle.roundButtonAbsolute} onPress={handleRequestButtonPress}>
                   {friendRequests.length > 0 && (
                     <View style={newStyle.notificationCircle}>
                       <Text style={newStyle.notificationText}>{friendRequests.length}</Text>
@@ -327,21 +325,42 @@ export default function ProfileScreen() {
               style={newStyle.largeProfileImage}
             />
             <Text style={[newStyle.titleText, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>{user.user_metadata.username}</Text>
-            <Text style={[newStyle.bodyText, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>{user.email}</Text>
+
+            {/* Bio */}
+            <Text style={[newStyle.bodyTextBig, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>
+              {userData && userData.bio ? userData.bio : 'No bio configured'}
+            </Text>
+
+
+            {/* Email */}
+            <Text style={[newStyle.bodyText, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>
+              {userData && userData.email ? userData.email : 'No email configured'}
+            </Text>
 
             {/* Birthday */}
             <View style={newStyle.row}>
               <Icon name="birthday-cake" size={14} style={[newStyle.marginRightExtraSmall, { color: isDarkMode ? '#FFFDF3' : '#000000' }]} />
               <Text style={[newStyle.bodyText, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>
-                {user.user_metadata.birthday ? user.user_metadata.birthday : 'No birthdate configured'}
+                {userData && userData.birthdate ? userData.birthdate : 'No birthdate configured'}
               </Text>
             </View>
 
             {/* Flag */}
-            <View style={newStyle.row}>
-              <Flag code="DE" size={16} style={newStyle.marginRightExtraSmall} />
-              <Text style={[newStyle.bodyText, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>Deutschland</Text>
-            </View>
+            {userData && userData.country.home_country && userData.country.home_country_code ?
+              <View style={newStyle.row}>
+                <Flag code={userData.country.home_country_code} size={16} style={newStyle.marginRightExtraSmall} />
+                <Text style={[newStyle.bodyText, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>
+                  {userData.country.home_country}
+                </Text>
+              </View> :
+              <View style={newStyle.row}>
+                <Flag code="DE" size={16} style={newStyle.marginRightExtraSmall} />
+                <Text style={[newStyle.bodyText, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>
+                  No home country configured
+                </Text>
+              </View>
+            }
+
           </View>
 
           {/* User Stats */}

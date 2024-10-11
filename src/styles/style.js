@@ -30,6 +30,14 @@ const newStyle = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
     },
+    column: {
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
+    container45Percent: {
+        width: '45%',
+    },
     rowMarginBottom: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -222,7 +230,7 @@ const newStyle = StyleSheet.create({
         lineHeight: 60,
         paddingBottom: 5,
     },
-    roundButtonContainer: {
+    roundButtonContainerTopRight: {
         position: 'absolute',
         right: 0,
         top: 0,
@@ -230,6 +238,15 @@ const newStyle = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
     },
+    roundButtonContainerBottomRight: {
+        position: 'absolute',
+        right: 0,
+        bottom: 0,
+        flexDirection: 'column', 
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
+
     roundButtonWrapper: {
         // position: 'absolute',
         // right: 0,
@@ -241,6 +258,17 @@ const newStyle = StyleSheet.create({
         // justifyContent: 'center',
     },
     roundButton: {
+        bottom: -10,
+        right: -10,
+        backgroundColor: '#3498DB',
+        width: 60,
+        height: 60,
+        marginBottom: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: 30,
+    },
+    roundButtonAbsolute: {
         position: 'absolute',
         top: 0,
         right: 0,
@@ -380,7 +408,19 @@ const newStyle = StyleSheet.create({
         borderWidth: 2,
         marginBottom: 16,
     },
-
+    profileImageContainer: {
+        alignItems: 'center',
+        marginBottom: 16,
+        height: 140,
+    },
+    profileImageWrapper: {
+        alignItems: 'center',
+        position: 'relative',
+        marginBottom: 16,
+        backgroundColor: '#f8f8f8',
+        width: 140,
+        height: 140,
+    },
 
     // List Styles
     listItem: {
@@ -389,6 +429,7 @@ const newStyle = StyleSheet.create({
         paddingVertical: 10,
         borderBottomWidth: 1,
         borderColor: '#ddd',
+        backgroundColor: '#f8f8f8',
     },
     listItemText: {
         fontSize: 16,

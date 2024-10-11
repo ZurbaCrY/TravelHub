@@ -9,15 +9,10 @@ class UserDataHandler {
       user_id: "",
       username: "",
       email: "",
-      profile_picture_url: "",
-      status: "",
-      last_seen: "",
+      profilepicture_url: "",
       bio: "",
-      phone: "",
-      created_at: "",
-      updated_at: "",
-      birthday: "",
-      home_country: "",
+      birthdate: "",
+      country: {},
       first_name: "",
       last_name: "",
     }
@@ -46,14 +41,29 @@ class UserDataHandler {
     try {
       const { data, error } = await this.supabase
       .from('users')
-      .select('*')
-      .eq('user_id', this.user.id)
-
-      if (error) {
+      .select(`
+        user_id,
+        first_name,
+        last_name,
+        username,
+        email,
+        profilepicture_url,
+        birthdate,
+        bio,
+        country:Country( 
+          home_country:Countryname,
+          home_country_code:ISO_Name
+          )
+          `)
+          .eq('user_id', this.user.id)
+      
+          if (error) {
         throw new Error("Error fetching user data: " + error.message);
       }
       if (data) {
-        this.userData = data[0];
+        this.userData = { ...this.userData, ...data[0] };
+    
+        console.log("User data loaded successfully:", this.userData);
       } else {
         console.log("No user data found for the current user.");
       }
