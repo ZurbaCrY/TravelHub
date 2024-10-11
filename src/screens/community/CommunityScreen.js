@@ -45,7 +45,7 @@ export default function CommunityScreen({ navigation }) {
       const postsData = await fetchPosts();
       setPosts(postsData);
     } catch (error) {
-      console.error('Error fetching posts: ', error);
+      console.error('Error loading posts: ', error);
     } finally {
       setRefreshing(false);
     }

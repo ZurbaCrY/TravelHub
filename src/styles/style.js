@@ -30,6 +30,14 @@ const newStyle = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
     },
+    column: {
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
+    container45Percent: {
+        width: '45%',
+    },
     rowMarginBottom: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -222,6 +230,74 @@ const newStyle = StyleSheet.create({
         lineHeight: 60,
         paddingBottom: 5,
     },
+    roundButtonContainerTopRight: {
+        position: 'absolute',
+        right: 0,
+        top: 0,
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
+    roundButtonContainerBottomRight: {
+        position: 'absolute',
+        right: 0,
+        bottom: 0,
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
+
+    roundButtonWrapper: {
+        // position: 'absolute',
+        // right: 0,
+        // top: 0,
+        // padding: 10,
+        alignItems: 'center',
+        width: '100%',
+        marginBottom: 54,
+        // justifyContent: 'center',
+    },
+    roundButton: {
+        bottom: -10,
+        right: -10,
+        backgroundColor: '#3498DB',
+        width: 60,
+        height: 60,
+        marginBottom: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: 30,
+    },
+    roundButtonAbsolute: {
+        position: 'absolute',
+        top: 0,
+        right: 0,
+        backgroundColor: '#3498DB',
+        width: 50,
+        height: 50,
+        marginBottom: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: 25,
+        // Change Border radius to that when trying to make it fit on the right side of the screen
+        // borderTopLeftRadius: 25,
+        // borderBottomLeftRadius: 25,
+    },
+    notificationCircle: {
+        position: 'absolute',
+        top: 0,
+        right: 0,
+        width: 20,
+        height: 20,
+        borderRadius: 10,
+        backgroundColor: 'red',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    notificationText: {
+        color: 'white',
+        fontSize: 12,
+    },
 
     // Input Styles
     inputField: {
@@ -232,6 +308,7 @@ const newStyle = StyleSheet.create({
         fontSize: 16,
         marginBottom: 10,
         backgroundColor: 'white',
+        height: 48
     },
 
     // Modal Styles
@@ -282,6 +359,22 @@ const newStyle = StyleSheet.create({
         color: 'white',
         fontSize: 16,
     },
+    friendRequestModal: {
+        position: 'absolute',
+        right: -20,
+        top: -20,
+        width: '85%',
+        height: '100%',
+        backgroundColor: '#f8f8f8',
+        padding: 20,
+        borderTopLeftRadius: 25,
+        borderBottomLeftRadius: 25,
+        // shadowColor: '#000',
+        // shadowOffset: { width: 0, height: 2 },
+        // shadowOpacity: 0.25,
+        // shadowRadius: 4,
+        // elevation: 5,
+    },
 
     // Image Styles
     largeProfileImage: {
@@ -316,7 +409,19 @@ const newStyle = StyleSheet.create({
         borderWidth: 2,
         marginBottom: 16,
     },
-
+    profileImageContainer: {
+        alignItems: 'center',
+        marginBottom: 16,
+        height: 140,
+    },
+    profileImageWrapper: {
+        alignItems: 'center',
+        position: 'relative',
+        marginBottom: 16,
+        backgroundColor: '#f8f8f8',
+        width: 140,
+        height: 140,
+    },
 
     // List Styles
     listItem: {
@@ -325,6 +430,7 @@ const newStyle = StyleSheet.create({
         paddingVertical: 10,
         borderBottomWidth: 1,
         borderColor: '#ddd',
+        backgroundColor: '#f8f8f8',
     },
     listItemText: {
         fontSize: 16,
@@ -359,6 +465,9 @@ const newStyle = StyleSheet.create({
     marginTopLarge: {
         marginTop: 24,
     },
+    marginTopHuge: {
+        marginTop: 54,
+    },
     marginLeftSmall: {
         marginLeft: 8,
     },
@@ -390,6 +499,7 @@ const newStyle = StyleSheet.create({
         fontSize: 16,
         color: '#666',
     },
+
     // Post Styles
     postContainer: {
         backgroundColor: '#f8f8f8',
@@ -568,6 +678,16 @@ const newStyle = StyleSheet.create({
     authSwitchTouchable: {
         alignItems: "center",
         marginBottom: 20,
+        backgroundColor: '#f8f8f8',
+    },
+
+    // Date Picker Style
+    datePicker: {
+        width: '100%',
+        padding: 10,
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 5,
         backgroundColor: '#f8f8f8',
     },
 });

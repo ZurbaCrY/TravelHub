@@ -6,13 +6,14 @@ const CustomButton = ({
   onPress,
   title,
   style,
+  wrapperStyle,
   textStyle,
   isLoading = false,
   disabled = false,
   loadingColor = '#fff',
 }) => {
   return (
-    <View style={[newStyle.buttonWrapper, disabled && newStyle.disabledButtonWrapper]}>
+    <View style={[newStyle.buttonWrapper, wrapperStyle, disabled && newStyle.disabledButtonWrapper]}>
       <TouchableOpacity
         style={[
           newStyle.primaryButton,

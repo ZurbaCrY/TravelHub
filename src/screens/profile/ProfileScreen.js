@@ -11,6 +11,7 @@ import {
   Modal,
   FlatList
 } from 'react-native';
+import ExtendedModal from "react-native-modal";
 import Flag from 'react-native-flags';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useDarkMode } from '../../context/DarkModeContext';
@@ -29,13 +30,15 @@ import {
   addWishListCountry,
   removeWishListCountry,
 } from '../../backend/Profile';
-import friendService from '../../services/friendService';
+import FriendService from '../../services/friendService';
+import UserDataHandler from '../../services/userDataHandler';
 import getUsernamesByUserIds from '../../services/getUsernamesByUserIds'
 import { getUserStats } from '../../services/getUserStats';
 import { useAuth } from '../../context/AuthContext';
 import { useLoading } from '../../context/LoadingContext';
 import PublicProfileModal from '../../components/PublicProfileModal';
 import { handleFilePicker, handleNewProfilePicture } from '../../backend/community';
+import { FontAwesome5 } from '@expo/vector-icons';
 
 export default function ProfileScreen() {
   const { isDarkMode } = useDarkMode();
@@ -55,6 +58,9 @@ export default function ProfileScreen() {
   const { showLoading, hideLoading } = useLoading();
   const [userProfileModal, setUserProfileModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [requestModalVisible, setRequestModalVisible] = useState(false);
+  const [friendRequests, setFriendRequests] = useState([]);
+  const [userData, setUserData] = useState(null);
   const [imageUrl, setImageUrl] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -70,12 +76,10 @@ export default function ProfileScreen() {
         setProfilePictureUrl(url);
       } catch (error) {
         console.error("Error fetching Profile Picture URL:", error);
-      } finally {
-        hideLoading();
       }
     };
 
-    const fetchProfileData = async () => {
+    const fetchUserStats = async () => {
       try {
         showLoading("Fetching User Stats");
         const visitedCountriesData = await fetchVisitedCountries(user.id);
@@ -85,7 +89,7 @@ export default function ProfileScreen() {
         setWishListCountries(wishListCountriesData);
 
         // Fetch travel buddies
-        const travelBuddiesData = await friendService.getFriends();
+        const travelBuddiesData = await FriendService.getFriends();
         const travelBuddiesIds = travelBuddiesData.map(buddy => buddy.friend_id);
         const travelBuddiesNames = await getUsernamesByUserIds(travelBuddiesIds);
         setTravelBuddies(travelBuddiesNames);
@@ -97,13 +101,47 @@ export default function ProfileScreen() {
         setDownvoteCount(stats.downvoteCount);
       } catch (error) {
         console.error('Error fetching profile data:', error);
-      } finally {
-        hideLoading();
       }
     };
 
-    fetchProfilePictureUrl();
-    fetchProfileData();
+    const fetchRequests = async () => {
+      try {
+        const requests = await FriendService.getIncomingRequests(pending = true, accepted = false, declined = false);
+        const senderIds = requests.map(request => request.sender_id);
+        const senderUsernames = await getUsernamesByUserIds(senderIds);
+        const requestsWithUsernames = requests.map((request, index) => ({
+          friend_request_id: request.friend_request_id,
+          sender_id: request.sender_id,
+          sender_username: senderUsernames[index].username
+        }));
+        setFriendRequests(requestsWithUsernames);
+      } catch (error) {
+        console.error('Error fetching friend requests:', error);
+      }
+    };
+
+    const fetchUserData = async () => {
+      try {
+        showLoading("Fetching User Data");
+        const userData = await UserDataHandler.getUserData(user.id);
+        setUserData(userData);
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+
+
+    try {
+      showLoading("Loading Profile");
+      fetchProfilePictureUrl();
+      fetchUserStats();
+      fetchRequests();
+      fetchUserData();
+    } catch (error) {
+      console.error('Error fetching profile data:', error);
+    } finally {
+      hideLoading();
+    }
   }, [user]);
 
   const handleAddVisitedCountry = async () => {
@@ -214,9 +252,32 @@ export default function ProfileScreen() {
   const handleFriendRequestPress = async () => {
     try {
       showLoading("Sending Friend Request");
-      await friendService.sendFriendRequest(selectedUser.user_id);
+      await FriendService.sendFriendRequest(selectedUser.user_id);
     } catch (error) {
       console.error('Error sending friend request:', error);
+    } finally {
+      hideLoading();
+    }
+  }
+
+  const handleRequestButtonPress = async () => {
+    try {
+      showLoading("Navigating to Friend Requests");
+      setRequestModalVisible(true);
+    } catch (error) {
+      console.error('Error navigating to friend requests:', error);
+    } finally {
+      hideLoading();
+    }
+  }
+
+  const respondToFriendRequest = async (requestId, action) => {
+    try {
+      showLoading("Responding to Friend Request");
+      await FriendService.respondToFriendRequest(requestId, action);
+      setFriendRequests(friendRequests.filter(request => request.friend_request_id !== requestId));
+    } catch (error) {
+      console.error('Error responding to friend request:', error);
     } finally {
       hideLoading();
     }
@@ -231,7 +292,7 @@ export default function ProfileScreen() {
   };
 
   return (
-    <View style={[newStyle.container, { backgroundColor: isDarkMode ? '#070A0F' : '#f8f8f8' }]}>
+    <View style={[newStyle.centeredContainer, { backgroundColor: isDarkMode ? '#070A0F' : '#f8f8f8' }]}>
       <TouchableWithoutFeedback onPress={() => {
         // Close the keyboard when the user taps outside of the input fields
         Keyboard.dismiss();
@@ -240,37 +301,82 @@ export default function ProfileScreen() {
       }}>
         <ScrollView style={[newStyle.container, { backgroundColor: isDarkMode ? '#070A0F' : '#f8f8f8' }]}>
           <View style={[newStyle.centeredContainer, { backgroundColor: isDarkMode ? '#070A0F' : '#f8f8f8' }]}>
+
+            <View style={newStyle.roundButtonContainerTopRight}>
+              {/* Settings Button */}
+              <View style={newStyle.roundButtonWrapper}>
+                <TouchableOpacity style={newStyle.roundButtonAbsolute} onPress={() => navigation.navigate('Settings')}>
+                  <FontAwesome5 name="cog" size={20} color={isDarkMode ? '#070A0F' : '#f8f8f8'} />
+                </TouchableOpacity>
+              </View>
+
+              {/* Edit Profile Button */}
+              <View style={newStyle.roundButtonWrapper}>
+                <TouchableOpacity style={newStyle.roundButtonAbsolute} onPress={() => navigation.navigate('EditProfile')}>
+                  <FontAwesome5 name="edit" size={20} color={isDarkMode ? '#070A0F' : '#f8f8f8'} />
+                </TouchableOpacity>
+              </View>
+
+              {/* Friend Request Button */}
+              <View style={newStyle.roundButtonWrapper}>
+                <TouchableOpacity style={newStyle.roundButtonAbsolute} onPress={handleRequestButtonPress}>
+                  {friendRequests.length > 0 && (
+                    <View style={newStyle.notificationCircle}>
+                      <Text style={newStyle.notificationText}>{friendRequests.length < 10 ? friendRequests.length : '9+'}</Text>
+                    </View>
+                  )}
+                  <FontAwesome5 name="user-plus" size={20} color={isDarkMode ? '#070A0F' : '#f8f8f8'} />
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* Profile Picture, Username, Email, Birthday, Country */}
             <TouchableOpacity onPress={handleImageChange}>
               <Image
                 source={{ uri: profilePictureUrl }}
                 style={newStyle.largeProfileImage}
               />
-              <View style={{ position: 'absolute', bottom: 0, right: 0 }}>
-                <TouchableOpacity onPress={handleImageChange}>
-                  <Image source={require('../../assets/images/picture.png')} style={newStyle.iconSmall}
-                  />
-                </TouchableOpacity>
-              </View>
             </TouchableOpacity>
             <Text style={[newStyle.titleText, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>{user.user_metadata.username}</Text>
-            <Text style={[newStyle.bodyText, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>{user.email}</Text>
+
+            {/* Bio */}
+            <Text style={[newStyle.bodyTextBig, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>
+              {userData && userData.bio ? '"' + userData.bio + '"' : 'No bio configured'}
+            </Text>
+
+
+            {/* Email */}
+            <Text style={[newStyle.bodyText, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>
+              {userData && userData.email ? userData.email : 'No email configured'}
+            </Text>
 
             {/* Birthday */}
             <View style={newStyle.row}>
               <Icon name="birthday-cake" size={14} style={[newStyle.marginRightExtraSmall, { color: isDarkMode ? '#FFFDF3' : '#000000' }]} />
               <Text style={[newStyle.bodyText, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>
-                {user.user_metadata.birthday ? user.user_metadata.birthday : 'No birthdate configured'}
+                {userData && userData.birthdate ? new Date(userData.birthdate).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' }) : 'No birthdate configured'}
               </Text>
             </View>
 
             {/* Flag */}
-            <View style={newStyle.row}>
-              <Flag code="DE" size={16} style={newStyle.marginRightExtraSmall} />
-              <Text style={[newStyle.bodyText, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>Deutschland</Text>
-            </View>
+            {userData && userData.country.home_country && userData.country.home_country_code ?
+              <View style={newStyle.row}>
+                <Flag code={userData.country.home_country_code} size={16} style={newStyle.marginRightExtraSmall} />
+                <Text style={[newStyle.bodyText, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>
+                  {userData.country.home_country}
+                </Text>
+              </View> :
+              <View style={newStyle.row}>
+                <Flag code="DE" size={16} style={newStyle.marginRightExtraSmall} />
+                <Text style={[newStyle.bodyText, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>
+                  No home country configured
+                </Text>
+              </View>
+            }
+
           </View>
 
-          {/* User Stats Section */}
+          {/* User Stats */}
           <View style={newStyle.userStatsContainer}>
             {/* Row 1: Friends and Posts */}
             <View style={newStyle.userStatsRow}>
@@ -298,6 +404,8 @@ export default function ProfileScreen() {
               </View>
             </View>
           </View>
+
+          {/* Visited and Wish List Countries */}
           <View style={newStyle.infoSection}>
             <Text style={newStyle.header}>Bereits besuchte Länder:</Text>
             {visitedCountries.length === 0 ? (
@@ -369,12 +477,8 @@ export default function ProfileScreen() {
             )}
           </View>
 
-          <View style={[styles.infoSection, { backgroundColor: isDarkMode ? '#070A0F' : '#f8f8f8' }]}>
-            <CustomButton
-              title={"Zu den Einstellungen"}
-              onPress={() => navigation.navigate('Settings')}
-            />
-          </View>
+          {/* Placeholder for the bottom of the screen */}
+          <View style={[styles.infoSection, { backgroundColor: isDarkMode ? '#070A0F' : '#f8f8f8' }]} />
           {/* Modal für die Bildvorschau */}
           <Modal
             animationType="slide"
@@ -451,9 +555,59 @@ export default function ProfileScreen() {
               </View>
             </TouchableWithoutFeedback>
           </Modal>
-
         </ScrollView>
       </TouchableWithoutFeedback>
+
+      {/* Friend Requests */}
+      <ExtendedModal
+        isVisible={requestModalVisible}
+        onBackdropPress={() => setRequestModalVisible(false)}
+        onBackButtonPress={() => setRequestModalVisible(false)}
+        animationIn="slideInRight"
+        animationOut="slideOutRight"
+        backdropOpacity={0.5}
+        style={newStyle.friendRequestModal}
+      >
+        <View style={newStyle.container}>
+          <Text style={newStyle.titleText}>Friend Requests</Text>
+          {friendRequests.length === 0 ? (
+            <Text style={newStyle.bodyText}>You have no friend requests.</Text>
+          ) : (
+            <FlatList
+              data={friendRequests}
+              keyExtractor={(item) => item.friend_request_id}
+              renderItem={({ item }) => (
+                <View style={newStyle.containerRow}>
+                  <TouchableOpacity
+                    style={newStyle.containerNoMarginTop}
+                    onPress={() => handleUserPress(item = { user_id: item.sender_id, username: item.sender_username })}
+                  >
+                    <Text style={newStyle.bodyText}>{item.sender_username}</Text>
+                  </TouchableOpacity>
+                  <View style={newStyle.row}>
+                    <TouchableOpacity
+                      style={newStyle.containerNoMarginTop}
+                      onPress={() => respondToFriendRequest(item.friend_request_id, "accept")}
+                    >
+                      <Text style={newStyle.bodyText}>Accept</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={newStyle.containerNoMarginTop}
+                      onPress={() => respondToFriendRequest(item.friend_request_id, "decline")}
+                    >
+                      <Text style={newStyle.bodyText}>Decline</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              )}
+            />
+          )}
+          {/* <View style={newStyle.marginBottomLarge}/> 
+          <Text style={newStyle.titleText}>Suggested Users</Text>
+          <Text style={newStyle.bodyText}>This feature will be added in the future.</Text> */}
+        </View>
+      </ExtendedModal>
+
       {/* User Profile Modal */}
       <PublicProfileModal
         user={selectedUser}

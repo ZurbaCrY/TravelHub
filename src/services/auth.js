@@ -7,6 +7,7 @@ class AuthService {
     this.initialized = false;
     this.user = null;
     this.initialize();
+    this.rememberMe = false;
   }
 
   async initialize() {
@@ -28,10 +29,8 @@ class AuthService {
 
   For more information contact Tom-N-M
   */
-  getUser() {
-    if (!this.initialized) {
-      this.initialize()
-    }
+  async getUser() {
+    await this.initialize()
     return this.user;
   }
 
@@ -77,8 +76,11 @@ class AuthService {
     console.info("User signed in:", data.user);
     console.info("User.id:", data.user.id);
     // SaveUser Saves to SecureStore if User wants so
-    if (rememberMe) {
+    this.rememberMe = rememberMe;
+    if (this.rememberMe) {
       await this.saveUser(data.user);
+    } else if (!this.rememberMe) {
+      await this.removeUser();
     }
     this.user = data.user;
     return data.user;
@@ -133,6 +135,7 @@ class AuthService {
         },
       ]);
       // Only local Save, user needs to login again on next app open
+      this.removeUser();
       this.user = data.user;
       return data.user;
     } else {
