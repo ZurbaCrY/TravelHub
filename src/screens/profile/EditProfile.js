@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, TouchableWithoutFeedback } from 'react-native';
+import { Modal, TouchableWithoutFeedback, Keyboard, ScrollView, Alert } from 'react-native';
 import { View, Text, TextInput, Image } from 'react-native';
 import UserDataHandler from '../../services/userDataHandler';
 import { useLoading } from '../../context/LoadingContext';
@@ -20,6 +20,7 @@ const EditProfile = ({ navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const today = new Date();
   const [userData, setUserData] = useState({});
+  const [country, setCountry] = useState();
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -27,7 +28,9 @@ const EditProfile = ({ navigation }) => {
         showLoading("Fetching user data");
         const data = await UserDataHandler.getUserData();
         // data.birthdate = new Date(data.birthdate); // Ensure birthdate is a Date object
-        setUserData({ ...userData, ...data })
+        setUserData({ ...userData, ...data });
+        setCountry(data.country.home_country);
+        setDate(new Date(data.birthdate));
         console.log("User data fetched:", data);
       } catch (error) {
         console.error('EditProfile: Error fetching user data:', error);
@@ -66,6 +69,8 @@ const EditProfile = ({ navigation }) => {
   const handleSave = async () => {
     try {
       showLoading("Saving user data");
+      userData.birthdate = date.toISOString().split('T')[0];
+      userData.country = { home_country: country };
       await UserDataHandler.updateUserData(userData);
     }
     catch (error) {
@@ -75,135 +80,147 @@ const EditProfile = ({ navigation }) => {
     finally {
       hideLoading();
       alert('User data saved successfully');
-      // navigation.goBack();
+      navigation.goBack();
     }
   };
 
   return (
     <View style={[styles.containerNoMarginTop, styles.paddingHorizontalMedium]}>
+      <TouchableWithoutFeedback onPress={() => {
+        // Close the keyboard when the user taps outside of the input fields
+        Keyboard.dismiss();
+      }}>
+        <ScrollView>
 
-      <View style={styles.profileImageContainer}>
-        <View style={styles.profileImageWrapper}>
-          <TouchableWithoutFeedback onPress={() => handleImageChange()}>
-            <Image
-              source={{ uri: userData.profilepicture_url }}
-              style={styles.largeProfileImage}
-            />
-          </TouchableWithoutFeedback>
-          <View style={styles.roundButtonContainerBottomRight}>
-            <TouchableOpacity style={styles.roundButton} onPress={() => handleImageChange()}>
-              <FontAwesome5 name="edit" size={20} color={isDarkMode ? '#070A0F' : '#f8f8f8'} />
-            </TouchableOpacity>
+          <View style={styles.profileImageContainer}>
+            <View style={styles.profileImageWrapper}>
+              <TouchableWithoutFeedback onPress={() => handleImageChange()}>
+                <Image
+                  source={{ uri: userData.profilepicture_url }}
+                  style={styles.largeProfileImage}
+                />
+              </TouchableWithoutFeedback>
+              <View style={styles.roundButtonContainerBottomRight}>
+                <TouchableOpacity style={styles.roundButton} onPress={() => handleImageChange()}>
+                  <FontAwesome5 name="edit" size={20} color={isDarkMode ? '#070A0F' : '#f8f8f8'} />
+                </TouchableOpacity>
+              </View>
+            </View>
           </View>
-        </View>
-      </View>
 
-      <View style={styles.row}>
-        <View style={styles.container45Percent}>
-          <Text style={styles.bodyText}>First Name</Text>
+
+          <View style={styles.row}>
+            <View style={styles.container45Percent}>
+              <Text style={styles.bodyText}>First Name</Text>
+              <TextInput
+                style={styles.inputField}
+                value={userData.first_name}
+                onChangeText={(text) => handleInputChange('first_name', text)}
+              />
+            </View>
+            <View style={styles.container45Percent}>
+              <Text style={styles.bodyText}>Last Name</Text>
+              <TextInput
+                style={styles.inputField}
+                value={userData.last_name}
+                onChangeText={(text) => handleInputChange('last_name', text)}
+              />
+            </View>
+          </View>
+
+          <Text style={styles.bodyText}>Username</Text>
           <TextInput
             style={styles.inputField}
-            value={userData.first_name}
-            onChangeText={(text) => handleInputChange('first_name', text)}
+            value={userData.username}
+            onChangeText={(text) => handleInputChange('username', text)}
           />
-        </View>
-        <View style={styles.container45Percent}>
-          <Text style={styles.bodyText}>Last Name</Text>
+
+          <Text style={styles.bodyText}>Bio</Text>
           <TextInput
             style={styles.inputField}
-            value={userData.last_name}
-            onChangeText={(text) => handleInputChange('last_name', text)}
+            value={userData.bio}
+            onChangeText={(text) => handleInputChange('bio', text)}
           />
-        </View>
-      </View>
 
-      <Text style={styles.bodyText}>Username</Text>
-      <TextInput
-        style={styles.inputField}
-        value={userData.username}
-        onChangeText={(text) => handleInputChange('username', text)}
-      />
+          <Text style={styles.bodyText}>Email</Text>
+          <TextInput
+            style={styles.inputField}
+            value={userData.email}
+            // onChangeText={(text) => handleInputChange('email', text)}
+            onPress={() => Alert.alert('Error', 'There is a Problem with this feature. \nPlease Contact Support')}
+            onChangeText={(text) => Alert.alert('Error', 'There is a Problem with this feature. \nPlease Contact Support')}
+          />
 
-      <Text style={styles.bodyText}>Bio</Text>
-      <TextInput
-        style={styles.inputField}
-        value={userData.bio}
-        onChangeText={(text) => handleInputChange('bio', text)}
-      />
+          <Text style={styles.bodyText}>Birthday</Text>
+          <TouchableOpacity
+            onPress={() => setShowDatepicker(true)}
+            style={styles.inputField}
+          >
+            <Text style={styles.bodyText}>
+              {date ? `${date.getDate()} ${date.toLocaleString('default', { month: 'long' })} ${date.getFullYear()}` : ''}
+            </Text>
+          </TouchableOpacity>
+          {showDatepicker && (
+            <DateTimePicker
+              value={date}
+              mode='date'
+              display='spinner'
+              onChange={onDateChange}
+              minimumDate={new Date(0)}
+              maximumDate={today}
+              style={styles.datePicker}
+            />
+          )}
 
-      <Text style={styles.bodyText}>Email</Text>
-      <TextInput
-        style={styles.inputField}
-        value={userData.email}
-        onChangeText={(text) => handleInputChange('email', text)}
-      />
+          <Text style={styles.bodyText}>Country</Text>
+          <TextInput
+            style={styles.inputField}
+            value={country}
+            onChangeText={(text) => setCountry(text)}
+          />
 
-      <Text style={styles.bodyText}>Birthday</Text>
-      <TouchableOpacity
-        onPress={() => setShowDatepicker(true)}
-        style={styles.inputField}
-      >
-        <Text style={styles.bodyText}>{userData.birthdate ? userData.birthdate : ''}</Text>
-      </TouchableOpacity>
-      {showDatepicker && (
-        <DateTimePicker
-          value={date}
-          mode='date'
-          display='spinner'
-          onChange={onDateChange}
-          minimumDate={new Date(0)}
-          maximumDate={today}
-          style={styles.datePicker}
-        />
-      )}
+          <CustomButton title={"Save"} onPress={handleSave} />
 
-      <Text style={styles.bodyText}>Country</Text>
-      <TextInput
-        style={styles.inputField}
-        value={userData.country ? userData.country.home_country : ''}
-        onChangeText={(text) => handleInputChange('country.home_country', text)}
-      />
-      <CustomButton title={"Save"} onPress={handleSave} />
+          {/* Modal für die Bildvorschau */}
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => {
+              setModalVisible(!modalVisible);
+            }}
+          >
+            <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
+              <View style={styles.modalBackground}>
+                <TouchableWithoutFeedback>
+                  <View style={styles.modalContent}>
+                    <Text style={styles.modalTitleText}>Profilbild ändern</Text>
 
+                    {imageUrl && (
+                      <Image source={{ uri: imageUrl }} style={styles.postImage} />
+                    )}
+                    <View style={styles.row}>
 
-      {/* Modal für die Bildvorschau */}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => {
-          setModalVisible(!modalVisible);
-        }}
-      >
-        <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
-          <View style={styles.modalBackground}>
-            <TouchableWithoutFeedback>
-              <View style={styles.modalContent}>
-                <Text style={styles.modalTitleText}>Profilbild ändern</Text>
-
-                {imageUrl && (
-                  <Image source={{ uri: imageUrl }} style={styles.postImage} />
-                )}
-                <View style={styles.row}>
-
-                  <TouchableOpacity style={styles.averageRedButton} onPress={() => setModalVisible(false)}>
-                    <Text style={styles.smallButtonText}>Schließen</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={styles.averageBlueButton}
-                    onPress={async () => {
-                      const success = await handleNewProfilePicture(imageUrl);
-                      setModalVisible(false);
-                    }}
-                  >
-                    <Text style={styles.smallButtonText}>Posten</Text>
-                  </TouchableOpacity>
-                </View>
+                      <TouchableOpacity style={styles.averageRedButton} onPress={() => setModalVisible(false)}>
+                        <Text style={styles.smallButtonText}>Schließen</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={styles.averageBlueButton}
+                        onPress={async () => {
+                          const success = await handleNewProfilePicture(imageUrl);
+                          setModalVisible(false);
+                        }}
+                      >
+                        <Text style={styles.smallButtonText}>Posten</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </TouchableWithoutFeedback>
               </View>
             </TouchableWithoutFeedback>
-          </View>
-        </TouchableWithoutFeedback>
-      </Modal>
+          </Modal>
+        </ScrollView>
+      </TouchableWithoutFeedback>
     </View>
   );
 };

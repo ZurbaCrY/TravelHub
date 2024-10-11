@@ -328,7 +328,7 @@ export default function ProfileScreen() {
 
             {/* Bio */}
             <Text style={[newStyle.bodyTextBig, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>
-              {userData && userData.bio ? userData.bio : 'No bio configured'}
+              {userData && userData.bio ? '"' + userData.bio + '"' : 'No bio configured'}
             </Text>
 
 
@@ -341,7 +341,7 @@ export default function ProfileScreen() {
             <View style={newStyle.row}>
               <Icon name="birthday-cake" size={14} style={[newStyle.marginRightExtraSmall, { color: isDarkMode ? '#FFFDF3' : '#000000' }]} />
               <Text style={[newStyle.bodyText, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>
-                {userData && userData.birthdate ? userData.birthdate : 'No birthdate configured'}
+                {userData && userData.birthdate ? new Date(userData.birthdate).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' }) : 'No birthdate configured'}
               </Text>
             </View>
 

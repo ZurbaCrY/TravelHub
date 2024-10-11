@@ -40,8 +40,8 @@ class UserDataHandler {
   async loadUserData() {
     try {
       const { data, error } = await this.supabase
-      .from('users')
-      .select(`
+        .from('users')
+        .select(`
         user_id,
         first_name,
         last_name,
@@ -56,14 +56,14 @@ class UserDataHandler {
           home_country_code:ISO_Name
           )
           `)
-          .eq('user_id', this.user.id)
-      
-          if (error) {
+        .eq('user_id', this.user.id)
+
+      if (error) {
         throw new Error("Error fetching user data: " + error.message);
       }
       if (data) {
         this.userData = { ...this.userData, ...data[0] };
-    
+
         console.log("User data loaded successfully:", this.userData);
       } else {
         console.log("No user data found for the current user.");
@@ -85,14 +85,23 @@ class UserDataHandler {
   async updateUserData(newData) {
     try {
       await this.initialize();
-      
-      const { data: countryId, error: countryError } = await this.supabase
-        .from('Country')
-        .select('Country_ID')
-        .eq('Countryname', newData.country.home_country)
-        .single();
-      if (countryError) {
-        throw new Error("Error fetching country ID: " + countryError.message);
+
+      if (!newData) {
+        console.error("No data to update");
+        return;
+      }
+      let countryId = null;
+      if (newData.country && newData.country.home_country) {
+        console.log("Fetching country ID for:", newData.country.home_country);
+        const { data, error: countryError } = await this.supabase
+          .from('Country')
+          .select('Country_ID')
+          .eq('Countryname', newData.country.home_country)
+          .single();
+        if (countryError) {
+          throw new Error("Error fetching country ID: " + countryError.message);
+        }
+        countryId = data ? data.Country_ID : null;
       }
 
       this.userData = { ...this.userData, ...newData };
@@ -105,18 +114,36 @@ class UserDataHandler {
         profilepicture_url: newData.profilepicture_url ? newData.profilepicture_url : this.userData.profilepicture_url,
         birthdate: newData.birthdate ? newData.birthdate : this.userData.birthdate,
         bio: newData.bio ? newData.bio : this.userData.bio,
-        home_country: countryId ? countryId.Country_ID : this.userData.country.Country_ID,
+        home_country: countryId ? countryId : this.userData.country.Country_ID,
       };
 
-      
-      console.log("updateData:", updateData);
+      const { data, error } = await this.supabase
+        .from('users')
+        .upsert(updateData)
+        .eq('user_id', this.user.id)
+        .select(`
+        user_id,
+        first_name,
+        last_name,
+        username,
+        email,
+        profilepicture_url,
+        birthdate,
+        bio,
+        country:Country( 
+          id:Country_ID,
+          home_country:Countryname,
+          home_country_code:ISO_Name
+          )
+          `);
 
-      // const { data, error } = await this.supabase
-      //   .from('users')
-      //   .upsert(this.userData)
-      //  .eq('user_id', this.user.id)
-      //   .select();
-            
+      console.log("User data updated successfully:", data);
+
+      if (error) {
+        throw new Error("Error updating user data: " + error.message);
+      }
+      console.log("User data updated successfully:", data);
+
     } catch (error) {
       console.error("Error updating user data:", error);
     }
