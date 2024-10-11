@@ -31,21 +31,23 @@ export default function ChatScreen({ route, navigation }) {
     navigation.setOptions({
       headerTitle: () => (
         <TouchableOpacity onPress={() => handleUserPress()} style={newStyle.headerTitleContainer}>
-          <View style={newStyle.containerRow}>
+          <View style={[newStyle.containerRow, { backgroundColor: isDarkMode ? 'rgba(0, 0, 0, 0)' : 'rgba(0, 0, 0, 0)' }]}>
             <View style={newStyle.marginTopMedium}>
               <Image source={{ uri: chatPartnerProfilePicutreUrl }} style={newStyle.extraSmallProfileImage} />
             </View>
             <View style={[newStyle.marginTopSmall, newStyle.marginLeftSmall]}>
-              <Text style={newStyle.titleText}>{chatName}</Text>
+            <Text style={[newStyle.titleText, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>{chatName}</Text>
             </View>
           </View>
         </TouchableOpacity>
       ),
       headerStyle: {
         backgroundColor: isDarkMode ? '#070A0F' : '#f8f8f8',
-      }
+      },
+      headerTintColor: isDarkMode ? '#f8f8f8' : '#18171c', // Farbe des Pfeils
     });
-
+        
+      
     const fetchMessages = async () => {
       try {
         const { data, error } = await supabase
@@ -250,7 +252,7 @@ export default function ChatScreen({ route, navigation }) {
   };
 
   return (
-    <View style={[newStyle.containerNoMarginTop, { backgroundColor: isDarkMode ? '#070A0F' : '#f8f8f8' }]}>
+    <View style={[newStyle.containerNoMarginTop, { backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]}>
       <GiftedChat
         messages={messages}
         onSend={(messages) => onSend(messages)}
@@ -259,7 +261,7 @@ export default function ChatScreen({ route, navigation }) {
         }}
         text={messageInput}
         onInputTextChanged={(text) => setMessageInput(text)}
-        textInputStyle={{ color: isDarkMode ? '#f8f8f8' : '#000' }}
+        textInputStyle={{ color: isDarkMode ? '#f8f8f8' : '#18171c' }}
         onLongPress={handleLongPress}
         renderMessageText={renderMessageText}
       />
@@ -271,19 +273,19 @@ export default function ChatScreen({ route, navigation }) {
         onRequestClose={() => setDeleteModalVisible(false)}
       >
         <View style={[newStyle.modalBackground, { backgroundColor: isDarkMode ? 'rgba(0, 0, 0, 0.8)' : 'rgba(255, 255, 255, 0.8)' }]}>
-          <View style={[newStyle.modalContent, { backgroundColor: isDarkMode ? '#1C1C1C' : '#FFF' }]}>
-            <Text style={[newStyle.modalTitleText, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>Bearbeiten oder Löschen</Text>
+          <View style={[newStyle.modalContent, { backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]}>
+            <Text style={[newStyle.modalTitleText, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>Bearbeiten oder Löschen</Text>
             
             <TouchableOpacity style={[newStyle.primaryRedButton, { backgroundColor: isDarkMode ? '#8B0000' : '#FF6347' }]} onPress={deleteMessage}>
-              <Text style={[newStyle.primaryButtonText, { color: isDarkMode ? '#FFF' : '#FFF' }]}>Nachricht löschen</Text>
+              <Text style={[newStyle.primaryButtonText, { color: isDarkMode ? '#f8f8f8' : '#f8f8f8' }]}>Nachricht löschen</Text>
             </TouchableOpacity>
   
             <TouchableOpacity style={[newStyle.primaryButton, { backgroundColor: isDarkMode ? '#1E90FF' : '#007BFF' }]} onPress={() => openEditModal(selectedMessage)}>
-              <Text style={[newStyle.primaryButtonText, { color: isDarkMode ? '#FFF' : '#FFF' }]}>Text bearbeiten</Text>
+              <Text style={[newStyle.primaryButtonText, { color: isDarkMode ? '#f8f8f8' : '#f8f8f8' }]}>Text bearbeiten</Text>
             </TouchableOpacity>
   
             <TouchableOpacity style={[newStyle.primaryButton, { backgroundColor: isDarkMode ? '#333' : '#DDD' }]} onPress={() => setDeleteModalVisible(false)}>
-              <Text style={[newStyle.primaryButtonText, { color: isDarkMode ? '#FFF' : '#000' }]}>Abbrechen</Text>
+              <Text style={[newStyle.primaryButtonText, { color: isDarkMode ? '#f8f8f8' : '#000' }]}>Abbrechen</Text>
             </TouchableOpacity>
           </View>
         </View>
