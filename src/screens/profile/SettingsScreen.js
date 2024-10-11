@@ -38,17 +38,17 @@ const SettingsScreen = () => {
   };
 
   return (
-    <View style={[styles.containerNoMarginTop, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
-      <Text style={[styles.titleText, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>Einstellungen</Text>
+    <View style={[styles.containerNoMarginTop, { backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]}>
+      <Text style={[styles.titleText, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>Einstellungen</Text>
       <View style={styles.rowMarginBottom}>
-        <Text style={[styles.bodyTextBig, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>Profilbild wechseln </Text>
+        <Text style={[styles.bodyTextBig, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>Profilbild wechseln </Text>
         <TouchableOpacity onPress={handleImageChange}>
           <Image source={require('../../assets/images/picture.png')} style={styles.iconBig} />
         </TouchableOpacity>
       </View>
 
       <View style={styles.rowMarginBottom}>
-        <Text style={[styles.bodyTextBig, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>Darkmode</Text>
+        <Text style={[styles.bodyTextBig, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>Darkmode</Text>
         <AnimatedSwitch
           onValueChange={toggleDarkMode}
           value={isDarkMode}
@@ -56,7 +56,7 @@ const SettingsScreen = () => {
       </View>
 
       <View style={styles.rowMarginBottom}>
-        <Text style={[styles.bodyTextBig, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>Benachrichtigungen</Text>
+        <Text style={[styles.bodyTextBig, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>Benachrichtigungen</Text>
         <AnimatedSwitch
           onValueChange={() => setNotificationsEnabled(previousState => !previousState)}
           value={notificationsEnabled}
@@ -65,7 +65,7 @@ const SettingsScreen = () => {
 
       <View>
       <TouchableOpacity style={[newStyle.primaryButton, { backgroundColor: isDarkMode ? '#1E90FF' : '#007BFF' }]} onPress={handleSignOut}>
-         <Text style={[newStyle.primaryButtonText, { color: isDarkMode ? '#FFF' : '#FFF' }]}>Sign Out</Text>
+         <Text style={[newStyle.primaryButtonText, { color: isDarkMode ? '#f8f8f8' : '#f8f8f8' }]}>Sign Out</Text>
         </TouchableOpacity>
       </View>
 
