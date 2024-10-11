@@ -35,6 +35,7 @@ import { getUserStats } from '../../services/getUserStats';
 import { useAuth } from '../../context/AuthContext';
 import { useLoading } from '../../context/LoadingContext';
 import PublicProfileModal from '../../components/PublicProfileModal';
+import { handleFilePicker, handleNewProfilePicture } from '../../backend/community';
 
 export default function ProfileScreen() {
   const { isDarkMode } = useDarkMode();
@@ -54,6 +55,8 @@ export default function ProfileScreen() {
   const { showLoading, hideLoading } = useLoading();
   const [userProfileModal, setUserProfileModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [imageUrl, setImageUrl] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
 
   const navigation = useNavigation();
 
@@ -219,6 +222,14 @@ export default function ProfileScreen() {
     }
   }
 
+  const handleImageChange = async () => {
+    const image = await handleFilePicker();
+    if (image) {
+      setImageUrl(image);
+      setModalVisible(true);
+    }
+  };
+
   return (
     <View style={[newStyle.container, { backgroundColor: isDarkMode ? '#070A0F' : '#f8f8f8' }]}>
       <TouchableWithoutFeedback onPress={() => {
@@ -229,10 +240,18 @@ export default function ProfileScreen() {
       }}>
         <ScrollView style={[newStyle.container, { backgroundColor: isDarkMode ? '#070A0F' : '#f8f8f8' }]}>
           <View style={[newStyle.centeredContainer, { backgroundColor: isDarkMode ? '#070A0F' : '#f8f8f8' }]}>
-            <Image
-              source={{ uri: profilePictureUrl }}
-              style={newStyle.largeProfileImage}
-            />
+            <TouchableOpacity onPress={handleImageChange}>
+              <Image
+                source={{ uri: profilePictureUrl }}
+                style={newStyle.largeProfileImage}
+              />
+              <View style={{ position: 'absolute', bottom: 0, right: 0 }}>
+                <TouchableOpacity onPress={handleImageChange}>
+                  <Image source={require('../../assets/images/picture.png')} style={newStyle.iconSmall}
+                  />
+                </TouchableOpacity>
+              </View>
+            </TouchableOpacity>
             <Text style={[newStyle.titleText, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>{user.user_metadata.username}</Text>
             <Text style={[newStyle.bodyText, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>{user.email}</Text>
 
@@ -356,7 +375,44 @@ export default function ProfileScreen() {
               onPress={() => navigation.navigate('Settings')}
             />
           </View>
+          {/* Modal für die Bildvorschau */}
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => {
+              setModalVisible(!modalVisible);
+            }}
+          >
+            <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
+              <View style={newStyle.modalBackground}>
+                <TouchableWithoutFeedback>
+                  <View style={newStyle.modalContent}>
+                    <Text style={newStyle.modalTitleText}>Profilbild ändern</Text>
 
+                    {imageUrl && (
+                      <Image source={{ uri: imageUrl }} style={newStyle.postImage} />
+                    )}
+                    <View style={styles.row}>
+
+                      <TouchableOpacity style={newStyle.averageRedButton} onPress={() => setModalVisible(false)}>
+                        <Text style={newStyle.smallButtonText}>Schließen</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={newStyle.averageBlueButton}
+                        onPress={async () => {
+                          const success = await handleNewProfilePicture(imageUrl);
+                          setModalVisible(false);
+                        }}
+                      >
+                        <Text style={newStyle.smallButtonText}>Posten</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </TouchableWithoutFeedback>
+              </View>
+            </TouchableWithoutFeedback>
+          </Modal>
           {/* Travel Buddies Modal */}
           <Modal
             animationType="slide"
