@@ -17,6 +17,9 @@ web-build/
 *.key
 *.mobileprovision
 
+#Visual Studio Code
+.vscode
+
 # Metro
 .metro-health-check*
 

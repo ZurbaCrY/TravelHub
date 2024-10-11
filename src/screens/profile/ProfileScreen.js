@@ -37,6 +37,7 @@ import { getUserStats } from '../../services/getUserStats';
 import { useAuth } from '../../context/AuthContext';
 import { useLoading } from '../../context/LoadingContext';
 import PublicProfileModal from '../../components/PublicProfileModal';
+import { handleFilePicker, handleNewProfilePicture } from '../../backend/community';
 import { FontAwesome5 } from '@expo/vector-icons';
 
 export default function ProfileScreen() {
@@ -60,6 +61,8 @@ export default function ProfileScreen() {
   const [requestModalVisible, setRequestModalVisible] = useState(false);
   const [friendRequests, setFriendRequests] = useState([]);
   const [userData, setUserData] = useState(null);
+  const [imageUrl, setImageUrl] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
 
   const navigation = useNavigation();
 
@@ -280,6 +283,14 @@ export default function ProfileScreen() {
     }
   }
 
+  const handleImageChange = async () => {
+    const image = await handleFilePicker();
+    if (image) {
+      setImageUrl(image);
+      setModalVisible(true);
+    }
+  };
+
   return (
     <View style={[newStyle.centeredContainer, { backgroundColor: isDarkMode ? '#070A0F' : '#f8f8f8' }]}>
       <TouchableWithoutFeedback onPress={() => {
@@ -320,10 +331,12 @@ export default function ProfileScreen() {
             </View>
 
             {/* Profile Picture, Username, Email, Birthday, Country */}
-            <Image
-              source={{ uri: profilePictureUrl }}
-              style={newStyle.largeProfileImage}
-            />
+            <TouchableOpacity onPress={handleImageChange}>
+              <Image
+                source={{ uri: profilePictureUrl }}
+                style={newStyle.largeProfileImage}
+              />
+            </TouchableOpacity>
             <Text style={[newStyle.titleText, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>{user.user_metadata.username}</Text>
 
             {/* Bio */}
@@ -466,7 +479,44 @@ export default function ProfileScreen() {
 
           {/* Placeholder for the bottom of the screen */}
           <View style={[styles.infoSection, { backgroundColor: isDarkMode ? '#070A0F' : '#f8f8f8' }]} />
+          {/* Modal für die Bildvorschau */}
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => {
+              setModalVisible(!modalVisible);
+            }}
+          >
+            <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
+              <View style={newStyle.modalBackground}>
+                <TouchableWithoutFeedback>
+                  <View style={newStyle.modalContent}>
+                    <Text style={newStyle.modalTitleText}>Profilbild ändern</Text>
 
+                    {imageUrl && (
+                      <Image source={{ uri: imageUrl }} style={newStyle.postImage} />
+                    )}
+                    <View style={styles.row}>
+
+                      <TouchableOpacity style={newStyle.averageRedButton} onPress={() => setModalVisible(false)}>
+                        <Text style={newStyle.smallButtonText}>Schließen</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={newStyle.averageBlueButton}
+                        onPress={async () => {
+                          const success = await handleNewProfilePicture(imageUrl);
+                          setModalVisible(false);
+                        }}
+                      >
+                        <Text style={newStyle.smallButtonText}>Posten</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </TouchableWithoutFeedback>
+              </View>
+            </TouchableWithoutFeedback>
+          </Modal>
           {/* Travel Buddies Modal */}
           <Modal
             animationType="slide"

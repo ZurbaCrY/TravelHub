@@ -552,6 +552,11 @@ const newStyle = StyleSheet.create({
         width: 24,
         height: 24,
     },
+    iconSmall: {
+        width: 40,   
+        height: 40,  
+        borderRadius: 12,  
+      },      
     iconBig: {
         width: 48,
         height: 48,
