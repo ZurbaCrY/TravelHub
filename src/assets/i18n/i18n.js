@@ -17,7 +17,7 @@ i18n.use(initReactI18next).init({
     es: { translation: es },
     fr: { translation: fr },
     it: { translation: it },
-    zh: { translation: zh }
+    zh: { translation: zh },
   },
   interpolation: { escapeValue: false }, // not needed for react as it escapes by default
 
