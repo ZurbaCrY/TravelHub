@@ -6,8 +6,10 @@ import { useAuth } from '../../context/AuthContext';
 import PublicProfileModal from '../../components/PublicProfileModal';
 import { useLoading } from '../../context/LoadingContext';
 import { getUserStats } from '../../services/getUserStats';
+import { useTranslation } from 'react-i18next';
 
 export default function CommunityDetailScreen({ route, navigation }) {
+  const { t } = useTranslation();
   const { post } = route.params;
   const { user } = useAuth();
   const [refreshing, setRefreshing] = useState(false);
@@ -123,7 +125,7 @@ export default function CommunityDetailScreen({ route, navigation }) {
 
   const handleUserPress = async (item) => {
     try {
-      showLoading("Loading User Data");
+      showLoading(t('LOADING_MESSAGE.USER'));
       const stats = await getUserStats(user_id = item.user_id);
       const selectedUserData = {
         user_id: item.user_id,
@@ -145,7 +147,7 @@ export default function CommunityDetailScreen({ route, navigation }) {
 
   const handleFriendRequestPress = async () => {
     try {
-      showLoading("Sending Friend Request");
+      showLoading(t('LOADING_MESSAGE.FRIEND_REQUEST'));
       await friendService.sendFriendRequest(selectedUser.user_id);
     } catch (error) {
       console.error('Error sending friend request:', error);
@@ -215,7 +217,9 @@ export default function CommunityDetailScreen({ route, navigation }) {
                   <Image source={require('../../assets/images/thumbs-up.png')} style={newStyle.icon} />
                 </TouchableOpacity>
                 <TouchableOpacity onPress={openUpvoterModal}>
-                  <Text style={newStyle.voteCount}>{postData.upvotes} Upvotes</Text>
+                  <Text style={newStyle.voteCount}>{postData.upvotes}
+                    {t('SCREENS.COMMUNITY.UPVOTES')}
+                  </Text>
                 </TouchableOpacity>
               </View>
               <View style={newStyle.voteContainer}>
@@ -223,7 +227,9 @@ export default function CommunityDetailScreen({ route, navigation }) {
                   <Image source={require('../../assets/images/thumbs-down.png')} style={newStyle.icon} />
                 </TouchableOpacity>
                 <TouchableOpacity onPress={openDownvoterModal}>
-                  <Text style={newStyle.voteCount}>{postData.downvotes} Downvotes</Text>
+                  <Text style={newStyle.voteCount}>{postData.downvotes}
+                    {t('SCREENS.COMMUNITY.DOWNVOTES')}
+                  </Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -281,13 +287,19 @@ export default function CommunityDetailScreen({ route, navigation }) {
         <View style={newStyle.modalBackground}>
           <TouchableWithoutFeedback>
             <View style={newStyle.modalContent}>
-              <Text style={newStyle.modalTitleText}>Confirm Delete</Text>
+              <Text style={newStyle.modalTitleText}>
+                {t('CONFIRM_DELETE')}
+              </Text>
               <View style={newStyle.row}>
                 <TouchableOpacity style={newStyle.averageRedButton} onPress={() => setModalVisible(false)}>
-                  <Text style={newStyle.smallButtonText}>Cancel</Text>
+                  <Text style={newStyle.smallButtonText}>
+                    {t('CANCEL')}
+                  </Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={newStyle.averageBlueButton} onPress={handleDeletePost}>
-                  <Text style={newStyle.smallButtonText}>Delete</Text>
+                  <Text style={newStyle.smallButtonText}>
+                    {t('DELETE')}
+                  </Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -319,7 +331,9 @@ export default function CommunityDetailScreen({ route, navigation }) {
               </View>
               <View style={newStyle.row}>
                 <TouchableOpacity style={[newStyle.averageRedButton, { width: '100%' }]} onPress={closeUpvoterModal}>
-                  <Text style={newStyle.smallButtonText}>Back</Text>
+                  <Text style={newStyle.smallButtonText}>
+                    {t('BACK')}
+                  </Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -338,13 +352,17 @@ export default function CommunityDetailScreen({ route, navigation }) {
         <View style={newStyle.modalBackground}>
           <TouchableWithoutFeedback onPress={closeDownvoterModal}>
             <View style={newStyle.modalContent}>
-              <Text style={newStyle.modalTitleText}>Downvoters</Text>
+              <Text style={newStyle.modalTitleText}>
+                {t('SCREENS.COMMUNITY.DOWNVOTERS')}
+              </Text>
               <View>
                 {renderVotersList(downvoters)}
               </View>
               <View style={newStyle.row}>
                 <TouchableOpacity style={[newStyle.averageRedButton, { width: '100%' }]} onPress={closeUpvoterModal}>
-                  <Text style={newStyle.smallButtonText}>Back</Text>
+                  <Text style={newStyle.smallButtonText}>
+                    {t('BACK')}
+                  </Text>
                 </TouchableOpacity>
               </View>
             </View>
