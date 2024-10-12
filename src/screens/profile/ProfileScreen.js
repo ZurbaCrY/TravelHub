@@ -650,7 +650,7 @@ export default function ProfileScreen() {
             />
           )}
           {/* <View style={newStyle.marginBottomLarge}/> 
-          <Text style={newStyle.titleText}>Suggested Users</Text>
+          <Text style={newStyle.titleText}>{t('SCREENS.PROFILE.SUGGESTED_FRIENDS)}</Text>
           <Text style={newStyle.bodyText}>This feature will be added in the future.</Text> */}
         </View>
       </ExtendedModal>

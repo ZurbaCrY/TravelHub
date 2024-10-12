@@ -124,7 +124,7 @@ export default function ChatListScreen({ navigation }) {
 
   const createNewChat = async () => {
     if (!selectedUser || selectedUser.user_id === CURRENT_USER_ID) {
-      Alert.alert('Fehler', 'Sie können keinen Chat mit sich selbst erstellen.');
+      Alert.alert(t('ERROR'), t('SCREENS.CHAT.NEW_CHAT_OWN_USER'));
       return;
     }
     const newChat = { chat_id: Date.now(), created_at: new Date().toISOString() };
@@ -139,7 +139,7 @@ export default function ChatListScreen({ navigation }) {
     await supabase.from('messages').insert([initialMessage]);
 
     const chatPartnerProfilePicutreUrl = await getProfilePictureUrlByUserId(selectedUser.user_id);
-    
+
     fetchChats();
     setModalVisible(false);
     navigation.navigate('Chat', { chatId: newChat.chat_id, chatName: selectedUser.username, chatPartnerId: selectedUser.user_id, chatPartnerProfilePicutreUrl: chatPartnerProfilePicutreUrl });
@@ -209,13 +209,19 @@ export default function ChatListScreen({ navigation }) {
           <View style={styles.modalBackground} />
         </TouchableWithoutFeedback>
         <View style={styles.modalContentWidth}>
-          <Text style={styles.modalTitleText}>Wähle einen Benutzer für den Chat</Text>
+          <Text style={styles.modalTitleText}>
+            {t('SCREENS.CHAT.NEW_CHAT_CHOOSE_USER')}
+          </Text>
           {users.length > 0 ? (
             users.map(renderUserItem)
           ) : (
-            <Text style={styles.bodyText}>Keine neuen Benutzer verfügbar</Text>
+            <Text style={styles.bodyText}>
+              {t('SCREENS.CHAT.NEW_CHAT_NO_USERS')}
+              </Text>
           )}
-          <Button onPress={createNewChat} disabled={!selectedUser}>Chat starten</Button>
+          <Button onPress={createNewChat} disabled={!selectedUser}>
+            {t('SCREENS.CHAT.NEW_CHAT_CREATE_CHAT')}
+          </Button>
         </View>
       </Modal>
     </View>

@@ -217,7 +217,9 @@ export default function CommunityDetailScreen({ route, navigation }) {
                   <Image source={require('../../assets/images/thumbs-up.png')} style={newStyle.icon} />
                 </TouchableOpacity>
                 <TouchableOpacity onPress={openUpvoterModal}>
-                  <Text style={newStyle.voteCount}>{postData.upvotes} Upvotes</Text>
+                  <Text style={newStyle.voteCount}>{postData.upvotes}
+                    {t('SCREENS.COMMUNITY.UPVOTES')}
+                  </Text>
                 </TouchableOpacity>
               </View>
               <View style={newStyle.voteContainer}>
@@ -225,7 +227,9 @@ export default function CommunityDetailScreen({ route, navigation }) {
                   <Image source={require('../../assets/images/thumbs-down.png')} style={newStyle.icon} />
                 </TouchableOpacity>
                 <TouchableOpacity onPress={openDownvoterModal}>
-                  <Text style={newStyle.voteCount}>{postData.downvotes} Downvotes</Text>
+                  <Text style={newStyle.voteCount}>{postData.downvotes}
+                    {t('SCREENS.COMMUNITY.DOWNVOTES')}
+                  </Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -283,13 +287,19 @@ export default function CommunityDetailScreen({ route, navigation }) {
         <View style={newStyle.modalBackground}>
           <TouchableWithoutFeedback>
             <View style={newStyle.modalContent}>
-              <Text style={newStyle.modalTitleText}>Confirm Delete</Text>
+              <Text style={newStyle.modalTitleText}>
+                {t('CONFIRM_DELETE')}
+              </Text>
               <View style={newStyle.row}>
                 <TouchableOpacity style={newStyle.averageRedButton} onPress={() => setModalVisible(false)}>
-                  <Text style={newStyle.smallButtonText}>Cancel</Text>
+                  <Text style={newStyle.smallButtonText}>
+                    {t('CANCEL')}
+                  </Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={newStyle.averageBlueButton} onPress={handleDeletePost}>
-                  <Text style={newStyle.smallButtonText}>Delete</Text>
+                  <Text style={newStyle.smallButtonText}>
+                    {t('DELETE')}
+                  </Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -321,7 +331,9 @@ export default function CommunityDetailScreen({ route, navigation }) {
               </View>
               <View style={newStyle.row}>
                 <TouchableOpacity style={[newStyle.averageRedButton, { width: '100%' }]} onPress={closeUpvoterModal}>
-                  <Text style={newStyle.smallButtonText}>Back</Text>
+                  <Text style={newStyle.smallButtonText}>
+                    {t('BACK')}
+                  </Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -340,13 +352,17 @@ export default function CommunityDetailScreen({ route, navigation }) {
         <View style={newStyle.modalBackground}>
           <TouchableWithoutFeedback onPress={closeDownvoterModal}>
             <View style={newStyle.modalContent}>
-              <Text style={newStyle.modalTitleText}>Downvoters</Text>
+              <Text style={newStyle.modalTitleText}>
+                {t('SCREENS.COMMUNITY.DOWNVOTERS')}
+              </Text>
               <View>
                 {renderVotersList(downvoters)}
               </View>
               <View style={newStyle.row}>
                 <TouchableOpacity style={[newStyle.averageRedButton, { width: '100%' }]} onPress={closeUpvoterModal}>
-                  <Text style={newStyle.smallButtonText}>Back</Text>
+                  <Text style={newStyle.smallButtonText}>
+                    {t('BACK')}
+                  </Text>
                 </TouchableOpacity>
               </View>
             </View>

@@ -27,7 +27,8 @@ const SettingsScreen = ({ navigation }) => {
     { label: "English", value: "en" },
     { label: "Deutsch", value: "de" },
     { label: "Español", value: "es" },
-    { label: "Français", value: "fr" },
+    { label: "Français", value: "fr" },,
+    { label: "Italiano", value: "it" },
     { label: "中文", value: "zh" }
   ];
   const [selectedLanguage, setSelectedLanguage] = useState('en');

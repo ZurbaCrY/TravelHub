@@ -28,7 +28,7 @@ export default function ChatScreen({ route, navigation }) {
   const { showLoading, hideLoading } = useLoading();
   const [selectedUser, setSelectedUser] = useState(null);
   const [loading, setLoading] = useState(false);
-  
+
   useEffect(() => {
     navigation.setOptions({
       headerTitle: () => (
@@ -234,7 +234,9 @@ export default function ChatScreen({ route, navigation }) {
       <View>
         <MessageText {...props} />
         {currentMessage.edited && (
-          <Text style={newStyle.boldMiniText}>Bearbeitet</Text>
+          <Text style={newStyle.boldMiniText}>
+            {t('CHAT.EDITED')}
+          </Text>
         )}
       </View>
     );
@@ -274,15 +276,23 @@ export default function ChatScreen({ route, navigation }) {
       >
         <View style={newStyle.modalBackground}>
           <View style={newStyle.modalContent}>
-            <Text style={newStyle.modalTitleText}>Bearbeiten oder Löschen</Text>
+            <Text style={newStyle.modalTitleText}>
+              {t('SCREENS.CHAT.EDIT_OR_DELETE')}
+            </Text>
             <TouchableOpacity style={newStyle.primaryRedButton} onPress={deleteMessage}>
-              <Text style={newStyle.primaryButtonText}>Nachricht löschen</Text>
+              <Text style={newStyle.primaryButtonText}>
+                {t('SCREENS.CHAT.DELETE_MESSAGE')}
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity style={newStyle.primaryButton} onPress={() => openEditModal(selectedMessage)}>
-              <Text style={newStyle.primaryButtonText}>Text bearbeiten</Text>
+              <Text style={newStyle.primaryButtonText}>
+                {t('SCREENS.CHAT.EDIT_MESSAGE')}
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity style={newStyle.primaryButton} onPress={() => setDeleteModalVisible(false)}>
-              <Text style={newStyle.primaryButtonText}>Abbrechen</Text>
+              <Text style={newStyle.primaryButtonText}>
+                {t('CANCEL')}
+              </Text>
             </TouchableOpacity>
           </View>
         </View>

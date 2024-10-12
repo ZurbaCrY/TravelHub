@@ -1,4 +1,6 @@
 {
+  "TRAVELHUB": "TravelHub",
+  "WELCOME": "Welcome to TravelHub - Your Adventure Starts Here!",
   "LANGUAGE": "English",
   "SCREENS": {
     "SETTINGS": {
@@ -34,6 +36,8 @@
       "NO_COUNTRY": "No home country configured",
       "TRAVEL_BUDDIES": "Travel Buddies",
       "NO_TRAVEL_BUDDIES": "You have no travel buddies yet.",
+      "SUGGESTED_FRIENDS": "Suggested Friends",
+      "NO_SUGGESTED_FRIENDS": "No suggested friends.",
       "POSTS": "Posts",
       "UPVOTES": "Upvotes",
       "DOWNVOTES": "Downvotes",
@@ -43,13 +47,40 @@
       "WISHLIST_COUNTRIES": "Wishlist Countries: ",
       "NO_WISHLIST_COUNTRIES": "No wishlist countries added yet",
       "ADD_WISHLIST_COUNTRY": "Add wishlist country",
-      "CHANGE_PROFILE_PICTURE": "Change Profile Picture",
+      "CHANGE_PROFILE_PICTURE": "Change Profile Picture"
     },
     "COMMUNITY": {
-      "TITLE": "Community"
+      "TITLE": "Community",
+      "NEW_POST": "New Post",
+      "CREATE_NEW_POST": "Create new Post",
+      "POST_CONTENT_PLACEHOLDER": "What's on your mind?",
+      "SELECT_COUNTRY": "Select a Country",
+      "SELECT_CITY": "Select a City", 
+      "SELECT_ATTRACTION": "Select an Attraction",
+      "UPVOTE": "Upvote",
+      "UPVOTES": "Upvotes",
+      "UPVOTERS": "Upvoters",
+      "DOWNVOTE": "Downvote",
+      "DOWNVOTES": "Downvotes",
+      "DOWNVOTERS": "Downvoters"
+    },
+    "CHAT": {
+      "CHAT": "Chat",
+      "CHATS": "Chats",
+      "NO_CHATS": "You have no chats yet.",
+      "NO_MESSAGES": "No messages yet.",
+      "MESSAGE_PLACEHOLDER": "Type a message...",
+      "SEND": "Send",
+      "NEW_CHAT_CHOOSE_USER": "Choose a user to start a new chat with",
+      "NEW_CHAT_NO_USERS": "No users available to start a new chat with",
+      "NEW_CHAT_CREATE_CHAT": "Create Chat",
+      "NEW_CHAT_OWN_USER": "You cannot chat with yourself",
+      "EDIT_OR_DELETE": "Edit or delete message",
+      "EDIT_MESSAGE": "Edit message",
+      "EDITED": "edited",
+      "DELETE_MESSAGE": "Delete message"
     }
   },
-  "COMPONENTS": {},
   "LOADING_MESSAGE": {
     "LANGUAGE": "Loading language...",
     "SIGN_IN": "Signing in...",
@@ -95,8 +126,34 @@
       "SEND_ERROR": "Error sending friend request."
     }
   },
+  "AUTH": {
+    "SIGN_IN": "Sign In",
+    "SIGN_IN_ERROR": "Error signing in",
+    "SIGN_IN_ERROR_MESSAGE": "Unable to sign in. Please check your credentials and try again.",
+    "SIGN_IN_SUCCESS": "Sign in successful",
+    "NAVIGATE_SIGN_UP": "Don't have an account? Sign Up instead",
+    "EMAIL": "Email",
+    "EMAIL_PLACEHOLDER": "email@address.com",
+    "PASSWORD": "Password",
+    "PASSWORD_PLACEHOLDER": "Password",
+    "CONFIRM_PASSWORD": "Confirm Password",
+    "CONFIRM_PASSWORD_PLACEHOLDER": "Confirm Password",
+    "PASSWORD_NOT_MATCH": "Passwords do not match",
+    "PASSWORD_NOT_MATCH_MESSAGE": "Please ensure both passwords are the same.",
+    "REMEMBER_ME": "Remember me",
+    "FORGOT_PASSWORD": "Forgot password?",
+    "SIGN_UP": "Sign Up",
+    "SIGN_UP_ERROR": "Error signing up",
+    "SIGN_UP_ERROR_MESSAGE": "Unable to sign up. Please try again.",
+    "NAVIGATE_SIGN_IN": "Already have an account? Sign In instead",
+    "USERNAME": "Username",
+    "USERNAME_PLACEHOLDER": "Give yourself a username"
+  },
   "CANCEL": "Cancel",
   "POST": "Post",
+  "DELETE": "Delete",
+  "CONFIRM_DELETE": "Confirm Delete",
+  "CONFIRM": "Confirm",
   "SUCCESS": "Success",
   "ERROR": "Error",
   "ADD": "Add",
@@ -104,5 +161,7 @@
   "ACCEPT": "Accept",
   "DECLINE": "Decline",
   "REVOKE": "Revoke",
-  "SEND": "Send"
+  "SEND": "Send",
+  "BACK": "Back",
+  "FEATURE_NOT_IMPLEMENTED": "Feature not implemented yet. Please contact the developer."
 }
