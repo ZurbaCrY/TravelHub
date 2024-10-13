@@ -156,15 +156,29 @@ export default function CommunityScreen({ navigation }) {
           <View style={newStyle.postContainer}>
             <TouchableOpacity onPress={() => handleUserPress(item)}>
               <View style={newStyle.postHeader}>
-                <Image source={{ uri: item.users.profilepicture_url }} style={newStyle.extraSmallProfileImage} />
-                <Text style={newStyle.boldTextBig}>{item.users.username}</Text>
+                {/* Conditionally display user info based on the anonymous field */}
+                {item.users.anonymous ? (
+                  <>
+                    {/* Default anonymous profile picture */}
+                    <Image source={require('../../assets/images/account.png')} style={newStyle.extraSmallProfileImage} />
+                    <Text style={newStyle.boldTextBig}>Anonymous</Text>
+                  </>
+                ) : (
+                  <>
+                    {/* Actual profile picture and username */}
+                    <Image source={{ uri: item.users.profilepicture_url }} style={newStyle.extraSmallProfileImage} />
+                    <Text style={newStyle.boldTextBig}>{item.users.username}</Text>
+                  </>
+                )}
               </View>
             </TouchableOpacity>
+
             {item.users.username === user_username && (
               <TouchableOpacity onPress={() => confirmDeletePost(item.id)} style={newStyle.deleteButton}>
                 <Image source={require('../../assets/images/trash.png')} style={newStyle.icon} />
               </TouchableOpacity>
             )}
+
             <TouchableOpacity onPress={() => handlePostPress(item)}>
               {item.Country && (
                 <Text style={newStyle.countryText}>
@@ -187,6 +201,7 @@ export default function CommunityScreen({ navigation }) {
               {item.image_url && <Image source={{ uri: item.image_url }} style={newStyle.postImage} />}
               <Text style={newStyle.postText}>{item.content}</Text>
             </TouchableOpacity>
+
             <View style={newStyle.voteRow}>
               <View style={newStyle.voteContainer}>
                 <TouchableOpacity onPress={() => handleUpvote(item.id, user.id, loadPosts)}>
