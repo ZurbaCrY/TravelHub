@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, TouchableWithoutFeedback, Keyboard, ScrollView, Alert } from 'react-native';
 import { View, Text, TextInput, Image } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 import UserDataHandler from '../../services/userDataHandler';
 import { useLoading } from '../../context/LoadingContext';
 import styles from '../../styles/style';
@@ -11,6 +12,7 @@ import CustomButton from '../../components/CustomButton';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { handleFilePicker, handleNewProfilePicture } from '../../backend/community';
 import { useTranslation } from 'react-i18next';
+import { fetchCountries } from '../../backend/community';
 
 const EditProfile = ({ navigation }) => {
   const { t } = useTranslation();
@@ -23,6 +25,9 @@ const EditProfile = ({ navigation }) => {
   const today = new Date();
   const [userData, setUserData] = useState({});
   const [country, setCountry] = useState();
+  const [countryId, setCountryId] = useState();
+  const [countries, setCountries] = useState([]);
+
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -41,8 +46,21 @@ const EditProfile = ({ navigation }) => {
       }
     };
 
+    const loadCountries = async () => {
+      try {
+        showLoading(t('LOADING_MESSAGE.COUNTRIES'));
+        const countriesData = await fetchCountries();
+        setCountries(countriesData);
+      } catch (error) {
+        console.error('Error fetching countries: ', error);
+      } finally {
+        hideLoading();
+      }
+    };
+
     navigation.setOptions({ title: 'Edit Profile', headerStyle: { backgroundColor: '#f8f8f8' } });
     fetchUserData();
+    loadCountries();
   }, [navigation]);
 
   const handleInputChange = (field, value) => {
@@ -186,14 +204,23 @@ const EditProfile = ({ navigation }) => {
             />
           )}
 
+          {/* Country Picker */}
           <Text style={styles.bodyText}>
             {t('SCREENS.PROFILE.COUNTRY')}
           </Text>
-          <TextInput
-            style={styles.inputField}
-            value={country}
-            onChangeText={(text) => setCountry(text)}
-          />
+          <Picker style={styles.inputField}
+            selectedValue={country}
+            onValueChange={(itemValue) => {
+              setCountryId(itemValue);
+              setCountry(countries.find((country) => country.id === itemValue).name);
+            }}>
+            <Picker.Item label={country} value={country} />
+            {countries.map((country) => (
+              <Picker.Item key={country.id} label={country.name} value={country.id} />
+            ))}
+          </Picker>
+
+
 
           <CustomButton title={"Save"} onPress={handleSave} />
 

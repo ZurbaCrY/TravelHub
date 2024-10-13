@@ -16,13 +16,10 @@ class UserDataHandler {
       first_name: "",
       last_name: "",
     }
-    this.initialized = false;
     this.initialize();
   }
 
   async initialize() {
-    if (this.initialized) return;
-    this.initialized = true;
     try {
       await AuthService.initialize();
       this.user = await AuthService.getUser();
@@ -59,7 +56,7 @@ class UserDataHandler {
         .eq('user_id', this.user.id)
 
       if (error) {
-        throw new Error("Error fetching user data: " + error.message);
+        throw new Error("LoadUserData: Error fetching user data: " + error.message);
       }
       if (data) {
         this.userData = { ...this.userData, ...data[0] };
@@ -79,6 +76,20 @@ class UserDataHandler {
       return this.userData;
     } catch (error) {
       console.error("Error getting user data:", error);
+    }
+  }
+
+  removeUserData() {
+    this.userData = {
+      user_id: "",
+      username: "",
+      email: "",
+      profilepicture_url: "",
+      bio: "",
+      birthdate: "",
+      country: {},
+      first_name: "",
+      last_name: "",
     }
   }
 

@@ -125,10 +125,10 @@ export default function ProfileScreen() {
     const fetchUserData = async () => {
       try {
         showLoading(t('LOADING_MESSAGE.USER_DATA'));
-        const userData = await UserDataHandler.getUserData(user.id);
-        setUserData(userData);
+        const fetcheduserData = await UserDataHandler.getUserData(user.id);
+        setUserData(fetcheduserData);
       } catch (error) {
-        console.error('Error fetching user data:', error);
+        console.error('ProfileScreen: Error fetching user data:', error);
       }
     };
 

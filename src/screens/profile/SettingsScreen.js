@@ -12,6 +12,7 @@ import { Picker } from '@react-native-picker/picker';
 import { useAuth } from '../../context/AuthContext';
 import i18n from '../../assets/i18n/i18n';
 import { useTranslation } from 'react-i18next';
+import userDataHandler from '../../services/userDataHandler';
 
 const SettingsScreen = ({ navigation }) => {
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
@@ -71,6 +72,7 @@ const SettingsScreen = ({ navigation }) => {
               showLoading(t('LOADING_MESSAGE.SIGN_OUT'));
               await AuthService.signOut();
               await loadUser();
+              await userDataHandler.removeUserData();
               navigation.navigate('Welcome');
             } catch (error) {
               console.error('Error signing out:', error);

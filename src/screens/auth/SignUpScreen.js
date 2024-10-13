@@ -32,7 +32,7 @@ const SignUpScreen = () => {
       const user = await AuthService.signUp(username, email, password, confirmPassword);
       await loadUser();
       if (user) {
-        navigation.navigate('Main');
+        navigation.navigate('EditProfile');
       }
     } catch (error) {
       Alert.alert(t('SIGN_UP_ERROR'), t('SIGN_UP_ERROR_MESSAGE'));
