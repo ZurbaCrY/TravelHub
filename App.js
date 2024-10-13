@@ -51,8 +51,7 @@ function AppContent() {
         if (savedLanguage) {
           i18n.changeLanguage(savedLanguage);
         } else {
-          const locale = Localization.getLocales();
-          i18n.changeLanguage(locale);
+          i18n.changeLanguage('en');
         }
       } catch (error) {
         console.error('Error loading language:', error);
