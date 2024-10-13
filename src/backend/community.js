@@ -3,7 +3,7 @@ import * as FileSystem from 'expo-file-system';
 import { supabase } from '../services/supabase';
 import AuthService from '../services/auth'
 import { SUPABASE_URL } from '@env';
-
+import { useAuth } from '../context/AuthContext';
 
 export const fetchAttractionsByCity = async (cityId) => {
   try {
@@ -432,11 +432,9 @@ export const fetchPosts = async () => {
   }
 };
 
-export const createNewPost = async (newPostContent, user_username, imageUrl, countryId, cityId, attractionId) => {  
+export const createNewPost = async (newPostContent, user_id, user_username, imageUrl, countryId, cityId, attractionId) => {  
    try {
     let uploadedImageUrl = null;
-    const CURRENT_USER = AuthService.getUser();
-    const CURRENT_USER_ID = CURRENT_USER.id;
 
     if (imageUrl) {
       // Lade das Bild hoch
@@ -473,7 +471,7 @@ export const createNewPost = async (newPostContent, user_username, imageUrl, cou
       image_url: uploadedImageUrl,
       upvotes: 0,
       downvotes: 0,
-      user_id: CURRENT_USER_ID,
+      user_id: user_id,
       country_id: countryId ? countryId : null,
       city_id: cityId ? cityId : null,
       attraction_id: attractionId ? attractionId : null

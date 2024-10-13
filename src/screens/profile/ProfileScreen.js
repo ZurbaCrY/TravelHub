@@ -9,7 +9,8 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
   Modal,
-  FlatList
+  FlatList,
+  RefreshControl
 } from 'react-native';
 import ExtendedModal from "react-native-modal";
 import Flag from 'react-native-flags';
@@ -63,6 +64,8 @@ export default function ProfileScreen() {
   const [userData, setUserData] = useState(null);
   const [imageUrl, setImageUrl] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [isProfileLoaded, setIsProfileLoaded] = useState(false);
 
   const navigation = useNavigation();
 
@@ -210,6 +213,12 @@ export default function ProfileScreen() {
     }
   };
 
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchProfileData(); // Call this to refresh profile data as well
+    setRefreshing(false);
+  };
+
   const handleRemoveWishListCountry = async (index) => {
     const updatedCountries = [...wishListCountries];
     updatedCountries.splice(index, 1);
@@ -299,7 +308,11 @@ export default function ProfileScreen() {
         setShowVisitedInput(false);
         setShowWishListInput(false);
       }}>
-        <ScrollView style={[newStyle.container, { backgroundColor: isDarkMode ? '#070A0F' : '#f8f8f8' }]}>
+        <ScrollView
+          style={[newStyle.container, { backgroundColor: isDarkMode ? '#070A0F' : '#f8f8f8' }]}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }>
           <View style={[newStyle.centeredContainer, { backgroundColor: isDarkMode ? '#070A0F' : '#f8f8f8' }]}>
 
             <View style={newStyle.roundButtonContainerTopRight}>

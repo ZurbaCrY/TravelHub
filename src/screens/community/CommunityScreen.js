@@ -14,6 +14,7 @@ import { useLoading } from '../../context/LoadingContext';
 
 export default function CommunityScreen({ navigation }) {
   const { user } = useAuth();
+  const user_id = user.id;
   const user_username = user.user_metadata.username;
   const { isDarkMode } = useDarkMode();
   const [posts, setPosts] = useState([]);
@@ -83,7 +84,7 @@ export default function CommunityScreen({ navigation }) {
   };
 
   const handleCreateNewPost = async () => {
-    await createNewPost(newPostContent, user_username, imageUrl, selectedCountry, selectedCity, selectedAttraction);
+    await createNewPost(newPostContent, user_id, user_username, imageUrl, selectedCountry, selectedCity, selectedAttraction);
     setNewPostContent('');
     setImageUrl(null);
     setSelectedCountry('');
