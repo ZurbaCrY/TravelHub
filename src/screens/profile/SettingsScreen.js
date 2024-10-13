@@ -12,6 +12,8 @@ import { Picker } from '@react-native-picker/picker';
 import { useAuth } from '../../context/AuthContext';
 import i18n from '../../assets/i18n/i18n';
 import { useTranslation } from 'react-i18next';
+import { handleAnonymousModeToggle } from '../../backend/Profile';
+import { supabase } from '../../services/supabase';
 import userDataHandler from '../../services/userDataHandler';
 
 const SettingsScreen = ({ navigation }) => {
@@ -20,7 +22,10 @@ const SettingsScreen = ({ navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const { showLoading, hideLoading } = useLoading();
   const { isDarkMode, toggleDarkMode } = useDarkMode();
-  const { loadUser } = useAuth();
+  const { loadUser } = useAuth();  
+  const [anonymousEnabled, setAnonymousEnabled] = useState(false);
+  const { user } = useAuth();
+
   const { t } = useTranslation();
   const [language, setLanguage] = useState('en');
 
@@ -33,6 +38,29 @@ const SettingsScreen = ({ navigation }) => {
     { label: "中文", value: "zh" }
   ];
   const [selectedLanguage, setSelectedLanguage] = useState('en');
+
+  useEffect(() => {
+    const fetchAnonymousStatus = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('users')
+          .select('anonymous')
+          .eq('user_id', user.id)
+          .single();
+
+        if (error) {
+          console.error('Error fetching anonymous status:', error.message);
+        } else {
+          setAnonymousEnabled(data.anonymous);
+        }
+      } catch (error) {
+        console.error('Unexpected error:', error.message);
+      }
+    };
+
+    fetchAnonymousStatus();
+  }, []);
+
 
   useEffect(() => {
     const fetchLanguage = async () => {
@@ -128,9 +156,22 @@ const SettingsScreen = ({ navigation }) => {
       </View>
 
       <View style={styles.rowMarginBottom}>
+        <Text style={[styles.bodyTextBig, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>
+          Anonymous Mode
+        </Text>
+        <AnimatedSwitch
+          onValueChange={(value) => {
+            setAnonymousEnabled(value);  
+            handleAnonymousModeToggle(value, user.id);  
+          }}
+          value={anonymousEnabled}  
+        />
+      </View>
+
+      <View style={styles.rowMarginBottom}>
         <Text style={[styles.bodyTextBig, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>{t('SCREENS.SETTINGS.NOTIFICATIONS')}</Text>
         <AnimatedSwitch
-          onValueChange={() => setNotificationsEnabled(previousState => !previousState)}
+          onValueChange={() => setAnonymousEnabled(previousState => !previousState)}
           value={notificationsEnabled}
         />
       </View>

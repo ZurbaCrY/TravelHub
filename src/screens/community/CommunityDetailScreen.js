@@ -177,75 +177,124 @@ export default function CommunityDetailScreen({ route, navigation }) {
               {/* Username and Profilepicture */}
               <TouchableOpacity onPress={() => handleUserPress(postData)}>
                 <View style={newStyle.postHeader}>
-                  <Image source={{ uri: postData.users.profilepicture_url }} style={newStyle.extraSmallProfileImage} />
-                  <Text style={newStyle.boldTextBig}>{postData.users.username}</Text>
+                  {postData.users.anonymous ? (
+                    <>
+                      <Image
+                        source={require('../../assets/images/account.png')}
+                        style={newStyle.extraSmallProfileImage}
+                      />
+                      <Text style={newStyle.boldTextBig}>Anonymous</Text>
+                    </>
+                  ) : (
+                    <>
+                      <Image
+                        source={{ uri: postData.users.profilepicture_url }}
+                        style={newStyle.extraSmallProfileImage}
+                      />
+                      <Text style={newStyle.boldTextBig}>{postData.users.username}</Text>
+                    </>
+                  )}
                 </View>
               </TouchableOpacity>
+  
               {/* Delete Button if the post belongs to the logged-in user */}
               {postData.users.username === user.user_metadata.username && (
-                <TouchableOpacity style={newStyle.deleteButton} onPress={() => openDeleteModal(postData.id)}>
-                  <Image source={require('../../assets/images/trash.png')} style={newStyle.icon} />
+                <TouchableOpacity
+                  style={newStyle.deleteButton}
+                  onPress={() => openDeleteModal(postData.id)}
+                >
+                  <Image
+                    source={require('../../assets/images/trash.png')}
+                    style={newStyle.icon}
+                  />
                 </TouchableOpacity>
               )}
             </View>
+  
+            {/* Country, City, Attraction Info */}
             {postData.Country && (
               <Text style={newStyle.countryText}>
-                <Image source={require('../../assets/images/globus.png')} style={{ width: 20, height: 20 }} />
+                <Image
+                  source={require('../../assets/images/globus.png')}
+                  style={{ width: 20, height: 20 }}
+                />
                 {postData.Country.Countryname}
               </Text>
             )}
             {postData.City && (
               <Text style={newStyle.cityText}>
-                <Image source={require('../../assets/images/city.png')} style={{ width: 20, height: 20 }} />
+                <Image
+                  source={require('../../assets/images/city.png')}
+                  style={{ width: 20, height: 20 }}
+                />
                 {postData.City.Cityname}
               </Text>
             )}
             {postData.Attraction && (
               <Text style={newStyle.cityText}>
-                <Image source={require('../../assets/images/attractions/attraction.png')} style={{ width: 20, height: 20 }} />
+                <Image
+                  source={require('../../assets/images/attractions/attraction.png')}
+                  style={{ width: 20, height: 20 }}
+                />
                 {postData.Attraction.Attraction_Name}
               </Text>
             )}
+  
+            {/* Post Image and Content */}
             {postData.image_url && (
-              <Image source={{ uri: postData.image_url }} style={newStyle.postImage} />
+              <Image
+                source={{ uri: postData.image_url }}
+                style={newStyle.postImage}
+              />
             )}
             <Text style={newStyle.bodyText}>{postData.content}</Text>
+  
             {/* Upvotes and Downvotes Section */}
             <View style={newStyle.voteRow}>
               <View style={newStyle.voteContainer}>
-                <TouchableOpacity onPress={() => handleUpvote(postData.id, user.id, loadPosts)}>
-                  <Image source={require('../../assets/images/thumbs-up.png')} style={newStyle.icon} />
+                <TouchableOpacity
+                  onPress={() => handleUpvote(postData.id, user.id, loadPosts)}
+                >
+                  <Image
+                    source={require('../../assets/images/thumbs-up.png')}
+                    style={newStyle.icon}
+                  />
                 </TouchableOpacity>
                 <TouchableOpacity onPress={openUpvoterModal}>
-                  <Text style={newStyle.voteCount}>{postData.upvotes}
+                  <Text style={newStyle.voteCount}>
+                    {postData.upvotes}
                     {t('SCREENS.COMMUNITY.UPVOTES')}
                   </Text>
                 </TouchableOpacity>
               </View>
               <View style={newStyle.voteContainer}>
-                <TouchableOpacity onPress={() => handleDownvote(postData.id, user.id, loadPosts)}>
-                  <Image source={require('../../assets/images/thumbs-down.png')} style={newStyle.icon} />
+                <TouchableOpacity
+                  onPress={() => handleDownvote(postData.id, user.id, loadPosts)}
+                >
+                  <Image
+                    source={require('../../assets/images/thumbs-down.png')}
+                    style={newStyle.icon}
+                  />
                 </TouchableOpacity>
                 <TouchableOpacity onPress={openDownvoterModal}>
-                  <Text style={newStyle.voteCount}>{postData.downvotes}
+                  <Text style={newStyle.voteCount}>
+                    {postData.downvotes}
                     {t('SCREENS.COMMUNITY.DOWNVOTES')}
                   </Text>
                 </TouchableOpacity>
               </View>
             </View>
-
+  
+            {/* Voters List */}
             {showUpvoters && (
-              <View style={newStyle.updropdown}>
-                {renderVotersList(upvoters)}
-              </View>
+              <View style={newStyle.updropdown}>{renderVotersList(upvoters)}</View>
             )}
-
             {showDownvoters && (
               <View style={newStyle.downdropdown}>
                 {renderVotersList(downvoters)}
               </View>
             )}
-
+  
             {/* Comments Section */}
             <View style={newStyle.commentSection}>
               <TextInput
@@ -255,9 +304,14 @@ export default function CommunityDetailScreen({ route, navigation }) {
                 onChangeText={setNewComment}
               />
               <TouchableOpacity onPress={handleSubmitComment}>
-                <Image source={require('../../assets/images/message_send.png')} style={{ width: 50, height: 50 }} />
+                <Image
+                  source={require('../../assets/images/message_send.png')}
+                  style={{ width: 50, height: 50 }}
+                />
               </TouchableOpacity>
             </View>
+  
+            {/* Display Comments */}
             <FlatList
               data={comments}
               keyExtractor={(item) => item.id.toString()}
@@ -265,8 +319,21 @@ export default function CommunityDetailScreen({ route, navigation }) {
                 <View style={newStyle.commentItem}>
                   <TouchableOpacity onPress={() => handleUserPress(item)}>
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                      <Image source={{ uri: item.users.profilepicture_url }} style={newStyle.commentProfileImage} />
-                      <Text style={newStyle.commentUsername}>{item.users.username}:</Text>
+                      {item.users.anonymous ? (
+                        <Image
+                          source={require('../../assets/images/account.png')}
+                          style={newStyle.commentProfileImage}
+                        />
+                      ) : (
+                        <Image
+                          source={{ uri: item.users.profilepicture_url }}
+                          style={newStyle.commentProfileImage}
+                        />
+                      )}
+                      <Text style={newStyle.commentUsername}>
+                        {item.users.anonymous ? 'Anonymous' : item.users.username}
+                        :
+                      </Text>
                     </View>
                   </TouchableOpacity>
                   <Text style={newStyle.commentText}>{item.content}</Text>
@@ -276,7 +343,7 @@ export default function CommunityDetailScreen({ route, navigation }) {
           </>
         )}
       />
-
+  
       {/* Modal for Delete Confirmation */}
       <Modal
         transparent={true}
@@ -287,35 +354,27 @@ export default function CommunityDetailScreen({ route, navigation }) {
         <View style={newStyle.modalBackground}>
           <TouchableWithoutFeedback>
             <View style={newStyle.modalContent}>
-              <Text style={newStyle.modalTitleText}>
-                {t('CONFIRM_DELETE')}
-              </Text>
+              <Text style={newStyle.modalTitleText}>{t('CONFIRM_DELETE')}</Text>
               <View style={newStyle.row}>
-                <TouchableOpacity style={newStyle.averageRedButton} onPress={() => setModalVisible(false)}>
-                  <Text style={newStyle.smallButtonText}>
-                    {t('CANCEL')}
-                  </Text>
+                <TouchableOpacity
+                  style={newStyle.averageRedButton}
+                  onPress={() => setModalVisible(false)}
+                >
+                  <Text style={newStyle.smallButtonText}>{t('CANCEL')}</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={newStyle.averageBlueButton} onPress={handleDeletePost}>
-                  <Text style={newStyle.smallButtonText}>
-                    {t('DELETE')}
-                  </Text>
+                <TouchableOpacity
+                  style={newStyle.averageBlueButton}
+                  onPress={handleDeletePost}
+                >
+                  <Text style={newStyle.smallButtonText}>{t('DELETE')}</Text>
                 </TouchableOpacity>
               </View>
             </View>
           </TouchableWithoutFeedback>
         </View>
       </Modal>
-      < PublicProfileModal
-        isVisible={userProfileModal}
-        onClose={() => setUserProfileModal(false)}
-        user={selectedUser}
-        onFriendRequestPress={handleFriendRequestPress}
-        isLoading={loading}
-      />
-
-
-      {/* Modal für Upvoter */}
+  
+      {/* Modal for Upvoters */}
       <Modal
         transparent={true}
         animationType="slide"
@@ -326,23 +385,21 @@ export default function CommunityDetailScreen({ route, navigation }) {
           <TouchableWithoutFeedback onPress={closeUpvoterModal}>
             <View style={newStyle.modalContent}>
               <Text style={newStyle.modalTitleText}>Upvoters</Text>
-              <View>
-                {renderVotersList(upvoters)}
-              </View>
+              <View>{renderVotersList(upvoters)}</View>
               <View style={newStyle.row}>
-                <TouchableOpacity style={[newStyle.averageRedButton, { width: '100%' }]} onPress={closeUpvoterModal}>
-                  <Text style={newStyle.smallButtonText}>
-                    {t('BACK')}
-                  </Text>
+                <TouchableOpacity
+                  style={[newStyle.averageRedButton, { width: '100%' }]}
+                  onPress={closeUpvoterModal}
+                >
+                  <Text style={newStyle.smallButtonText}>{t('BACK')}</Text>
                 </TouchableOpacity>
               </View>
             </View>
           </TouchableWithoutFeedback>
         </View>
       </Modal>
-
-
-      {/* Modal für Downvoter */}
+  
+      {/* Modal for Downvoters */}
       <Modal
         transparent={true}
         animationType="slide"
@@ -355,14 +412,13 @@ export default function CommunityDetailScreen({ route, navigation }) {
               <Text style={newStyle.modalTitleText}>
                 {t('SCREENS.COMMUNITY.DOWNVOTERS')}
               </Text>
-              <View>
-                {renderVotersList(downvoters)}
-              </View>
+              <View>{renderVotersList(downvoters)}</View>
               <View style={newStyle.row}>
-                <TouchableOpacity style={[newStyle.averageRedButton, { width: '100%' }]} onPress={closeUpvoterModal}>
-                  <Text style={newStyle.smallButtonText}>
-                    {t('BACK')}
-                  </Text>
+                <TouchableOpacity
+                  style={[newStyle.averageRedButton, { width: '100%' }]}
+                  onPress={closeDownvoterModal}
+                >
+                  <Text style={newStyle.smallButtonText}>{t('BACK')}</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -370,5 +426,5 @@ export default function CommunityDetailScreen({ route, navigation }) {
         </View>
       </Modal>
     </View>
-  );
+  );  
 }

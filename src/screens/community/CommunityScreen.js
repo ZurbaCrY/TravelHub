@@ -118,17 +118,32 @@ export default function CommunityScreen({ navigation }) {
   const handleUserPress = async (item) => {
     try {
       showLoading(t('LOADING_MESSAGE.USER_STATS'));
-      const stats = await getUserStats(item.user_id);
-      const selectedUserData = {
-        user_id: item.user_id,
-        username: item.users.username,
-        profilepicture_url: item.users.profilepicture_url,
-        friendCount: stats.friendCount,
-        upvotes: stats.upvoteCount,
-        downvotes: stats.downvoteCount,
-        postCount: stats.postCount
-      };
-      setSelectedUser(selectedUserData);
+      if (item.users.anonymous) {
+        const selectedUserData = {
+          user_id: item.user_id,
+          username: 'Anonymous',
+          profilepicture_url: 'https://zjnvamrbnqzefncmdpaf.supabase.co/storage/v1/object/public/Images/images/account.png', 
+          friendCount: 0, 
+          upvotes: 0,
+          downvotes: 0,
+          postCount: 0,
+        };
+        setSelectedUser(selectedUserData);
+      } else {
+        // If not anonymous, fetch actual user stats
+        const stats = await getUserStats(item.user_id);
+        const selectedUserData = {
+          user_id: item.user_id,
+          username: item.users.username,
+          profilepicture_url: item.users.profilepicture_url,
+          friendCount: stats.friendCount,
+          upvotes: stats.upvoteCount,
+          downvotes: stats.downvoteCount,
+          postCount: stats.postCount,
+        };
+        setSelectedUser(selectedUserData);
+      }
+
       setUserProfileModal(true);
     } catch (error) {
       console.error('Error fetching user stats:', error);
@@ -156,15 +171,29 @@ export default function CommunityScreen({ navigation }) {
           <View style={newStyle.postContainer}>
             <TouchableOpacity onPress={() => handleUserPress(item)}>
               <View style={newStyle.postHeader}>
-                <Image source={{ uri: item.users.profilepicture_url }} style={newStyle.extraSmallProfileImage} />
-                <Text style={newStyle.boldTextBig}>{item.users.username}</Text>
+                {/* Check if item.users is defined */}
+                {item.users && item.users.anonymous ? (
+                  <>
+                    <Image source={require('../../assets/images/account.png')} style={newStyle.extraSmallProfileImage} />
+                    <Text style={newStyle.boldTextBig}>Anonymous</Text>
+                  </>
+                ) : (
+                  item.users && ( // Ensure item.users is defined
+                    <>
+                      <Image source={{ uri: item.users.profilepicture_url }} style={newStyle.extraSmallProfileImage} />
+                      <Text style={newStyle.boldTextBig}>{item.users.username}</Text>
+                    </>
+                  )
+                )}
               </View>
             </TouchableOpacity>
-            {item.users.username === user_username && (
+
+            {item.users && item.users.username === user_username && (
               <TouchableOpacity onPress={() => confirmDeletePost(item.id)} style={newStyle.deleteButton}>
                 <Image source={require('../../assets/images/trash.png')} style={newStyle.icon} />
               </TouchableOpacity>
             )}
+
             <TouchableOpacity onPress={() => handlePostPress(item)}>
               {item.Country && (
                 <Text style={newStyle.countryText}>
@@ -187,6 +216,7 @@ export default function CommunityScreen({ navigation }) {
               {item.image_url && <Image source={{ uri: item.image_url }} style={newStyle.postImage} />}
               <Text style={newStyle.postText}>{item.content}</Text>
             </TouchableOpacity>
+
             <View style={newStyle.voteRow}>
               <View style={newStyle.voteContainer}>
                 <TouchableOpacity onPress={() => handleUpvote(item.id, user.id, loadPosts)}>

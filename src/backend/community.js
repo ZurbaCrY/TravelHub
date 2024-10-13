@@ -116,7 +116,8 @@ export const fetchComments = async (postId) => {
         *,
         users (
           username,
-          profilepicture_url
+          profilepicture_url,
+          anonymous
         )
       `) 
       .eq('post_id', postId)
@@ -403,7 +404,8 @@ export const fetchPosts = async () => {
         timestamp, 
         users (
           username, 
-          profilepicture_url
+          profilepicture_url,
+          anonymous
         ),
         Country (
           Country_ID,
