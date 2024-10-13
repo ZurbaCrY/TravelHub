@@ -14,6 +14,7 @@ import { useDarkMode } from '../../context/DarkModeContext';
 import { useLoading } from "../../context/LoadingContext";
 import CustomButton from "../../components/CustomButton";
 import { useTranslation } from "react-i18next";
+import { useAuth } from "../../context/AuthContext";
 
 const SignInScreen = ({ navigation }) => {
   const { t } = useTranslation();
@@ -21,13 +22,18 @@ const SignInScreen = ({ navigation }) => {
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
   const { showLoading, hideLoading } = useLoading();
+  const { loadUser } = useAuth();
 
   navigation = useNavigation();
 
   const handleSignIn = async () => {
     try {
-      showLoading(t('LOADING_MESSAGE.SIGNING_IN'));
+      showLoading(t('LOADING_MESSAGE.SIGN_IN'));
       const user = await AuthService.signIn(email, password, remember);
+      await loadUser();
+      if (user) {
+        navigation.navigate("Main");
+      }
     } catch (error) {
       Alert.alert(t('AUTH.SIGN_IN_ERROR'), t('AUTH.SIGN_IN_ERROR_MESSAGE'));
       console.error('Sign-in error:', error);

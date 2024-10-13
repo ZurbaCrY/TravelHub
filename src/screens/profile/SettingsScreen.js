@@ -9,7 +9,7 @@ import { useLoading } from '../../context/LoadingContext';
 import CustomButton from '../../components/CustomButton';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Picker } from '@react-native-picker/picker';
-
+import { useAuth } from '../../context/AuthContext';
 import i18n from '../../assets/i18n/i18n';
 import { useTranslation } from 'react-i18next';
 
@@ -19,7 +19,7 @@ const SettingsScreen = ({ navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const { showLoading, hideLoading } = useLoading();
   const { isDarkMode, toggleDarkMode } = useDarkMode();
-
+  const { loadUser } = useAuth();
   const { t } = useTranslation();
   const [language, setLanguage] = useState('en');
 
@@ -56,8 +56,12 @@ const SettingsScreen = ({ navigation }) => {
 
   const handleSignOut = async () => {
     try {
-      showLoading(t('SCREENS.SETTINGS.SIGNING_OUT'));
+      showLoading(t('SCREENS.SETTINGS.SIGN_OUT'));
       const user = await AuthService.signOut();
+      await loadUser();
+      if (!user) {
+        navigation.navigate('Welcome');
+      }
     } catch (error) {
       Alert.alert(t('SCREENS.SETTINGS.ERROR'), t('SCREENS.SETTINGS.SIGN_OUT_ERROR'));
       console.error('Sign-out error:', error);

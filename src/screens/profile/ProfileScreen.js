@@ -363,7 +363,7 @@ export default function ProfileScreen() {
             <View style={newStyle.row}>
               <Icon name="birthday-cake" size={14} style={[newStyle.marginRightExtraSmall, { color: isDarkMode ? '#FFFDF3' : '#000000' }]} />
               <Text style={[newStyle.bodyText, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>
-                {userData && userData.birthdate ? new Date(userData.birthdate).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' }) : t('SCREENS.PROFILE.NO_BIRTHDAY')}
+                {userData && userData.birthdate ? new Date(userData.birthdate).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' }) : t('SCREENS.PROFILE.NO_BIRTHDATE')}
               </Text>
             </View>
 
@@ -378,7 +378,7 @@ export default function ProfileScreen() {
               <View style={newStyle.row}>
                 <Flag code="DE" size={16} style={newStyle.marginRightExtraSmall} />
                 <Text style={[newStyle.bodyText, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>
-                  {t('SCREENS.PROFILE.NO_HOME_COUNTRY')}
+                  {t('SCREENS.PROFILE.NO_COUNTRY')}
                 </Text>
               </View>
             }
