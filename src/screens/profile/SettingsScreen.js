@@ -27,7 +27,7 @@ const SettingsScreen = ({ navigation }) => {
     { label: "English", value: "en" },
     { label: "Deutsch", value: "de" },
     { label: "Español", value: "es" },
-    { label: "Français", value: "fr" },,
+    { label: "Français", value: "fr" },
     { label: "Italiano", value: "it" },
     { label: "中文", value: "zh" }
   ];
@@ -55,19 +55,33 @@ const SettingsScreen = ({ navigation }) => {
 
 
   const handleSignOut = async () => {
-    try {
-      showLoading(t('SCREENS.SETTINGS.SIGN_OUT'));
-      const user = await AuthService.signOut();
-      await loadUser();
-      if (!user) {
-        navigation.navigate('Welcome');
-      }
-    } catch (error) {
-      Alert.alert(t('SCREENS.SETTINGS.ERROR'), t('SCREENS.SETTINGS.SIGN_OUT_ERROR'));
-      console.error('Sign-out error:', error);
-    } finally {
-      hideLoading();
-    }
+    Alert.alert(
+      t('SCREENS.SETTINGS.LOGOUT_CONFIRM_TITLE'),
+      t('SCREENS.SETTINGS.LOGOUT_CONFIRM_MESSAGE'),
+      [
+        {
+          text: t('CANCEL'),
+          onPress: () => console.log('Logout cancelled'),
+          style: 'cancel',
+        },
+        {
+          text: t('CONFIRM'),
+          onPress: async () => {
+            try {
+              showLoading(t('LOADING_MESSAGE.SIGN_OUT'));
+              await AuthService.signOut();
+              await loadUser();
+              navigation.navigate('Welcome');
+            } catch (error) {
+              console.error('Error signing out:', error);
+            } finally {
+              hideLoading();
+            }
+          },
+        },
+      ],
+      { cancelable: false }
+    );
   };
 
   const handleImageChange = async () => {
