@@ -96,8 +96,6 @@ export default function CommunityScreen({ navigation }) {
 
   const handleDeletePost = async () => {
     try {
-      await deletePost(postId);
-      loadPosts();
       await deletePost(selectedPostId);
       setDeletePostModalVisible(false);
       loadPosts();
