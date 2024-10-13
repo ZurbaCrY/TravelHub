@@ -9,6 +9,9 @@ import PropTypes from 'prop-types';
 import { useLoading } from '../../context/LoadingContext.js';
 import { useAuth } from '../../context/AuthContext.js';
 import { getProfilePictureUrlByUserId } from '../../services/getProfilePictureUrlByUserId';
+import { useTranslation } from 'react-i18next';
+import FriendService from '../../services/friendService';
+import getUsernamesByUserIds from '../../services/getUsernamesByUserIds.js';
 
 const fetchFromSupabase = async (table, select, filters = []) => {
   let query = supabase.from(table).select(select);
@@ -25,6 +28,7 @@ const fetchFromSupabase = async (table, select, filters = []) => {
 };
 
 export default function ChatListScreen({ navigation }) {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const CURRENT_USER = user;
   const CURRENT_USER_ID = CURRENT_USER.id;
@@ -41,7 +45,7 @@ export default function ChatListScreen({ navigation }) {
 
     const fetchChatsAndUsers = async () => {
       try {
-        showLoading("Fetching Chats");
+        showLoading(t('LOADING_MESSAGE.CHATS'));
         await fetchChats();
         await fetchUsers();
       } catch (error) {
@@ -113,6 +117,8 @@ export default function ChatListScreen({ navigation }) {
   };
 
   const fetchUsers = async () => {
+    await FriendService.initialize();
+    const allFriends = await FriendService.getFriends();
     const allUsers = await fetchFromSupabase('users', 'user_id, username', [['neq', 'user_id', CURRENT_USER_ID]]);
     const existingChats = await fetchFromSupabase('chat_user', 'chat_id', [['eq', 'user_id', CURRENT_USER_ID]]);
 
@@ -126,8 +132,11 @@ export default function ChatListScreen({ navigation }) {
     const flattenedUserIds = existingChatUserIds.flat();
     setExistingChatUserIds(flattenedUserIds);
 
-    const availableUsers = allUsers.filter(user => !flattenedUserIds.includes(user.user_id));
-    setUsers(availableUsers);
+    const availableUsers = allFriends.filter(user => !flattenedUserIds.includes(user.friend_id));
+    const availableUserIds = availableUsers.map(user => user.friend_id);
+    const availableUsersWithUsername = await getUsernamesByUserIds(availableUserIds);
+    
+    setUsers(availableUsersWithUsername);
   };
 
   const getChatUsers = async (chatId) => {
@@ -141,7 +150,7 @@ export default function ChatListScreen({ navigation }) {
 
   const createNewChat = async () => {
     if (!selectedUser || selectedUser.user_id === CURRENT_USER_ID) {
-      Alert.alert('Fehler', 'Sie können keinen Chat mit sich selbst erstellen.');
+      Alert.alert(t('ERROR'), t('SCREENS.CHAT.NEW_CHAT_OWN_USER'));
       return;
     }
     const newChat = { chat_id: Date.now(), created_at: new Date().toISOString() };
@@ -241,14 +250,18 @@ export default function ChatListScreen({ navigation }) {
           <View style={styles.modalBackground} />
         </TouchableWithoutFeedback>
         <View style={styles.modalContentWidth}>
-          <Text style={styles.modalTitleText}>Wähle einen Benutzer für den Chat</Text>
+          <Text style={styles.modalTitleText}>
+            {t('SCREENS.CHAT.NEW_CHAT_CHOOSE_USER')}
+          </Text>
           {users.length > 0 ? (
             users.map(renderUserItem)
           ) : (
-            <Text style={styles.bodyText}>Keine neuen Benutzer verfügbar</Text>
+            <Text style={styles.bodyText}>
+              {t('SCREENS.CHAT.NEW_CHAT_NO_USERS')}
+            </Text>
           )}
           <Button onPress={createNewChat} disabled={!selectedUser}>
-            Chat starten
+            {t('SCREENS.CHAT.NEW_CHAT_CREATE_CHAT')}
           </Button>
         </View>
       </Modal>
