@@ -12,7 +12,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import i18n from './src/assets/i18n/i18n';
 import { useTranslation } from 'react-i18next';
 
-
 export default function App() {
   return (
     <LoadingProvider>
@@ -32,7 +31,6 @@ function AppContent() {
   const { showLoading, hideLoading } = useLoading();
 
   const { t } = useTranslation();
-  const [language, setLanguage] = useState('en');
 
   useEffect(() => {
     const initFriends = async () => {
@@ -63,7 +61,9 @@ function AppContent() {
       }
     }
 
-    initFriends();
+    if (user) {
+      initFriends();
+    }
     loadLanguage();
   }, []);
 

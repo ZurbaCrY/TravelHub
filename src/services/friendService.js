@@ -4,7 +4,6 @@ import AuthService from "../services/auth";
 class FriendService {
   constructor(supabase) {
     this.supabase = supabase;
-    this.initialized = false;
     this.user = null;
     this.friendRequests = {
       received: {
@@ -22,8 +21,6 @@ class FriendService {
   }
 
   async initialize() {
-    if (this.initialized) return;
-    this.initialized = true;
     try {
       await this.loadUser();
       await Promise.all([this.fetchFriends(), this.fetchFriendRequests()]);
@@ -33,7 +30,7 @@ class FriendService {
   }
 
   async loadUser() {
-    await AuthService.loadUser();
+    await AuthService.initialize();
     this.user = await AuthService.getUser();
     if (!this.user || !this.user.id) {
       throw new Error("User not loaded");

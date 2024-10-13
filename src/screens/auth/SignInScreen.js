@@ -15,6 +15,7 @@ import { useLoading } from "../../context/LoadingContext";
 import CustomButton from "../../components/CustomButton";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../../context/AuthContext";
+import FriendService from "../../services/friendService";
 
 const SignInScreen = ({ navigation }) => {
   const { t } = useTranslation();
@@ -31,6 +32,7 @@ const SignInScreen = ({ navigation }) => {
       showLoading(t('LOADING_MESSAGE.SIGN_IN'));
       const user = await AuthService.signIn(email, password, remember);
       await loadUser();
+      await FriendService.initialize();
       if (user) {
         navigation.navigate("Main");
       }

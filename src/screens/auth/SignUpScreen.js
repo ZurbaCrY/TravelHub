@@ -9,6 +9,7 @@ import { useLoading } from '../../context/LoadingContext';
 import CustomButton from '../../components/CustomButton';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
+import FriendService from '../../services/friendService';
 
 const SignUpScreen = () => {
   const [username, setUsername] = useState('');
@@ -31,6 +32,7 @@ const SignUpScreen = () => {
       showLoading(t('LOADING_MESSAGE.SIGN_UP'));
       const user = await AuthService.signUp(username, email, password, confirmPassword);
       await loadUser();
+      await FriendService.initialize();
       if (user) {
         navigation.navigate('EditProfile');
       }
