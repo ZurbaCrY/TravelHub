@@ -2,17 +2,19 @@ import React, { createContext, useState, useContext, useEffect } from 'react';
 import { useLoading } from './LoadingContext';
 import AuthService from '../services/auth'
 import { supabase } from '../services/supabase';
+import { useTranslation } from 'react-i18next';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const { showLoading, hideLoading } = useLoading();
   const [user, setUser] = useState(null);
+  const { t } = useTranslation();
 
   // Initialize user on component mount
   useEffect(() => {
     const initUser = async () => {
-      showLoading('Initializing user...');
+      showLoading(t('LOADING_MESSAGE.USER'));
       try {
         await AuthService.initialize();
         const fetchedUser = await AuthService.getUser();

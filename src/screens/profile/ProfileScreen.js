@@ -40,8 +40,10 @@ import { useLoading } from '../../context/LoadingContext';
 import PublicProfileModal from '../../components/PublicProfileModal';
 import { handleFilePicker, handleNewProfilePicture } from '../../backend/community';
 import { FontAwesome5 } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 
 export default function ProfileScreen() {
+  const { t } = useTranslation();
   const { isDarkMode } = useDarkMode();
   const [visitedCountries, setVisitedCountries] = useState([]);
   const [wishListCountries, setWishListCountries] = useState([]);
@@ -74,7 +76,7 @@ export default function ProfileScreen() {
 
     const fetchProfilePictureUrl = async () => {
       try {
-        showLoading("Fetching Profile Picture");
+        showLoading(t('LOADING_MESSAGE.PROFILE_PICTURE'));
         const url = await getProfilePictureUrlByUserId(user.id);
         setProfilePictureUrl(url);
       } catch (error) {
@@ -84,7 +86,7 @@ export default function ProfileScreen() {
 
     const fetchUserStats = async () => {
       try {
-        showLoading("Fetching User Stats");
+        showLoading(t('LOADING_MESSAGE.USER_STATS'));
         const visitedCountriesData = await fetchVisitedCountries(user.id);
         setVisitedCountries(visitedCountriesData);
 
@@ -125,7 +127,7 @@ export default function ProfileScreen() {
 
     const fetchUserData = async () => {
       try {
-        showLoading("Fetching User Data");
+        showLoading(t('LOADING_MESSAGE.USER_DATA'));
         const userData = await UserDataHandler.getUserData(user.id);
         setUserData(userData);
       } catch (error) {
@@ -135,7 +137,7 @@ export default function ProfileScreen() {
 
 
     try {
-      showLoading("Loading Profile");
+      showLoading(t('LOADING_MESSAGE.PROFILE'));
       fetchProfilePictureUrl();
       fetchUserStats();
       fetchRequests();
@@ -237,7 +239,7 @@ export default function ProfileScreen() {
 
   const handleUserPress = async (item) => {
     try {
-      showLoading("Loading User Stats");
+      showLoadingt('LOADING_MESSAGE.USER');
       const stats = await getUserStats(item.user_id);
       const profilePictureUrl = await getProfilePictureUrlByUserId(item.user_id);
       const selectedUserData = {
@@ -260,7 +262,7 @@ export default function ProfileScreen() {
 
   const handleFriendRequestPress = async () => {
     try {
-      showLoading("Sending Friend Request");
+      showLoading(t('LOADING_MESSAGE.FRIEND_REQUEST_SEND'));
       await FriendService.sendFriendRequest(selectedUser.user_id);
     } catch (error) {
       console.error('Error sending friend request:', error);
@@ -271,7 +273,7 @@ export default function ProfileScreen() {
 
   const handleRequestButtonPress = async () => {
     try {
-      showLoading("Navigating to Friend Requests");
+      showLoading(t('LOADING_MESSAGE.FRIEND_REQUEST'));
       setRequestModalVisible(true);
     } catch (error) {
       console.error('Error navigating to friend requests:', error);
@@ -282,7 +284,14 @@ export default function ProfileScreen() {
 
   const respondToFriendRequest = async (requestId, action) => {
     try {
-      showLoading("Responding to Friend Request");
+      if (action === "accept") {
+        showLoading(t('LOADING_MESSAGE.FRIEND_REQUEST_ACCEPT'));
+      } else if (action === "decline") {
+        showLoading(t('LOADING_MESSAGE.FRIEND_REQUEST_DECLINE'));
+      } else {
+        console.error('Invalid action:', action);
+        return;
+      }
       await FriendService.respondToFriendRequest(requestId, action);
       setFriendRequests(friendRequests.filter(request => request.friend_request_id !== requestId));
     } catch (error) {
@@ -354,24 +363,24 @@ export default function ProfileScreen() {
 
             {/* Bio */}
             <Text style={[newStyle.bodyTextBig, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>
-              {userData && userData.bio ? '"' + userData.bio + '"' : 'No bio configured'}
+              {userData && userData.bio ? '"' + userData.bio + '"' :  t('SCREENS.PROFILE.NO_BIO') }
             </Text>
 
 
             {/* Email */}
             <Text style={[newStyle.bodyText, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>
-              {userData && userData.email ? userData.email : 'No email configured'}
+              {userData && userData.email ? userData.email : t('SCREENS.PROFILE.NO_EMAIL')}
             </Text>
 
             {/* Birthday */}
             <View style={newStyle.row}>
               <Icon name="birthday-cake" size={14} style={[newStyle.marginRightExtraSmall, { color: isDarkMode ? '#FFFDF3' : '#000000' }]} />
               <Text style={[newStyle.bodyText, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>
-                {userData && userData.birthdate ? new Date(userData.birthdate).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' }) : 'No birthdate configured'}
+                {userData && userData.birthdate ? new Date(userData.birthdate).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' }) : t('SCREENS.PROFILE.NO_BIRTHDAY')}
               </Text>
             </View>
 
-            {/* Flag */}
+            {/* Flag & Home Country */}
             {userData && userData.country.home_country && userData.country.home_country_code ?
               <View style={newStyle.row}>
                 <Flag code={userData.country.home_country_code} size={16} style={newStyle.marginRightExtraSmall} />
@@ -382,7 +391,7 @@ export default function ProfileScreen() {
               <View style={newStyle.row}>
                 <Flag code="DE" size={16} style={newStyle.marginRightExtraSmall} />
                 <Text style={[newStyle.bodyText, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>
-                  No home country configured
+                  {t('SCREENS.PROFILE.NO_HOME_COUNTRY')}
                 </Text>
               </View>
             }
@@ -395,12 +404,16 @@ export default function ProfileScreen() {
             <View style={newStyle.userStatsRow}>
               <View style={newStyle.userStatColumn}>
                 <TouchableOpacity onPress={() => setTravelBuddiesModalVisible(true)} style={[{ justifyContent: 'center', alignItems: 'center' }]}>
-                  <Text style={newStyle.userStatLabel}>Travel-Buddies</Text>
+                  <Text style={newStyle.userStatLabel}>
+                    {t('SCREENS.PROFILE.TRAVEL_BUDDIES')}
+                  </Text>
                   <Text style={newStyle.userStatValue}>{travelBuddies.length != null ? travelBuddies.length : 'N/A'}</Text>
                 </TouchableOpacity>
               </View>
               <View style={newStyle.userStatColumn}>
-                <Text style={newStyle.userStatLabel}>Posts</Text>
+                <Text style={newStyle.userStatLabel}>
+                  {t('SCREENS.PROFILE.POSTS')}
+                </Text>
                 <Text style={newStyle.userStatValue}>{postCount != null ? postCount : 'N/A'}</Text>
               </View>
             </View>
@@ -408,11 +421,15 @@ export default function ProfileScreen() {
             {/* Row 2: Upvotes and Downvotes */}
             <View style={newStyle.userStatsRow}>
               <View style={newStyle.userStatColumn}>
-                <Text style={newStyle.userStatLabel}>Upvotes</Text>
+                <Text style={newStyle.userStatLabel}>
+                  {t('SCREENS.PROFILE.UPVOTES')}
+                </Text>
                 <Text style={newStyle.userStatValue}>{upvoteCount != null ? upvoteCount : 'N/A'}</Text>
               </View>
               <View style={newStyle.userStatColumn}>
-                <Text style={newStyle.userStatLabel}>Downvotes</Text>
+                <Text style={newStyle.userStatLabel}>
+                  {t('SCREENS.PROFILE.DOWNVOTES')}
+                </Text>
                 <Text style={newStyle.userStatValue}>{downvoteCount != null ? downvoteCount : 'N/A'}</Text>
               </View>
             </View>
@@ -420,9 +437,13 @@ export default function ProfileScreen() {
 
           {/* Visited and Wish List Countries */}
           <View style={newStyle.infoSection}>
-            <Text style={newStyle.header}>Bereits besuchte Länder:</Text>
+            <Text style={newStyle.header}>
+              {t('SCREENS.PROFILE.VISITED_COUNTRIES')}
+            </Text>
             {visitedCountries.length === 0 ? (
-              <Text style={newStyle.details}>Keine besuchten Länder hinzugefügt</Text>
+              <Text style={newStyle.details}>
+                {t('SCREENS.PROFILE.NO_VISITED_COUNTRIES')}
+              </Text>
             ) : (
               visitedCountries.map((country, index) => (
                 <View key={index} style={styles.countryItem}>
@@ -442,24 +463,32 @@ export default function ProfileScreen() {
                   style={styles.input}
                   onChangeText={setNewVisited}
                   value={newVisited}
-                  placeholder="Neues Ziel hinzufügen"
+                  placeholder={t('SCREENS.PROFILE.ADD_VISITED_COUNTRY')}
                   placeholderTextColor="#cccccc"
                 />
-                <Button onPress={handleAddVisitedCountry} color="#58CFEC">Hinzufügen</Button>
+                <Button onPress={handleAddVisitedCountry} color="#58CFEC">
+                  {t('ADD')}
+                </Button>
               </>
             )}
             {!showVisitedInput && (
               <TouchableOpacity onPress={() => setShowVisitedInput(true)} style={styles.addButton}>
                 <Icon name="plus" size={20} color="#FFFDF3" />
-                <Text style={styles.addButtonText}> Besuchtes Land hinzufügen</Text>
+                <Text style={styles.addButtonText}>
+                  {t('SCREENS.PROFILE.ADD_VISITED_COUNTRY')}
+                </Text>
               </TouchableOpacity>
             )}
           </View>
 
           <View style={styles.infoSection}>
-            <Text style={styles.header}>Wunschreiseziele:</Text>
+            <Text style={styles.header}>
+              {t('SCREENS.PROFILE.WISHLIST_COUNTRIES')}
+            </Text>
             {wishListCountries.length === 0 ? (
-              <Text style={styles.details}>Keine Wunschziele hinzugefügt</Text>
+              <Text style={styles.details}>
+                {t('SCREENS.PROFILE.NO_WISHLIST_COUNTRIES')}
+              </Text>
             ) : (
               wishListCountries.map((country, index) => (
                 <View key={index} style={styles.countryItem}>
@@ -476,16 +505,20 @@ export default function ProfileScreen() {
                   style={styles.input}
                   onChangeText={setNewWishList}
                   value={newWishList}
-                  placeholder="Neues Wunschland hinzufügen"
+                  placeholder={t('SCREENS.PROFILE.ADD_WISHLIST_COUNTRY')}
                   placeholderTextColor="#cccccc"
                 />
-                <Button onPress={handleAddWishListCountry} color="#58CFEC">Hinzufügen</Button>
+                <Button onPress={handleAddWishListCountry} color="#58CFEC">
+                  {t('ADD')}
+                </Button>
               </>
             )}
             {!showWishListInput && (
               <TouchableOpacity onPress={() => setShowWishListInput(true)} style={styles.addButton}>
                 <Icon name="plus" size={20} color="#FFFDF3" />
-                <Text style={styles.addButtonText}> Wunschland hinzufügen</Text>
+                <Text style={styles.addButtonText}>
+                  {t('SCREENS.PROFILE.ADD_WISHLIST_COUNTRY')}
+                </Text>
               </TouchableOpacity>
             )}
           </View>
@@ -505,7 +538,9 @@ export default function ProfileScreen() {
               <View style={newStyle.modalBackground}>
                 <TouchableWithoutFeedback>
                   <View style={newStyle.modalContent}>
-                    <Text style={newStyle.modalTitleText}>Profilbild ändern</Text>
+                    <Text style={newStyle.modalTitleText}>
+                      {t('SCREENS.PROFILE.CHANGE_PROFILE_PICTURE')}
+                    </Text>
 
                     {imageUrl && (
                       <Image source={{ uri: imageUrl }} style={newStyle.postImage} />
@@ -513,7 +548,9 @@ export default function ProfileScreen() {
                     <View style={styles.row}>
 
                       <TouchableOpacity style={newStyle.averageRedButton} onPress={() => setModalVisible(false)}>
-                        <Text style={newStyle.smallButtonText}>Schließen</Text>
+                        <Text style={newStyle.smallButtonText}>
+                          {t('CLOSE')}
+                        </Text>
                       </TouchableOpacity>
                       <TouchableOpacity
                         style={newStyle.averageBlueButton}
@@ -522,7 +559,9 @@ export default function ProfileScreen() {
                           setModalVisible(false);
                         }}
                       >
-                        <Text style={newStyle.smallButtonText}>Posten</Text>
+                        <Text style={newStyle.smallButtonText}>
+                          {t('POST')}
+                        </Text>
                       </TouchableOpacity>
                     </View>
                   </View>
@@ -547,9 +586,13 @@ export default function ProfileScreen() {
                     </TouchableOpacity>
 
                     {/* Travel Buddies listed */}
-                    <Text style={newStyle.modalTitleText}>Travel Buddies</Text>
+                    <Text style={newStyle.modalTitleText}>
+                      {t('SCREENS.PROFILE.TRAVEL_BUDDIES')}
+                    </Text>
                     {travelBuddies.length === 0 ? (
-                      <Text style={newStyle.bodyText}>You have no travel buddies yet.</Text>
+                      <Text style={newStyle.bodyText}>
+                        {t('SCREENS.PROFILE.NO_TRAVEL_BUDDIES')}
+                      </Text>
                     ) : (
                       <FlatList
                         data={travelBuddies}
@@ -582,9 +625,13 @@ export default function ProfileScreen() {
         style={newStyle.friendRequestModal}
       >
         <View style={newStyle.container}>
-          <Text style={newStyle.titleText}>Friend Requests</Text>
+          <Text style={newStyle.titleText}>
+            {t('FRIENDS.REQUESTS.FRIEND_REQUESTS')}
+          </Text>
           {friendRequests.length === 0 ? (
-            <Text style={newStyle.bodyText}>You have no friend requests.</Text>
+            <Text style={newStyle.bodyText}>
+              {t('FRIENDS.REQUESTS.NO_FRIEND_REQUESTS')}
+            </Text>
           ) : (
             <FlatList
               data={friendRequests}
@@ -593,7 +640,7 @@ export default function ProfileScreen() {
                 <View style={newStyle.containerRow}>
                   <TouchableOpacity
                     style={newStyle.containerNoMarginTop}
-                    onPress={() => handleUserPress(item = { user_id: item.sender_id, username: item.sender_username })}
+                    onPress={() => handleUserPress({ user_id: item.sender_id, username: item.sender_username })}
                   >
                     <Text style={newStyle.bodyText}>{item.sender_username}</Text>
                   </TouchableOpacity>
@@ -602,13 +649,13 @@ export default function ProfileScreen() {
                       style={newStyle.containerNoMarginTop}
                       onPress={() => respondToFriendRequest(item.friend_request_id, "accept")}
                     >
-                      <Text style={newStyle.bodyText}>Accept</Text>
+                      <Text style={newStyle.bodyText}>{t('SCREENS.PROFILE.ACCEPT')}</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                       style={newStyle.containerNoMarginTop}
                       onPress={() => respondToFriendRequest(item.friend_request_id, "decline")}
                     >
-                      <Text style={newStyle.bodyText}>Decline</Text>
+                      <Text style={newStyle.bodyText}>{t('SCREENS.PROFILE.DECLINE')}</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -616,7 +663,7 @@ export default function ProfileScreen() {
             />
           )}
           {/* <View style={newStyle.marginBottomLarge}/> 
-          <Text style={newStyle.titleText}>Suggested Users</Text>
+          <Text style={newStyle.titleText}>{t('SCREENS.PROFILE.SUGGESTED_FRIENDS)}</Text>
           <Text style={newStyle.bodyText}>This feature will be added in the future.</Text> */}
         </View>
       </ExtendedModal>

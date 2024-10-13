@@ -11,8 +11,10 @@ import FriendService from '../../services/friendService';
 import { getUserStats } from '../../services/getUserStats';
 import { useAuth } from '../../context/AuthContext';
 import { useLoading } from '../../context/LoadingContext';
+import { useTranslation } from 'react-i18next';
 
 export default function CommunityScreen({ navigation }) {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const user_id = user.id;
   const user_username = user.user_metadata.username;
@@ -32,12 +34,12 @@ export default function CommunityScreen({ navigation }) {
   const [cities, setCities] = useState([]);
   const [attractions, setAttractions] = useState([]);
   const [selectedCountry, setSelectedCountry] = useState('');
-  const [selectedCity, setSelectedCity] = useState(''); 
+  const [selectedCity, setSelectedCity] = useState('');
   const [selectedAttraction, setSelectedAttraction] = useState('');
 
   useEffect(() => {
     loadPosts();
-    loadCountries(); 
+    loadCountries();
   }, []);
 
   const loadPosts = async () => {
@@ -115,7 +117,7 @@ export default function CommunityScreen({ navigation }) {
 
   const handleUserPress = async (item) => {
     try {
-      showLoading("Loading User Stats");
+      showLoading(t('LOADING_MESSAGE.USER_STATS'));
       const stats = await getUserStats(item.user_id);
       const selectedUserData = {
         user_id: item.user_id,
@@ -209,7 +211,9 @@ export default function CommunityScreen({ navigation }) {
       />
 
       <TouchableOpacity style={newStyle.primaryButton} onPress={() => setNewPostModalVisible(true)}>
-        <Text style={newStyle.primaryButtonText}>New Post</Text>
+        <Text style={newStyle.primaryButtonText}>
+          {t('SCREENS.COMMUNITY.NEW_POST')}
+        </Text>
       </TouchableOpacity>
 
       {/* New Post Modal */}
@@ -218,10 +222,12 @@ export default function CommunityScreen({ navigation }) {
           <View style={newStyle.modalBackground}>
             <TouchableWithoutFeedback>
               <View style={newStyle.modalContent}>
-                <Text style={newStyle.modalTitleText}>Create New Post</Text>
+                <Text style={newStyle.modalTitleText}>
+                  {t('SCREENS.COMMUNITY.CREATE_NEW_POST')}
+                </Text>
                 <TextInput
                   style={newStyle.inputField}
-                  placeholder="What's on your mind?"
+                  placeholder={t('SCREENS.COMMUNITY.POST_CONTENT_PLACEHOLDER')}
                   value={newPostContent}
                   onChangeText={(text) => setNewPostContent(text)}
                 />
@@ -233,10 +239,10 @@ export default function CommunityScreen({ navigation }) {
                 {/* Country Picker */}
                 <Picker selectedValue={selectedCountry} onValueChange={(itemValue) => {
                   setSelectedCountry(itemValue);
-                  loadCities(itemValue); 
+                  loadCities(itemValue);
                   setSelectedCity(''); // Zurücksetzen der ausgewählten Stadt
                 }}>
-                  <Picker.Item label="Select a country" value="" />
+                  <Picker.Item label={t('SCREENS.COMMUNITY.SELECT_COUNTRY')} value="" />
                   {countries.map((country) => (
                     <Picker.Item key={country.id} label={country.name} value={country.id} />
                   ))}
@@ -248,7 +254,7 @@ export default function CommunityScreen({ navigation }) {
                     setSelectedCity(itemValue);
                     loadAttractions(itemValue); // Lade die Attraktionen für die ausgewählte Stadt
                   }}>
-                    <Picker.Item label="Select a city" value="" />
+                    <Picker.Item label={t('SCREENS.COMMUNITY.SELECT_CITY')} value="" />
                     {cities.map((city) => (
                       <Picker.Item key={city.City_ID} label={city.Cityname} value={city.City_ID} />
                     ))}
@@ -262,7 +268,7 @@ export default function CommunityScreen({ navigation }) {
                     onValueChange={setSelectedAttraction}
                     style={newStyle.picker}
                   >
-                    <Picker.Item label="Select Attraction" value="" />
+                    <Picker.Item label={t('SCREENS.COMMUNITY.SELECT_ATTRACTION')} value="" />
                     {attractions.map((attraction) => (
                       <Picker.Item key={attraction.Attraction_ID} label={attraction.Attraction_Name} value={attraction.Attraction_ID} />
                     ))}
@@ -270,10 +276,14 @@ export default function CommunityScreen({ navigation }) {
                 )}
                 <View style={newStyle.row}>
                   <TouchableOpacity style={newStyle.averageRedButton} onPress={() => setNewPostModalVisible(false)}>
-                    <Text style={newStyle.smallButtonText}>Cancel</Text>
+                    <Text style={newStyle.smallButtonText}>
+                      {t('CANCEL')}
+                    </Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={newStyle.averageBlueButton} onPress={handleCreateNewPost}>
-                    <Text style={newStyle.smallButtonText}>Post</Text>
+                    <Text style={newStyle.smallButtonText}>
+                      {t('POST')}
+                    </Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -288,13 +298,19 @@ export default function CommunityScreen({ navigation }) {
           <View style={newStyle.modalBackground}>
             <TouchableWithoutFeedback>
               <View style={newStyle.modalContent}>
-                <Text style={newStyle.modalTitleText}>Confirm Delete</Text>
+                <Text style={newStyle.modalTitleText}>
+                  {t('CONFIRM_DELETE')}
+                </Text>
                 <View style={newStyle.row}>
                   <TouchableOpacity style={newStyle.averageRedButton} onPress={() => setDeletePostModalVisible(false)}>
-                    <Text style={newStyle.smallButtonText}>Cancel</Text>
+                    <Text style={newStyle.smallButtonText}>
+                      {t('CANCEL')}
+                    </Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={newStyle.averageBlueButton} onPress={handleDeletePost}>
-                    <Text style={newStyle.smallButtonText}>Delete</Text>
+                    <Text style={newStyle.smallButtonText}>
+                      {t('DELETE')}
+                    </Text>
                   </TouchableOpacity>
                 </View>
               </View>
