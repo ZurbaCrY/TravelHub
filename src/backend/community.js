@@ -2,7 +2,7 @@ import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
 import { supabase } from '../services/supabase';
 import AuthService from '../services/auth'
-import { SUPABASE_URL } from '@env';
+import { EXPO_PUBLIC_SUPABASE_URL } from '@env';
 import { useAuth } from '../context/AuthContext';
 
 export const fetchAttractionsByCity = async (cityId) => {
@@ -462,7 +462,7 @@ export const createNewPost = async (newPostContent, user_id, user_username, imag
       }
 
       // Öffentliche URL
-      uploadedImageUrl = `${SUPABASE_URL}/storage/v1/object/public/Images/images/${fileName}`;
+      uploadedImageUrl = `${EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/Images/images/${fileName}`;
     }
 
     const { error: postError } = await supabase.from('posts').insert([{
@@ -537,7 +537,7 @@ export const handleNewProfilePicture = async (imageUrl) => {
       }
 
       // Öffentliche URL
-      uploadedImageUrl = `${SUPABASE_URL}/storage/v1/object/public/Images/profilepictures/${fileName}`;
+      uploadedImageUrl = `${EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/Images/profilepictures/${fileName}`;
     }
 
     const { error: updateError } = await supabase

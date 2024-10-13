@@ -1,5 +1,6 @@
 import { supabase as sb } from "./supabase";
 import * as SecureStore from "expo-secure-store";
+import { EXPO_PUBLIC_SUPABASE_URL } from '@env';
 
 class AuthService {
   constructor(supabase) {
@@ -116,7 +117,7 @@ class AuthService {
       if (error) throw error;
 
       const randomNumber = Math.floor(Math.random() * 13) + 1;
-      const profilepicture_url = `https://zjnvamrbnqzefncmdpaf.supabase.co/storage/v1/object/public/Images/anonym/${randomNumber}`;
+      const profilepicture_url = `${EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/Images/anonym/${randomNumber}`;
       
       if (data != null && data.user != null) {
         await this.supabase.from("users").insert([
