@@ -31,7 +31,6 @@ function AppContent() {
   const { showLoading, hideLoading } = useLoading();
 
   const { t } = useTranslation();
-  const [language, setLanguage] = useState('en');
 
   useEffect(() => {
     const initFriends = async () => {
@@ -61,7 +60,9 @@ function AppContent() {
       }
     }
 
-    initFriends();
+    if (user) {
+      initFriends();
+    }
     loadLanguage();
   }, []);
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, Alert } from 'react';
 import { View, TouchableOpacity, Text } from 'react-native';
 import { Input } from 'react-native-elements';
 import styles from '../../styles/style';
@@ -8,6 +8,8 @@ import { useDarkMode } from '../../context/DarkModeContext';
 import { useLoading } from '../../context/LoadingContext';
 import CustomButton from '../../components/CustomButton';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../../context/AuthContext';
+import FriendService from '../../services/friendService';
 
 const SignUpScreen = () => {
   const [username, setUsername] = useState('');
@@ -16,6 +18,7 @@ const SignUpScreen = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const { showLoading, hideLoading } = useLoading();
   const { t } = useTranslation();
+  const { loadUser } = useAuth();
 
   const navigation = useNavigation();
 
@@ -28,6 +31,11 @@ const SignUpScreen = () => {
     try {
       showLoading(t('LOADING_MESSAGE.SIGN_UP'));
       const user = await AuthService.signUp(username, email, password, confirmPassword);
+      await loadUser();
+      if (user) {
+        FriendService.setUser(user);
+        navigation.navigate('EditProfile');
+      }
     } catch (error) {
       Alert.alert(t('SIGN_UP_ERROR'), t('SIGN_UP_ERROR_MESSAGE'));
       console.error(error);

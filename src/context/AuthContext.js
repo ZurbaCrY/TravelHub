@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { useLoading } from './LoadingContext';
-import AuthService from '../services/auth'
+import AuthService from '../services/auth';
 import { supabase } from '../services/supabase';
 import { useTranslation } from 'react-i18next';
 
@@ -43,8 +43,21 @@ export const AuthProvider = ({ children }) => {
     };
   }, []);
 
+  const loadUser = async () => {
+    showLoading(t('LOADING_MESSAGE.USER'));
+    try {
+      await AuthService.initialize();
+      const fetchedUser = await AuthService.getUser();
+      setUser(fetchedUser);
+    } catch (error) {
+      console.error('Error initializing user:', error);
+    } finally {
+      hideLoading();
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user }}>
+    <AuthContext.Provider value={{ user, loadUser }}>
       {children}
     </AuthContext.Provider>
   );

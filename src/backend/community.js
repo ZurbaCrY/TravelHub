@@ -3,6 +3,7 @@ import * as FileSystem from 'expo-file-system';
 import { supabase } from '../services/supabase';
 import AuthService from '../services/auth'
 import { EXPO_PUBLIC_SUPABASE_URL } from '@env';
+import { useAuth } from '../context/AuthContext';
 
 export const fetchAttractionsByCity = async (cityId) => {
   try {
@@ -538,7 +539,7 @@ export const handleNewProfilePicture = async (imageUrl) => {
       }
 
       // Öffentliche URL
-      uploadedImageUrl = `${SUPABASE_URL}/storage/v1/object/public/Images/profilepictures/${fileName}`;
+      uploadedImageUrl = `${EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/Images/profilepictures/${fileName}`;
     }
 
     const { error: updateError } = await supabase

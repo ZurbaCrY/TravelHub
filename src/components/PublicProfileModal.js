@@ -3,6 +3,7 @@ import { View, Text, Image, Modal, TouchableOpacity, TouchableWithoutFeedback, F
 import CustomButton from './CustomButton'; // Ensure CustomButton is imported correctly
 import newStyle from '../styles/style'; // Updated to use the new styles variable name
 import FriendService from '../services/friendService';
+import { useTranslation } from 'react-i18next';
 
 const UserProfileModal = ({
   isVisible,
@@ -14,6 +15,7 @@ const UserProfileModal = ({
   setFriendListVisible
 }) => {
 
+  const { t } = useTranslation();
   const [friendshipState, setFriendshipState] = useState(null);
 
   useEffect(() => {
@@ -36,7 +38,8 @@ const UserProfileModal = ({
   const handleFriendRequestSend = async () => {
     try {
       await FriendService.sendFriendRequest(user.user_id);
-      setFriendshipState({ request: { type: 'sent' } });
+      const friendshipState = await FriendService.getFriendshipStatus(user.user_id);
+      setFriendshipState(friendshipState);
     } catch (error) {
       console.error('Failed to send friend request:', error);
     }
@@ -63,7 +66,7 @@ const UserProfileModal = ({
 
   const handleFriendRequestRevoke = async () => {
     try {
-      await FriendService.respondToFriendRequest(requestId = friendshipState.request.friend_request_id, action = 'decline');
+      await FriendService.respondToFriendRequest(requestId = friendshipState.request.friend_request_id, action = 'revoke');
       setFriendshipState({ request: null });
     } catch (error) {
       console.error('Failed to revoke friend request:', error);
@@ -110,11 +113,15 @@ const UserProfileModal = ({
                 {/* Row 1: Friends and Posts */}
                 <View style={newStyle.userStatsRow}>
                   <View style={newStyle.userStatColumn}>
-                    <Text style={newStyle.userStatLabel}>Travel-Buddies</Text>
+                    <Text style={newStyle.userStatLabel}>
+                      {t('SCREENS.PROFILE.TRAVEL_BUDDIES')}
+                    </Text>
                     <Text style={newStyle.userStatValue}>{user.friendCount != null ? user.friendCount : 'N/A'}</Text>
                   </View>
                   <View style={newStyle.userStatColumn}>
-                    <Text style={newStyle.userStatLabel}>Posts</Text>
+                    <Text style={newStyle.userStatLabel}>
+                      {t('SCREENS.PROFILE.POSTS')}
+                    </Text>
                     <Text style={newStyle.userStatValue}>{user.postCount != null ? user.postCount : 'N/A'}</Text>
                   </View>
                 </View>
@@ -122,11 +129,15 @@ const UserProfileModal = ({
                 {/* Row 2: Upvotes and Downvotes */}
                 <View style={newStyle.userStatsRow}>
                   <View style={newStyle.userStatColumn}>
-                    <Text style={newStyle.userStatLabel}>Upvotes</Text>
+                    <Text style={newStyle.userStatLabel}>
+                      {t('SCREENS.PROFILE.UPVOTES')}
+                    </Text>
                     <Text style={newStyle.userStatValue}>{user.upvotes != null ? user.upvotes : 'N/A'}</Text>
                   </View>
                   <View style={newStyle.userStatColumn}>
-                    <Text style={newStyle.userStatLabel}>Downvotes</Text>
+                    <Text style={newStyle.userStatLabel}>
+                      {t('SCREENS.PROFILE.DOWNVOTES')}
+                    </Text>
                     <Text style={newStyle.userStatValue}>{user.downvotes != null ? user.downvotes : 'N/A'}</Text>
                   </View>
                 </View>
@@ -143,7 +154,9 @@ const UserProfileModal = ({
                   <TouchableWithoutFeedback onPress={() => setFriendListVisible(false)}>
                     <View style={newStyle.modalBackground}>
                       <View style={newStyle.modalContent}>
-                        <Text style={newStyle.modalTitleText}>Friend List</Text>
+                        <Text style={newStyle.modalTitleText}>
+                          {t('SCREENS.PROFILE.TRAVEL_BUDDIES')}
+                        </Text>
                         {user.friends && user.friends.length > 0 ? (
                           <FlatList
                             data={user.friends}
@@ -159,10 +172,14 @@ const UserProfileModal = ({
                             keyExtractor={(item) => item.id.toString()}
                           />
                         ) : (
-                          <Text>No friends available</Text>
+                          <Text>
+                            {t('SCREENS.PROFILE.NO_TRAVEL_BUDDIES')}
+                          </Text>
                         )}
                         <TouchableOpacity onPress={() => setFriendListVisible(false)} style={newStyle.closeModalButton}>
-                          <Text style={newStyle.closeModalButtonText}>Close</Text>
+                          <Text style={newStyle.closeModalButtonText}>
+                            {t('CLOSE')}
+                          </Text>
                         </TouchableOpacity>
                       </View>
                     </View>
@@ -173,7 +190,7 @@ const UserProfileModal = ({
               {friendshipState && !friendshipState.isFriend && !friendshipState.request && (
                 <CustomButton
                   onPress={handleFriendRequestSend}
-                  title="Send Friend Request"
+                  title={t('FRIENDS.REQUESTS.SEND')}
                   isLoading={isLoading}
                   disabled={isLoading}
                 />
@@ -185,7 +202,7 @@ const UserProfileModal = ({
                     wrapperStyle={{ width: '45%', marginRight: 10 }}
                     style={{ backgroundColor: 'green' }}
                     onPress={handleFriendRequestAccept}
-                    title="Accept Friend Request"
+                    title={t('FRIENDS.REQUESTS.ACCEPT')}
                     isLoading={isLoading}
                     disabled={isLoading}
                   />
@@ -193,7 +210,7 @@ const UserProfileModal = ({
                     wrapperStyle={{ width: '45%', marginLeft: 'auto', marginRight: 0 }}
                     style={{ backgroundColor: 'red' }}
                     onPress={handleFriendRequestDecline}
-                    title="Decline Friend Request"
+                    title={t('FRIENDS.REQUESTS.DECLINE')}
                     isLoading={isLoading}
                     disabled={isLoading}
                   />
@@ -203,7 +220,7 @@ const UserProfileModal = ({
               {friendshipState && !friendshipState.isFriend && friendshipState.request && friendshipState.request.type === 'sent' && (
                 <CustomButton
                   onPress={handleFriendRequestRevoke}
-                  title="Revoke Friend Request"
+                  title={t('FRIENDS.REQUESTS.REVOKE')}
                   isLoading={isLoading}
                   disabled={isLoading}
                 />
@@ -213,7 +230,7 @@ const UserProfileModal = ({
                 <CustomButton
                   onPress={handleFriendRemove}
                   style={{ backgroundColor: 'red' }}
-                  title="Remove Friend"
+                  title={t('FRIENDS.REMOVE')}
                   isLoading={isLoading}
                   disabled={isLoading}
                 />

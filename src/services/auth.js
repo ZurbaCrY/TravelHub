@@ -1,13 +1,14 @@
 import { supabase as sb } from "./supabase";
 import * as SecureStore from "expo-secure-store";
+import { EXPO_PUBLIC_SUPABASE_URL } from '@env';
 
 class AuthService {
   constructor(supabase) {
     this.supabase = supabase;
     this.initialized = false;
     this.user = null;
-    this.initialize();
     this.rememberMe = false;
+    this.initialize();
   }
 
   async initialize() {
@@ -16,22 +17,13 @@ class AuthService {
     try {
       await this.loadUser();
     } catch (error) {
-      console.error("Error in AuthService setup: ", error)
+      console.error("Error in AuthService setup: ", error);
     }
   }
 
-  /* If you need to use User Information use this:
-  
-  user = AuthService.getUser();
-  user_id = user.id
-  user_email = user.email
-  user_username = user.user_metadata.username
-
-  For more information contact Tom-N-M
-  */
   async getUser() {
-    await this.initialize()
-    return this.user;
+    await this.initialize();
+        return this.user;
   }
 
   async loadUser() {
@@ -40,10 +32,10 @@ class AuthService {
       if (userJson) {
         this.user = JSON.parse(userJson);
       } else {
-        console.log("No User Signed in");
+        this.user = null;
       }
     } catch (error) {
-      console.error("Failed to load user from SecureStore:", error);
+      console.error("Error loading user:", error);
     }
   }
 
@@ -60,10 +52,7 @@ class AuthService {
       await SecureStore.deleteItemAsync("user");
       this.user = null;
     } catch (error) {
-      console.error(
-        "Failed to remove user from AsyncStorage/SecureStore: ",
-        error
-      );
+      console.error("Failed to remove user from AsyncStorage/SecureStore: ", error);
     }
   }
 
@@ -75,7 +64,6 @@ class AuthService {
     if (error) throw error;
     console.info("User signed in:", data.user);
     console.info("User.id:", data.user.id);
-    // SaveUser Saves to SecureStore if User wants so
     this.rememberMe = rememberMe;
     if (this.rememberMe) {
       await this.saveUser(data.user);
@@ -87,59 +75,68 @@ class AuthService {
   }
 
   async signOut() {
-    const { error } = await this.supabase.auth.signOut();
-    if (error) throw error;
-    console.info("User signed out");
-    await this.removeUser();
-    return this.user;
+    try {
+      const { error } = await this.supabase.auth.signOut();
+      if (error) throw error;
+      await this.removeUser();
+      this.user = null;
+      await SecureStore.deleteItemAsync("user");
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
   }
 
   async signUp(username, email, password, confirmPassword) {
-    if (password !== confirmPassword) {
-      throw Error("Passwords do not match");
-    }
-    // check if username and email are unique
-    const checkUnique = async (field, value) => {
-      let { data, error } = await this.supabase
-        .from("users")
-        .select("user_id")
-        .eq(field, value);
-      if (error) throw error;
-      if (data && data.length > 0) {
-        throw new Error(`${field.capitalize()} is already taken`);
+    try {
+      if (password !== confirmPassword) {
+        throw Error("Passwords do not match");
       }
-    };
-    await checkUnique("username", username);
-    await checkUnique("email", email);
+      // check if username and email are unique
+      const checkUnique = async (field, value) => {
+        let { data, error } = await this.supabase
+          .from("users")
+          .select("user_id")
+          .eq(field, value);
+        if (error) throw error;
+        if (data && data.length > 0) {
+          throw new Error(`${field.capitalize()} is already taken`);
+        }
+      };
+      await checkUnique("username", username);
+      await checkUnique("email", email);
 
-    // The main signUp:
-    const { data, error } = await this.supabase.auth.signUp({
-      email: email,
-      password: password,
-      options: {
-        data: {
-          username: username,
+      const { data, error } = await this.supabase.auth.signUp({
+        email: email,
+        password: password,
+        options: {
+          data: {
+            username: username,
+          },
         },
-      },
-    });
-    if (error) throw error;
+      });
+      if (error) throw error;
 
-    // Check if Data is there before proceeding
-    if (data != null && data.user != null) {
-      // Update User info table:
-      await this.supabase.from("users").insert([
-        {
-          user_id: data.user.id,
-          email: email,
-          username: username,
-        },
-      ]);
-      // Only local Save, user needs to login again on next app open
-      this.removeUser();
-      this.user = data.user;
-      return data.user;
-    } else {
-      throw new Error("Something went wrong, data retrieved: ", data);
+      const randomNumber = Math.floor(Math.random() * 13) + 1;
+      const profilepicture_url = `${EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/Images/anonym/${randomNumber}`;
+      
+      if (data != null && data.user != null) {
+        await this.supabase.from("users").insert([
+          {
+            user_id: data.user.id,
+            email: email,
+            username: username,
+            profilepicture_url: profilepicture_url,
+          },
+        ]);
+        this.removeUser();
+        this.user = data.user;
+        return data.user;
+      } else {
+        throw new Error("Something went wrong, data retrieved: ", data);
+      }
+    } catch (error) {
+      console.error("Error signing up:", error);
+      throw error;
     }
   }
 }

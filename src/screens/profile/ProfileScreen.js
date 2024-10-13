@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import {
   View,
   Text,
@@ -71,6 +72,7 @@ export default function ProfileScreen() {
 
   const navigation = useNavigation();
 
+
   useEffect(() => {
     if (!user || !user.id) return; // Exit if user is not yet defined or has no id
 
@@ -111,7 +113,7 @@ export default function ProfileScreen() {
 
     const fetchRequests = async () => {
       try {
-        const requests = await FriendService.getIncomingRequests(pending = true, accepted = false, declined = false);
+        const requests = await FriendService.getIncomingRequests(pending = true, accepted = false, declined = false, revoked = false);
         const senderIds = requests.map(request => request.sender_id);
         const senderUsernames = await getUsernamesByUserIds(senderIds);
         const requestsWithUsernames = requests.map((request, index) => ({
@@ -128,10 +130,10 @@ export default function ProfileScreen() {
     const fetchUserData = async () => {
       try {
         showLoading(t('LOADING_MESSAGE.USER_DATA'));
-        const userData = await UserDataHandler.getUserData(user.id);
-        setUserData(userData);
+        const fetcheduserData = await UserDataHandler.getUserData(user.id);
+        setUserData(fetcheduserData);
       } catch (error) {
-        console.error('Error fetching user data:', error);
+        console.error('ProfileScreen: Error fetching user data:', error);
       }
     };
 
@@ -148,6 +150,23 @@ export default function ProfileScreen() {
       hideLoading();
     }
   }, [user]);
+
+  const reloadUserData = async () => {
+    try {
+      const fetcheduserData = await UserDataHandler.getUserData(user.id);
+      setUserData(fetcheduserData);
+    } catch (error) {
+      console.error('ProfileScreen: Error fetching user data:', error);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      if (user && user.id) {
+        reloadUserData();
+      }
+    }, [user])
+  );
 
   const handleAddVisitedCountry = async () => {
     if (newVisited) {
@@ -239,7 +258,7 @@ export default function ProfileScreen() {
 
   const handleUserPress = async (item) => {
     try {
-      showLoadingt('LOADING_MESSAGE.USER');
+      showLoading('LOADING_MESSAGE.USER');
       const stats = await getUserStats(item.user_id);
       const profilePictureUrl = await getProfilePictureUrlByUserId(item.user_id);
       const selectedUserData = {
@@ -376,7 +395,7 @@ export default function ProfileScreen() {
             <View style={newStyle.row}>
               <Icon name="birthday-cake" size={14} style={[newStyle.marginRightExtraSmall, { color: isDarkMode ? '#FFFDF3' : '#000000' }]} />
               <Text style={[newStyle.bodyText, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>
-                {userData && userData.birthdate ? new Date(userData.birthdate).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' }) : t('SCREENS.PROFILE.NO_BIRTHDAY')}
+                {userData && userData.birthdate ? new Date(userData.birthdate).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' }) : t('SCREENS.PROFILE.NO_BIRTHDATE')}
               </Text>
             </View>
 
@@ -391,7 +410,7 @@ export default function ProfileScreen() {
               <View style={newStyle.row}>
                 <Flag code="DE" size={16} style={newStyle.marginRightExtraSmall} />
                 <Text style={[newStyle.bodyText, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>
-                  {t('SCREENS.PROFILE.NO_HOME_COUNTRY')}
+                  {t('SCREENS.PROFILE.NO_COUNTRY')}
                 </Text>
               </View>
             }
