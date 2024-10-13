@@ -102,7 +102,8 @@
     "PROFILE": "Loading profile...",
     "CHATS": "Loading chats...",
     "CHANGING_LANGUAGE": "Changing language...",
-    "FETCHING_LANGUAGE": "Fetching language..."
+    "FETCHING_LANGUAGE": "Fetching language...",
+    "COUNTRIES": "Loading countries..."
   },
   "FRIENDS": {
     "FRIEND": "Friends",

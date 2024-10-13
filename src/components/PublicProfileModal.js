@@ -38,7 +38,8 @@ const UserProfileModal = ({
   const handleFriendRequestSend = async () => {
     try {
       await FriendService.sendFriendRequest(user.user_id);
-      setFriendshipState({ request: { type: 'sent' } });
+      const friendshipState = await FriendService.getFriendshipStatus(user.user_id);
+      setFriendshipState(friendshipState);
     } catch (error) {
       console.error('Failed to send friend request:', error);
     }
@@ -65,7 +66,7 @@ const UserProfileModal = ({
 
   const handleFriendRequestRevoke = async () => {
     try {
-      await FriendService.respondToFriendRequest(requestId = friendshipState.request.friend_request_id, action = 'decline');
+      await FriendService.respondToFriendRequest(requestId = friendshipState.request.friend_request_id, action = 'revoke');
       setFriendshipState({ request: null });
     } catch (error) {
       console.error('Failed to revoke friend request:', error);

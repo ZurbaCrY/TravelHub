@@ -109,7 +109,7 @@ export default function ProfileScreen() {
 
     const fetchRequests = async () => {
       try {
-        const requests = await FriendService.getIncomingRequests(pending = true, accepted = false, declined = false);
+        const requests = await FriendService.getIncomingRequests(pending = true, accepted = false, declined = false, revoked = false);
         const senderIds = requests.map(request => request.sender_id);
         const senderUsernames = await getUsernamesByUserIds(senderIds);
         const requestsWithUsernames = requests.map((request, index) => ({

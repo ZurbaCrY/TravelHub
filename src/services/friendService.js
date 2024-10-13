@@ -10,14 +10,17 @@ class FriendService {
         pending: [],
         accepted: [],
         declined: [],
+        revoked: [],
       },
       sent: {
         pending: [],
         accepted: [],
         declined: [],
+        revoked: [],
       }
     };
     this.friends = [];
+    this.initialize();
   }
 
   async initialize() {
@@ -31,6 +34,7 @@ class FriendService {
 
   async loadUser() {
     await AuthService.initialize();
+    await AuthService.loadUser();
     this.user = await AuthService.getUser();
     if (!this.user || !this.user.id) {
       throw new Error("User not loaded");
@@ -81,15 +85,24 @@ class FriendService {
       throw new Error("Error sending friend request: " + error.message);
     }
     this.friendRequests.sent.pending.push(data[0]);
+    console.log("Friend request sent: ", data[0]);
     return data;
   }
 
   async respondToFriendRequest(requestId, action) {
-    if (action !== "accept" && action !== "decline") {
+    let request = null;
+    let type = null;
+    if (action == "accept" || action == "decline"){
+      type = "received";
+      request = this.findRequestById(requestId, "received");
+    } else if (action == "revoke") {
+      type = "sent";
+      request = this.findRequestById(requestId, "sent");
+    } else {
       console.error("Invalid action: ", action);
+      return;
     }
 
-    const request = this.findRequestById(requestId, "received");
     if (!request) {
       throw new Error("Friend request not found.");
     }
@@ -101,7 +114,7 @@ class FriendService {
       throw new Error("You are already friends with this user");
     }
 
-    const status = action === "accept" ? "accepted" : "declined";
+    const status = action === "accept" ? "accepted" : action === "decline" ? "declined" : "revoked";
     const { data, error } = await this.supabase
       .from("friend_requests")
       .update({ status })
@@ -114,7 +127,7 @@ class FriendService {
     if (action === "accept") {
       await this.addFriend(data.sender_id);
     }
-    this.updateRequestStatus(requestId, "received", status);
+    this.updateRequestStatus(requestId, type, status);
   }
 
   async addFriend(friend_id) {
@@ -198,15 +211,17 @@ class FriendService {
     return this.friends;
   }
 
-  getIncomingRequests(pending = true, accepted = true, declined = true) {
+  getIncomingRequests(pending = true, accepted = true, declined = true, revoked = true) {
     const requests = [];
     if (pending) requests.push(...this.friendRequests.received.pending);
     if (accepted) requests.push(...this.friendRequests.received.accepted);
     if (declined) requests.push(...this.friendRequests.received.declined);
+    if (revoked) requests.push(...this.friendRequests.received.revoked);
     return requests;
   }
 
-  getFriendshipStatus(friend_id) {
+  async getFriendshipStatus(friend_id) {
+    await this.fetchFriendRequests();
     const isFriend = this.checkFriendshipLocal(friend_id);
     const sentRequest = this.friendRequests.sent.pending.find(req => req.receiver_id === friend_id);
     const receivedRequest = this.friendRequests.received.pending.find(req => req.sender_id === friend_id);
