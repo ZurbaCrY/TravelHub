@@ -12,7 +12,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import i18n from './src/assets/i18n/i18n';
 import { useTranslation } from 'react-i18next';
 
-
 export default function App() {
   return (
     <LoadingProvider>
@@ -53,8 +52,7 @@ function AppContent() {
         if (savedLanguage) {
           i18n.changeLanguage(savedLanguage);
         } else {
-          const locale = Localization.getLocales();
-          i18n.changeLanguage(locale);
+          i18n.changeLanguage('en');
         }
       } catch (error) {
         console.error('Error loading language:', error);
