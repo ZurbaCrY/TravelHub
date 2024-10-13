@@ -32,8 +32,8 @@ const SignInScreen = ({ navigation }) => {
       showLoading(t('LOADING_MESSAGE.SIGN_IN'));
       const user = await AuthService.signIn(email, password, remember);
       await loadUser();
-      await FriendService.initialize();
       if (user) {
+        FriendService.setUser(user);
         navigation.navigate("Main");
       }
     } catch (error) {

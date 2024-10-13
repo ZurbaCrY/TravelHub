@@ -20,7 +20,6 @@ class FriendService {
       }
     };
     this.friends = [];
-    this.initialize();
   }
 
   async initialize() {
@@ -39,6 +38,10 @@ class FriendService {
     if (!this.user || !this.user.id) {
       throw new Error("User not loaded");
     }
+  }
+
+  setUser(user) {
+    this.user = user;
   }
 
   async fetchFriends() {

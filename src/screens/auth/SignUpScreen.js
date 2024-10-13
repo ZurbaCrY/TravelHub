@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, Alert } from 'react';
 import { View, TouchableOpacity, Text } from 'react-native';
 import { Input } from 'react-native-elements';
 import styles from '../../styles/style';
@@ -32,8 +32,8 @@ const SignUpScreen = () => {
       showLoading(t('LOADING_MESSAGE.SIGN_UP'));
       const user = await AuthService.signUp(username, email, password, confirmPassword);
       await loadUser();
-      await FriendService.initialize();
       if (user) {
+        FriendService.setUser(user);
         navigation.navigate('EditProfile');
       }
     } catch (error) {

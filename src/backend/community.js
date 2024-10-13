@@ -510,7 +510,7 @@ export const handleFilePicker = async () => {
 export const handleNewProfilePicture = async (imageUrl) => {
   try {
     let uploadedImageUrl = null;
-    const CURRENT_USER = AuthService.getUser();
+    const CURRENT_USER = await AuthService.getUser();
     const CURRENT_USER_ID = CURRENT_USER.id;
 
     if (imageUrl) {

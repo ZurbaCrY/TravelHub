@@ -69,6 +69,7 @@ export default function ProfileScreen() {
 
   const navigation = useNavigation();
 
+
   useEffect(() => {
     if (!user || !user.id) return; // Exit if user is not yet defined or has no id
 

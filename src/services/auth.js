@@ -22,7 +22,7 @@ class AuthService {
 
   async getUser() {
     await this.initialize();
-    return this.user;
+        return this.user;
   }
 
   async loadUser() {
@@ -86,47 +86,56 @@ class AuthService {
   }
 
   async signUp(username, email, password, confirmPassword) {
-    if (password !== confirmPassword) {
-      throw Error("Passwords do not match");
-    }
-    // check if username and email are unique
-    const checkUnique = async (field, value) => {
-      let { data, error } = await this.supabase
-        .from("users")
-        .select("user_id")
-        .eq(field, value);
-      if (error) throw error;
-      if (data && data.length > 0) {
-        throw new Error(`${field.capitalize()} is already taken`);
+    try {
+      if (password !== confirmPassword) {
+        throw Error("Passwords do not match");
       }
-    };
-    await checkUnique("username", username);
-    await checkUnique("email", email);
+      // check if username and email are unique
+      const checkUnique = async (field, value) => {
+        let { data, error } = await this.supabase
+          .from("users")
+          .select("user_id")
+          .eq(field, value);
+        if (error) throw error;
+        if (data && data.length > 0) {
+          throw new Error(`${field.capitalize()} is already taken`);
+        }
+      };
+      await checkUnique("username", username);
+      await checkUnique("email", email);
 
-    const { data, error } = await this.supabase.auth.signUp({
-      email: email,
-      password: password,
-      options: {
-        data: {
-          username: username,
+      const { data, error } = await this.supabase.auth.signUp({
+        email: email,
+        password: password,
+        options: {
+          data: {
+            username: username,
+          },
         },
-      },
-    });
-    if (error) throw error;
+      });
+      if (error) throw error;
 
-    if (data != null && data.user != null) {
-      await this.supabase.from("users").insert([
-        {
-          user_id: data.user.id,
-          email: email,
-          username: username,
-        },
-      ]);
-      this.removeUser();
-      this.user = data.user;
-      return data.user;
-    } else {
-      throw new Error("Something went wrong, data retrieved: ", data);
+      const randomNumber = Math.floor(Math.random() * 13) + 1;
+      const profilepicture_url = `https://zjnvamrbnqzefncmdpaf.supabase.co/storage/v1/object/public/Images/anonym/${randomNumber}`;
+      
+      if (data != null && data.user != null) {
+        await this.supabase.from("users").insert([
+          {
+            user_id: data.user.id,
+            email: email,
+            username: username,
+            profilepicture_url: profilepicture_url,
+          },
+        ]);
+        this.removeUser();
+        this.user = data.user;
+        return data.user;
+      } else {
+        throw new Error("Something went wrong, data retrieved: ", data);
+      }
+    } catch (error) {
+      console.error("Error signing up:", error);
+      throw error;
     }
   }
 }
