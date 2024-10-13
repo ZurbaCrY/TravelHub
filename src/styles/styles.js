@@ -659,9 +659,12 @@ export const styles = StyleSheet.create({
   },
   closeButton: {
     padding: 10,
-    backgroundColor: 'lightgray',
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    zIndex: 1,
+    backgroundColor: 'lightgrey',
     borderRadius: 5,
-    alignSelf: 'flex-end',
   },
   closeButtonText: {
     fontSize: 16,

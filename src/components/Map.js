@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text } from 'react-native';
+import { ActivityIndicator, View, Text } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 
 const Map = ({
@@ -59,7 +59,10 @@ const Map = ({
         )}
       </MapView>
     ) : (
-      <Text>Map Loading...</Text>
+      <View>
+        <ActivityIndicator size="large" color="#3EAAE9" />
+        <Text>Loading Map...</Text>
+      </View>
     )
   );
 };
