@@ -113,6 +113,26 @@ const removeWishListCountry = async (userId) => {
   }
 };
 
+export const handleAnonymousModeToggle = async (enabled, user_id) => {
+  if (!user_id) return;
+
+  try {
+    const { error } = await supabase
+      .from('users')
+      .update({ anonymous: enabled })  // Update the anonymous field in Supabase
+      .eq('user_id', user_id);  // Match the user by their id
+
+    if (error) {
+      console.error('Error updating anonymous mode:', error.message);
+    } else {
+      console.log('Anonymous mode updated successfully.');
+    }
+  } catch (error) {
+    console.error('Unexpected error:', error.message);
+  }
+};
+
+
 export {
   fetchVisitedCountries,
   fetchWishListCountries,

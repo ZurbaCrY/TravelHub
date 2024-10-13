@@ -3,7 +3,6 @@ import * as FileSystem from 'expo-file-system';
 import { supabase } from '../services/supabase';
 import AuthService from '../services/auth'
 import { SUPABASE_URL } from '@env';
-import { useAuth } from '../context/AuthContext';
 
 export const fetchAttractionsByCity = async (cityId) => {
   try {
