@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, TouchableOpacity, Modal, TouchableWithoutFeedback, Alert, Image } from 'react-native';
 import { useDarkMode } from '../../context/DarkModeContext';
 import { supabase } from '../../services/supabase';
@@ -6,8 +6,7 @@ import AuthService from '../../services/auth';
 import Button from '../../components/Button';
 import styles from '../../styles/style';
 import PropTypes from 'prop-types';
-import { useFocusEffect } from '@react-navigation/native';
-import { useLoading } from '../../context/LoadingContext.js'
+import { useLoading } from '../../context/LoadingContext.js';
 import { useAuth } from '../../context/AuthContext.js';
 import { getProfilePictureUrlByUserId } from '../../services/getProfilePictureUrlByUserId';
 import { useTranslation } from 'react-i18next';
@@ -41,29 +40,51 @@ export default function ChatListScreen({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
   const { loading, showLoading, hideLoading } = useLoading();
 
-  useFocusEffect(
-    React.useCallback(() => {
-      const fetchChatsAndUsers = async () => {
-        try {
-          showLoading(t('LOADING_MESSAGE.CHATS'));
-          await fetchChats();
-          await fetchUsers();
-        } catch (error) {
-          console.error('Error fetching chats and users:', error);
-        } finally {
-          hideLoading();
+  useEffect(() => {
+    let messagesSubscription;
+
+    const fetchChatsAndUsers = async () => {
+      try {
+        showLoading(t('LOADING_MESSAGE.CHATS'));
+        await fetchChats();
+        await fetchUsers();
+      } catch (error) {
+        console.error('Error fetching chats and users:', error);
+      } finally {
+        hideLoading();
+      }
+    };
+
+    fetchChatsAndUsers();
+
+    // Echtzeit-Abonnement für die 'messages'-Tabelle einrichten
+    messagesSubscription = supabase
+      .channel('messages_changes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'messages' },
+        (payload) => {
+          console.log('Änderung in der messages-Tabelle:', payload);
+          fetchChats(); // Chats erneut abrufen, wenn sich die messages-Tabelle ändert
         }
-      };
-      fetchChatsAndUsers();
-    }, [])
-  );
+      )
+      .subscribe();
+
+    // Aufräumen des Abonnements bei Komponentendemontage
+    return () => {
+      if (messagesSubscription) {
+        supabase.removeChannel(messagesSubscription);
+      }
+    };
+  }, []);
 
   const fetchChats = async () => {
     const chatUserData = await fetchFromSupabase('chat_user', 'chat_id', [['eq', 'user_id', CURRENT_USER_ID]]);
     const chatIds = chatUserData.map(chatUser => chatUser.chat_id);
 
     if (chatIds.length === 0) {
-      console.log("No chats found for the current user.");
+      console.log("Keine Chats für den aktuellen Benutzer gefunden.");
+      setChats([]); // Leere die Chat-Liste, wenn keine Chats vorhanden sind
       return;
     }
 
@@ -76,7 +97,6 @@ export default function ChatListScreen({ navigation }) {
     });
 
     const chatData = await fetchFromSupabase('chat', '*', [['in', 'chat_id', Array.from(chatMap.keys())]]);
-    const userIds = Array.from(new Set(messages.map(message => message.user_id)));
 
     const chatList = await Promise.all(chatData.map(async (chat) => {
       const chatUsers = await getChatUsers(chat.chat_id);
@@ -87,7 +107,7 @@ export default function ChatListScreen({ navigation }) {
         ...chat,
         latestMessage: chatMap.get(chat.chat_id),
         chatPartnerId: chatPartner.user_id || null,
-        chatPartnerUsername: chatPartnerUsername || 'Unknown User',
+        chatPartnerUsername: chatPartnerUsername || 'Unbekannter Benutzer',
         chatPartnerProfilePicutreUrl: chatPartnerProfilePicutreUrl || null,
       };
     }));
@@ -95,7 +115,6 @@ export default function ChatListScreen({ navigation }) {
     chatList.sort((a, b) => new Date(b.latestMessage.created_at) - new Date(a.latestMessage.created_at));
     setChats(chatList);
   };
-
 
   const fetchUsers = async () => {
     await FriendService.initialize();
@@ -142,27 +161,38 @@ export default function ChatListScreen({ navigation }) {
     ];
     await supabase.from('chat_user').insert(newChatUser);
 
-    const initialMessage = { chat_id: newChat.chat_id, content: `Hallo ${selectedUser.username}`, user_id: CURRENT_USER_ID, created_at: new Date().toISOString(), edited: false };
+    const initialMessage = {
+      chat_id: newChat.chat_id,
+      content: `Hallo ${selectedUser.username}`,
+      user_id: CURRENT_USER_ID,
+      created_at: new Date().toISOString(),
+      edited: false,
+    };
     await supabase.from('messages').insert([initialMessage]);
 
     const chatPartnerProfilePicutreUrl = await getProfilePictureUrlByUserId(selectedUser.user_id);
 
-    fetchChats();
+    // Kein Aufruf von fetchChats() erforderlich, da das Abonnement die Aktualisierung übernimmt
     setModalVisible(false);
-    navigation.navigate('Chat', { chatId: newChat.chat_id, chatName: selectedUser.username, chatPartnerId: selectedUser.user_id, chatPartnerProfilePicutreUrl: chatPartnerProfilePicutreUrl });
+    navigation.navigate('Chat', {
+      chatId: newChat.chat_id,
+      chatName: selectedUser.username,
+      chatPartnerId: selectedUser.user_id,
+      chatPartnerProfilePicutreUrl: chatPartnerProfilePicutreUrl,
+    });
   };
 
   const renderChatItem = ({ item }) => (
     <TouchableOpacity
       style={[styles.postContainer, styles.containerRow]}
-      onPress={() => navigation.navigate('Chat',
-        {
+      onPress={() =>
+        navigation.navigate('Chat', {
           chatId: item.chat_id,
           chatName: item.chatPartnerUsername,
           chatPartnerId: item.chatPartnerId,
-          chatPartnerProfilePicutreUrl: item.chatPartnerProfilePicutreUrl
-        }
-      )}
+          chatPartnerProfilePicutreUrl: item.chatPartnerProfilePicutreUrl,
+        })
+      }
     >
       <View style={styles.marginTopMedium}>
         <Image source={{ uri: item.chatPartnerProfilePicutreUrl }} style={styles.smallProfileImage} />
@@ -179,11 +209,19 @@ export default function ChatListScreen({ navigation }) {
       key={user.user_id}
       style={[
         styles.postContainer,
-        selectedUser && selectedUser.user_id === user.user_id && styles.selectedUserItem
+        selectedUser && selectedUser.user_id === user.user_id && styles.selectedUserItem,
       ]}
       onPress={() => setSelectedUser(user)}
     >
-      <Text style={selectedUser && selectedUser.user_id === user.user_id ? styles.selectedText : styles.bodyText}>{user.username}</Text>
+      <Text
+        style={
+          selectedUser && selectedUser.user_id === user.user_id
+            ? styles.selectedText
+            : styles.bodyText
+        }
+      >
+        {user.username}
+      </Text>
     </TouchableOpacity>
   );
 
@@ -191,11 +229,7 @@ export default function ChatListScreen({ navigation }) {
 
   return (
     <View style={[styles.container, { backgroundColor: isDarkMode ? '#070A0F' : '#f8f8f8' }]}>
-      <FlatList
-        data={chats}
-        keyExtractor={(item) => item.chat_id.toString()}
-        renderItem={renderChatItem}
-      />
+      <FlatList data={chats} keyExtractor={(item) => item.chat_id.toString()} renderItem={renderChatItem} />
       <TouchableOpacity
         style={styles.newChatButton}
         onPress={() => {
