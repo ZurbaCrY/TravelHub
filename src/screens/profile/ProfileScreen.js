@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import {
   View,
   Text,
@@ -145,6 +146,23 @@ export default function ProfileScreen() {
       hideLoading();
     }
   }, [user]);
+
+  const reloadUserData = async () => {
+    try {
+      const fetcheduserData = await UserDataHandler.getUserData(user.id);
+      setUserData(fetcheduserData);
+    } catch (error) {
+      console.error('ProfileScreen: Error fetching user data:', error);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      if (user && user.id) {
+        reloadUserData();
+      }
+    }, [user])
+  );
 
   const handleAddVisitedCountry = async () => {
     if (newVisited) {
