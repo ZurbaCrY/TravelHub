@@ -248,7 +248,7 @@ export default function ProfileScreen() {
 
   const handleUserPress = async (item) => {
     try {
-      showLoadingt('LOADING_MESSAGE.USER');
+      showLoading('LOADING_MESSAGE.USER');
       const stats = await getUserStats(item.user_id);
       const profilePictureUrl = await getProfilePictureUrlByUserId(item.user_id);
       const selectedUserData = {
