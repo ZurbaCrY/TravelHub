@@ -85,7 +85,7 @@
         "LANGUAGE": "Cargando idioma...",
         "SIGN_IN": "Iniciando sesión...",
         "SIGN_UP": "Registrándose...",
-        "LOG_OUT": "Cerrando sesión...",
+        "SIGN_OUT": "Cerrando sesión...",
         "USER": "Cargando usuario...",
         "USER_STATS": "Cargando estadísticas del usuario...",
         "USER_DATA": "Cargando datos del usuario...",

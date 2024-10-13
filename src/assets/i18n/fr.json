@@ -85,7 +85,7 @@
         "LANGUAGE": "Chargement de la langue...",
         "SIGN_IN": "Connexion...",
         "SIGN_UP": "Inscription...",
-        "LOG_OUT": "Déconnexion...",
+        "SIGN_OUT": "Déconnexion...",
         "USER": "Chargement de l'utilisateur...",
         "USER_STATS": "Chargement des statistiques de l'utilisateur...",
         "USER_DATA": "Chargement des données de l'utilisateur...",
