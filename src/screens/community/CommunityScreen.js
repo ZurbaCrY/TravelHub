@@ -182,7 +182,7 @@ export default function CommunityScreen({ navigation }) {
                   item.users && ( // Ensure item.users is defined
                     <>
                       <Image source={{ uri: item.users.profilepicture_url }} style={newStyle.extraSmallProfileImage} />
-                      <Text style={[newStyle.boldTextBig, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>{item.users.username}</Text>
+                      <Text style={newStyle.boldTextBig}>{item.users.username}</Text>
                     </>
                   )
                 )}

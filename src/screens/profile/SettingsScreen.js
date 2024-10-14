@@ -79,18 +79,10 @@ const SettingsScreen = ({ navigation }) => {
       };
     };
 
-    navigation.setOptions({ title: t('SCREENS.SETTINGS.TITLE'),
-      headerStyle: {
-        backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8'  // Hintergrundfarbe des Headers
-      },
-      headerTitleStyle: {
-        color: isDarkMode ? '#f8f8f8' : '#18171c'  // Textfarbe des Titels
-      },
-      headerTintColor: isDarkMode ? '#f8f8f8' : '#18171c'  // Farbe des "Zurück"-Pfeils
-    });
+    navigation.setOptions({ title: t('SCREENS.SETTINGS.TITLE'), headerStyle: { backgroundColor: '#f8f8f8' } });
     fetchLanguage();
-  }, [isDarkMode]);  // Füge isDarkMode als Abhängigkeit hinzu
-  
+  }, []);
+
 
   const handleSignOut = async () => {
     Alert.alert(
@@ -138,15 +130,7 @@ const SettingsScreen = ({ navigation }) => {
       setSelectedLanguage(pressedLanguage);
       i18n.changeLanguage(pressedLanguage);
       Alert.alert(t('SCREENS.SETTINGS.SUCCESS'), t('SCREENS.SETTINGS.LANGUAGE_CHANGE_SUCCESS'));
-      navigation.setOptions({ title: t('SCREENS.SETTINGS.TITLE'),
-        headerStyle: {
-          backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8'  // Hintergrundfarbe des Headers
-        },
-        headerTitleStyle: {
-          color: isDarkMode ? '#f8f8f8' : '#18171c'  // Textfarbe des Titels
-        },
-        headerTintColor: isDarkMode ? '#f8f8f8' : '#18171c'  // Farbe des "Zurück"-Pfeils
-      });
+      navigation.setOptions({ title: t('SCREENS.SETTINGS.TITLE'), headerStyle: { backgroundColor: '#f8f8f8' } });
     } catch (error) {
       Alert.alert(t('SCREENS.SETTINGS.ERROR'), t('SCREENS.SETTINGS.LANGUAGE_CHANGE_ERROR'));
       console.error('Language change error:', error);

@@ -418,7 +418,7 @@ export default function ProfileScreen() {
   };
 
   return (
-    <View style={[newStyle.centeredContainerNoMarginTop, { backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]}>
+    <View style={[newStyle.centeredContainer, { backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]}>
       <TouchableWithoutFeedback onPress={() => {
         // Close the keyboard when the user taps outside of the input fields
         Keyboard.dismiss();
@@ -731,14 +731,14 @@ export default function ProfileScreen() {
         animationIn="slideInRight"
         animationOut="slideOutRight"
         backdropOpacity={0.5}
-        style={[newStyle.friendRequestModal,{ backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]}
+        style={newStyle.friendRequestModal}
       >
-     <View style={[newStyle.container, { backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]}>
-     <Text style={[newStyle.titleText, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>
+        <View style={newStyle.container}>
+          <Text style={newStyle.titleText}>
             {t('FRIENDS.REQUESTS.FRIEND_REQUESTS')}
           </Text>
           {friendRequests.length === 0 ? (
-            <Text style={[newStyle.bodyText, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>
+            <Text style={newStyle.bodyText}>
               {t('FRIENDS.REQUESTS.NO_FRIEND_REQUESTS')}
             </Text>
           ) : (

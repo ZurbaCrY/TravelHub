@@ -25,13 +25,6 @@ const newStyle = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: '#f8f8f8',
     },
-    centeredContainerNoMarginTop: {
-        flex: 1,
-        padding: 8,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#f8f8f8',
-    },
     containerRow: {
         flexDirection: 'row',
         alignItems: 'center',
