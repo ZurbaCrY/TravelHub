@@ -25,7 +25,7 @@ class FriendService {
   async initialize() {
     try {
       await this.loadUser();
-      await Promise.all([this.fetchFriends(), this.fetchFriendRequests()]);
+      // await Promise.all([this.fetchFriends(), this.fetchFriendRequests()]);
     } catch (error) {
       console.error("Error in FriendService setup: ", error);
     }
@@ -53,6 +53,7 @@ class FriendService {
       throw new Error("Error fetching friends: " + error.message);
     }
     this.friends = data || [];
+    console.log("Friends: ", this.friends);
   }
 
   async fetchFriendRequests() {
@@ -62,13 +63,15 @@ class FriendService {
       .or(`receiver_id.eq.${this.user.id},sender_id.eq.${this.user.id}`)
       .in("status", ["pending", "accepted", "declined"]);
     if (error) {
-      throw new Error("Error fetching friend requests: " + error.message);
+      throw new Error("Fetch Friend Requests: Error fetching friend requests: " + error.message);
     }
 
     data.forEach(req => {
       const type = req.receiver_id === this.user.id ? 'received' : 'sent';
       this.friendRequests[type][req.status].push(req);
     });
+
+    console.log("Friend Requests: ", this.friendRequests);
   }
 
   async sendFriendRequest(receiver_id) {
@@ -214,7 +217,8 @@ class FriendService {
     return this.friends;
   }
 
-  getIncomingRequests(pending = true, accepted = true, declined = true, revoked = true) {
+  async getIncomingRequests(pending = true, accepted = true, declined = true, revoked = true) {
+    await this.fetchFriendRequests();
     const requests = [];
     if (pending) requests.push(...this.friendRequests.received.pending);
     if (accepted) requests.push(...this.friendRequests.received.accepted);

@@ -21,7 +21,7 @@ const SignInScreen = ({ navigation }) => {
   const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [remember, setRemember] = useState(false);
+  const [remember, setRemember] = useState(true);
   const { showLoading, hideLoading } = useLoading();
   const { loadUser } = useAuth();
 
@@ -30,10 +30,12 @@ const SignInScreen = ({ navigation }) => {
   const handleSignIn = async () => {
     try {
       showLoading(t('LOADING_MESSAGE.SIGN_IN'));
-      const user = await AuthService.signIn(email, password, remember);
+      const user = await AuthService.signIn(email, password, true);
       await loadUser();
       if (user) {
         FriendService.setUser(user);
+        await FriendService.fetchFriendRequests();
+        await FriendService.fetchFriends();
         navigation.navigate("Main");
       }
     } catch (error) {

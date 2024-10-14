@@ -19,7 +19,6 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { useDarkMode } from '../../context/DarkModeContext';
 import { useNavigation } from '@react-navigation/native';
 import Button from '../../components/Button';
-import CustomButton from '../../components/CustomButton';
 import { styles } from '../../styles/styles';
 import newStyle from '../../styles/style';
 import { getProfilePictureUrlByUserId } from '../../services/getProfilePictureUrlByUserId';
@@ -113,6 +112,7 @@ export default function ProfileScreen() {
 
     const fetchRequests = async () => {
       try {
+        await FriendService.initialize();
         const requests = await FriendService.getIncomingRequests(pending = true, accepted = false, declined = false, revoked = false);
         const senderIds = requests.map(request => request.sender_id);
         const senderUsernames = await getUsernamesByUserIds(senderIds);
@@ -123,7 +123,7 @@ export default function ProfileScreen() {
         }));
         setFriendRequests(requestsWithUsernames);
       } catch (error) {
-        console.error('Error fetching friend requests:', error);
+        console.error('Fetch Requests: Error fetching friend requests:', error);
       }
     };
 
@@ -137,13 +137,12 @@ export default function ProfileScreen() {
       }
     };
 
-
     try {
       showLoading(t('LOADING_MESSAGE.PROFILE'));
+      fetchUserData();
       fetchProfilePictureUrl();
       fetchUserStats();
       fetchRequests();
-      fetchUserData();
     } catch (error) {
       console.error('Error fetching profile data:', error);
     } finally {
@@ -656,7 +655,7 @@ export default function ProfileScreen() {
               data={friendRequests}
               keyExtractor={(item) => item.friend_request_id}
               renderItem={({ item }) => (
-                <View style={newStyle.containerRow}>
+                <View>
                   <TouchableOpacity
                     style={newStyle.containerNoMarginTop}
                     onPress={() => handleUserPress({ user_id: item.sender_id, username: item.sender_username })}
@@ -668,13 +667,13 @@ export default function ProfileScreen() {
                       style={newStyle.containerNoMarginTop}
                       onPress={() => respondToFriendRequest(item.friend_request_id, "accept")}
                     >
-                      <Text style={newStyle.bodyText}>{t('SCREENS.PROFILE.ACCEPT')}</Text>
+                      <Text style={newStyle.bodyText}>{t('ACCEPT')}</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                       style={newStyle.containerNoMarginTop}
                       onPress={() => respondToFriendRequest(item.friend_request_id, "decline")}
                     >
-                      <Text style={newStyle.bodyText}>{t('SCREENS.PROFILE.DECLINE')}</Text>
+                      <Text style={newStyle.bodyText}>{t('DECLINE')}</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
