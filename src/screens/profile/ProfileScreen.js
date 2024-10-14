@@ -303,7 +303,7 @@ export default function ProfileScreen() {
                   onChangeText={setNewVisited}
                   value={newVisited}
                   placeholder="Neues Ziel hinzufügen"
-                  placeholderTextColor="#f8f8f8"
+                  placeholderTextColor={isDarkMode ? '#18171c' : '#18171c'} // Hellere Farben für bessere Lesbarkeit
                 />
                 <Button onPress={handleAddVisitedCountry} color="#f8f8f8">Hinzufügen</Button>
               </>
@@ -317,7 +317,7 @@ export default function ProfileScreen() {
           </View>
 
           <View style={styles.infoSection}>
-            <Text style={styles.header}>Wunschreiseziele:</Text>
+            <Text style={[styles.header, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>Wunschreiseziele:</Text>
             {wishListCountries.length === 0 ? (
               <Text style={styles.details}>Keine Wunschziele hinzugefügt</Text>
             ) : (
@@ -337,7 +337,7 @@ export default function ProfileScreen() {
                   onChangeText={setNewWishList}
                   value={newWishList}
                   placeholder="Neues Wunschland hinzufügen"
-                  placeholderTextColor="#f8f8f8"
+                  placeholderTextColor={isDarkMode ? '#18171c' : '#18171c'} //Hellere Farben für bessere Lesbarkeit
                 />
                 <Button onPress={handleAddWishListCountry} color="#f8f8f8">Hinzufügen</Button>
               </>

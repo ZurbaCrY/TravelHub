@@ -171,7 +171,7 @@ export default function ChatListScreen({ navigation }) {
       key={user.user_id}
       style={[
         styles.postContainer,
-        { backgroundColor: isDarkMode ? '#f8f8f8' : '#18171c' }, // Hintergrundfarbe für Darkmode
+        { backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }, // Hintergrundfarbe für Darkmode
         selectedUser && selectedUser.user_id === user.user_id && styles.selectedUserItem
       ]}
       onPress={() => setSelectedUser(user)}
@@ -213,12 +213,12 @@ export default function ChatListScreen({ navigation }) {
         <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
           <View style={[styles.modalBackground, { backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]} />
         </TouchableWithoutFeedback>
-        <View style={[styles.modalContentWidth, { backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]}>
-          <Text style={[styles.modalTitleText, { color: isDarkMode ? '#18171c' : '#f8f8f8' }]}>Wähle einen Benutzer für den Chat</Text>
+        <View style={[styles.modalContentWidth, { backgroundColor: isDarkMode ? '#18171' : '#f8f8f8' }]}>
+          <Text style={[styles.modalTitleText, { color: isDarkMode ? '#18171c' : '#18171c' }]}>Wähle einen Benutzer für den Chat</Text>
           {users.length > 0 ? (
             users.map(renderUserItem)
           ) : (
-            <Text style={[styles.bodyText, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>Keine neuen Benutzer verfügbar</Text>
+            <Text style={[styles.bodyText, { color: isDarkMode ? '#18171c' : '#18171c' }]}>Keine neuen Benutzer verfügbar</Text>
           )}
           <Button onPress={createNewChat} disabled={!selectedUser}>Chat starten</Button>
         </View>

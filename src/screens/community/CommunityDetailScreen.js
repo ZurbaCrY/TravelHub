@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, TouchableOpacity, RefreshControl, FlatList, TextInput, Modal, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, Image, TouchableOpacity, RefreshControl, FlatList, TextInput, Modal, TouchableWithoutFeedback,  SafeAreaView } from 'react-native';
 import { handleDownvote, handleUpvote, fetchPosts, getUpvoters, getDownvoters, fetchComments, addComment, deletePost } from '../../backend/community';
 import newStyle from '../../styles/style'; // Verwende die neue CSS-Datei
 import { useAuth } from '../../context/AuthContext';
@@ -115,9 +115,9 @@ export default function CommunityDetailScreen({ route, navigation }) {
       data={voters}
       keyExtractor={(item, index) => index.toString()}
       renderItem={({ item }) => (
-        <View style={[newStyle.listItem, { backgroundColor: isDarkMode ? '#000' : '#FFF' }]}>
+        <View style={[newStyle.listItem, { backgroundColor: isDarkMode ? '#f8f8f8' : '#18171c' }]}>
           <Image source={{ uri: item.profilepicture_url }} style={newStyle.mediumProfileImage} />
-          <Text style={[newStyle.listItemText, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>{item.username}</Text>
+          <Text style={[newStyle.listItemText, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>{item.username}</Text>
         </View>
       )}
     />
@@ -164,7 +164,8 @@ export default function CommunityDetailScreen({ route, navigation }) {
 
 
   return (
-    <View style={[newStyle.containerNoMarginTop, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
+  <SafeAreaView style={{ flex: 1, backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }}>  
+    <View style={[newStyle.containerNoMarginTop, { backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]}>
       <FlatList
         data={[postData]}
         keyExtractor={(item) => item.id.toString()}
@@ -173,12 +174,12 @@ export default function CommunityDetailScreen({ route, navigation }) {
         }
         renderItem={() => (
           <>
-            <View style={newStyle.containerRow}>
+          <View style={[newStyle.containerRow, { backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]}>
               {/* Username and Profilepicture */}
               <TouchableOpacity onPress={() => handleUserPress(postData)}>
                 <View style={newStyle.postHeader}>
                   <Image source={{ uri: postData.users.profilepicture_url }} style={newStyle.extraSmallProfileImage} />
-                  <Text style={[newStyle.boldTextBig, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>{postData.users.username}</Text>
+                  <Text style={[newStyle.boldTextBig, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>{postData.users.username}</Text>
                 </View>
               </TouchableOpacity>
               {/* Delete Button if the post belongs to the logged-in user */}
@@ -189,19 +190,19 @@ export default function CommunityDetailScreen({ route, navigation }) {
               )}
             </View>
             {postData.Country && (
-              <Text style={newStyle.countryText}>
+              <Text style={[newStyle.countryText, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>
                 <Image source={require('../../assets/images/globus.png')} style={{ width: 20, height: 20 }} />
                 {postData.Country.Countryname}
               </Text>
             )}
             {postData.City && (
-              <Text style={newStyle.cityText}>
+               <Text style={[newStyle.cityText, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>
                 <Image source={require('../../assets/images/city.png')} style={{ width: 20, height: 20 }} />
                 {postData.City.Cityname}
               </Text>
             )}
             {postData.Attraction && (
-              <Text style={newStyle.cityText}>
+              <Text style={[newStyle.cityText, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>
                 <Image source={require('../../assets/images/attractions/attraction.png')} style={{ width: 20, height: 20 }} />
                 {postData.Attraction.Attraction_Name}
               </Text>
@@ -209,7 +210,7 @@ export default function CommunityDetailScreen({ route, navigation }) {
             {postData.image_url && (
               <Image source={{ uri: postData.image_url }} style={[newStyle.postImage, { borderColor: isDarkMode ? '#555' : '#CCC' }]} />
             )}
-            <Text style={[newStyle.bodyText, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>{postData.content}</Text>
+            <Text style={[newStyle.bodyText, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>{postData.content}</Text>
             {/* Upvotes and Downvotes Section */}
             <View style={newStyle.voteRow}>
               <View style={newStyle.voteContainer}>
@@ -239,15 +240,15 @@ export default function CommunityDetailScreen({ route, navigation }) {
   
             {/* Downvoters Dropdown */}
             {showDownvoters && (
-              <View style={[newStyle.downdropdown, { backgroundColor: isDarkMode ? '#333' : '#FFF' }]}>
+              <View style={[newStyle.downdropdown, { backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]}>
                 {renderVotersList(downvoters)}
               </View>
             )}
 
             {/* Comments Section */}
-            <View style={[newStyle.commentSection, { backgroundColor: isDarkMode ? '#1C1C1C' : '#FFF' }]}>
+            <View style={[newStyle.commentSection, { backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]}>
               <TextInput
-                style={[newStyle.commentInput, { backgroundColor: isDarkMode ? '#333' : '#F5F5F5', color: isDarkMode ? '#FFFDF3' : '#000', borderColor: isDarkMode ? '#555' : '#CCC' }]}
+                style={[newStyle.commentInput, { backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8', color: isDarkMode ? '#FFFDF3' : '#000', borderColor: isDarkMode ? '#555' : '#CCC' }]}
                 placeholder="Add a comment..."
                 placeholderTextColor={isDarkMode ? '#777' : '#ccc'}
                 value={newComment}
@@ -263,14 +264,16 @@ export default function CommunityDetailScreen({ route, navigation }) {
               data={comments}
               keyExtractor={(item) => item.id.toString()}
               renderItem={({ item }) => (
-                <View style={[newStyle.commentItem, { backgroundColor: isDarkMode ? '#1C1C1C' : '#FFF' }]}>
+                <View style={[newStyle.commentItem, { backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]}>
                   <TouchableOpacity onPress={() => handleUserPress(item)}>
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                       <Image source={{ uri: item.users.profilepicture_url }} style={newStyle.commentProfileImage} />
-                      <Text style={[newStyle.commentUsername, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>{item.users.username}:</Text>
+                      <Text style={[newStyle.commentUsername, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>{item.users.username}:</Text>
                     </View>
                   </TouchableOpacity>
-                  <Text style={newStyle.commentText}>{item.content}</Text>
+                  <Text style={[newStyle.commentText, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}> {item.content}
+    </Text>
+
                 </View>
               )}
             />
@@ -287,8 +290,8 @@ export default function CommunityDetailScreen({ route, navigation }) {
       >
         <View style={newStyle.modalBackground}>
           <TouchableWithoutFeedback>
-            <View style={newStyle.modalContent}>
-              <Text style={newStyle.modalTitleText}>Confirm Delete</Text>
+          <View style={[newStyle.modalContent, { backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]}>
+          <Text style={[newStyle.modalTitleText, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>Confirm Delete</Text>
               <View style={newStyle.row}>
                 <TouchableOpacity style={newStyle.averageRedButton} onPress={() => setModalVisible(false)}>
                   <Text style={newStyle.smallButtonText}>Cancel</Text>
@@ -359,5 +362,6 @@ export default function CommunityDetailScreen({ route, navigation }) {
         </View>
       </Modal>
     </View>
+  </SafeAreaView>
   );
 }
