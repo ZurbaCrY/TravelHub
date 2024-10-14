@@ -147,7 +147,7 @@ export default function ChatListScreen({ navigation }) {
 
   const renderChatItem = ({ item }) => (
     <TouchableOpacity
-      style={[styles.postContainer, styles.containerRow,{ backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]}
+      style={[styles.postContainer, styles.containerRow]}
       onPress={() => navigation.navigate('Chat',
         {
           chatId: item.chat_id,
@@ -157,40 +157,33 @@ export default function ChatListScreen({ navigation }) {
         }
       )}
     >
-      <View style={[styles.marginTopMedium, {backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8'}]}>
-
+      <View style={styles.marginTopMedium}>
         <Image source={{ uri: item.chatPartnerProfilePicutreUrl }} style={styles.smallProfileImage} />
       </View>
-      <View style={[styles.containerNoMarginTop, {backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8'}]}>
-        <Text style={[styles.titleText, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>{item.chatPartnerUsername}</Text>
-        <Text style={[styles.smallBodyText, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>{item.latestMessage.content}</Text>
+      <View style={styles.containerNoMarginTop}>
+        <Text style={styles.titleText}>{item.chatPartnerUsername}</Text>
+        <Text style={styles.smallBodyText}>{item.latestMessage.content}</Text>
       </View>
     </TouchableOpacity>
   );
-  
+
   const renderUserItem = (user) => (
     <TouchableOpacity
       key={user.user_id}
       style={[
         styles.postContainer,
-        { backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }, // Hintergrundfarbe für Darkmode
         selectedUser && selectedUser.user_id === user.user_id && styles.selectedUserItem
       ]}
       onPress={() => setSelectedUser(user)}
     >
-      <Text style={[
-        selectedUser && selectedUser.user_id === user.user_id ? styles.selectedText : styles.bodyText,
-        { color: isDarkMode ? '#f8f8f8' : '#18171c' } // Textfarbe für Darkmode
-      ]}>
-        {user.username}
-      </Text>
+      <Text style={selectedUser && selectedUser.user_id === user.user_id ? styles.selectedText : styles.bodyText}>{user.username}</Text>
     </TouchableOpacity>
   );
-  
+
   if (loading) return null;
-  
+
   return (
-    <View style={[styles.container, { backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]}>
+    <View style={[styles.container, { backgroundColor: isDarkMode ? '#070A0F' : '#f8f8f8' }]}>
       <FlatList
         data={chats}
         keyExtractor={(item) => item.chat_id.toString()}
@@ -213,10 +206,10 @@ export default function ChatListScreen({ navigation }) {
         onRequestClose={() => setModalVisible(!modalVisible)}
       >
         <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
-          <View style={[styles.modalBackground, { backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]} />
+          <View style={styles.modalBackground} />
         </TouchableWithoutFeedback>
-        <View style={[styles.modalContentWidth, { backgroundColor: isDarkMode ? '#18171' : '#f8f8f8' }]}>
-          <Text style={[styles.modalTitleText, { color: isDarkMode ? '#18171c' : '#18171c' }]}>
+        <View style={styles.modalContentWidth}>
+          <Text style={styles.modalTitleText}>
             {t('SCREENS.CHAT.NEW_CHAT_CHOOSE_USER')}
           </Text>
           {users.length > 0 ? (
@@ -234,3 +227,10 @@ export default function ChatListScreen({ navigation }) {
     </View>
   );
 }
+
+
+ChatListScreen.propTypes = {
+  navigation: PropTypes.shape({
+    navigate: PropTypes.func.isRequired,
+  }).isRequired,
+};
