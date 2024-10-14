@@ -4,7 +4,6 @@ import CustomButton from './CustomButton'; // Ensure CustomButton is imported co
 import newStyle from '../styles/style'; // Updated to use the new styles variable name
 import FriendService from '../services/friendService';
 import { useTranslation } from 'react-i18next';
-import { useDarkMode } from '../context/DarkModeContext'; // Import DarkMode context
 
 const UserProfileModal = ({
   isVisible,
@@ -83,7 +82,6 @@ const UserProfileModal = ({
       console.error('Failed to remove friend:', error);
     }
   };
-  const { isDarkMode } = useDarkMode(); // Access Dark Mode state
 
   if (!user) return null;
 
@@ -95,16 +93,16 @@ const UserProfileModal = ({
       onRequestClose={onClose}
     >
       <TouchableWithoutFeedback onPress={onClose}>
-        <View style={[newStyle.modalBackground, { backgroundColor: isDarkMode ? 'rgba(0, 0, 0, 0.8)' : 'rgba(255, 255, 255, 0.8)' }]}>
+        <View style={newStyle.modalBackground}>
           <TouchableWithoutFeedback>
-            <View style={[newStyle.modalContent, { backgroundColor: isDarkMode ? '#1C1C1C' : '#FFF' }]}>
+            <View style={newStyle.modalContent}>
               {/* Close Button (X) */}
               <TouchableOpacity style={newStyle.closeButtonX} onPress={onClose}>
-                <Text style={[newStyle.closeButtonX, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>✖</Text>
+                <Text style={newStyle.closeButtonX}>✖</Text>
               </TouchableOpacity>
 
               {/* User Info Section */}
-              <Text style={[newStyle.modalTitleText, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>{user.username || 'N/A'}</Text>
+              <Text style={newStyle.modalTitleText}>{user.username || 'N/A'}</Text>
               <Image
                 source={{ uri: user.profilepicture_url || 'https://via.placeholder.com/100' }}
                 style={newStyle.mediumProfileImage}
@@ -115,32 +113,32 @@ const UserProfileModal = ({
                 {/* Row 1: Friends and Posts */}
                 <View style={newStyle.userStatsRow}>
                   <View style={newStyle.userStatColumn}>
-                    <Text style={[newStyle.userStatLabel, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>
+                    <Text style={newStyle.userStatLabel}>
                       {t('SCREENS.PROFILE.TRAVEL_BUDDIES')}
                     </Text>
-                    <Text style={[newStyle.userStatValue, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>{user.friendCount != null ? user.friendCount : 'N/A'}</Text>
+                    <Text style={newStyle.userStatValue}>{user.friendCount != null ? user.friendCount : 'N/A'}</Text>
                   </View>
                   <View style={newStyle.userStatColumn}>
-                    <Text style={[newStyle.userStatLabel, { color: isDarkMode ? '#FFFDF3' : '#555' }]}>
+                    <Text style={newStyle.userStatLabel}>
                       {t('SCREENS.PROFILE.POSTS')}
                     </Text>
-                    <Text style={[newStyle.userStatValue, { color: isDarkMode ? '#CCCCCC' : '#555' }]}>{user.postCount != null ? user.postCount : 'N/A'}</Text>
+                    <Text style={newStyle.userStatValue}>{user.postCount != null ? user.postCount : 'N/A'}</Text>
                   </View>
                 </View>
 
                 {/* Row 2: Upvotes and Downvotes */}
                 <View style={newStyle.userStatsRow}>
                   <View style={newStyle.userStatColumn}>
-                    <Text style={[newStyle.userStatLabel, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>
+                    <Text style={newStyle.userStatLabel}>
                       {t('SCREENS.PROFILE.UPVOTES')}
                     </Text>
-                    <Text style={[newStyle.userStatValue, { color: isDarkMode ? '#CCCCCC' : '#555' }]}>{user.upvotes != null ? user.upvotes : 'N/A'}</Text>
+                    <Text style={newStyle.userStatValue}>{user.upvotes != null ? user.upvotes : 'N/A'}</Text>
                   </View>
                   <View style={newStyle.userStatColumn}>
-                    <Text style={[newStyle.userStatLabel, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>
+                    <Text style={newStyle.userStatLabel}>
                       {t('SCREENS.PROFILE.DOWNVOTES')}
                     </Text>
-                    <Text style={[newStyle.userStatValue, { color: isDarkMode ? '#CCCCCC' : '#' }]}>{user.downvotes != null ? user.downvotes : 'N/A'}</Text>
+                    <Text style={newStyle.userStatValue}>{user.downvotes != null ? user.downvotes : 'N/A'}</Text>
                   </View>
                 </View>
               </View>
@@ -154,32 +152,32 @@ const UserProfileModal = ({
                   onRequestClose={() => setFriendListVisible(false)}
                 >
                   <TouchableWithoutFeedback onPress={() => setFriendListVisible(false)}>
-                    <View style={[newStyle.modalBackground, { backgroundColor: isDarkMode ? 'rgba(0, 0, 0, 0.8)' : 'rgba(255, 255, 255, 0.8)' }]}>
-                      <View style={[newStyle.modalContent, { backgroundColor: isDarkMode ? '#1C1C1C' : '#FFF' }]}>
-                        <Text style={[newStyle.modalTitleText, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>
+                    <View style={newStyle.modalBackground}>
+                      <View style={newStyle.modalContent}>
+                        <Text style={newStyle.modalTitleText}>
                           {t('SCREENS.PROFILE.TRAVEL_BUDDIES')}
                         </Text>
                         {user.friends && user.friends.length > 0 ? (
                           <FlatList
                             data={user.friends}
                             renderItem={({ item }) => (
-                              <View style={[newStyle.friendCard, { backgroundColor: isDarkMode ? '#333' : '#F5F5F5' }]}>
+                              <View style={newStyle.friendCard}>
                                 <Image
                                   source={{ uri: item.profilepicture_url || 'https://via.placeholder.com/40' }}
-                                  style={newStyle.smallProfileImage} 
+                                  style={newStyle.smallProfileImage} // Use the smaller image style
                                 />
-                                <Text style={[newStyle.friendName, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>{item.username || 'N/A'}</Text>
+                                <Text style={newStyle.friendName}>{item.username || 'N/A'}</Text>
                               </View>
                             )}
                             keyExtractor={(item) => item.id.toString()}
                           />
                         ) : (
-                          <Text style={{ color: isDarkMode ? '#FFFDF3' : '#000' }}>
+                          <Text>
                             {t('SCREENS.PROFILE.NO_TRAVEL_BUDDIES')}
                           </Text>
                         )}
                         <TouchableOpacity onPress={() => setFriendListVisible(false)} style={newStyle.closeModalButton}>
-                          <Text style={[newStyle.closeModalButtonText, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>
+                          <Text style={newStyle.closeModalButtonText}>
                             {t('CLOSE')}
                           </Text>
                         </TouchableOpacity>

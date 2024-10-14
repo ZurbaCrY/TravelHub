@@ -13,7 +13,6 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { handleFilePicker, handleNewProfilePicture } from '../../backend/community';
 import { useTranslation } from 'react-i18next';
 import { fetchCountries } from '../../backend/community';
-import { color } from 'react-native-elements/dist/helpers';
 
 const EditProfile = ({ navigation }) => {
   const { t } = useTranslation();
@@ -59,20 +58,10 @@ const EditProfile = ({ navigation }) => {
       }
     };
 
-    navigation.setOptions({
-      title: 'Edit Profile',
-      headerStyle: {
-        backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8'  // Hintergrundfarbe des Headers
-      },
-      headerTitleStyle: {
-        color: isDarkMode ? '#f8f8f8' : '#18171c'  // Textfarbe des Titels
-      },
-      headerTintColor: isDarkMode ? '#f8f8f8' : '#18171c'  // Farbe des "Zurück"-Pfeils
-    });
-  
+    navigation.setOptions({ title: 'Edit Profile', headerStyle: { backgroundColor: '#f8f8f8' } });
     fetchUserData();
     loadCountries();
-  }, [isDarkMode, navigation]);
+  }, [navigation]);
 
   const handleInputChange = (field, value) => {
     setUserData({ ...userData, [field]: value });
@@ -116,155 +105,172 @@ const EditProfile = ({ navigation }) => {
   };
 
   return (
-    <View style={[styles.containerNoMarginTop, styles.paddingHorizontalMedium, { backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]}>
-    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-      <ScrollView>
+    <View style={[styles.containerNoMarginTop, styles.paddingHorizontalMedium]}>
+      <TouchableWithoutFeedback onPress={() => {
+        // Close the keyboard when the user taps outside of the input fields
+        Keyboard.dismiss();
+      }}>
+        <ScrollView>
 
-        <View style={[styles.profileImageContainer,{ backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]}>
-          <View style={[styles.profileImageWrapper,{ backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]}>
-            <TouchableWithoutFeedback onPress={handleImageChange}>
-              <Image
-                source={{ uri: userData.profilepicture_url }}
-                style={styles.largeProfileImage}
-              />
-            </TouchableWithoutFeedback>
-            <View style={styles.roundButtonContainerBottomRight}>
-              <TouchableOpacity style={styles.roundButton} onPress={handleImageChange}>
-                <FontAwesome5 name="edit" size={20} color={isDarkMode ? '#070A0F' : '#f8f8f8'} />
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-
-        <View style={styles.row}>
-          <View style={styles.container45Percent}>
-            <Text style={[styles.bodyText, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>
-              First Name
-            </Text>
-            <TextInput
-              style={[styles.inputField, { color: isDarkMode ? '#f8f8f8' : '#18171c', backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]}
-              value={userData.first_name}
-              onChangeText={(text) => handleInputChange('first_name', text)}
-            />
-          </View>
-          <View style={styles.container45Percent}>
-            <Text style={[styles.bodyText, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>
-              Last Name
-            </Text>
-            <TextInput
-              style={[styles.inputField, { color: isDarkMode ? '#f8f8f8' : '#18171c', backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]}
-              value={userData.last_name}
-              onChangeText={(text) => handleInputChange('last_name', text)}
-            />
-          </View>
-        </View>
-
-        <Text style={[styles.bodyText, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>
-          Username
-        </Text>
-        <TextInput
-          style={[styles.inputField, { color: isDarkMode ? '#f8f8f8' : '#18171c', backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]}
-          value={userData.username}
-          onChangeText={(text) => handleInputChange('username', text)}
-        />
-
-        <Text style={[styles.bodyText, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>
-          Bio
-        </Text>
-        <TextInput
-          style={[styles.inputField, { color: isDarkMode ? '#f8f8f8' : '#18171c', backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]}
-          value={userData.bio}
-          onChangeText={(text) => handleInputChange('bio', text)}
-        />
-
-        <Text style={[styles.bodyText, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>
-          Email
-        </Text>
-        <TextInput
-          style={[styles.inputField, { color: isDarkMode ? '#f8f8f8' : '#18171c', backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]}
-          value={userData.email}
-          onPress={() => Alert.alert('Error', 'There is a Problem with this feature. \nPlease Contact Support')}
-          onChangeText={(text) => Alert.alert('Error', 'There is a Problem with this feature. \nPlease Contact Support')}
-        />
-
-        <Text style={[styles.bodyText, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>
-          Birthdate
-        </Text>
-        <TouchableOpacity onPress={() => setShowDatepicker(true)} style={[styles.inputField, { backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]}>
-          <Text style={[styles.bodyText, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>
-            {date ? `${date.getDate()} ${date.toLocaleString('default', { month: 'long' })} ${date.getFullYear()}` : ''}
-          </Text>
-        </TouchableOpacity>
-        {showDatepicker && (
-          <DateTimePicker
-            value={date}
-            mode='date'
-            display='spinner'
-            onChange={onDateChange}
-            minimumDate={new Date(0)}
-            maximumDate={today}
-            style={styles.datePicker}
-          />
-        )}
-
-        <Text style={[styles.bodyText, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>
-          Country
-        </Text>
-        <Picker
-          style={[styles.inputField, { backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8', color: isDarkMode ? '#f8f8f8' : '#18171c' }]}
-          selectedValue={country}
-          onValueChange={(itemValue) => setCountry(itemValue)}
-        >
-          <Picker.Item label={country} value={country} />
-          {countries.map((country) => (
-            <Picker.Item key={country.id} label={country.name} value={country.id} />
-          ))}
-        </Picker>
-
-        <CustomButton title={"Save"} onPress={handleSave} />
-
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={() => setModalVisible(!modalVisible)}
-        >
-          <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
-            <View style={[styles.modalBackground, { backgroundColor: isDarkMode ? 'rgba(24, 23, 28, 0.8)' : 'rgba(248, 248, 248, 0.8)' }]}>
-              <TouchableWithoutFeedback>
-                <View style={[styles.modalContent, { backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]}>
-                  <Text style={[styles.modalTitleText, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>
-                    Change Profile Picture
-                  </Text>
-
-                  {imageUrl && (
-                    <Image source={{ uri: imageUrl }} style={styles.postImage} />
-                  )}
-                  <View style={styles.row}>
-
-                    <TouchableOpacity style={styles.averageRedButton} onPress={() => setModalVisible(false)}>
-                      <Text style={[styles.smallButtonText, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>
-                        Close
-                      </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.averageBlueButton} onPress={async () => {
-                      const success = await handleNewProfilePicture(imageUrl);
-                      setModalVisible(false);
-                    }}>
-                      <Text style={[styles.smallButtonText, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>
-                        Post
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
+          <View style={styles.profileImageContainer}>
+            <View style={styles.profileImageWrapper}>
+              <TouchableWithoutFeedback onPress={() => handleImageChange()}>
+                <Image
+                  source={{ uri: userData.profilepicture_url }}
+                  style={styles.largeProfileImage}
+                />
               </TouchableWithoutFeedback>
+              <View style={styles.roundButtonContainerBottomRight}>
+                <TouchableOpacity style={styles.roundButton} onPress={() => handleImageChange()}>
+                  <FontAwesome5 name="edit" size={20} color={isDarkMode ? '#070A0F' : '#f8f8f8'} />
+                </TouchableOpacity>
+              </View>
             </View>
-          </TouchableWithoutFeedback>
-        </Modal>
+          </View>
 
-      </ScrollView>
-    </TouchableWithoutFeedback>
-  </View>
+
+          <View style={styles.row}>
+            <View style={styles.container45Percent}>
+              <Text style={styles.bodyText}>
+                {t('SCREENS.PROFILE.FIRST_NAME')}
+              </Text>
+              <TextInput
+                style={styles.inputField}
+                value={userData.first_name}
+                onChangeText={(text) => handleInputChange('first_name', text)}
+              />
+            </View>
+            <View style={styles.container45Percent}>
+              <Text style={styles.bodyText}>
+                {t('SCREENS.PROFILE.LAST_NAME')}
+              </Text>
+              <TextInput
+                style={styles.inputField}
+                value={userData.last_name}
+                onChangeText={(text) => handleInputChange('last_name', text)}
+              />
+            </View>
+          </View>
+
+          <Text style={styles.bodyText}>
+            {t('SCREENS.PROFILE.USERNAME')}
+          </Text>
+          <TextInput
+            style={styles.inputField}
+            value={userData.username}
+            onChangeText={(text) => handleInputChange('username', text)}
+          />
+
+          <Text style={styles.bodyText}>
+            {t('SCREENS.PROFILE.BIO')}
+          </Text>
+          <TextInput
+            style={styles.inputField}
+            value={userData.bio}
+            onChangeText={(text) => handleInputChange('bio', text)}
+          />
+
+          <Text style={styles.bodyText}>
+            {t('SCREENS.PROFILE.EMAIL')}
+          </Text>
+          <TextInput
+            style={styles.inputField}
+            value={userData.email}
+            // onChangeText={(text) => handleInputChange('email', text)}
+            onPress={() => Alert.alert('Error', 'There is a Problem with this feature. \nPlease Contact Support')}
+            onChangeText={(text) => Alert.alert('Error', 'There is a Problem with this feature. \nPlease Contact Support')}
+          />
+
+          <Text style={styles.bodyText}>
+            {t('SCREENS.PROFILE.BIRTHDATE')}
+          </Text>
+          <TouchableOpacity
+            onPress={() => setShowDatepicker(true)}
+            style={styles.inputField}
+          >
+            <Text style={styles.bodyText}>
+              {date ? `${date.getDate()} ${date.toLocaleString('default', { month: 'long' })} ${date.getFullYear()}` : ''}
+            </Text>
+          </TouchableOpacity>
+          {showDatepicker && (
+            <DateTimePicker
+              value={date}
+              mode='date'
+              display='spinner'
+              onChange={onDateChange}
+              minimumDate={new Date(0)}
+              maximumDate={today}
+              style={styles.datePicker}
+            />
+          )}
+
+          {/* Country Picker */}
+          <Text style={styles.bodyText}>
+            {t('SCREENS.PROFILE.COUNTRY')}
+          </Text>
+          <Picker style={styles.inputField}
+            selectedValue={country}
+            onValueChange={(itemValue) => {
+              setCountryId(itemValue);
+              setCountry(countries.find((country) => country.id === itemValue).name);
+            }}>
+            <Picker.Item label={country} value={country} />
+            {countries.map((country) => (
+              <Picker.Item key={country.id} label={country.name} value={country.id} />
+            ))}
+          </Picker>
+
+
+
+          <CustomButton title={"Save"} onPress={handleSave} />
+
+          {/* Modal für die Bildvorschau */}
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => {
+              setModalVisible(!modalVisible);
+            }}
+          >
+            <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
+              <View style={styles.modalBackground}>
+                <TouchableWithoutFeedback>
+                  <View style={styles.modalContent}>
+                    <Text style={styles.modalTitleText}>
+                      {t('SCREENS.SETTINGS.CHANGE_PROFILE_PICTURE')}
+                    </Text>
+
+                    {imageUrl && (
+                      <Image source={{ uri: imageUrl }} style={styles.postImage} />
+                    )}
+                    <View style={styles.row}>
+
+                      <TouchableOpacity style={styles.averageRedButton} onPress={() => setModalVisible(false)}>
+                        <Text style={styles.smallButtonText}>
+                          {t('CLOSE')}
+                        </Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={styles.averageBlueButton}
+                        onPress={async () => {
+                          const success = await handleNewProfilePicture(imageUrl);
+                          setModalVisible(false);
+                        }}
+                      >
+                        <Text style={styles.smallButtonText}>
+                          {t('POST')}
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </TouchableWithoutFeedback>
+              </View>
+            </TouchableWithoutFeedback>
+          </Modal>
+        </ScrollView>
+      </TouchableWithoutFeedback>
+    </View>
   );
 };
 

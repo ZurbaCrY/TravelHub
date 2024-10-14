@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, TextInput, Button, StyleSheet, TouchableOpacity, Text } from 'react-native';
 import { handleSearchLocalAutocomplete } from '../backend/MapSearchBarFunctions'; // Importiere die Funktion für lokale Suche
 import { findMiddleCoordinate } from '../services/MapMathematics';
+import { MaterialIcons } from '@expo/vector-icons';
 
 const MapSearchBar = ({ styles, mapRef, scrollToStart, setSelectedPlace, setSearchResult, continentsData, setRegion }) => {
   const [query, setQuery] = useState('');
@@ -72,12 +73,12 @@ const MapSearchBar = ({ styles, mapRef, scrollToStart, setSelectedPlace, setSear
         )}
       </View>
 
-      <Button
-        title="Go!"
-        onPress={handleButtonPress}
-        color="#007BFF" // Standardfarbe von Button anpassen
-        style={localStyles.button}
-      />
+      <TouchableOpacity
+          onPress={handleButtonPress}
+          style={localStyles.button}
+       >
+        <MaterialIcons name="send" size={24} color="white" />
+      </TouchableOpacity>
     </View>
   );
 };
@@ -88,13 +89,14 @@ const localStyles = StyleSheet.create({
     flexDirection: 'row', // Nebeneinander anordnen
     alignItems: 'center',  // Vertikal zentrieren
     marginTop: 40,
+    marginLeft: 10,
   },
   inputContainer: {
     position: 'relative',
     flex: 1, // Nimmt den verfügbaren Platz ein
   },
   searchInput: {
-    height: 40,
+    height: 50,
     borderColor: '#ccc',
     borderWidth: 1,
     borderRadius: 5,
@@ -107,19 +109,21 @@ const localStyles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    height: 40,
+    height: 50,
     justifyContent: 'center', // Vertikale Zentrierung
     paddingHorizontal: 10,
-    backgroundColor: 'rgba(255, 255, 255, 0.8)', // Transparenter Hintergrund
+    backgroundColor: 'rgba(255, 255, 255, 0.7)', // Transparenter Hintergrund
     borderBottomColor: '#ccc', // Untere Rahmenfarbe
-    borderBottomWidth: 1,
   },
   suggestionText: {
     fontSize: 16,
     color: 'gray', // Graue Schriftfarbe für Vorschlag
   },
   button: {
-    marginLeft: 10, // Abstand zwischen Input und Button
+    margin: 10, // Abstand zwischen Input und Button
+    backgroundColor: '#3d52d5',
+    padding: 10,
+    borderRadius: 5,
   },
 });
 

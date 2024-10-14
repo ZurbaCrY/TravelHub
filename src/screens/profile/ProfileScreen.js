@@ -329,7 +329,7 @@ export default function ProfileScreen() {
   };
 
   return (
-    <View style={[newStyle.centeredContainerNoMarginTop, { backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]}>
+    <View style={[newStyle.centeredContainer, { backgroundColor: isDarkMode ? '#070A0F' : '#f8f8f8' }]}>
       <TouchableWithoutFeedback onPress={() => {
         // Close the keyboard when the user taps outside of the input fields
         Keyboard.dismiss();
@@ -337,11 +337,11 @@ export default function ProfileScreen() {
         setShowWishListInput(false);
       }}>
         <ScrollView
-          style={[newStyle.container, { backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]}
+          style={[newStyle.container, { backgroundColor: isDarkMode ? '#070A0F' : '#f8f8f8' }]}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }>
-          <View style={[newStyle.centeredContainer, { backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]}>
+          <View style={[newStyle.centeredContainer, { backgroundColor: isDarkMode ? '#070A0F' : '#f8f8f8' }]}>
 
             <View style={newStyle.roundButtonContainerTopRight}>
               {/* Settings Button */}
@@ -378,10 +378,10 @@ export default function ProfileScreen() {
                 style={newStyle.largeProfileImage}
               />
             </TouchableOpacity>
-            <Text style={[newStyle.titleText, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>{user.user_metadata.username}</Text>
+            <Text style={[newStyle.titleText, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>{user.user_metadata.username}</Text>
 
             {/* Bio */}
-            <Text style={[newStyle.bodyTextBig, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>
+            <Text style={[newStyle.bodyTextBig, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>
               {userData && userData.bio ? '"' + userData.bio + '"' :  t('SCREENS.PROFILE.NO_BIO') }
             </Text>
 
@@ -403,13 +403,13 @@ export default function ProfileScreen() {
             {userData && userData.country.home_country && userData.country.home_country_code ?
               <View style={newStyle.row}>
                 <Flag code={userData.country.home_country_code} size={16} style={newStyle.marginRightExtraSmall} />
-                <Text style={[newStyle.bodyText, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>
+                <Text style={[newStyle.bodyText, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>
                   {userData.country.home_country}
                 </Text>
               </View> :
               <View style={newStyle.row}>
                 <Flag code="DE" size={16} style={newStyle.marginRightExtraSmall} />
-                <Text style={[newStyle.bodyText, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>
+                <Text style={[newStyle.bodyText, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>
                   {t('SCREENS.PROFILE.NO_COUNTRY')}
                 </Text>
               </View>
@@ -423,17 +423,17 @@ export default function ProfileScreen() {
             <View style={newStyle.userStatsRow}>
               <View style={newStyle.userStatColumn}>
                 <TouchableOpacity onPress={() => setTravelBuddiesModalVisible(true)} style={[{ justifyContent: 'center', alignItems: 'center' }]}>
-                  <Text style={[newStyle.userStatLabel, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>
+                  <Text style={newStyle.userStatLabel}>
                     {t('SCREENS.PROFILE.TRAVEL_BUDDIES')}
                   </Text>
-                  <Text style={[newStyle.userStatValue, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>{travelBuddies.length != null ? travelBuddies.length : 'N/A'}</Text>
+                  <Text style={newStyle.userStatValue}>{travelBuddies.length != null ? travelBuddies.length : 'N/A'}</Text>
                 </TouchableOpacity>
               </View>
-              <View style={[newStyle.userStatColumn, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>
-                <Text style={[newStyle.userStatLabel, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>
+              <View style={newStyle.userStatColumn}>
+                <Text style={newStyle.userStatLabel}>
                   {t('SCREENS.PROFILE.POSTS')}
                 </Text>
-                <Text style={[newStyle.userStatValue, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>{postCount != null ? postCount : 'N/A'}</Text>
+                <Text style={newStyle.userStatValue}>{postCount != null ? postCount : 'N/A'}</Text>
               </View>
             </View>
 
@@ -443,13 +443,13 @@ export default function ProfileScreen() {
                 <Text style={[newStyle.userStatLabel, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>
                   {t('SCREENS.PROFILE.UPVOTES')}
                 </Text>
-                <Text style={[newStyle.userStatValue, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>{upvoteCount != null ? upvoteCount : 'N/A'}</Text>
+                <Text style={newStyle.userStatValue}>{upvoteCount != null ? upvoteCount : 'N/A'}</Text>
               </View>
               <View style={newStyle.userStatColumn}>
-                <Text style={[newStyle.userStatLabel, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>
+                <Text style={newStyle.userStatLabel}>
                   {t('SCREENS.PROFILE.DOWNVOTES')}
                 </Text>
-                <Text style={[newStyle.userStatValue, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>{downvoteCount != null ? downvoteCount : 'N/A'}</Text>
+                <Text style={newStyle.userStatValue}>{downvoteCount != null ? downvoteCount : 'N/A'}</Text>
               </View>
             </View>
           </View>
@@ -471,7 +471,7 @@ export default function ProfileScreen() {
                     {country.verified && <Icon name="check-circle" size={16} color="green" style={styles.verifiedIcon} />}
                   </View>
                   <TouchableOpacity onPress={() => handleRemoveVisitedCountry(index)} style={styles.removeButton}>
-                    <Icon name="trash" size={20} color="#f8f8f8" />
+                    <Icon name="trash" size={20} color="#FFFDF3" />
                   </TouchableOpacity>
                 </View>
               ))
@@ -483,16 +483,16 @@ export default function ProfileScreen() {
                   onChangeText={setNewVisited}
                   value={newVisited}
                   placeholder={t('SCREENS.PROFILE.ADD_VISITED_COUNTRY')}
-                  placeholderTextColor={isDarkMode ? '#18171c' : '#18171c'} 
+                  placeholderTextColor="#cccccc"
                 />
-                <Button onPress={handleAddVisitedCountry} color="#f8f8f8">
+                <Button onPress={handleAddVisitedCountry} color="#58CFEC">
                   {t('ADD')}
                 </Button>
               </>
             )}
             {!showVisitedInput && (
               <TouchableOpacity onPress={() => setShowVisitedInput(true)} style={styles.addButton}>
-                <Icon name="plus" size={20} color="#f8f8f8" />
+                <Icon name="plus" size={20} color="#FFFDF3" />
                 <Text style={styles.addButtonText}>
                   {t('SCREENS.PROFILE.ADD_VISITED_COUNTRY')}
                 </Text>
@@ -501,7 +501,7 @@ export default function ProfileScreen() {
           </View>
 
           <View style={styles.infoSection}>
-            <Text style={[styles.header, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>
+            <Text style={styles.header}>
               {t('SCREENS.PROFILE.WISHLIST_COUNTRIES')}
             </Text>
             {wishListCountries.length === 0 ? (
@@ -513,7 +513,7 @@ export default function ProfileScreen() {
                 <View key={index} style={styles.countryItem}>
                   <Text style={styles.details}>{country}</Text>
                   <TouchableOpacity onPress={() => handleRemoveWishListCountry(index)} style={styles.removeButton}>
-                    <Icon name="trash" size={20} color="#f8f8f8" />
+                    <Icon name="trash" size={20} color="#FFFDF3" />
                   </TouchableOpacity>
                 </View>
               ))
@@ -525,16 +525,16 @@ export default function ProfileScreen() {
                   onChangeText={setNewWishList}
                   value={newWishList}
                   placeholder={t('SCREENS.PROFILE.ADD_WISHLIST_COUNTRY')}
-                  placeholderTextColor={isDarkMode ? '#18171c' : '#18171c'}
+                  placeholderTextColor="#cccccc"
                 />
-                <Button onPress={handleAddWishListCountry} color="#f8f8f8">
+                <Button onPress={handleAddWishListCountry} color="#58CFEC">
                   {t('ADD')}
                 </Button>
               </>
             )}
             {!showWishListInput && (
               <TouchableOpacity onPress={() => setShowWishListInput(true)} style={styles.addButton}>
-                <Icon name="plus" size={20} color="#f8f8f8" />
+                <Icon name="plus" size={20} color="#FFFDF3" />
                 <Text style={styles.addButtonText}>
                   {t('SCREENS.PROFILE.ADD_WISHLIST_COUNTRY')}
                 </Text>
@@ -543,7 +543,7 @@ export default function ProfileScreen() {
           </View>
 
           {/* Placeholder for the bottom of the screen */}
-          <View style={[styles.infoSection, { backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]} />
+          <View style={[styles.infoSection, { backgroundColor: isDarkMode ? '#070A0F' : '#f8f8f8' }]} />
           {/* Modal für die Bildvorschau */}
           <Modal
             animationType="slide"
@@ -641,14 +641,14 @@ export default function ProfileScreen() {
         animationIn="slideInRight"
         animationOut="slideOutRight"
         backdropOpacity={0.5}
-        style={[newStyle.friendRequestModal,{ backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]}
+        style={newStyle.friendRequestModal}
       >
-     <View style={[newStyle.container, { backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]}>
-     <Text style={[newStyle.titleText, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>
+        <View style={newStyle.container}>
+          <Text style={newStyle.titleText}>
             {t('FRIENDS.REQUESTS.FRIEND_REQUESTS')}
           </Text>
           {friendRequests.length === 0 ? (
-            <Text style={[newStyle.bodyText, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>
+            <Text style={newStyle.bodyText}>
               {t('FRIENDS.REQUESTS.NO_FRIEND_REQUESTS')}
             </Text>
           ) : (
