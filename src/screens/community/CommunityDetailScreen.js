@@ -305,7 +305,7 @@ export default function CommunityDetailScreen({ route, navigation }) {
               <View style={[newStyle.updropdown, { backgroundColor: isDarkMode ? '#333' : '#FFF' }]}>{renderVotersList(upvoters)}</View>
             )}
             {showDownvoters && (
-              <View style={[newStyle.downdropdown, { backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]}>
+              <View style={[newStyle.downdropdown, { backgroundColor: isDarkMode ? '#18171c' : '#18171c' }]}>
                 {renderVotersList(downvoters)}
               </View>
             )}
@@ -426,7 +426,7 @@ export default function CommunityDetailScreen({ route, navigation }) {
       >
         <View style={newStyle.modalBackground}>
           <TouchableWithoutFeedback onPress={closeDownvoterModal}>
-            <View style={newStyle.modalContent}>
+            <View style={[newStyle.modalContent,{ backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]}>
               <Text style={newStyle.modalTitleText}>
                 {t('SCREENS.COMMUNITY.DOWNVOTERS')}
               </Text>
