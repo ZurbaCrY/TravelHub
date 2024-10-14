@@ -121,7 +121,7 @@ const localStyles = StyleSheet.create({
   },
   button: {
     margin: 10, // Abstand zwischen Input und Button
-    backgroundColor: '#007BFF',
+    backgroundColor: '#3d52d5',
     padding: 10,
     borderRadius: 5,
   },
