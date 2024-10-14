@@ -50,7 +50,8 @@ const Map = ({
                   title={getNameForPlace(place)}
                   description={getDescriptionForPlace(place)}
                   calloutEnabled={true}
-                  image={getMarkerForPlace(place, selectedPlace)}
+                  image={getMarkerForPlace(place)}
+                  style={{ width: 20, height: 20 }}
                 />
               ))
             )

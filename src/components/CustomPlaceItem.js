@@ -20,7 +20,7 @@ const CustomPlaceItem = ({ place, handleMarkerPress, handleStarClick, handlePlac
         {/* Name und Beschreibung rechts daneben */}
         <View style={styles.customPlaceItemTextContainer}>
           <Text style={styles.customPlaceItemName}>{place.name}</Text>
-          <Text style={styles.customPlaceItemDescription}>{place.type}</Text>
+          <Text style={styles.customPlaceItemDescription}>{place.description}</Text>
         </View>
         {/* Sternsymbol */}
         <TouchableOpacity onPress={() => handleStarClick(place)} style={styles.starIconContainer}>

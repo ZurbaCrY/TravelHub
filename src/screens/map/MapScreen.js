@@ -119,7 +119,7 @@ export default function MapScreen() {
     setZoomLevel(region.latitudeDelta);
     setRegion(region);
 
-    if (region.latitudeDelta < 1) {
+    if (region.latitudeDelta < 12) {
       setShowMarkers(true);
       setShowBottomLine(true);
     } else {
