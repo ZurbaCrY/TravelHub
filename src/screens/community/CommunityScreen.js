@@ -242,7 +242,7 @@ export default function CommunityScreen({ navigation }) {
         ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
       />
 
-      <TouchableOpacity style={[newStyle.primaryButton, { backgroundColor: isDarkMode ? '#1E90FF' : '#007BFF' }]} onPress={() => setNewPostModalVisible(true)}>
+      <TouchableOpacity style={[newStyle.primaryButton, { backgroundColor: isDarkMode ? '#1E90FF' : '#3498DB' }]} onPress={() => setNewPostModalVisible(true)}>
         <Text style={[newStyle.primaryButtonTextt, { color: isDarkMode ? '#FFF' : '#FFF' }]}>
           {t('SCREENS.COMMUNITY.NEW_POST')}
         </Text>

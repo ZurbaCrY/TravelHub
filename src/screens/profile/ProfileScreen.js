@@ -440,7 +440,7 @@ export default function ProfileScreen() {
             {/* Row 2: Upvotes and Downvotes */}
             <View style={newStyle.userStatsRow}>
               <View style={newStyle.userStatColumn}>
-                <Text style={[newStyle.userStatLabelatLabel, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>
+                <Text style={[newStyle.userStatLabel, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>
                   {t('SCREENS.PROFILE.UPVOTES')}
                 </Text>
                 <Text style={[newStyle.userStatValue, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>{upvoteCount != null ? upvoteCount : 'N/A'}</Text>
