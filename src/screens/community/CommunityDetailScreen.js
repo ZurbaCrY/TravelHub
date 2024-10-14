@@ -33,6 +33,16 @@ export default function CommunityDetailScreen({ route, navigation }) {
 
 
   useEffect(() => {
+    navigation.setOptions({
+      title: 'Post',
+      headerStyle: {
+        backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8'  // Hintergrundfarbe des Headers
+      },
+      headerTitleStyle: {
+        color: isDarkMode ? '#f8f8f8' : '#18171c'  // Textfarbe des Titels
+      },
+      headerTintColor: isDarkMode ? '#f8f8f8' : '#18171c'  // Farbe des "Zurück"-Pfeils
+    });
     const fetchVoters = async () => {
       try {
         const upvoterList = await getUpvoters(post.id);
@@ -164,6 +174,8 @@ export default function CommunityDetailScreen({ route, navigation }) {
   const openDownvoterModal = () => setDownvoterModalVisible(true);
   const closeDownvoterModal = () => setDownvoterModalVisible(false);
 
+
+  
 
   return (
   <SafeAreaView style={{ flex: 1, backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }}>  
@@ -431,7 +443,7 @@ export default function CommunityDetailScreen({ route, navigation }) {
           </TouchableWithoutFeedback>
         </View>
       </Modal>
-    </View>
+    </View> 
     </SafeAreaView>
   );  
 }
