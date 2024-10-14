@@ -12,6 +12,7 @@ import { getUserStats } from '../../services/getUserStats';
 import { useAuth } from '../../context/AuthContext';
 import { useLoading } from '../../context/LoadingContext';
 import { useTranslation } from 'react-i18next';
+import { FontAwesome } from '@expo/vector-icons';
 
 export default function CommunityScreen({ navigation }) {
   const { t } = useTranslation();
@@ -262,7 +263,7 @@ export default function CommunityScreen({ navigation }) {
                   onChangeText={(text) => setNewPostContent(text)}
                 />
                 <TouchableOpacity onPress={async () => { const image = await handleFilePicker(); setImageUrl(image); }}>
-                  <Image source={require('../../assets/images/picture.png')} style={newStyle.iconBigCenter} />
+                  <Image source={require('../../assets/images/picture.png')} style={newStyle.iconSmall} />
                 </TouchableOpacity>
                 {imageUrl && <Image source={{ uri: imageUrl }} style={newStyle.postImage} />}
 

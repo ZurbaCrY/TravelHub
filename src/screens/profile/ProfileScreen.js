@@ -233,10 +233,95 @@ export default function ProfileScreen() {
     }
   };
 
+  const getUserProfileData = async (userId) => {
+    try {
+      // Lade alle Daten parallel
+      const [
+        profilePictureUrl,
+        visitedCountriesData,
+        wishListCountriesData,
+        travelBuddiesData,
+        userStats,
+        friendRequests
+      ] = await Promise.all([
+        getProfilePictureUrlByUserId(userId),
+        fetchVisitedCountries(userId),
+        fetchWishListCountries(userId),
+        FriendService.getFriends(),
+        getUserStats(userId, false),
+        FriendService.getIncomingRequests(true, false, false, false)
+      ]);
+      // Verarbeite die Freundschaftsanfragen mit den Nutzernamen
+      const senderIds = friendRequests.map(request => request.sender_id);
+      const senderUsernames = await getUsernamesByUserIds(senderIds);
+      const requestsWithUsernames = friendRequests.map((request, index) => ({
+        friend_request_id: request.friend_request_id,
+        sender_id: request.sender_id,
+        sender_username: senderUsernames[index].username
+      }));
+      // Reisebuddies mit Nutzernamen verknüpfen
+      const travelBuddiesIds = travelBuddiesData.map(buddy => buddy.friend_id);
+      const travelBuddiesNames = await getUsernamesByUserIds(travelBuddiesIds);
+      return {
+        profilePictureUrl,
+        visitedCountriesData,
+        wishListCountriesData,
+        travelBuddiesNames,
+        userStats,
+        requestsWithUsernames
+      };
+    } catch (error) {
+      console.error("Error fetching user profile data:", error);
+      throw error;
+    }
+  };
+  
+  useEffect(() => {
+    if (!user || !user.id) return;
+  
+    const loadUserProfileData = async () => {
+      try {
+        showLoading(t('LOADING_MESSAGE.PROFILE'));
+        const profileData = await getUserProfileData(user.id);
+  
+        // Setze die geladenen Daten in den State
+        setProfilePictureUrl(profileData.profilePictureUrl);
+        setVisitedCountries(profileData.visitedCountriesData);
+        setWishListCountries(profileData.wishListCountriesData);
+        setTravelBuddies(profileData.travelBuddiesNames);
+        setPostCount(profileData.userStats.postCount);
+        setUpvoteCount(profileData.userStats.upvoteCount);
+        setDownvoteCount(profileData.userStats.downvoteCount);
+        setFriendRequests(profileData.requestsWithUsernames);
+      } catch (error) {
+        console.error('Error loading profile data:', error);
+      } finally {
+        hideLoading();
+      }
+    };
+  
+    loadUserProfileData();
+  }, [user]);
+
   const onRefresh = async () => {
-    setRefreshing(true);
-    await fetchProfileData(); // Call this to refresh profile data as well
-    setRefreshing(false);
+    setRefreshing(true); 
+    try {
+      const profileData = await getUserProfileData(user.id); 
+  
+      // Aktualisiere den State mit den neu geladenen Daten
+      setProfilePictureUrl(profileData.profilePictureUrl);
+      setVisitedCountries(profileData.visitedCountriesData);
+      setWishListCountries(profileData.wishListCountriesData);
+      setTravelBuddies(profileData.travelBuddiesNames);
+      setPostCount(profileData.userStats.postCount);
+      setUpvoteCount(profileData.userStats.upvoteCount);
+      setDownvoteCount(profileData.userStats.downvoteCount);
+      setFriendRequests(profileData.requestsWithUsernames);
+    } catch (error) {
+      console.error('Error refreshing profile data:', error);
+    } finally {
+      setRefreshing(false); 
+    }
   };
 
   const handleRemoveWishListCountry = async (index) => {
@@ -574,6 +659,7 @@ export default function ProfileScreen() {
                         style={newStyle.averageBlueButton}
                         onPress={async () => {
                           const success = await handleNewProfilePicture(imageUrl);
+                          onRefresh();
                           setModalVisible(false);
                         }}
                       >
