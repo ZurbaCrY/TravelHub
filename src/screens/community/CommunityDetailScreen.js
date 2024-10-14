@@ -127,7 +127,7 @@ export default function CommunityDetailScreen({ route, navigation }) {
       data={voters}
       keyExtractor={(item, index) => index.toString()}
       renderItem={({ item }) => (
-        <View style={[newStyle.listItem, { backgroundColor: isDarkMode ? '#f8f8f8' : '#18171c' }]}>
+        <View style={[newStyle.listItem, { backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]}>
           <Image source={{ uri: item.profilepicture_url }} style={newStyle.mediumProfileImage} />
           <Text style={[newStyle.listItemText, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>{item.username}</Text>
         </View>
@@ -198,7 +198,7 @@ export default function CommunityDetailScreen({ route, navigation }) {
                         source={require('../../assets/images/account.png')}
                         style={newStyle.extraSmallProfileImage}
                       />
-                      <Text style={newStyle.boldTextBig}>Anonymous</Text>
+                      <Text style={[newStyle.boldTextBig,{ color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>Anonymous</Text>
                     </>
                   ) : (
                     <>
@@ -262,11 +262,12 @@ export default function CommunityDetailScreen({ route, navigation }) {
                 style={newStyle.postImage}
               />
             )}
-            <Text style={newStyle.bodyText}>{postData.content}</Text>
+            <Text style={[newStyle.bodyText, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>{postData.content}</Text>
+
   
             {/* Upvotes and Downvotes Section */}
             <View style={newStyle.voteRow}>
-              <View style={newStyle.voteContainer}>
+              <View style={[newStyle.voteContainer, { backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]}>
                 <TouchableOpacity
                   onPress={() => handleUpvote(postData.id, user.id, loadPosts)}
                 >
@@ -401,8 +402,8 @@ export default function CommunityDetailScreen({ route, navigation }) {
       >
         <View style={newStyle.modalBackground}>
           <TouchableWithoutFeedback onPress={closeUpvoterModal}>
-            <View style={newStyle.modalContent}>
-              <Text style={newStyle.modalTitleText}>Upvoters</Text>
+            <View style={[newStyle.modalContent,{ backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]}>
+              <Text style={[newStyle.modalTitleText,{ color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>Upvoters</Text>
               <View>{renderVotersList(upvoters)}</View>
               <View style={newStyle.row}>
                 <TouchableOpacity
@@ -427,7 +428,7 @@ export default function CommunityDetailScreen({ route, navigation }) {
         <View style={newStyle.modalBackground}>
           <TouchableWithoutFeedback onPress={closeDownvoterModal}>
             <View style={[newStyle.modalContent,{ backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]}>
-              <Text style={newStyle.modalTitleText}>
+              <Text style={[newStyle.modalTitleText,{ color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>
                 {t('SCREENS.COMMUNITY.DOWNVOTERS')}
               </Text>
               <View>{renderVotersList(downvoters)}</View>
