@@ -1,6 +1,6 @@
 import 'react-native-url-polyfill/auto';
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, TextInput, Image, TouchableOpacity, Modal, TouchableWithoutFeedback, SafeAreaView } from 'react-native';
+import { View, Text, FlatList, TextInput, Image, TouchableOpacity, Modal, TouchableWithoutFeedback } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { useDarkMode } from '../../context/DarkModeContext';
 import { handleUpvote, handleDownvote, fetchPosts, createNewPost, handleFilePicker, deletePost, fetchCountries, fetchCitiesByCountry, fetchAttractionsByCity } from '../../backend/community';
@@ -164,7 +164,6 @@ export default function CommunityScreen({ navigation }) {
   };
 
   return (
-  <SafeAreaView style={{ flex: 1, backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }}>
     <View style={[newStyle.container, { backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]}>
       <FlatList
         data={posts}
@@ -176,7 +175,7 @@ export default function CommunityScreen({ navigation }) {
                 {item.users && item.users.anonymous ? (
                   <>
                     <Image source={require('../../assets/images/account.png')} style={newStyle.extraSmallProfileImage} />
-                    <Text style={[newStyle.boldTextBig, { color: isDarkMode ? '#FFFDF3' : '#18171c' }]}>Anonymous</Text>
+                    <Text style={[newStyle.boldTextBig, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>Anonymous</Text>
                   </>
                 ) : (
                   item.users && ( // Ensure item.users is defined
@@ -191,8 +190,7 @@ export default function CommunityScreen({ navigation }) {
 
             {item.users && item.users.username === user_username && (
               <TouchableOpacity onPress={() => confirmDeletePost(item.id)} style={newStyle.deleteButton}>
-            <Image source={require('../../assets/images/trash.png')} style={[newStyle.icon, { tintColor: isDarkMode ? '#18171c' : '#f8f8f8' }]} />
-
+                <Image source={require('../../assets/images/trash.png')} style={newStyle.icon} />
               </TouchableOpacity>
             )}
 
@@ -215,8 +213,8 @@ export default function CommunityScreen({ navigation }) {
                   {item.Attraction.Attraction_Name}
                 </Text>
               )}
-           <Image source={{ uri: item.image_url }} style={[newStyle.postImage, { borderColor: isDarkMode ? '#555' : '#CCC' }]} />
-           <Text style={[newStyle.postText, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>{item.content}</Text>
+              {item.image_url && <Image source={{ uri: item.image_url }} style={newStyle.postImage} />}
+              <Text style={[newStyle.postText, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>{item.content}</Text>
             </TouchableOpacity>
 
             <View style={newStyle.voteRow}>
@@ -230,7 +228,7 @@ export default function CommunityScreen({ navigation }) {
                 <TouchableOpacity onPress={() => handleDownvote(item.id, user.id, loadPosts)}>
                   <Image source={require('../../assets/images/thumbs-down.png')} style={newStyle.icon} />
                 </TouchableOpacity>
-                <Text style={[newStyle.voteCount, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>{item.upvotes}</Text>
+                <Text style={[newStyle.voteCount, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>{item.downvotes}</Text>
               </View>
             </View>
           </View>
@@ -242,8 +240,8 @@ export default function CommunityScreen({ navigation }) {
         ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
       />
 
-      <TouchableOpacity style={[newStyle.primaryButton, { backgroundColor: isDarkMode ? '#1E90FF' : '#3498DB' }]} onPress={() => setNewPostModalVisible(true)}>
-        <Text style={[newStyle.primaryButtonTextt, { color: isDarkMode ? '#FFF' : '#FFF' }]}>
+      <TouchableOpacity style={[newStyle.primaryButton, { backgroundColor: isDarkMode ? '#3498DB' : '#3498DB' }]} onPress={() => setNewPostModalVisible(true)}>
+        <Text style={[newStyle.primaryButtonText, { color: isDarkMode ? '#FFF' : '#FFF' }]}>
           {t('SCREENS.COMMUNITY.NEW_POST')}
         </Text>
       </TouchableOpacity>
@@ -253,8 +251,8 @@ export default function CommunityScreen({ navigation }) {
         <TouchableWithoutFeedback onPress={() => setNewPostModalVisible(false)}>
           <View style={newStyle.modalBackground}>
             <TouchableWithoutFeedback>
-              <View style={[newStyle.modalContent, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>
-                <Text style={[newStyle.modalTitleText, { color: isDarkMode ? '#18171c' : '#18171c' }]}>
+              <View style={newStyle.modalContent}>
+                <Text style={newStyle.modalTitleText}>
                   {t('SCREENS.COMMUNITY.CREATE_NEW_POST')}
                 </Text>
                 <TextInput
@@ -359,6 +357,5 @@ export default function CommunityScreen({ navigation }) {
         isLoading={loading}
       />
     </View>
-    </SafeAreaView>
   );
 }
