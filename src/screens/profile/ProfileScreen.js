@@ -277,6 +277,7 @@ export default function ProfileScreen() {
   };
   
   useEffect(() => {
+    console.log('ProfileScreen: ', user.id);
     if (!user || !user.id) return;
   
     const loadUserProfileData = async () => {

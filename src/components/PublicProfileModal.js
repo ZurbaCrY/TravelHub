@@ -66,8 +66,9 @@ const UserProfileModal = ({
 
   const handleFriendRequestRevoke = async () => {
     try {
-      await FriendService.respondToFriendRequest(requestId = friendshipState.request.friend_request_id, action = 'revoke');
-      setFriendshipState({ request: null });
+      console.error("Revoke friend request not implemented yet");
+      // await FriendService.respondToFriendRequest(requestId = friendshipState.request.friend_request_id, action = 'revoke');
+      // setFriendshipState({ request: null });
     } catch (error) {
       console.error('Failed to revoke friend request:', error);
     }

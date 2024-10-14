@@ -11,6 +11,8 @@ import { useLoading } from '../../context/LoadingContext.js'
 import { useAuth } from '../../context/AuthContext.js';
 import { getProfilePictureUrlByUserId } from '../../services/getProfilePictureUrlByUserId';
 import { useTranslation } from 'react-i18next';
+import FriendService from '../../services/friendService';
+import getUsernamesByUserIds from '../../services/getUsernamesByUserIds.js';
 
 const fetchFromSupabase = async (table, select, filters = []) => {
   let query = supabase.from(table).select(select);
@@ -96,6 +98,8 @@ export default function ChatListScreen({ navigation }) {
 
 
   const fetchUsers = async () => {
+    await FriendService.initialize();
+    const allFriends = await FriendService.getFriends();
     const allUsers = await fetchFromSupabase('users', 'user_id, username', [['neq', 'user_id', CURRENT_USER_ID]]);
     const existingChats = await fetchFromSupabase('chat_user', 'chat_id', [['eq', 'user_id', CURRENT_USER_ID]]);
 
@@ -109,8 +113,11 @@ export default function ChatListScreen({ navigation }) {
     const flattenedUserIds = existingChatUserIds.flat();
     setExistingChatUserIds(flattenedUserIds);
 
-    const availableUsers = allUsers.filter(user => !flattenedUserIds.includes(user.user_id));
-    setUsers(availableUsers);
+    const availableUsers = allFriends.filter(user => !flattenedUserIds.includes(user.friend_id));
+    const availableUserIds = availableUsers.map(user => user.friend_id);
+    const availableUsersWithUsername = await getUsernamesByUserIds(availableUserIds);
+    
+    setUsers(availableUsersWithUsername);
   };
 
   const getChatUsers = async (chatId) => {

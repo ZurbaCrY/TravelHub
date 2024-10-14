@@ -66,6 +66,21 @@ class FriendService {
       throw new Error("Fetch Friend Requests: Error fetching friend requests: " + error.message);
     }
 
+    this.friendRequests = {
+      received: {
+        pending: [],
+        accepted: [],
+        declined: [],
+        revoked: [],
+      },
+      sent: {
+        pending: [],
+        accepted: [],
+        declined: [],
+        revoked: [],
+      }
+    };
+
     data.forEach(req => {
       const type = req.receiver_id === this.user.id ? 'received' : 'sent';
       this.friendRequests[type][req.status].push(req);
@@ -213,7 +228,8 @@ class FriendService {
     return request;
   }
 
-  getFriends() {
+  async getFriends() {
+    await this.fetchFriends();
     return this.friends;
   }
 
