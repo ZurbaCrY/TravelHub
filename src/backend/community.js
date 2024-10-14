@@ -2,8 +2,8 @@ import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
 import { supabase } from '../services/supabase';
 import AuthService from '../services/auth'
-import { SUPABASE_URL } from '@env';
-
+import { EXPO_PUBLIC_SUPABASE_URL } from '@env';
+import { useAuth } from '../context/AuthContext';
 
 export const fetchAttractionsByCity = async (cityId) => {
   try {
@@ -116,7 +116,8 @@ export const fetchComments = async (postId) => {
         *,
         users (
           username,
-          profilepicture_url
+          profilepicture_url,
+          anonymous
         )
       `) 
       .eq('post_id', postId)
@@ -403,7 +404,8 @@ export const fetchPosts = async () => {
         timestamp, 
         users (
           username, 
-          profilepicture_url
+          profilepicture_url,
+          anonymous
         ),
         Country (
           Country_ID,
@@ -422,7 +424,7 @@ export const fetchPosts = async () => {
       .order('timestamp', { ascending: false });
 
     if (error) {
-      throw error;
+      throw new Error('Error fetching posts: ' + error.message);
     }
 
     return data;
@@ -432,11 +434,9 @@ export const fetchPosts = async () => {
   }
 };
 
-export const createNewPost = async (newPostContent, user_username, imageUrl, countryId, cityId, attractionId) => {  
+export const createNewPost = async (newPostContent, user_id, user_username, imageUrl, countryId, cityId, attractionId) => {  
    try {
     let uploadedImageUrl = null;
-    const CURRENT_USER = AuthService.getUser();
-    const CURRENT_USER_ID = CURRENT_USER.id;
 
     if (imageUrl) {
       // Lade das Bild hoch
@@ -464,7 +464,7 @@ export const createNewPost = async (newPostContent, user_username, imageUrl, cou
       }
 
       // Öffentliche URL
-      uploadedImageUrl = `${SUPABASE_URL}/storage/v1/object/public/Images/images/${fileName}`;
+      uploadedImageUrl = `${EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/Images/images/${fileName}`;
     }
 
     const { error: postError } = await supabase.from('posts').insert([{
@@ -473,7 +473,7 @@ export const createNewPost = async (newPostContent, user_username, imageUrl, cou
       image_url: uploadedImageUrl,
       upvotes: 0,
       downvotes: 0,
-      user_id: CURRENT_USER_ID,
+      user_id: user_id,
       country_id: countryId ? countryId : null,
       city_id: cityId ? cityId : null,
       attraction_id: attractionId ? attractionId : null
@@ -510,7 +510,7 @@ export const handleFilePicker = async () => {
 export const handleNewProfilePicture = async (imageUrl) => {
   try {
     let uploadedImageUrl = null;
-    const CURRENT_USER = AuthService.getUser();
+    const CURRENT_USER = await AuthService.getUser();
     const CURRENT_USER_ID = CURRENT_USER.id;
 
     if (imageUrl) {
@@ -539,7 +539,7 @@ export const handleNewProfilePicture = async (imageUrl) => {
       }
 
       // Öffentliche URL
-      uploadedImageUrl = `${SUPABASE_URL}/storage/v1/object/public/Images/profilepictures/${fileName}`;
+      uploadedImageUrl = `${EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/Images/profilepictures/${fileName}`;
     }
 
     const { error: updateError } = await supabase

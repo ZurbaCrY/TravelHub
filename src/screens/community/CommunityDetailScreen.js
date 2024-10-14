@@ -6,9 +6,11 @@ import { useAuth } from '../../context/AuthContext';
 import PublicProfileModal from '../../components/PublicProfileModal';
 import { useLoading } from '../../context/LoadingContext';
 import { getUserStats } from '../../services/getUserStats';
+import { useTranslation } from 'react-i18next';
 import { useDarkMode } from '../../context/DarkModeContext';
 
 export default function CommunityDetailScreen({ route, navigation }) {
+  const { t } = useTranslation();
   const { post } = route.params;
   const { user } = useAuth();
   const [refreshing, setRefreshing] = useState(false);
@@ -70,7 +72,7 @@ export default function CommunityDetailScreen({ route, navigation }) {
       const commentsData = await fetchComments(post.id);
       setComments(commentsData);
     } catch (error) {
-      console.error('Error fetching posts: ', error);
+      console.error('Error loading posts: ', error);
     } finally {
       setRefreshing(false);
     }
@@ -125,7 +127,7 @@ export default function CommunityDetailScreen({ route, navigation }) {
 
   const handleUserPress = async (item) => {
     try {
-      showLoading("Loading User Data");
+      showLoading(t('LOADING_MESSAGE.USER'));
       const stats = await getUserStats(user_id = item.user_id);
       const selectedUserData = {
         user_id: item.user_id,
@@ -147,7 +149,7 @@ export default function CommunityDetailScreen({ route, navigation }) {
 
   const handleFriendRequestPress = async () => {
     try {
-      showLoading("Sending Friend Request");
+      showLoading(t('LOADING_MESSAGE.FRIEND_REQUEST'));
       await friendService.sendFriendRequest(selectedUser.user_id);
     } catch (error) {
       console.error('Error sending friend request:', error);
@@ -178,73 +180,124 @@ export default function CommunityDetailScreen({ route, navigation }) {
               {/* Username and Profilepicture */}
               <TouchableOpacity onPress={() => handleUserPress(postData)}>
                 <View style={newStyle.postHeader}>
-                  <Image source={{ uri: postData.users.profilepicture_url }} style={newStyle.extraSmallProfileImage} />
-                  <Text style={[newStyle.boldTextBig, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>{postData.users.username}</Text>
+                  {postData.users.anonymous ? (
+                    <>
+                      <Image
+                        source={require('../../assets/images/account.png')}
+                        style={newStyle.extraSmallProfileImage}
+                      />
+                      <Text style={newStyle.boldTextBig}>Anonymous</Text>
+                    </>
+                  ) : (
+                    <>
+                      <Image
+                        source={{ uri: postData.users.profilepicture_url }}
+                        style={newStyle.extraSmallProfileImage}
+                      />
+                      <Text style={[newStyle.boldTextBig, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>{postData.users.username}</Text>
+                    </>
+                  )}
                 </View>
               </TouchableOpacity>
+  
               {/* Delete Button if the post belongs to the logged-in user */}
               {postData.users.username === user.user_metadata.username && (
-                <TouchableOpacity style={newStyle.deleteButton} onPress={() => openDeleteModal(postData.id)}>
-                   <Image source={require('../../assets/images/trash.png')} style={[newStyle.icon, { tintColor: isDarkMode ? '#FFFDF3' : '#000' }]} />
+                <TouchableOpacity
+                  style={newStyle.deleteButton}
+                  onPress={() => openDeleteModal(postData.id)}
+                >
+                  <Image
+                    source={require('../../assets/images/trash.png')}
+                    style={newStyle.icon}
+                  />
                 </TouchableOpacity>
               )}
             </View>
+  
+            {/* Country, City, Attraction Info */}
             {postData.Country && (
               <Text style={[newStyle.countryText, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>
-                <Image source={require('../../assets/images/globus.png')} style={{ width: 20, height: 20 }} />
+                <Image
+                  source={require('../../assets/images/globus.png')}
+                  style={{ width: 20, height: 20 }}
+                />
                 {postData.Country.Countryname}
               </Text>
             )}
             {postData.City && (
-               <Text style={[newStyle.cityText, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>
-                <Image source={require('../../assets/images/city.png')} style={{ width: 20, height: 20 }} />
+              <Text style={[newStyle.cityText, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>
+                <Image
+                  source={require('../../assets/images/city.png')}
+                  style={{ width: 20, height: 20 }}
+                />
                 {postData.City.Cityname}
               </Text>
             )}
             {postData.Attraction && (
               <Text style={[newStyle.cityText, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>
-                <Image source={require('../../assets/images/attractions/attraction.png')} style={{ width: 20, height: 20 }} />
+                <Image
+                  source={require('../../assets/images/attractions/attraction.png')}
+                  style={{ width: 20, height: 20 }}
+                />
                 {postData.Attraction.Attraction_Name}
               </Text>
             )}
+  
+            {/* Post Image and Content */}
             {postData.image_url && (
-              <Image source={{ uri: postData.image_url }} style={[newStyle.postImage, { borderColor: isDarkMode ? '#555' : '#CCC' }]} />
+              <Image
+                source={{ uri: postData.image_url }}
+                style={newStyle.postImage}
+              />
             )}
-            <Text style={[newStyle.bodyText, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>{postData.content}</Text>
+            <Text style={newStyle.bodyText}>{postData.content}</Text>
+  
             {/* Upvotes and Downvotes Section */}
             <View style={newStyle.voteRow}>
               <View style={newStyle.voteContainer}>
-                <TouchableOpacity onPress={() => handleUpvote(postData.id, user.id, loadPosts)}>
-                  <Image source={require('../../assets/images/thumbs-up.png')} style={[newStyle.icon]} />
+                <TouchableOpacity
+                  onPress={() => handleUpvote(postData.id, user.id, loadPosts)}
+                >
+                  <Image
+                    source={require('../../assets/images/thumbs-up.png')}
+                    style={newStyle.icon}
+                  />
                 </TouchableOpacity>
                 <TouchableOpacity onPress={openUpvoterModal}>
-                <Text style={[newStyle.voteCount, { color: isDarkMode ? '#CCCCCC' : '#555555' }]}>{postData.upvotes} Upvotes</Text>
+                  <Text style={[newStyle.voteCount, { color: isDarkMode ? '#CCCCCC' : '#555555' }]}>
+                    {postData.upvotes}
+                    {t('SCREENS.COMMUNITY.UPVOTES')}
+                  </Text>
                 </TouchableOpacity>
               </View>
               <View style={newStyle.voteContainer}>
-                <TouchableOpacity onPress={() => handleDownvote(postData.id, user.id, loadPosts)}>
-                  <Image source={require('../../assets/images/thumbs-down.png')} style={[newStyle.icon]} />
+                <TouchableOpacity
+                  onPress={() => handleDownvote(postData.id, user.id, loadPosts)}
+                >
+                  <Image
+                    source={require('../../assets/images/thumbs-down.png')}
+                    style={newStyle.icon}
+                  />
                 </TouchableOpacity>
                 <TouchableOpacity onPress={openDownvoterModal}>
-                <Text style={[newStyle.voteCount, { color: isDarkMode ? '#CCCCCC' : '#555555' }]}>{postData.downvotes} Downvotes</Text>
+                  <Text style={[newStyle.voteCount, { color: isDarkMode ? '#CCCCCC' : '#555555' }]}>
+                    {postData.downvotes}
+                    {t('SCREENS.COMMUNITY.DOWNVOTES')}
+                  </Text>
                 </TouchableOpacity>
               </View>
             </View>
   
-            {/* Upvoters Dropdown */}
+            {/* Voters List */}
             {showUpvoters && (
-              <View style={[newStyle.updropdown, { backgroundColor: isDarkMode ? '#333' : '#FFF' }]}>
-                {renderVotersList(upvoters)}
-              </View>
+              <View style={[newStyle.updropdown, { backgroundColor: isDarkMode ? '#333' : '#FFF' }]}>{renderVotersList(upvoters)}</View>
             )}
-  
-            {/* Downvoters Dropdown */}
             {showDownvoters && (
               <View style={[newStyle.downdropdown, { backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]}>
                 {renderVotersList(downvoters)}
               </View>
             )}
-
+  
             {/* Comments Section */}
             <View style={[newStyle.commentSection, { backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]}>
               <TextInput
@@ -255,11 +308,14 @@ export default function CommunityDetailScreen({ route, navigation }) {
                 onChangeText={setNewComment}
               />
               <TouchableOpacity onPress={handleSubmitComment}>
-                <Image source={require('../../assets/images/message_send.png')} style={{ width: 50, height: 50, tintColor: isDarkMode ? '#FFFDF3' : '#000' }} />
+                <Image
+                  source={require('../../assets/images/message_send.png')}
+                  style={{ width: 50, height: 50 }}
+                />
               </TouchableOpacity>
             </View>
   
-            {/* Comments List */}
+            {/* Display Comments */}
             <FlatList
               data={comments}
               keyExtractor={(item) => item.id.toString()}
@@ -267,8 +323,21 @@ export default function CommunityDetailScreen({ route, navigation }) {
                 <View style={[newStyle.commentItem, { backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]}>
                   <TouchableOpacity onPress={() => handleUserPress(item)}>
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                      <Image source={{ uri: item.users.profilepicture_url }} style={newStyle.commentProfileImage} />
-                      <Text style={[newStyle.commentUsername, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>{item.users.username}:</Text>
+                      {item.users.anonymous ? (
+                        <Image
+                          source={require('../../assets/images/account.png')}
+                          style={newStyle.commentProfileImage}
+                        />
+                      ) : (
+                        <Image
+                          source={{ uri: item.users.profilepicture_url }}
+                          style={newStyle.commentProfileImage}
+                        />
+                      )}
+                      <Text style={[newStyle.commentUsername, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>
+                        {item.users.anonymous ? 'Anonymous' : item.users.username}
+                        :
+                      </Text>
                     </View>
                   </TouchableOpacity>
                   <Text style={[newStyle.commentText, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}> {item.content}
@@ -280,7 +349,7 @@ export default function CommunityDetailScreen({ route, navigation }) {
           </>
         )}
       />
-
+  
       {/* Modal for Delete Confirmation */}
       <Modal
         transparent={true}
@@ -290,30 +359,28 @@ export default function CommunityDetailScreen({ route, navigation }) {
       >
         <View style={newStyle.modalBackground}>
           <TouchableWithoutFeedback>
-          <View style={[newStyle.modalContent, { backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]}>
-          <Text style={[newStyle.modalTitleText, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>Confirm Delete</Text>
+            <View style={[newStyle.modalContent, { backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]}>
+              <Text style={[newStyle.modalTitleText, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>{t('CONFIRM_DELETE')}</Text>
               <View style={newStyle.row}>
-                <TouchableOpacity style={newStyle.averageRedButton} onPress={() => setModalVisible(false)}>
-                  <Text style={newStyle.smallButtonText}>Cancel</Text>
+                <TouchableOpacity
+                  style={newStyle.averageRedButton}
+                  onPress={() => setModalVisible(false)}
+                >
+                  <Text style={newStyle.smallButtonText}>{t('CANCEL')}</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={newStyle.averageBlueButton} onPress={handleDeletePost}>
-                  <Text style={newStyle.smallButtonText}>Delete</Text>
+                <TouchableOpacity
+                  style={newStyle.averageBlueButton}
+                  onPress={handleDeletePost}
+                >
+                  <Text style={newStyle.smallButtonText}>{t('DELETE')}</Text>
                 </TouchableOpacity>
               </View>
             </View>
           </TouchableWithoutFeedback>
         </View>
       </Modal>
-      < PublicProfileModal
-        isVisible={userProfileModal}
-        onClose={() => setUserProfileModal(false)}
-        user={selectedUser}
-        onFriendRequestPress={handleFriendRequestPress}
-        isLoading={loading}
-      />
-
-
-      {/* Modal für Upvoter */}
+  
+      {/* Modal for Upvoters */}
       <Modal
         transparent={true}
         animationType="slide"
@@ -324,21 +391,21 @@ export default function CommunityDetailScreen({ route, navigation }) {
           <TouchableWithoutFeedback onPress={closeUpvoterModal}>
             <View style={newStyle.modalContent}>
               <Text style={newStyle.modalTitleText}>Upvoters</Text>
-              <View>
-                {renderVotersList(upvoters)}
-              </View>
+              <View>{renderVotersList(upvoters)}</View>
               <View style={newStyle.row}>
-                <TouchableOpacity style={[newStyle.averageRedButton, { width: '100%' }]} onPress={closeUpvoterModal}>
-                  <Text style={newStyle.smallButtonText}>Back</Text>
+                <TouchableOpacity
+                  style={[newStyle.averageRedButton, { width: '100%' }]}
+                  onPress={closeUpvoterModal}
+                >
+                  <Text style={newStyle.smallButtonText}>{t('BACK')}</Text>
                 </TouchableOpacity>
               </View>
             </View>
           </TouchableWithoutFeedback>
         </View>
       </Modal>
-
-
-      {/* Modal für Downvoter */}
+  
+      {/* Modal for Downvoters */}
       <Modal
         transparent={true}
         animationType="slide"
@@ -348,13 +415,16 @@ export default function CommunityDetailScreen({ route, navigation }) {
         <View style={newStyle.modalBackground}>
           <TouchableWithoutFeedback onPress={closeDownvoterModal}>
             <View style={newStyle.modalContent}>
-              <Text style={newStyle.modalTitleText}>Downvoters</Text>
-              <View>
-                {renderVotersList(downvoters)}
-              </View>
+              <Text style={newStyle.modalTitleText}>
+                {t('SCREENS.COMMUNITY.DOWNVOTERS')}
+              </Text>
+              <View>{renderVotersList(downvoters)}</View>
               <View style={newStyle.row}>
-                <TouchableOpacity style={[newStyle.averageRedButton, { width: '100%' }]} onPress={closeUpvoterModal}>
-                  <Text style={newStyle.smallButtonText}>Back</Text>
+                <TouchableOpacity
+                  style={[newStyle.averageRedButton, { width: '100%' }]}
+                  onPress={closeDownvoterModal}
+                >
+                  <Text style={newStyle.smallButtonText}>{t('BACK')}</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -362,6 +432,6 @@ export default function CommunityDetailScreen({ route, navigation }) {
         </View>
       </Modal>
     </View>
-  </SafeAreaView>
-  );
+    </SafeAreaView>
+  );  
 }

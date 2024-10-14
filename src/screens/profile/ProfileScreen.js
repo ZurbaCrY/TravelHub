@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import {
   View,
   Text,
@@ -9,8 +10,10 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
   Modal,
-  FlatList
+  FlatList,
+  RefreshControl
 } from 'react-native';
+import ExtendedModal from "react-native-modal";
 import Flag from 'react-native-flags';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useDarkMode } from '../../context/DarkModeContext';
@@ -29,14 +32,19 @@ import {
   addWishListCountry,
   removeWishListCountry,
 } from '../../backend/Profile';
-import friendService from '../../services/friendService';
+import FriendService from '../../services/friendService';
+import UserDataHandler from '../../services/userDataHandler';
 import getUsernamesByUserIds from '../../services/getUsernamesByUserIds'
 import { getUserStats } from '../../services/getUserStats';
 import { useAuth } from '../../context/AuthContext';
 import { useLoading } from '../../context/LoadingContext';
 import PublicProfileModal from '../../components/PublicProfileModal';
+import { handleFilePicker, handleNewProfilePicture } from '../../backend/community';
+import { FontAwesome5 } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 
 export default function ProfileScreen() {
+  const { t } = useTranslation();
   const { isDarkMode } = useDarkMode();
   const [visitedCountries, setVisitedCountries] = useState([]);
   const [wishListCountries, setWishListCountries] = useState([]);
@@ -54,27 +62,33 @@ export default function ProfileScreen() {
   const { showLoading, hideLoading } = useLoading();
   const [userProfileModal, setUserProfileModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [requestModalVisible, setRequestModalVisible] = useState(false);
+  const [friendRequests, setFriendRequests] = useState([]);
+  const [userData, setUserData] = useState(null);
+  const [imageUrl, setImageUrl] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [isProfileLoaded, setIsProfileLoaded] = useState(false);
 
   const navigation = useNavigation();
+
 
   useEffect(() => {
     if (!user || !user.id) return; // Exit if user is not yet defined or has no id
 
     const fetchProfilePictureUrl = async () => {
       try {
-        showLoading("Fetching Profile Picture");
+        showLoading(t('LOADING_MESSAGE.PROFILE_PICTURE'));
         const url = await getProfilePictureUrlByUserId(user.id);
         setProfilePictureUrl(url);
       } catch (error) {
         console.error("Error fetching Profile Picture URL:", error);
-      } finally {
-        hideLoading();
       }
     };
 
-    const fetchProfileData = async () => {
+    const fetchUserStats = async () => {
       try {
-        showLoading("Fetching User Stats");
+        showLoading(t('LOADING_MESSAGE.USER_STATS'));
         const visitedCountriesData = await fetchVisitedCountries(user.id);
         setVisitedCountries(visitedCountriesData);
 
@@ -82,7 +96,7 @@ export default function ProfileScreen() {
         setWishListCountries(wishListCountriesData);
 
         // Fetch travel buddies
-        const travelBuddiesData = await friendService.getFriends();
+        const travelBuddiesData = await FriendService.getFriends();
         const travelBuddiesIds = travelBuddiesData.map(buddy => buddy.friend_id);
         const travelBuddiesNames = await getUsernamesByUserIds(travelBuddiesIds);
         setTravelBuddies(travelBuddiesNames);
@@ -94,14 +108,65 @@ export default function ProfileScreen() {
         setDownvoteCount(stats.downvoteCount);
       } catch (error) {
         console.error('Error fetching profile data:', error);
-      } finally {
-        hideLoading();
       }
     };
 
-    fetchProfilePictureUrl();
-    fetchProfileData();
+    const fetchRequests = async () => {
+      try {
+        const requests = await FriendService.getIncomingRequests(pending = true, accepted = false, declined = false, revoked = false);
+        const senderIds = requests.map(request => request.sender_id);
+        const senderUsernames = await getUsernamesByUserIds(senderIds);
+        const requestsWithUsernames = requests.map((request, index) => ({
+          friend_request_id: request.friend_request_id,
+          sender_id: request.sender_id,
+          sender_username: senderUsernames[index].username
+        }));
+        setFriendRequests(requestsWithUsernames);
+      } catch (error) {
+        console.error('Error fetching friend requests:', error);
+      }
+    };
+
+    const fetchUserData = async () => {
+      try {
+        showLoading(t('LOADING_MESSAGE.USER_DATA'));
+        const fetcheduserData = await UserDataHandler.getUserData(user.id);
+        setUserData(fetcheduserData);
+      } catch (error) {
+        console.error('ProfileScreen: Error fetching user data:', error);
+      }
+    };
+
+
+    try {
+      showLoading(t('LOADING_MESSAGE.PROFILE'));
+      fetchProfilePictureUrl();
+      fetchUserStats();
+      fetchRequests();
+      fetchUserData();
+    } catch (error) {
+      console.error('Error fetching profile data:', error);
+    } finally {
+      hideLoading();
+    }
   }, [user]);
+
+  const reloadUserData = async () => {
+    try {
+      const fetcheduserData = await UserDataHandler.getUserData(user.id);
+      setUserData(fetcheduserData);
+    } catch (error) {
+      console.error('ProfileScreen: Error fetching user data:', error);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      if (user && user.id) {
+        reloadUserData();
+      }
+    }, [user])
+  );
 
   const handleAddVisitedCountry = async () => {
     if (newVisited) {
@@ -169,6 +234,12 @@ export default function ProfileScreen() {
     }
   };
 
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchProfileData(); // Call this to refresh profile data as well
+    setRefreshing(false);
+  };
+
   const handleRemoveWishListCountry = async (index) => {
     const updatedCountries = [...wishListCountries];
     updatedCountries.splice(index, 1);
@@ -187,7 +258,7 @@ export default function ProfileScreen() {
 
   const handleUserPress = async (item) => {
     try {
-      showLoading("Loading User Stats");
+      showLoading('LOADING_MESSAGE.USER');
       const stats = await getUserStats(item.user_id);
       const profilePictureUrl = await getProfilePictureUrlByUserId(item.user_id);
       const selectedUserData = {
@@ -210,8 +281,8 @@ export default function ProfileScreen() {
 
   const handleFriendRequestPress = async () => {
     try {
-      showLoading("Sending Friend Request");
-      await friendService.sendFriendRequest(selectedUser.user_id);
+      showLoading(t('LOADING_MESSAGE.FRIEND_REQUEST_SEND'));
+      await FriendService.sendFriendRequest(selectedUser.user_id);
     } catch (error) {
       console.error('Error sending friend request:', error);
     } finally {
@@ -219,50 +290,149 @@ export default function ProfileScreen() {
     }
   }
 
+  const handleRequestButtonPress = async () => {
+    try {
+      showLoading(t('LOADING_MESSAGE.FRIEND_REQUEST'));
+      setRequestModalVisible(true);
+    } catch (error) {
+      console.error('Error navigating to friend requests:', error);
+    } finally {
+      hideLoading();
+    }
+  }
+
+  const respondToFriendRequest = async (requestId, action) => {
+    try {
+      if (action === "accept") {
+        showLoading(t('LOADING_MESSAGE.FRIEND_REQUEST_ACCEPT'));
+      } else if (action === "decline") {
+        showLoading(t('LOADING_MESSAGE.FRIEND_REQUEST_DECLINE'));
+      } else {
+        console.error('Invalid action:', action);
+        return;
+      }
+      await FriendService.respondToFriendRequest(requestId, action);
+      setFriendRequests(friendRequests.filter(request => request.friend_request_id !== requestId));
+    } catch (error) {
+      console.error('Error responding to friend request:', error);
+    } finally {
+      hideLoading();
+    }
+  }
+
+  const handleImageChange = async () => {
+    const image = await handleFilePicker();
+    if (image) {
+      setImageUrl(image);
+      setModalVisible(true);
+    }
+  };
+
   return (
-    <View style={[newStyle.container, { backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]}>
+    <View style={[newStyle.centeredContainer, { backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]}>
       <TouchableWithoutFeedback onPress={() => {
         // Close the keyboard when the user taps outside of the input fields
         Keyboard.dismiss();
         setShowVisitedInput(false);
         setShowWishListInput(false);
       }}>
-        <ScrollView style={[newStyle.container, { backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]}>
+        <ScrollView
+          style={[newStyle.container, { backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }>
           <View style={[newStyle.centeredContainer, { backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]}>
-            <Image
-              source={{ uri: profilePictureUrl }}
-              style={newStyle.largeProfileImage}
-            />
+
+            <View style={newStyle.roundButtonContainerTopRight}>
+              {/* Settings Button */}
+              <View style={newStyle.roundButtonWrapper}>
+                <TouchableOpacity style={newStyle.roundButtonAbsolute} onPress={() => navigation.navigate('Settings')}>
+                  <FontAwesome5 name="cog" size={20} color={isDarkMode ? '#070A0F' : '#f8f8f8'} />
+                </TouchableOpacity>
+              </View>
+
+              {/* Edit Profile Button */}
+              <View style={newStyle.roundButtonWrapper}>
+                <TouchableOpacity style={newStyle.roundButtonAbsolute} onPress={() => navigation.navigate('EditProfile')}>
+                  <FontAwesome5 name="edit" size={20} color={isDarkMode ? '#070A0F' : '#f8f8f8'} />
+                </TouchableOpacity>
+              </View>
+
+              {/* Friend Request Button */}
+              <View style={newStyle.roundButtonWrapper}>
+                <TouchableOpacity style={newStyle.roundButtonAbsolute} onPress={handleRequestButtonPress}>
+                  {friendRequests.length > 0 && (
+                    <View style={newStyle.notificationCircle}>
+                      <Text style={newStyle.notificationText}>{friendRequests.length < 10 ? friendRequests.length : '9+'}</Text>
+                    </View>
+                  )}
+                  <FontAwesome5 name="user-plus" size={20} color={isDarkMode ? '#070A0F' : '#f8f8f8'} />
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* Profile Picture, Username, Email, Birthday, Country */}
+            <TouchableOpacity onPress={handleImageChange}>
+              <Image
+                source={{ uri: profilePictureUrl }}
+                style={newStyle.largeProfileImage}
+              />
+            </TouchableOpacity>
             <Text style={[newStyle.titleText, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>{user.user_metadata.username}</Text>
-            <Text style={[newStyle.bodyText, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>{user.email}</Text>
+
+            {/* Bio */}
+            <Text style={[newStyle.bodyTextBig, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>
+              {userData && userData.bio ? '"' + userData.bio + '"' :  t('SCREENS.PROFILE.NO_BIO') }
+            </Text>
+
+
+            {/* Email */}
+            <Text style={[newStyle.bodyText, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>
+              {userData && userData.email ? userData.email : t('SCREENS.PROFILE.NO_EMAIL')}
+            </Text>
 
             {/* Birthday */}
             <View style={newStyle.row}>
               <Icon name="birthday-cake" size={14} style={[newStyle.marginRightExtraSmall, { color: isDarkMode ? '#FFFDF3' : '#000000' }]} />
-              <Text style={[newStyle.bodyText, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>
-                {user.user_metadata.birthday ? user.user_metadata.birthday : 'No birthdate configured'}
+              <Text style={[newStyle.bodyText, { color: isDarkMode ? '#FFFDF3' : '#000000' }]}>
+                {userData && userData.birthdate ? new Date(userData.birthdate).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' }) : t('SCREENS.PROFILE.NO_BIRTHDATE')}
               </Text>
             </View>
 
-            {/* Flag */}
-            <View style={newStyle.row}>
-              <Flag code="DE" size={16} style={newStyle.marginRightExtraSmall} />
-              <Text style={[newStyle.bodyText, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>Deutschland</Text>
-            </View>
+            {/* Flag & Home Country */}
+            {userData && userData.country.home_country && userData.country.home_country_code ?
+              <View style={newStyle.row}>
+                <Flag code={userData.country.home_country_code} size={16} style={newStyle.marginRightExtraSmall} />
+                <Text style={[newStyle.bodyText, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>
+                  {userData.country.home_country}
+                </Text>
+              </View> :
+              <View style={newStyle.row}>
+                <Flag code="DE" size={16} style={newStyle.marginRightExtraSmall} />
+                <Text style={[newStyle.bodyText, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>
+                  {t('SCREENS.PROFILE.NO_COUNTRY')}
+                </Text>
+              </View>
+            }
+
           </View>
 
-          {/* User Stats Section */}
+          {/* User Stats */}
           <View style={newStyle.userStatsContainer}>
             {/* Row 1: Friends and Posts */}
             <View style={newStyle.userStatsRow}>
               <View style={newStyle.userStatColumn}>
                 <TouchableOpacity onPress={() => setTravelBuddiesModalVisible(true)} style={[{ justifyContent: 'center', alignItems: 'center' }]}>
-                  <Text style={[newStyle.userStatLabel, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>Travel-Buddies</Text>
+                  <Text style={[newStyle.userStatLabel, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>
+                    {t('SCREENS.PROFILE.TRAVEL_BUDDIES')}
+                  </Text>
                   <Text style={[newStyle.userStatValue, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>{travelBuddies.length != null ? travelBuddies.length : 'N/A'}</Text>
                 </TouchableOpacity>
               </View>
-              <View style={newStyle.userStatColumn}>
-                <Text style={[newStyle.userStatLabel, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>Posts</Text>
+              <View style={[newStyle.userStatColumn, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>
+                <Text style={[newStyle.userStatLabel, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>
+                  {t('SCREENS.PROFILE.POSTS')}
+                </Text>
                 <Text style={[newStyle.userStatValue, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>{postCount != null ? postCount : 'N/A'}</Text>
               </View>
             </View>
@@ -270,19 +440,29 @@ export default function ProfileScreen() {
             {/* Row 2: Upvotes and Downvotes */}
             <View style={newStyle.userStatsRow}>
               <View style={newStyle.userStatColumn}>
-                <Text style={[newStyle.userStatLabel, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>Upvotes</Text>
+                <Text style={[newStyle.userStatLabelatLabel, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>
+                  {t('SCREENS.PROFILE.UPVOTES')}
+                </Text>
                 <Text style={[newStyle.userStatValue, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>{upvoteCount != null ? upvoteCount : 'N/A'}</Text>
               </View>
               <View style={newStyle.userStatColumn}>
-                <Text style={[newStyle.userStatLabel, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>Downvotes</Text>
+                <Text style={[newStyle.userStatLabel, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>
+                  {t('SCREENS.PROFILE.DOWNVOTES')}
+                </Text>
                 <Text style={[newStyle.userStatValue, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>{downvoteCount != null ? downvoteCount : 'N/A'}</Text>
               </View>
             </View>
           </View>
+
+          {/* Visited and Wish List Countries */}
           <View style={newStyle.infoSection}>
-            <Text style={newStyle.header}>Bereits besuchte Länder:</Text>
+            <Text style={newStyle.header}>
+              {t('SCREENS.PROFILE.VISITED_COUNTRIES')}
+            </Text>
             {visitedCountries.length === 0 ? (
-              <Text style={newStyle.details}>Keine besuchten Länder hinzugefügt</Text>
+              <Text style={newStyle.details}>
+                {t('SCREENS.PROFILE.NO_VISITED_COUNTRIES')}
+              </Text>
             ) : (
               visitedCountries.map((country, index) => (
                 <View key={index} style={styles.countryItem}>
@@ -302,24 +482,32 @@ export default function ProfileScreen() {
                   style={styles.input}
                   onChangeText={setNewVisited}
                   value={newVisited}
-                  placeholder="Neues Ziel hinzufügen"
-                  placeholderTextColor={isDarkMode ? '#18171c' : '#18171c'} // Hellere Farben für bessere Lesbarkeit
+                  placeholder={t('SCREENS.PROFILE.ADD_VISITED_COUNTRY')}
+                  placeholderTextColor={isDarkMode ? '#18171c' : '#18171c'} 
                 />
-                <Button onPress={handleAddVisitedCountry} color="#f8f8f8">Hinzufügen</Button>
+                <Button onPress={handleAddVisitedCountry} color="#f8f8f8">
+                  {t('ADD')}
+                </Button>
               </>
             )}
             {!showVisitedInput && (
               <TouchableOpacity onPress={() => setShowVisitedInput(true)} style={styles.addButton}>
                 <Icon name="plus" size={20} color="#f8f8f8" />
-                <Text style={styles.addButtonText}> Besuchtes Land hinzufügen</Text>
+                <Text style={styles.addButtonText}>
+                  {t('SCREENS.PROFILE.ADD_VISITED_COUNTRY')}
+                </Text>
               </TouchableOpacity>
             )}
           </View>
 
           <View style={styles.infoSection}>
-            <Text style={[styles.header, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>Wunschreiseziele:</Text>
+            <Text style={[styles.header, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>
+              {t('SCREENS.PROFILE.WISHLIST_COUNTRIES')}
+            </Text>
             {wishListCountries.length === 0 ? (
-              <Text style={styles.details}>Keine Wunschziele hinzugefügt</Text>
+              <Text style={styles.details}>
+                {t('SCREENS.PROFILE.NO_WISHLIST_COUNTRIES')}
+              </Text>
             ) : (
               wishListCountries.map((country, index) => (
                 <View key={index} style={styles.countryItem}>
@@ -336,27 +524,70 @@ export default function ProfileScreen() {
                   style={styles.input}
                   onChangeText={setNewWishList}
                   value={newWishList}
-                  placeholder="Neues Wunschland hinzufügen"
-                  placeholderTextColor={isDarkMode ? '#18171c' : '#18171c'} //Hellere Farben für bessere Lesbarkeit
+                  placeholder={t('SCREENS.PROFILE.ADD_WISHLIST_COUNTRY')}
+                  placeholderTextColor={isDarkMode ? '#18171c' : '#18171c'}
                 />
-                <Button onPress={handleAddWishListCountry} color="#f8f8f8">Hinzufügen</Button>
+                <Button onPress={handleAddWishListCountry} color="#f8f8f8">
+                  {t('ADD')}
+                </Button>
               </>
             )}
             {!showWishListInput && (
               <TouchableOpacity onPress={() => setShowWishListInput(true)} style={styles.addButton}>
                 <Icon name="plus" size={20} color="#f8f8f8" />
-                <Text style={styles.addButtonText}> Wunschland hinzufügen</Text>
+                <Text style={styles.addButtonText}>
+                  {t('SCREENS.PROFILE.ADD_WISHLIST_COUNTRY')}
+                </Text>
               </TouchableOpacity>
             )}
           </View>
 
-          <View style={[styles.infoSection, { backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]}>
-            <CustomButton
-              title={"Zu den Einstellungen"}
-              onPress={() => navigation.navigate('Settings')}
-            />
-          </View>
+          {/* Placeholder for the bottom of the screen */}
+          <View style={[styles.infoSection, { backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]} />
+          {/* Modal für die Bildvorschau */}
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => {
+              setModalVisible(!modalVisible);
+            }}
+          >
+            <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
+              <View style={newStyle.modalBackground}>
+                <TouchableWithoutFeedback>
+                  <View style={newStyle.modalContent}>
+                    <Text style={newStyle.modalTitleText}>
+                      {t('SCREENS.PROFILE.CHANGE_PROFILE_PICTURE')}
+                    </Text>
 
+                    {imageUrl && (
+                      <Image source={{ uri: imageUrl }} style={newStyle.postImage} />
+                    )}
+                    <View style={styles.row}>
+
+                      <TouchableOpacity style={newStyle.averageRedButton} onPress={() => setModalVisible(false)}>
+                        <Text style={newStyle.smallButtonText}>
+                          {t('CLOSE')}
+                        </Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={newStyle.averageBlueButton}
+                        onPress={async () => {
+                          const success = await handleNewProfilePicture(imageUrl);
+                          setModalVisible(false);
+                        }}
+                      >
+                        <Text style={newStyle.smallButtonText}>
+                          {t('POST')}
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </TouchableWithoutFeedback>
+              </View>
+            </TouchableWithoutFeedback>
+          </Modal>
           {/* Travel Buddies Modal */}
           <Modal
             animationType="slide"
@@ -374,9 +605,13 @@ export default function ProfileScreen() {
                     </TouchableOpacity>
 
                     {/* Travel Buddies listed */}
-                    <Text style={newStyle.modalTitleText}>Travel Buddies</Text>
+                    <Text style={newStyle.modalTitleText}>
+                      {t('SCREENS.PROFILE.TRAVEL_BUDDIES')}
+                    </Text>
                     {travelBuddies.length === 0 ? (
-                      <Text style={newStyle.bodyText}>You have no travel buddies yet.</Text>
+                      <Text style={newStyle.bodyText}>
+                        {t('SCREENS.PROFILE.NO_TRAVEL_BUDDIES')}
+                      </Text>
                     ) : (
                       <FlatList
                         data={travelBuddies}
@@ -395,9 +630,63 @@ export default function ProfileScreen() {
               </View>
             </TouchableWithoutFeedback>
           </Modal>
-
         </ScrollView>
       </TouchableWithoutFeedback>
+
+      {/* Friend Requests */}
+      <ExtendedModal
+        isVisible={requestModalVisible}
+        onBackdropPress={() => setRequestModalVisible(false)}
+        onBackButtonPress={() => setRequestModalVisible(false)}
+        animationIn="slideInRight"
+        animationOut="slideOutRight"
+        backdropOpacity={0.5}
+        style={newStyle.friendRequestModal}
+      >
+        <View style={newStyle.container}>
+          <Text style={newStyle.titleText}>
+            {t('FRIENDS.REQUESTS.FRIEND_REQUESTS')}
+          </Text>
+          {friendRequests.length === 0 ? (
+            <Text style={newStyle.bodyText}>
+              {t('FRIENDS.REQUESTS.NO_FRIEND_REQUESTS')}
+            </Text>
+          ) : (
+            <FlatList
+              data={friendRequests}
+              keyExtractor={(item) => item.friend_request_id}
+              renderItem={({ item }) => (
+                <View style={newStyle.containerRow}>
+                  <TouchableOpacity
+                    style={newStyle.containerNoMarginTop}
+                    onPress={() => handleUserPress({ user_id: item.sender_id, username: item.sender_username })}
+                  >
+                    <Text style={newStyle.bodyText}>{item.sender_username}</Text>
+                  </TouchableOpacity>
+                  <View style={newStyle.row}>
+                    <TouchableOpacity
+                      style={newStyle.containerNoMarginTop}
+                      onPress={() => respondToFriendRequest(item.friend_request_id, "accept")}
+                    >
+                      <Text style={newStyle.bodyText}>{t('SCREENS.PROFILE.ACCEPT')}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={newStyle.containerNoMarginTop}
+                      onPress={() => respondToFriendRequest(item.friend_request_id, "decline")}
+                    >
+                      <Text style={newStyle.bodyText}>{t('SCREENS.PROFILE.DECLINE')}</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              )}
+            />
+          )}
+          {/* <View style={newStyle.marginBottomLarge}/> 
+          <Text style={newStyle.titleText}>{t('SCREENS.PROFILE.SUGGESTED_FRIENDS)}</Text>
+          <Text style={newStyle.bodyText}>This feature will be added in the future.</Text> */}
+        </View>
+      </ExtendedModal>
+
       {/* User Profile Modal */}
       <PublicProfileModal
         user={selectedUser}

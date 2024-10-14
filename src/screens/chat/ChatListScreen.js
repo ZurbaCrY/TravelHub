@@ -10,6 +10,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useLoading } from '../../context/LoadingContext.js'
 import { useAuth } from '../../context/AuthContext.js';
 import { getProfilePictureUrlByUserId } from '../../services/getProfilePictureUrlByUserId';
+import { useTranslation } from 'react-i18next';
 
 const fetchFromSupabase = async (table, select, filters = []) => {
   let query = supabase.from(table).select(select);
@@ -26,6 +27,7 @@ const fetchFromSupabase = async (table, select, filters = []) => {
 };
 
 export default function ChatListScreen({ navigation }) {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const CURRENT_USER = user;
   const CURRENT_USER_ID = CURRENT_USER.id;
@@ -41,7 +43,7 @@ export default function ChatListScreen({ navigation }) {
     React.useCallback(() => {
       const fetchChatsAndUsers = async () => {
         try {
-          showLoading("Fetching Chats");
+          showLoading(t('LOADING_MESSAGE.CHATS'));
           await fetchChats();
           await fetchUsers();
         } catch (error) {
@@ -122,7 +124,7 @@ export default function ChatListScreen({ navigation }) {
 
   const createNewChat = async () => {
     if (!selectedUser || selectedUser.user_id === CURRENT_USER_ID) {
-      Alert.alert('Fehler', 'Sie können keinen Chat mit sich selbst erstellen.');
+      Alert.alert(t('ERROR'), t('SCREENS.CHAT.NEW_CHAT_OWN_USER'));
       return;
     }
     const newChat = { chat_id: Date.now(), created_at: new Date().toISOString() };
@@ -137,7 +139,7 @@ export default function ChatListScreen({ navigation }) {
     await supabase.from('messages').insert([initialMessage]);
 
     const chatPartnerProfilePicutreUrl = await getProfilePictureUrlByUserId(selectedUser.user_id);
-    
+
     fetchChats();
     setModalVisible(false);
     navigation.navigate('Chat', { chatId: newChat.chat_id, chatName: selectedUser.username, chatPartnerId: selectedUser.user_id, chatPartnerProfilePicutreUrl: chatPartnerProfilePicutreUrl });
@@ -214,13 +216,19 @@ export default function ChatListScreen({ navigation }) {
           <View style={[styles.modalBackground, { backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]} />
         </TouchableWithoutFeedback>
         <View style={[styles.modalContentWidth, { backgroundColor: isDarkMode ? '#18171' : '#f8f8f8' }]}>
-          <Text style={[styles.modalTitleText, { color: isDarkMode ? '#18171c' : '#18171c' }]}>Wähle einen Benutzer für den Chat</Text>
+          <Text style={[styles.modalTitleText, { color: isDarkMode ? '#18171c' : '#18171c' }]}>
+            {t('SCREENS.CHAT.NEW_CHAT_CHOOSE_USER')}
+          </Text>
           {users.length > 0 ? (
             users.map(renderUserItem)
           ) : (
-            <Text style={[styles.bodyText, { color: isDarkMode ? '#18171c' : '#18171c' }]}>Keine neuen Benutzer verfügbar</Text>
+            <Text style={styles.bodyText}>
+              {t('SCREENS.CHAT.NEW_CHAT_NO_USERS')}
+              </Text>
           )}
-          <Button onPress={createNewChat} disabled={!selectedUser}>Chat starten</Button>
+          <Button onPress={createNewChat} disabled={!selectedUser}>
+            {t('SCREENS.CHAT.NEW_CHAT_CREATE_CHAT')}
+          </Button>
         </View>
       </Modal>
     </View>

@@ -28,7 +28,7 @@ const CustomPlaceItem = ({ place, handleMarkerPress, handleStarClick, handlePlac
         </TouchableOpacity>
         {/* Weiterleitungs-Symbol */}
         <TouchableOpacity onPress={() => handlePlaceDetail(place)} style={styles.iconContainer}>
-          <MaterialIcons name="info" size={24} color="#3EAAE9" />
+          <MaterialIcons name="arrow-forward-ios" size={24} color="#3EAAE9" />
         </TouchableOpacity>
       </View>
     </TouchableOpacity>
@@ -73,6 +73,7 @@ const styles = StyleSheet.create({
   },
   starIconContainer: {
     marginLeft: 'auto', // Setzt das Sternsymbol ganz rechts
+    margin: 7,
   },
   selectedItem: {
     backgroundColor: '#FFFDF3', // Hintergrundfarbe ändern

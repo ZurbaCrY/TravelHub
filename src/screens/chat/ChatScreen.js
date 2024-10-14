@@ -10,8 +10,10 @@ import PublicProfileModal from '../../components/PublicProfileModal.js';
 import { useLoading } from '../../context/LoadingContext.js';
 import { getUserStats } from '../../services/getUserStats.js';
 import FriendService from '../../services/friendService.js';
+import { useTranslation } from 'react-i18next';
 
 export default function ChatScreen({ route, navigation }) {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const CURRENT_USER = user;
   const CURRENT_USER_ID = CURRENT_USER.id;
@@ -26,7 +28,7 @@ export default function ChatScreen({ route, navigation }) {
   const { showLoading, hideLoading } = useLoading();
   const [selectedUser, setSelectedUser] = useState(null);
   const [loading, setLoading] = useState(false);
-  
+
   useEffect(() => {
     navigation.setOptions({
       headerTitle: () => (
@@ -92,7 +94,7 @@ export default function ChatScreen({ route, navigation }) {
 
   const handleUserPress = async () => {
     try {
-      showLoading("Loading User Stats");
+      showLoading(t('LOADING.GETTING_USER_STATS'));
       const stats = await getUserStats(user_id = chatPartnerId);
       const selectedUserData = {
         user_id: chatPartnerId,
@@ -234,7 +236,9 @@ export default function ChatScreen({ route, navigation }) {
       <View>
         <MessageText {...props} />
         {currentMessage.edited && (
-          <Text style={newStyle.boldMiniText}>Bearbeitet</Text>
+          <Text style={newStyle.boldMiniText}>
+            {t('CHAT.EDITED')}
+          </Text>
         )}
       </View>
     );
@@ -242,7 +246,7 @@ export default function ChatScreen({ route, navigation }) {
 
   const handleFriendRequestPress = async () => {
     try {
-      showLoading();
+      showLoading(t('LOADING.SENDING_FRIEND_REQUEST'));
       await FriendService.sendFriendRequest(selectedUser.user_id);
     } catch (error) {
       console.error(error);
@@ -274,18 +278,23 @@ export default function ChatScreen({ route, navigation }) {
       >
         <View style={[newStyle.modalBackground, { backgroundColor: isDarkMode ? 'rgba(0, 0, 0, 0.8)' : 'rgba(255, 255, 255, 0.8)' }]}>
           <View style={[newStyle.modalContent, { backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]}>
-            <Text style={[newStyle.modalTitleText, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>Bearbeiten oder Löschen</Text>
-            
+            <Text style={[newStyle.modalTitleText, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>
+              {t('SCREENS.CHAT.EDIT_OR_DELETE')}
+            </Text>
             <TouchableOpacity style={[newStyle.primaryRedButton, { backgroundColor: isDarkMode ? '#8B0000' : '#FF6347' }]} onPress={deleteMessage}>
-              <Text style={[newStyle.primaryButtonText, { color: isDarkMode ? '#f8f8f8' : '#f8f8f8' }]}>Nachricht löschen</Text>
+              <Text style={[newStyle.primaryButtonText, { color: isDarkMode ? '#f8f8f8' : '#f8f8f8' }]}>
+                {t('SCREENS.CHAT.DELETE_MESSAGE')}
+              </Text>
             </TouchableOpacity>
-  
-            <TouchableOpacity style={[newStyle.primaryButton, { backgroundColor: isDarkMode ? '#1E90FF' : '#007BFF' }]} onPress={() => openEditModal(selectedMessage)}>
-              <Text style={[newStyle.primaryButtonText, { color: isDarkMode ? '#f8f8f8' : '#f8f8f8' }]}>Text bearbeiten</Text>
+            <TouchableOpacity style={newStyle.primaryButton} onPress={() => openEditModal(selectedMessage)}>
+              <Text style={newStyle.primaryButtonText}>
+                {t('SCREENS.CHAT.EDIT_MESSAGE')}
+              </Text>
             </TouchableOpacity>
-  
             <TouchableOpacity style={[newStyle.primaryButton, { backgroundColor: isDarkMode ? '#333' : '#DDD' }]} onPress={() => setDeleteModalVisible(false)}>
-              <Text style={[newStyle.primaryButtonText, { color: isDarkMode ? '#f8f8f8' : '#000' }]}>Abbrechen</Text>
+              <Text style={[newStyle.primaryButtonText, { color: isDarkMode ? '#f8f8f8' : '#000' }]}>
+                {t('CANCEL')}
+              </Text>
             </TouchableOpacity>
           </View>
         </View>

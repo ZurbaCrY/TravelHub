@@ -1,5 +1,6 @@
 import { supabase } from '../services/supabase';
 import { Continent, Country, City, Place } from './MapClasses'; // Passe den Pfad zu deinen Klassen an
+import { findNearestCity } from './MapLocationChangeFunctions';
 
 /**
 * Funktionen zum Favorisieren der Orte.
@@ -153,5 +154,90 @@ export const getNameForPlace = (place, selectedPlace) => {
     return place.name;
   } else {
     return null;
+  }
+};
+
+/**
+ * Funktion, die einen Ort zur DB hinzufügt.
+ */
+export const addPlaceToDB = async (placeData, continentsData) => {
+  try {
+    const cityId = findNearestCity({
+      latitude: placeData.latitude,
+      longitude: placeData.longitude,
+      latitudeDelta: 1,
+      longitudeDelta: 1,
+    }, continentsData).cityId;
+
+    const { data, error } = await supabase
+      .from('Attraction')
+      .insert([{
+        Attraction_Name: placeData.name,
+        City_ID: cityId,
+        Type_of_Attraction: placeData.type,
+        Description: placeData.description,
+        Latitude: placeData.latitude,
+        Longitude: placeData.longitude
+      }]);
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    return { success: true };
+  } catch (error) {
+    return { success: false, message: error.message };
+  }
+};
+
+/**
+ * Validiert, ob alle notwendigen Daten vorhanden sind, um einen Ort zur DB hinzuzufügen.
+ */
+export const validatePlaceData = (placeName, placeDescription, placeType, coordinates) => {
+  if (!placeName || !placeDescription || !placeType || !coordinates) {
+    return { valid: false, message: 'Bitte füllen Sie alle erforderlichen Felder aus.' };
+  }
+  return { valid: true };
+};
+
+
+
+export const loadRatings = async (attractionId) => {
+  try {
+    const { data, error } = await supabase
+      .from('Rating')
+      .select('rating, text, created_at')
+      .eq('Attraction_Id', attractionId);
+
+    if (error) {
+      console.error('Fehler beim Laden der Bewertungen:', error.message);
+      return [];
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Fehler beim Abrufen der Bewertungen:', error.message);
+    return [];
+  }
+};
+
+export const saveRatingToDB = async (attractionId, rating, reviewText) => {
+  try {
+    const { data, error } = await supabase
+      .from('Rating')
+      .insert([{
+        Attraction_Id: attractionId,
+        rating: rating,
+        text: reviewText,
+      }]);
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    return { success: true, data };
+  } catch (error) {
+    console.error('Fehler beim Speichern der Bewertung:', error.message);
+    return { success: false, message: error.message };
   }
 };

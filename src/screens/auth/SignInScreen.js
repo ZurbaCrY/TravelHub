@@ -9,26 +9,35 @@ import { Input } from "react-native-elements";
 import styles from '../../styles/style';
 import AuthService from "../../services/auth";
 import AnimatedSwitch from "../../components/AnimatedSwitch";
-import PropTypes from 'prop-types';
-import { useNavigation, useNavigationBuilder } from "@react-navigation/core";
+import { useNavigation } from "@react-navigation/core";
 import { useDarkMode } from '../../context/DarkModeContext';
 import { useLoading } from "../../context/LoadingContext";
 import CustomButton from "../../components/CustomButton";
+import { useTranslation } from "react-i18next";
+import { useAuth } from "../../context/AuthContext";
+import FriendService from "../../services/friendService";
 
 const SignInScreen = ({ navigation }) => {
+  const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
   const { showLoading, hideLoading } = useLoading();
+  const { loadUser } = useAuth();
 
   navigation = useNavigation();
 
   const handleSignIn = async () => {
     try {
-      showLoading(true, "Signing in");
+      showLoading(t('LOADING_MESSAGE.SIGN_IN'));
       const user = await AuthService.signIn(email, password, remember);
+      await loadUser();
+      if (user) {
+        FriendService.setUser(user);
+        navigation.navigate("Main");
+      }
     } catch (error) {
-      Alert.alert("Sign-In Error", "Unable to sign in. Please check your credentials and try again.");
+      Alert.alert(t('AUTH.SIGN_IN_ERROR'), t('AUTH.SIGN_IN_ERROR_MESSAGE'));
       console.error('Sign-in error:', error);
     } finally {
       hideLoading();
@@ -36,7 +45,7 @@ const SignInScreen = ({ navigation }) => {
   };
 
   const handleForgetPasswordPress = () => {
-    Alert.alert("This Feature is not implemented yet. Please contact Support!");
+    Alert.alert(t('FEATURE NOT IMPLEMENTED'));
   };
 
   const authSwitchToSignUp = () => {
@@ -45,31 +54,33 @@ const SignInScreen = ({ navigation }) => {
 
   return (
     <View style={styles.centeredContainer}>
-      <Text style={styles.titleTextBlue}>Login</Text>
+      <Text style={styles.titleTextBlue}>
+        {t('AUTH.SIGN_IN')}
+      </Text>
       <TouchableOpacity onPress={authSwitchToSignUp}>
         <Text style={styles.blueText}>
-          Don't have an account? Sign Up instead
+          {t('AUTH.NAVIGATE_SIGN_UP')}
         </Text>
       </TouchableOpacity>
       <View style={styles.inputView}>
         <Input
           style={styles.container}
-          label="Email"
+          label={t('AUTH.EMAIL')}
           leftIcon={{ type: "font-awesome", name: "envelope" }}
           onChangeText={setEmail}
           value={email}
-          placeholder="email@address.com"
+          placeholder={t('AUTH.EMAIL_PLACEHOLDER')}
           autoCapitalize={"none"}
           containerStyle={styles.inputLogin}
         />
         <Input
           style={styles.container}
-          label="Password"
+          label={t('AUTH.PASSWORD')}
           leftIcon={{ type: "font-awesome", name: "lock" }}
           onChangeText={setPassword}
           value={password}
           secureTextEntry={true}
-          placeholder="Password"
+          placeholder={t('AUTH.PASSWORD_PLACEHOLDER')}
           autoCapitalize={"none"}
           containerStyle={styles.inputLogin}
         />
@@ -80,16 +91,20 @@ const SignInScreen = ({ navigation }) => {
             value={remember}
             onValueChange={setRemember}
           />
-          <Text style={styles.smallBodyText}>Remember Me</Text>
+          <Text style={styles.smallBodyText}>
+            {t('AUTH.REMEMBER_ME')}
+          </Text>
         </View>
         <TouchableOpacity onPress={handleForgetPasswordPress}>
-          <Text style={styles.blueText}>Forgot password?</Text>
+          <Text style={styles.blueText}>
+            {t('AUTH.FORGOT_PASSWORD')}
+          </Text>
         </TouchableOpacity>
       </View>
       <View style={styles.buttonView}>
         <CustomButton
           onPress={handleSignIn}
-          title={"Sign In"}
+          title={t('AUTH.SIGN_IN')}
         />
       </View>
     </View>

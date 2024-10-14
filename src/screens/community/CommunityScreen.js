@@ -11,9 +11,12 @@ import FriendService from '../../services/friendService';
 import { getUserStats } from '../../services/getUserStats';
 import { useAuth } from '../../context/AuthContext';
 import { useLoading } from '../../context/LoadingContext';
+import { useTranslation } from 'react-i18next';
 
 export default function CommunityScreen({ navigation }) {
+  const { t } = useTranslation();
   const { user } = useAuth();
+  const user_id = user.id;
   const user_username = user.user_metadata.username;
   const { isDarkMode } = useDarkMode();
   const [posts, setPosts] = useState([]);
@@ -31,12 +34,12 @@ export default function CommunityScreen({ navigation }) {
   const [cities, setCities] = useState([]);
   const [attractions, setAttractions] = useState([]);
   const [selectedCountry, setSelectedCountry] = useState('');
-  const [selectedCity, setSelectedCity] = useState(''); 
+  const [selectedCity, setSelectedCity] = useState('');
   const [selectedAttraction, setSelectedAttraction] = useState('');
 
   useEffect(() => {
     loadPosts();
-    loadCountries(); 
+    loadCountries();
   }, []);
 
   const loadPosts = async () => {
@@ -45,7 +48,7 @@ export default function CommunityScreen({ navigation }) {
       const postsData = await fetchPosts();
       setPosts(postsData);
     } catch (error) {
-      console.error('Error fetching posts: ', error);
+      console.error('Error loading posts: ', error);
     } finally {
       setRefreshing(false);
     }
@@ -83,7 +86,7 @@ export default function CommunityScreen({ navigation }) {
   };
 
   const handleCreateNewPost = async () => {
-    await createNewPost(newPostContent, user_username, imageUrl, selectedCountry, selectedCity, selectedAttraction);
+    await createNewPost(newPostContent, user_id, user_username, imageUrl, selectedCountry, selectedCity, selectedAttraction);
     setNewPostContent('');
     setImageUrl(null);
     setSelectedCountry('');
@@ -95,8 +98,6 @@ export default function CommunityScreen({ navigation }) {
 
   const handleDeletePost = async () => {
     try {
-      await deletePost(postId);
-      loadPosts();
       await deletePost(selectedPostId);
       setDeletePostModalVisible(false);
       loadPosts();
@@ -116,18 +117,33 @@ export default function CommunityScreen({ navigation }) {
 
   const handleUserPress = async (item) => {
     try {
-      showLoading("Loading User Stats");
-      const stats = await getUserStats(item.user_id);
-      const selectedUserData = {
-        user_id: item.user_id,
-        username: item.users.username,
-        profilepicture_url: item.users.profilepicture_url,
-        friendCount: stats.friendCount,
-        upvotes: stats.upvoteCount,
-        downvotes: stats.downvoteCount,
-        postCount: stats.postCount
-      };
-      setSelectedUser(selectedUserData);
+      showLoading(t('LOADING_MESSAGE.USER_STATS'));
+      if (item.users.anonymous) {
+        const selectedUserData = {
+          user_id: item.user_id,
+          username: 'Anonymous',
+          profilepicture_url: 'https://zjnvamrbnqzefncmdpaf.supabase.co/storage/v1/object/public/Images/images/account.png', 
+          friendCount: 0, 
+          upvotes: 0,
+          downvotes: 0,
+          postCount: 0,
+        };
+        setSelectedUser(selectedUserData);
+      } else {
+        // If not anonymous, fetch actual user stats
+        const stats = await getUserStats(item.user_id);
+        const selectedUserData = {
+          user_id: item.user_id,
+          username: item.users.username,
+          profilepicture_url: item.users.profilepicture_url,
+          friendCount: stats.friendCount,
+          upvotes: stats.upvoteCount,
+          downvotes: stats.downvoteCount,
+          postCount: stats.postCount,
+        };
+        setSelectedUser(selectedUserData);
+      }
+
       setUserProfileModal(true);
     } catch (error) {
       console.error('Error fetching user stats:', error);
@@ -156,18 +172,30 @@ export default function CommunityScreen({ navigation }) {
           <View style={[newStyle.postContainer, { backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]}>
             <TouchableOpacity onPress={() => handleUserPress(item)}>
               <View style={newStyle.postHeader}>
-                <Image source={{ uri: item.users.profilepicture_url }} style={newStyle.extraSmallProfileImage} />
-                <Text style={[newStyle.boldTextBig, { color: isDarkMode ? '#FFFDF3' : '#18171c' }]}> {item.users.username}
-</Text>
-
+                {/* Check if item.users is defined */}
+                {item.users && item.users.anonymous ? (
+                  <>
+                    <Image source={require('../../assets/images/account.png')} style={newStyle.extraSmallProfileImage} />
+                    <Text style={[newStyle.boldTextBig, { color: isDarkMode ? '#FFFDF3' : '#18171c' }]}>Anonymous</Text>
+                  </>
+                ) : (
+                  item.users && ( // Ensure item.users is defined
+                    <>
+                      <Image source={{ uri: item.users.profilepicture_url }} style={newStyle.extraSmallProfileImage} />
+                      <Text style={newStyle.boldTextBig}>{item.users.username}</Text>
+                    </>
+                  )
+                )}
               </View>
             </TouchableOpacity>
-            {item.users.username === user_username && (
+
+            {item.users && item.users.username === user_username && (
               <TouchableOpacity onPress={() => confirmDeletePost(item.id)} style={newStyle.deleteButton}>
             <Image source={require('../../assets/images/trash.png')} style={[newStyle.icon, { tintColor: isDarkMode ? '#18171c' : '#f8f8f8' }]} />
 
               </TouchableOpacity>
             )}
+
             <TouchableOpacity onPress={() => handlePostPress(item)}>
               {item.Country && (
                 <Text style={[newStyle.countryText, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>
@@ -190,6 +218,7 @@ export default function CommunityScreen({ navigation }) {
            <Image source={{ uri: item.image_url }} style={[newStyle.postImage, { borderColor: isDarkMode ? '#555' : '#CCC' }]} />
            <Text style={[newStyle.postText, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>{item.content}</Text>
             </TouchableOpacity>
+
             <View style={newStyle.voteRow}>
               <View style={[newStyle.voteContainer, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>
                 <TouchableOpacity onPress={() => handleUpvote(item.id, user.id, loadPosts)}>
@@ -213,9 +242,11 @@ export default function CommunityScreen({ navigation }) {
         ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
       />
 
-       <TouchableOpacity style={[newStyle.primaryButton, { backgroundColor: isDarkMode ? '#1E90FF' : '#007BFF' }]} onPress={() => setNewPostModalVisible(true)}>
-    <Text style={[newStyle.primaryButtonText, { color: isDarkMode ? '#FFF' : '#FFF' }]}>New Post</Text>
-  </TouchableOpacity>
+      <TouchableOpacity style={[newStyle.primaryButton, { backgroundColor: isDarkMode ? '#1E90FF' : '#007BFF' }]} onPress={() => setNewPostModalVisible(true)}>
+        <Text style={[newStyle.primaryButtonTextt, { color: isDarkMode ? '#FFF' : '#FFF' }]}>
+          {t('SCREENS.COMMUNITY.NEW_POST')}
+        </Text>
+      </TouchableOpacity>
 
       {/* New Post Modal */}
       <Modal animationType="slide" transparent={true} visible={newPostModalVisible} onRequestClose={() => setNewPostModalVisible(false)}>
@@ -223,10 +254,12 @@ export default function CommunityScreen({ navigation }) {
           <View style={newStyle.modalBackground}>
             <TouchableWithoutFeedback>
               <View style={[newStyle.modalContent, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>
-                <Text style={[newStyle.modalTitleText, { color: isDarkMode ? '#18171c' : '#18171c' }]}>Create New Post</Text>
+                <Text style={[newStyle.modalTitleText, { color: isDarkMode ? '#18171c' : '#18171c' }]}>
+                  {t('SCREENS.COMMUNITY.CREATE_NEW_POST')}
+                </Text>
                 <TextInput
                   style={newStyle.inputField}
-                  placeholder="What's on your mind?"
+                  placeholder={t('SCREENS.COMMUNITY.POST_CONTENT_PLACEHOLDER')}
                   value={newPostContent}
                   onChangeText={(text) => setNewPostContent(text)}
                 />
@@ -238,10 +271,10 @@ export default function CommunityScreen({ navigation }) {
                 {/* Country Picker */}
                 <Picker selectedValue={selectedCountry} onValueChange={(itemValue) => {
                   setSelectedCountry(itemValue);
-                  loadCities(itemValue); 
+                  loadCities(itemValue);
                   setSelectedCity(''); // Zurücksetzen der ausgewählten Stadt
                 }}>
-                  <Picker.Item label="Select a country" value="" />
+                  <Picker.Item label={t('SCREENS.COMMUNITY.SELECT_COUNTRY')} value="" />
                   {countries.map((country) => (
                     <Picker.Item key={country.id} label={country.name} value={country.id} />
                   ))}
@@ -253,7 +286,7 @@ export default function CommunityScreen({ navigation }) {
                     setSelectedCity(itemValue);
                     loadAttractions(itemValue); // Lade die Attraktionen für die ausgewählte Stadt
                   }}>
-                    <Picker.Item label="Select a city" value="" />
+                    <Picker.Item label={t('SCREENS.COMMUNITY.SELECT_CITY')} value="" />
                     {cities.map((city) => (
                       <Picker.Item key={city.City_ID} label={city.Cityname} value={city.City_ID} />
                     ))}
@@ -267,7 +300,7 @@ export default function CommunityScreen({ navigation }) {
                     onValueChange={setSelectedAttraction}
                     style={newStyle.picker}
                   >
-                    <Picker.Item label="Select Attraction" value="" />
+                    <Picker.Item label={t('SCREENS.COMMUNITY.SELECT_ATTRACTION')} value="" />
                     {attractions.map((attraction) => (
                       <Picker.Item key={attraction.Attraction_ID} label={attraction.Attraction_Name} value={attraction.Attraction_ID} />
                     ))}
@@ -275,10 +308,14 @@ export default function CommunityScreen({ navigation }) {
                 )}
                 <View style={newStyle.row}>
                   <TouchableOpacity style={newStyle.averageRedButton} onPress={() => setNewPostModalVisible(false)}>
-                    <Text style={newStyle.smallButtonText}>Cancel</Text>
+                    <Text style={newStyle.smallButtonText}>
+                      {t('CANCEL')}
+                    </Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={newStyle.averageBlueButton} onPress={handleCreateNewPost}>
-                    <Text style={newStyle.smallButtonText}>Post</Text>
+                    <Text style={newStyle.smallButtonText}>
+                      {t('POST')}
+                    </Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -293,13 +330,19 @@ export default function CommunityScreen({ navigation }) {
           <View style={newStyle.modalBackground}>
             <TouchableWithoutFeedback>
               <View style={newStyle.modalContent}>
-                <Text style={newStyle.modalTitleText}>Confirm Delete</Text>
+                <Text style={newStyle.modalTitleText}>
+                  {t('CONFIRM_DELETE')}
+                </Text>
                 <View style={newStyle.row}>
                   <TouchableOpacity style={newStyle.averageRedButton} onPress={() => setDeletePostModalVisible(false)}>
-                    <Text style={newStyle.smallButtonText}>Cancel</Text>
+                    <Text style={newStyle.smallButtonText}>
+                      {t('CANCEL')}
+                    </Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={newStyle.averageBlueButton} onPress={handleDeletePost}>
-                    <Text style={newStyle.smallButtonText}>Delete</Text>
+                    <Text style={newStyle.smallButtonText}>
+                      {t('DELETE')}
+                    </Text>
                   </TouchableOpacity>
                 </View>
               </View>
