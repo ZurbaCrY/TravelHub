@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { FontAwesome } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
 import Alert from './Alert';
-import { loadRatings, saveRatingToDB } from '../backend/LoadEditPlaceData';
+import { loadRatings, saveRatingToDB, getAverageRating } from '../backend/LoadEditPlaceData';
 
 const PlaceDetailScreen = ({ visible, place, onClose }) => {
   const translateX = useRef(new Animated.Value(-1000)).current;
@@ -13,25 +13,27 @@ const PlaceDetailScreen = ({ visible, place, onClose }) => {
   const [reviews, setReviews] = useState([]);
   const [alertVisible, setAlertVisible] = useState(false);
   const [message, setMessage] = useState('');
+  const [averageRating, setAverageRating] = useState(0);
 
-useEffect(() => {
-  if (visible && place) {
-    // Animation starten
-    Animated.timing(translateX, {
-      toValue: 0,
-      duration: 300,
-      useNativeDriver: true,
-    }).start();
+  useEffect(() => {
+    if (visible && place) {
+      Animated.timing(translateX, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
 
-    // Bewertungen aus der DB laden
-    const fetchRatings = async () => {
-      const ratings = await loadRatings(place.placeId); // place.placeId ist die Attraction_Id
-      setReviews(ratings);  // Setze die Bewertungen im Zustand
-    };
+      const fetchRatings = async () => {
+        const ratings = await loadRatings(place.placeId);
+        setReviews(ratings);
 
-    fetchRatings();
-  }
-}, [visible, place]);
+        const avgRating = getAverageRating(ratings);
+        setAverageRating(avgRating);
+      };
+
+      fetchRatings();
+    }
+  }, [visible, place]);
 
   if (!visible || !place) {
     return null;
@@ -46,32 +48,36 @@ useEffect(() => {
     setRating(value);
   };
 
- const handleSubmitReview = async () => {
-   if (rating > 0 && review.trim() !== '') {
-     // Neue Bewertung lokal erstellen
-     const newReview = {
-       id: Math.random().toString(36).substr(2, 9),  // Temporäre ID für die lokale Anzeige
-       rating,
-       text: review,
-       date: new Date().toLocaleDateString(),
-       created_at: new Date(),
-     };
+  const handleSubmitReview = async () => {
+    if (rating > 0 && review.trim() !== '') {
+      // Neue Bewertung lokal erstellen
+      const newReview = {
+        id: Math.random().toString(36).substr(2, 9), // Temporäre ID für die lokale Anzeige
+        rating,
+        text: review,
+        date: new Date().toLocaleDateString(),
+        created_at: new Date(),
+      };
 
-     // Bewertung in die DB speichern
-     const result = await saveRatingToDB(place.placeId, rating, review);
+      // Bewertung in die DB speichern
+      const result = await saveRatingToDB(place.placeId, rating, review);
 
-     if (result.success) {
-       // Wenn die Bewertung erfolgreich gespeichert wurde, zur lokalen Anzeige hinzufügen
-       setReviews([...reviews, newReview]);
-       setReview('');  // Eingabefeld leeren
-       setRating(0);   // Bewertung zurücksetzen
-     } else {
-       showAlert('Fehler beim Speichern der Bewertung: ');
-     }
-   } else {
-     showAlert('Bitte geben Sie eine Bewertung und einen Text ein.');
-   }
- };
+      if (result.success) {
+        // Wenn die Bewertung erfolgreich gespeichert wurde, zur lokalen Anzeige hinzufügen
+        setReviews([...reviews, newReview]);
+        setReview(''); // Eingabefeld leeren
+        setRating(0); // Bewertung zurücksetzen
+
+        // Durchschnitt neu berechnen
+        const avgRating = getAverageRating([...reviews, newReview]);
+        setAverageRating(avgRating);
+      } else {
+        showAlert('Fehler beim Speichern der Bewertung: ');
+      }
+    } else {
+      showAlert('Bitte geben Sie eine Bewertung und einen Text ein.');
+    }
+  };
 
 
    const renderReviewItem = (item) => {
@@ -112,6 +118,20 @@ useEffect(() => {
             {/* Name des Ortes */}
             <Text style={styles.placeName}>{place.name}</Text>
 
+            {/* Durchschnittliche Sternebewertung */}
+            <View style={styles.averageRatingContainer}>
+              <View style={styles.averageStars}>
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <FontAwesome
+                    key={star}
+                    name={star <= averageRating ? 'star' : 'star-o'}
+                    size={24}
+                    color="#FFD700"
+                  />
+                ))}
+              </View>
+            </View>
+
             {/* Bild des Ortes */}
             {place.link ? (
               <Image
@@ -128,11 +148,13 @@ useEffect(() => {
             </View>
 
             {/* Beschreibung */}
+            <View style={styles.averageRatingContainer}>
             <Text style={styles.placeDescription}>{place.description}</Text>
+            </View>
 
             {/* Sternebewertung */}
             <View style={styles.ratingContainer}>
-              <Text style={styles.ratingTitle}>Bewertung:</Text>
+              <Text style={styles.ratingTitle}>Bewertung verfassen:</Text>
               <View style={styles.stars}>
                 {[1, 2, 3, 4, 5].map((star) => (
                   <TouchableOpacity key={star} onPress={() => handleRatingPress(star)}>
@@ -210,6 +232,7 @@ const styles = StyleSheet.create({
   content: {
     padding: 20,
     flexGrow: 1,
+    flexDirection: 'column',
   },
   placeName: {
     fontSize: 28,
@@ -241,6 +264,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginVertical: 10,
     lineHeight: 22,
+    alignItems: 'center',
   },
   ratingContainer: {
     marginVertical: 20,
@@ -313,14 +337,26 @@ const styles = StyleSheet.create({
   reviewText: {
     fontSize: 16,
   },
-  closeButton: {
-    padding: 10,
-    position: 'absolute',
-    top: 0,
-    right: 10,
-    zIndex: 1,
-    backgroundColor: 'lightgrey',
-    borderRadius: 5,
+closeButton: {
+  padding: 10,
+  position: 'absolute',
+  top: 0,
+  right: 10,
+  zIndex: 1,
+  backgroundColor: 'rgba(211, 211, 211, 0.5)', // lightgrey mit 50% Transparenz
+  borderRadius: 5,
+},
+  averageRatingContainer: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    marginVertical: 10,
+  },
+  averageRatingText: {
+    fontSize: 16,
+    marginRight: 10,
+  },
+  averageStars: {
+    flexDirection: 'row',
   },
 });
 
