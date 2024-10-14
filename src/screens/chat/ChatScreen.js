@@ -33,21 +33,23 @@ export default function ChatScreen({ route, navigation }) {
     navigation.setOptions({
       headerTitle: () => (
         <TouchableOpacity onPress={() => handleUserPress()} style={newStyle.headerTitleContainer}>
-          <View style={newStyle.containerRow}>
+          <View style={[newStyle.containerRow, { backgroundColor: isDarkMode ? 'rgba(0, 0, 0, 0)' : 'rgba(0, 0, 0, 0)' }]}>
             <View style={newStyle.marginTopMedium}>
               <Image source={{ uri: chatPartnerProfilePicutreUrl }} style={newStyle.extraSmallProfileImage} />
             </View>
             <View style={[newStyle.marginTopSmall, newStyle.marginLeftSmall]}>
-              <Text style={newStyle.titleText}>{chatName}</Text>
+            <Text style={[newStyle.titleText, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>{chatName}</Text>
             </View>
           </View>
         </TouchableOpacity>
       ),
       headerStyle: {
         backgroundColor: isDarkMode ? '#070A0F' : '#f8f8f8',
-      }
+      },
+      headerTintColor: isDarkMode ? '#f8f8f8' : '#18171c', // Farbe des Pfeils
     });
-
+        
+      
     const fetchMessages = async () => {
       try {
         const { data, error } = await supabase
@@ -254,7 +256,7 @@ export default function ChatScreen({ route, navigation }) {
   };
 
   return (
-    <View style={[newStyle.containerNoMarginTop, { backgroundColor: isDarkMode ? '#070A0F' : '#f8f8f8' }]}>
+    <View style={[newStyle.containerNoMarginTop, { backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]}>
       <GiftedChat
         messages={messages}
         onSend={(messages) => onSend(messages)}
@@ -263,24 +265,24 @@ export default function ChatScreen({ route, navigation }) {
         }}
         text={messageInput}
         onInputTextChanged={(text) => setMessageInput(text)}
-        textInputStyle={{ color: isDarkMode ? '#f8f8f8' : '#000' }}
+        textInputStyle={{ color: isDarkMode ? '#f8f8f8' : '#18171c' }}
         onLongPress={handleLongPress}
         renderMessageText={renderMessageText}
       />
-
+  
       <Modal
         transparent={true}
         visible={isDeleteModalVisible}
         animationType="slide"
         onRequestClose={() => setDeleteModalVisible(false)}
       >
-        <View style={newStyle.modalBackground}>
-          <View style={newStyle.modalContent}>
-            <Text style={newStyle.modalTitleText}>
+        <View style={[newStyle.modalBackground, { backgroundColor: isDarkMode ? 'rgba(0, 0, 0, 0.8)' : 'rgba(255, 255, 255, 0.8)' }]}>
+          <View style={[newStyle.modalContent, { backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]}>
+            <Text style={[newStyle.modalTitleText, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>
               {t('SCREENS.CHAT.EDIT_OR_DELETE')}
             </Text>
-            <TouchableOpacity style={newStyle.primaryRedButton} onPress={deleteMessage}>
-              <Text style={newStyle.primaryButtonText}>
+            <TouchableOpacity style={[newStyle.primaryRedButton, { backgroundColor: isDarkMode ? '#8B0000' : '#FF6347' }]} onPress={deleteMessage}>
+              <Text style={[newStyle.primaryButtonText, { color: isDarkMode ? '#f8f8f8' : '#f8f8f8' }]}>
                 {t('SCREENS.CHAT.DELETE_MESSAGE')}
               </Text>
             </TouchableOpacity>
@@ -289,8 +291,8 @@ export default function ChatScreen({ route, navigation }) {
                 {t('SCREENS.CHAT.EDIT_MESSAGE')}
               </Text>
             </TouchableOpacity>
-            <TouchableOpacity style={newStyle.primaryButton} onPress={() => setDeleteModalVisible(false)}>
-              <Text style={newStyle.primaryButtonText}>
+            <TouchableOpacity style={[newStyle.primaryButton, { backgroundColor: isDarkMode ? '#333' : '#DDD' }]} onPress={() => setDeleteModalVisible(false)}>
+              <Text style={[newStyle.primaryButtonText, { color: isDarkMode ? '#f8f8f8' : '#000' }]}>
                 {t('CANCEL')}
               </Text>
             </TouchableOpacity>
@@ -306,8 +308,7 @@ export default function ChatScreen({ route, navigation }) {
       />
     </View>
   );
-}
-
+}  
 ChatScreen.propTypes = {
   route: PropTypes.shape({
     params: PropTypes.shape({

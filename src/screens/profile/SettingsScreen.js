@@ -4,6 +4,7 @@ import { useDarkMode } from '../../context/DarkModeContext';
 import AuthService from '../../services/auth';
 import AnimatedSwitch from '../../components/AnimatedSwitch';
 import styles from '../../styles/style';
+import newStyle from '../../styles/style';
 import { handleFilePicker, handleNewProfilePicture } from '../../backend/community';
 import { useLoading } from '../../context/LoadingContext';
 import CustomButton from '../../components/CustomButton';
@@ -78,10 +79,18 @@ const SettingsScreen = ({ navigation }) => {
       };
     };
 
-    navigation.setOptions({ title: t('SCREENS.SETTINGS.TITLE'), headerStyle: { backgroundColor: '#f8f8f8' } });
+    navigation.setOptions({ title: t('SCREENS.SETTINGS.TITLE'),
+      headerStyle: {
+        backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8'  // Hintergrundfarbe des Headers
+      },
+      headerTitleStyle: {
+        color: isDarkMode ? '#f8f8f8' : '#18171c'  // Textfarbe des Titels
+      },
+      headerTintColor: isDarkMode ? '#f8f8f8' : '#18171c'  // Farbe des "Zurück"-Pfeils
+    });
     fetchLanguage();
-  }, []);
-
+  }, [isDarkMode]);  // Füge isDarkMode als Abhängigkeit hinzu
+  
 
   const handleSignOut = async () => {
     Alert.alert(
@@ -129,7 +138,15 @@ const SettingsScreen = ({ navigation }) => {
       setSelectedLanguage(pressedLanguage);
       i18n.changeLanguage(pressedLanguage);
       Alert.alert(t('SCREENS.SETTINGS.SUCCESS'), t('SCREENS.SETTINGS.LANGUAGE_CHANGE_SUCCESS'));
-      navigation.setOptions({ title: t('SCREENS.SETTINGS.TITLE'), headerStyle: { backgroundColor: '#f8f8f8' } });
+      navigation.setOptions({ title: t('SCREENS.SETTINGS.TITLE'),
+        headerStyle: {
+          backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8'  // Hintergrundfarbe des Headers
+        },
+        headerTitleStyle: {
+          color: isDarkMode ? '#f8f8f8' : '#18171c'  // Textfarbe des Titels
+        },
+        headerTintColor: isDarkMode ? '#f8f8f8' : '#18171c'  // Farbe des "Zurück"-Pfeils
+      });
     } catch (error) {
       Alert.alert(t('SCREENS.SETTINGS.ERROR'), t('SCREENS.SETTINGS.LANGUAGE_CHANGE_ERROR'));
       console.error('Language change error:', error);
@@ -139,16 +156,16 @@ const SettingsScreen = ({ navigation }) => {
   }
 
   return (
-    <View style={[styles.containerNoMarginTop, { backgroundColor: isDarkMode ? '#070A0F' : '#FFF' }]}>
+    <View style={[styles.containerNoMarginTop, { backgroundColor: isDarkMode ? '#18171c' : '#f8f8f8' }]}>
       <View style={styles.rowMarginBottom}>
-        <Text style={[styles.bodyTextBig, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>{t('SCREENS.SETTINGS.CHANGE_PROFILE_PICTURE')} </Text>
+        <Text style={[styles.bodyTextBig, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>{t('SCREENS.SETTINGS.CHANGE_PROFILE_PICTURE')} </Text>
         <TouchableOpacity onPress={handleImageChange}>
           <Image source={require('../../assets/images/picture.png')} style={styles.iconBig} />
         </TouchableOpacity>
       </View>
 
       <View style={styles.rowMarginBottom}>
-        <Text style={[styles.bodyTextBig, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>{t('SCREENS.SETTINGS.DARKMODE')}</Text>
+        <Text style={[styles.bodyTextBig, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>{t('SCREENS.SETTINGS.DARKMODE')}</Text>
         <AnimatedSwitch
           onValueChange={toggleDarkMode}
           value={isDarkMode}
@@ -156,7 +173,7 @@ const SettingsScreen = ({ navigation }) => {
       </View>
 
       <View style={styles.rowMarginBottom}>
-        <Text style={[styles.bodyTextBig, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>
+        <Text style={[styles.bodyTextBig, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>
           Anonymous Mode
         </Text>
         <AnimatedSwitch
@@ -169,7 +186,7 @@ const SettingsScreen = ({ navigation }) => {
       </View>
 
       <View style={styles.rowMarginBottom}>
-        <Text style={[styles.bodyTextBig, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>{t('SCREENS.SETTINGS.NOTIFICATIONS')}</Text>
+        <Text style={[styles.bodyTextBig, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>{t('SCREENS.SETTINGS.NOTIFICATIONS')}</Text>
         <AnimatedSwitch
           onValueChange={() => setAnonymousEnabled(previousState => !previousState)}
           value={notificationsEnabled}
@@ -177,10 +194,10 @@ const SettingsScreen = ({ navigation }) => {
       </View>
 
       <View style={styles.rowMarginBottom}>
-        <Text style={[styles.bodyTextBig, { color: isDarkMode ? '#FFFDF3' : '#000' }]}>{t('SCREENS.SETTINGS.LANGUAGE')}</Text>
+        <Text style={[styles.bodyTextBig, { color: isDarkMode ? '#f8f8f8' : '#18171c' }]}>{t('SCREENS.SETTINGS.LANGUAGE')}</Text>
         <Picker
           selectedValue={selectedLanguage}
-          style={{ height: 50, width: 150, color: isDarkMode ? '#FFFDF3' : '#000' }}
+          style={{ height: 50, width: 150, color: isDarkMode ? '#f8f8f8' : '#18171c' }}
           onValueChange={(itemValue) => languageSwitch(itemValue)}
         >
           {languages.map((language, index) => (
