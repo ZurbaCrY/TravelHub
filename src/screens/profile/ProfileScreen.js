@@ -664,6 +664,7 @@ export default function ProfileScreen() {
                         style={newStyle.averageBlueButton}
                         onPress={async () => {
                           const success = await handleNewProfilePicture(imageUrl);
+                          onRefresh();
                           setModalVisible(false);
                         }}
                       >
