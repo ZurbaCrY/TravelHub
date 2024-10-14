@@ -105,22 +105,28 @@ export const handleStarClick = async (place, currentUserId, setForceUpdate) => {
  * Funktion, die den richtigen Marker für einen Ort zurückgibt.
  */
 export const getMarkerForPlace = (place, selectedPlace) => {
+  const blueMarkers = [
+    require('../assets/images/marker-blau-rechts.png'),
+    require('../assets/images/marker-blau-links.png'),
+    require('../assets/images/marker-blau-mitte.png')
+  ];
+
+  const yellowMarkers = [
+    require('../assets/images/marker-gelb-rechts.png'),
+    require('../assets/images/marker-gelb-links.png'),
+    require('../assets/images/marker-gelb-mitte.png')
+  ];
+
+  const typeIndex = place.type ? place.type.length % blueMarkers.length : 0;
+
   if (place === selectedPlace) {
-    return require('../assets/images/travel-marker-x.png');
+    return yellowMarkers[typeIndex];
   }
-  switch (place.type) {
-    case 'Sehenswürdigkeit':
-      return require('../assets/images/travel-marker-s.png');
-    case 'Restaurant':
-      return require('../assets/images/travel-marker-r.png');
-    case 'Einkaufsladen':
-      return require('../assets/images/travel-marker-m.png');
-    case 'Aussichtspunkt':
-      return require('../assets/images/travel-marker-v.png');
-    default:
-      return require('../assets/images/travel-marker-x.png');
-  }
+
+  // Andernfalls gib den blauen Marker zurück
+  return blueMarkers[typeIndex];
 };
+
 
 /**
  * Funktion, die die Beschreibung eines Ortes zurückgibt.
@@ -240,4 +246,15 @@ export const saveRatingToDB = async (attractionId, rating, reviewText) => {
     console.error('Fehler beim Speichern der Bewertung:', error.message);
     return { success: false, message: error.message };
   }
+};
+
+export const getAverageRating = (ratings) => {
+  if (!ratings || ratings.length === 0) {
+    return 0;
+  }
+
+  const totalRating = ratings.reduce((acc, rating) => acc + rating.rating, 0);
+  const averageRating = totalRating / ratings.length;
+
+  return parseFloat(averageRating.toFixed(1));
 };
